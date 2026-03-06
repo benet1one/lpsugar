@@ -36,6 +36,16 @@ p$variables$y["b"]
 p$variables$y[c("a", "b")]
 
 
+x2 <- add_v_v(p$variables$x, p$variables$y)
+x3 <- add_v_v(xpy, p$variables$y)
+
+x4 <- add_v_c(x3, 2)
+x5 <- add_v_c(x3, 2:4)
+
+x6 <- multiply_v_c(x5, 3)
+x7 <- multiply_v_c(x5, 3:1)
+
+
 testthat::test_that("variable indexing", {
     testthat::expect_error(p$variables$y[4])
     testthat::expect_error(p$variables$y[0])

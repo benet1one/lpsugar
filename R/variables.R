@@ -198,6 +198,72 @@ c.lp_variable <- function(x, ...) {
     abort("`lp_variable`s don't support double indexing `{x$name}[[i]]`. Use `{x$name}[i]` instead")
 }
 
+# Math -----------------------
+
+# var + var
+add_v_v <- function(x, y) {
+    if (non_conformable(x, y)) {
+        abort("non-conformable arrays", call = parent.frame())
+    }
+
+    max_n <- max(length(x), length(y))
+    x <- recycle_var(x, max_n)
+    y <- recycle_var(y, max_n)
+
+    if (!all(dim(x) == dim(y)))
+        browser()
+
+    z <- x
+    z$coef <- x$coef + y$coef
+    z$add <- z$add + y$add
+    z$raw <- FALSE
+
+    return(z)
+}
+
+# var + constant
+add_v_c <- function(x, c) {
+    if (non_conformable(x, c)) {
+        abort("non-conformable arrays", call = parent.frame())
+    }
+
+    max_n <- max(length(x), length(c))
+    x <- recycle_var(x, max_n)
+    c <- recycle_const(c, max_n)
+
+    x$add <- x$add + c
+    x$raw <- FALSE
+
+    return(x)
+}
+
+# var * constant
+multiply_v_c <- function(x, c) {
+    if (non_conformable(x, c)) {
+        abort("non-conformable arrays", call = parent.frame())
+    }
+
+    max_n <- max(length(x), length(c))
+    x <- recycle_var(x, max_n)
+    c <- recycle_const(c, max_n)
+
+    x$coef <- horizontal_multiply(x$coef, c)
+    x$add <- x$add * c
+    x$raw <- FALSE
+
+    return(x)
+}
+
+horizontal_multiply <- function(x, c) {
+    stopifnot(nrow(x) == length(c))
+    out <- array(dim = dim(x))
+
+    for (i in 1:nrow(x)) {
+        out[i, ] <- x[i, ] * c[i]
+    }
+
+    out
+}
 
 # Utils ----------------------
 
@@ -245,4 +311,32 @@ name_variable <- function(name, sets) {
     grid <- do.call(expand.grid, sets)
     index <- .mapply(dots = grid, FUN = paste, MoreArgs = list(sep = ","))
     paste0(name, "[", index, "]")
+}
+
+recycle_var <- function(x, n) {
+    if (length(x) == n) {
+        return(x)
+    } else if (length(x) == 1L) {
+        i <- rep(1L, n)
+        x$ind <- x$ind[i]
+        x$coef <- x$coef[i, ]
+        x$add <- x$add[i]
+        x$raw <- FALSE
+        return(x)
+    }
+
+    abort("attempt to recycle variable of length {length(x)} to length {n}")
+}
+recycle_const <- function(x, n) {
+    if (length(x) == n) {
+        return(c(x))
+    } else if (length(x) == 1L) {
+        return(rep(x, n))
+    }
+
+    abort("attempt to recycle array of length {length(x)} to length {n}")
+}
+
+non_conformable <- function(x, y) {
+    length(x) > 1L && length(y) > 1L && length(x) != length(y)
 }
