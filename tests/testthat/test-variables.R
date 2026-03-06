@@ -37,7 +37,7 @@ p$variables$y[c("a", "b")]
 
 
 x2 <- add_v_v(p$variables$x, p$variables$y)
-x3 <- add_v_v(xpy, p$variables$y)
+x3 <- add_v_v(x2, p$variables$y)
 
 x4 <- add_v_c(x3, 2)
 x5 <- add_v_c(x3, 2:4)
