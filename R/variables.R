@@ -59,7 +59,7 @@ lp_variable <- function(.problem, definition,
         name_variable(name, sets)
     )
 
-    add <- matrix(ncol = 1L, nrow = length(ind)) |> robust_index()
+    add <- matrix(0, ncol = 1L, nrow = length(ind)) |> robust_index()
 
     new_variable <- list(
         name = name,
