@@ -41,6 +41,13 @@ lp_variable <- function(.problem, definition,
         upper <- 1
     }
 
+    type <- if (binary)
+        "binary"
+    else if (integer)
+        "integer"
+    else
+        "real"
+
     # Index array of variable.
     # Indicates which objective coefficients correspond to this variable.
     ind <- array(dim = lengths(sets), dimnames = sets) |> robust_index()
@@ -52,17 +59,7 @@ lp_variable <- function(.problem, definition,
         name_variable(name, sets)
     )
 
-    add <- numeric(length(nams)) |>
-        matrix(ncol = 1L) |>
-        robust_index()
-
-    type <- if (binary)
-        "binary"
-    else if (integer)
-        "integer"
-    else
-        "real"
-
+    add <- matrix(ncol = 1L, nrow = length(ind)) |> robust_index()
 
     new_variable <- list(
         name = name,
