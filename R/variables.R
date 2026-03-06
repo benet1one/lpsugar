@@ -7,7 +7,7 @@ lp_variable <- function(.problem, definition,
     check_problem(.problem)
 
     def <- parse_variable_definition(
-        {{ definition }},
+        !!rlang::enexpr(definition),
         envir = parent.frame()
     )
 
@@ -23,6 +23,7 @@ lp_variable <- function(.problem, definition,
         rlang::is_bool(binary)
     )
 
+    # Corrects NULL and NA bounds as well as checking they are numeric scalars
     lower <- interpret_bound(lower, default = -Inf)
     upper <- interpret_bound(upper, default = +Inf)
 
@@ -40,7 +41,9 @@ lp_variable <- function(.problem, definition,
         upper <- 1
     }
 
-    ind <- array(dim = lengths(sets), dimnames = sets)
+    # Index array of variable.
+    # Indicates which objective coefficients correspond to this variable.
+    ind <- array(dim = lengths(sets), dimnames = sets) |> robust_index()
     ind[] <- 1:length(ind) + .problem$.nvar
     .problem$.nvar <- max(ind)
 
@@ -74,7 +77,7 @@ lp_variable <- function(.problem, definition,
 
     .problem$variables <- append(
         .problem$variables,
-        list(new_variable) |> setNames(name)
+        list(new_variable) |> rlang::set_names(name)
     )
 
     .problem <- update_variables(.problem)
@@ -85,23 +88,27 @@ lp_variable <- function(.problem, definition,
 
 
 update_variables <- function(.problem) {
-    for (i in names(.problem$variables)) {
-        v <- .problem$variables[[i]]
-        total_vars <- .problem$.nvar
+    total_vars <- .problem$.nvar
+    varnames <- .problem$.varnames
 
-        v$add <- numeric(total_vars)
-        v$coef <- matrix(0, nrow = length(v), ncol = total_vars)
-        v$coef[, v$ind] <- diag(length(v))
+    for (i in names(.problem$variables)) {
+        x <- .problem$variables[[i]]
+
+        x$add <- numeric(total_vars)
+        names(x$add) <- varnames
+
+        x$coef <- matrix(0, nrow = length(x), ncol = total_vars) |> robust_index()
+        x$coef[, x$ind] <- diag(length(x))
+        colnames(x$coef) <- varnames
 
         # v$selected <- numeric(total_vars)
         # v$selected[v$ind] <- TRUE
 
-        .problem$variables[[i]] <- v
+        .problem$variables[[i]] <- x
     }
 
     .problem
 }
-
 update_objective <- function(.problem) {
     total_vars <- .problem$.nvar
     objective_len <- length(.problem$objective)
@@ -111,11 +118,13 @@ update_objective <- function(.problem) {
         numeric(total_vars - objective_len)
     )
 
+    names(.problem$objective) <- .problem$.varnames
     .problem
 }
 
 # Methods --------------------
 
+#' @export
 print.lp_variable <- function(x, ...) {
     if (!x$raw) {
         print(x$coef)
@@ -143,15 +152,49 @@ print.lp_variable <- function(x, ...) {
     cat("\n")
     return(x)
 }
+#' @export
 dim.lp_variable <- function(x) {
     dim(x$ind)
 }
-dimnames.lp_variable <- function(x) {
-    x$sets
-}
+#' @export
 length.lp_variable <- function(x) {
     length(x$ind)
 }
+#' @export
+dimnames.lp_variable <- function(x) {
+    dimnames(x$ind)
+}
+#' @export
+names.lp_variable <- function(x) {
+    names(x$ind)
+}
+
+
+#' @export
+`[.lp_variable` <- function(x, ...) {
+    if (!x$indexable) {
+        abort("Cannot index this result.")
+    }
+
+    old_ind <- x$ind
+    x$ind <- x$ind[...]
+    x$raw <- FALSE
+
+    # Remove this when indexing has been fixed
+    # if (anyNA(x$ind))
+    #     abort("Variable was wrongly indexed.")
+
+    keep <- is.element(old_ind, x$ind)
+    x$coef <- x$coef[keep, ]
+    x$add <- x$add[keep]
+
+    x
+}
+#' @export
+`[[.lp_variable` <- function(x, ...) {
+    abort("`lp_variable`s don't support double indexing `{x$name}[[i]]`. Use `{x$name}[i]` instead")
+}
+
 
 # Utils ----------------------
 
