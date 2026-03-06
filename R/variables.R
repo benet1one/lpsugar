@@ -168,6 +168,10 @@ dimnames.lp_variable <- function(x) {
 names.lp_variable <- function(x) {
     names(x$ind)
 }
+#' @export
+c.lp_variable <- function(x, ...) {
+    abort("concatenating `lp_variable`s is not supported.")
+}
 
 
 # Indexing ----------------------
