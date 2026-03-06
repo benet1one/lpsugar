@@ -8,7 +8,7 @@ robust_index <- function(x) {
 `[.robust_index` <- function(x, ..., drop = FALSE) {
     if (...length() == 1L) {
         check_index_valid_vector(x, index = c(...))
-        NextMethod(drop = drop)
+        NextMethod(drop = drop) |> robust_index()
     }
 
     if (is.array(x)) {
@@ -44,8 +44,7 @@ robust_index <- function(x) {
         check_index_valid_vector(x, index = im)
     }
 
-    # browser()
-    NextMethod(drop = drop)
+    NextMethod(drop = drop) |> robust_index()
 }
 
 check_index_valid_array <- function(x, margin, index, call = parent.frame()) {
