@@ -52,6 +52,10 @@ lp_variable <- function(.problem, definition,
         name_variable(name, sets)
     )
 
+    add <- numeric(length(nams)) |>
+        matrix(ncol = 1L) |>
+        robust_index()
+
     type <- if (binary)
         "binary"
     else if (integer)
@@ -70,6 +74,9 @@ lp_variable <- function(.problem, definition,
         binary = binary,
 
         ind = ind,
+        coef = NULL, # Created and updated later
+        add = add,
+
         raw = TRUE,
         indexable = TRUE
 
@@ -93,9 +100,6 @@ update_variables <- function(.problem) {
 
     for (i in names(.problem$variables)) {
         x <- .problem$variables[[i]]
-
-        x$add <- numeric(total_vars)
-        names(x$add) <- varnames
 
         x$coef <- matrix(0, nrow = length(x), ncol = total_vars) |> robust_index()
         x$coef[, x$ind] <- diag(length(x))
