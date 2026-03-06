@@ -35,7 +35,7 @@ abort <- function(message, call = parent.frame(), ...) {
 
 # Inheritance -------------------
 
-is_prbblem <- function(x) {
+is_problem <- function(x) {
     inherits(x, "lp_problem")
 }
 
