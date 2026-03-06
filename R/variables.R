@@ -128,7 +128,7 @@ update_objective <- function(.problem) {
 #' @export
 print.lp_variable <- function(x, ...) {
     if (!x$raw) {
-        print(x$coef)
+        unclass(x)[c("coef", "add")] |> print()
         return(x)
     }
 
