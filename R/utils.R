@@ -38,6 +38,9 @@ abort <- function(message, call = parent.frame(), ...) {
 is_problem <- function(x) {
     inherits(x, "lp_problem")
 }
+is_lp_variable <- function(x) {
+    inherits(x, "lp_variable")
+}
 
 check_problem <- function(x) {
     if (!is_problem(x))

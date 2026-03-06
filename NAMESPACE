@@ -3,6 +3,7 @@
 S3method("[",lp_variable)
 S3method("[",robust_index)
 S3method("[[",lp_variable)
+S3method(Ops,lp_variable)
 S3method(c,lp_variable)
 S3method(dim,lp_variable)
 S3method(dimnames,lp_variable)
