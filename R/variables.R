@@ -170,6 +170,8 @@ names.lp_variable <- function(x) {
 }
 
 
+# Indexing ----------------------
+
 #' @export
 `[.lp_variable` <- function(x, ...) {
     if (!x$indexable) {
@@ -179,10 +181,6 @@ names.lp_variable <- function(x) {
     old_ind <- x$ind
     x$ind <- x$ind[...]
     x$raw <- FALSE
-
-    # Remove this when indexing has been fixed
-    # if (anyNA(x$ind))
-    #     abort("Variable was wrongly indexed.")
 
     keep <- is.element(old_ind, x$ind)
     x$coef <- x$coef[keep, ]
