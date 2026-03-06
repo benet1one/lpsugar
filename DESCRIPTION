@@ -1,0 +1,24 @@
+Package: sugarlp
+Type: Package
+Title: Readable Vectorized Syntax for Linear Problems
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "benet",
+      email = "benet1one@gmail.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: More about what it does (maybe more than one line).
+    Continuation lines should be indented.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    glue,
+    lpSolveAPI,
+    rlang
+Roxygen: list(markdown = TRUE)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
