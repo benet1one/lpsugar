@@ -8,11 +8,8 @@ robust_index <- function(x) {
 `[.robust_index` <- function(x, ..., drop = FALSE) {
     if (...length() == 1L) {
         check_index_valid_vector(x, index = c(...))
-        out <- NextMethod(drop = drop) |> robust_index()
-        return(out)
-    }
 
-    if (is.array(x)) {
+    } else if (is.array(x)) {
         d <- dim(x)
 
         if (...length() != length(d)) {

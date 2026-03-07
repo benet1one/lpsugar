@@ -226,7 +226,7 @@ c.lp_variable <- function(x, ...) {
     x$raw <- FALSE
 
     x$coef <- x$coef[old_ind, ]
-    x$add <- x$add[old_ind]
+    x$add <- x$add[old_ind, ]
 
     x
 }
@@ -290,7 +290,7 @@ recycle_var <- function(x, n) {
         i <- rep(1L, n)
         x$ind <- x$ind[i]
         x$coef <- x$coef[i, ]
-        x$add <- x$add[i]
+        x$add <- x$add[i, ]
         x$raw <- FALSE
         return(x)
     }
