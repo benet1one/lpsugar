@@ -2,6 +2,7 @@
 Code
 - Do we need variable$selected ?
 - robust_index sometimes dropping class?
+- Math.lp_variable
 
 Docs
 - Readme
