@@ -304,6 +304,3 @@ recycle_const <- function(x, n) {
     abort("attempt to recycle array of length {length(x)} to length {n}")
 }
 
-non_conformable <- function(x, y) {
-    length(x) > 1L && length(y) > 1L && length(x) != length(y)
-}

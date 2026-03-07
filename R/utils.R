@@ -32,6 +32,33 @@ abort <- function(message, call = parent.frame(), ...) {
     rlang::abort(message = message, call = call, ...)
 }
 
+# Safety ------------------------
+
+non_conformable <- function(x, y) {
+    length(x) > 1L && length(y) > 1L && length(x) != length(y)
+}
+compatible_dimensions <- function(x, y, drop_dim = TRUE) {
+    if (is_lp_variable(x)) {
+        x <- x$ind
+    }
+    if (is_lp_variable(y)) {
+        y <- y$ind
+    }
+
+    if (drop_dim) {
+        x <- drop(x)
+        y <- drop(y)
+    }
+
+    attempt <- rlang::try_fetch(x + y, warning = identity, error = identity)
+
+    if (rlang::is_condition(attempt)) {
+        return(structure(FALSE, cnd = attempt))
+    } else {
+        return(TRUE)
+    }
+}
+
 # Inheritance -------------------
 
 is_problem <- function(x) {
