@@ -55,7 +55,7 @@ Ops.lp_variable <- function(e1, e2) {
 }
 
 
-# Math -----------------------
+# Arithmetics -----------------------
 
 add_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
@@ -244,6 +244,6 @@ compare_lp <- function(x, y, op, call) {
     lhs <- lhs$coef
     dir <- rep(op, length(rhs))
 
-    list(lhs = lhs, dir = dir, rhs = rhs) |>
+    list(lhs = lhs, dir = dir, rhs = rhs, call = format(call)) |>
         structure(class = "lp_constraint")
 }
