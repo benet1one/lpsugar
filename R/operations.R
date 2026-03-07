@@ -2,51 +2,51 @@
 # Wrappers -------------------
 
 #' @export
-Ops.lp_variable <- function(x, y) {
+Ops.lp_variable <- function(e1, e2) {
     op <- format(.Generic)
-    op_text <- if (rlang::is_missing(y)) {
+    op_text <- if (rlang::is_missing(e2)) {
         paste0(
             op,
-            rlang::enexpr(x) |> format()
+            rlang::enexpr(e1) |> format()
         )
     } else {
         paste(
-            rlang::enexpr(x) |> format(),
+            rlang::enexpr(e1) |> format(),
             op,
-            rlang::enexpr(y) |> format()
+            rlang::enexpr(e2) |> format()
         )
     }
     call <- str2lang(op_text)
 
     # Arithmetic and Logic ---------------
     # +x, -x, !x
-    if (rlang::is_missing(y)) {
+    if (rlang::is_missing(e2)) {
         if (op == "+") {
-            return(x)
+            return(e1)
         } else if (op == "-") {
-            return(minus_v(x))
+            return(minus_v(e1))
         } else if (op == "!") {
-            return(negate_v(x, call))
+            return(negate_v(e1, call))
         }
         abort("unsupported operation `{op}`", call = call)
     }
 
     if (op == "+") {
-        return(add_lp(x, y, call))
+        return(add_lp(e1, e2, call))
     } else if (op == "-") {
-        return(subtract_lp(x, y, call))
+        return(subtract_lp(e1, e2, call))
     } else if (op == "*") {
-        return(multiply_lp(x, y, call))
+        return(multiply_lp(e1, e2, call))
     } else if (op == "/") {
-        return(divide_lp(x, y, call))
+        return(divide_lp(e1, e2, call))
     } else if (op == "^") {
-        return(power_lp(x, y, call))
+        return(power_lp(e1, e2, call))
     }
 
     # Comparison -----------------------
     comparison_ops <- c("<", "<=", "==", ">=", ">")
     if (op %in% comparison_ops) {
-        return(compare_lp(x, y, op, call))
+        return(compare_lp(e1, e2, op, call))
     } else if (op == "!=") {
         abort("inequality `!=` is not supported in constraints.", call = call)
     }
