@@ -218,12 +218,15 @@ c.lp_variable <- function(x, ...) {
     }
 
     old_ind <- x$ind
+    old_ind[] <- 1:length(old_ind)
+    old_ind <- old_ind[...]
+    old_ind <- c(old_ind)
+
     x$ind <- x$ind[...]
     x$raw <- FALSE
 
-    keep <- is.element(old_ind, x$ind)
-    x$coef <- x$coef[keep, ]
-    x$add <- x$add[keep]
+    x$coef <- x$coef[old_ind, ]
+    x$add <- x$add[old_ind]
 
     x
 }

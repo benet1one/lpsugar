@@ -35,6 +35,10 @@ p$variables$y[c(TRUE, TRUE, FALSE)]
 p$variables$y["b"]
 p$variables$y[c("a", "b")]
 
+rev(p$variables$y)
+t(p$variables$z)
+p$variables$z[2:1, ]
+
 
 x2 <- add_v_v(p$variables$x, p$variables$y)
 x3 <- add_v_v(x2, p$variables$y)
