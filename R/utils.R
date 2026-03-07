@@ -1,7 +1,6 @@
 
 # Misc --------------------------
 
-`%||%` <- rlang::`%||%`
 inside <- function(expr) {
     if (rlang::is_symbol(expr)) {
         return(expr)
