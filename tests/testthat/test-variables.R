@@ -27,21 +27,24 @@ p <- lp_problem() |>
     lp_variable(z[1:2, a], lower = 0)
 
 print(p)
+x <- p$variables$x
+y <- p$variables$y
+z <- p$variables$z
 
-p$variables$y[1:2]
-p$variables$y[-3]
-p$variables$y[c(TRUE, TRUE, FALSE)]
+y[1:2]
+y[-3]
+y[c(TRUE, TRUE, FALSE)]
 
-p$variables$y["b"]
-p$variables$y[c("a", "b")]
+y["b"]
+y[c("a", "b")]
 
-rev(p$variables$y)
-t(p$variables$z)
-p$variables$z[2:1, ]
+rev(y)
+t(z)
+z[2:1, ]
 
 
-x2 <- add_v_v(p$variables$x, p$variables$y)
-x3 <- add_v_v(x2, p$variables$y)
+x2 <- x + y
+x3 <- x2 + y
 
 x4 <- add_v_c(x3, 2)
 x5 <- add_v_c(x3, 2:4)
@@ -51,7 +54,19 @@ x7 <- multiply_v_c(x5, 3:1)
 
 
 testthat::test_that("variable indexing", {
-    testthat::expect_error(p$variables$y[4])
-    testthat::expect_error(p$variables$y[0])
-    testthat::expect_error(p$variables$y["d"])
+    testthat::expect_error(y[4])
+    testthat::expect_error(y[0])
+    testthat::expect_error(y["d"])
+    testthat::expect_identical(rev(y), y[rev(a)])
+})
+
+testthat::test_that("operations", {
+    testthat::expect_identical(x, +x)
+    testthat::expect_identical(x/2, x*0.5)
+    testthat::expect_identical(1-y, !y)
+    testthat::expect_identical(2*y, y + y)
+    testthat::expect_identical(-z, z - 2*z)
+    testthat::expect_error(x*x)
+    testthat::expect_error(x^2)
+    testthat::expect_error(2/x)
 })
