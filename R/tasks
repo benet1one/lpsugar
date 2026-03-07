@@ -2,7 +2,10 @@
 Code
 - Do we need variable$selected ?
 - robust_index sometimes dropping class?
-- Math.lp_variable
+- Math.lp_variable()
+- check dimensions better in operations between variables
+- t.lp_variable()
+- update_constraints()
 
 Docs
 - Readme
