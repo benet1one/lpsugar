@@ -1,9 +1,20 @@
 
+#' Create a Linear Problem.
+#'
+#' Use [lp_variable()] to define the variables,
+#' [lp_minimize()] or [lp_maximize()] to define the objective function,
+#' [lp_constraint()] to add constraints and
+#' [lp_solve()] to solve it.
+#'
+#' @returns An `lp_problem` object.
 #' @export
+#'
+#' @examples
 lp_problem <- function() {
     list(
         variables = list(),
         objective = numeric(),
+        direction = "",
         constraints = list(),
 
         # Must equal length of objective coefficients.

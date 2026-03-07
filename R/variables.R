@@ -1,5 +1,39 @@
 
+#' Define a variable for a Linear Problem
+#'
+#' Add a variable to a problem by defining it's name, dimensions, type, and bounds.
+#'
+#' @param .problem An [lp_problem()] object.
+#' @param definition Expression.
+#' - If the variable is a scalar, simply type it's name.
+#'   - `lp_variable(x)`
+#'
+#' - If the variable is a vector, type it's name and indices. Indices can also be named. e.g.
+#'   - `lp_variable( v[1:5] )`
+#'   - `lp_variable( v[letters[1:5]] )`
+#'   - `lp_variable( v[ind = letters[1:5]] )`
+#'   - `ind <- letters[1:5]; lp_variable( v[ind] )`
+#'
+#'   The last two have the same result.
+#'
+#' - If the variable is a matrix or n-dimensional array, type it's name and the indices
+#' for every dimension ([base::dimnames()]), comma-separated.
+#'   - `lp_variable( mat[1:2, 1:3] )`
+#'   - `lp_variable( arr[1:2, 1:3, 1:2] )`
+#'
+#' @param integer Boolean, whether to treat variable as integer.
+#' @param binary Boolean, whether to treat variable as binary, \{0, 1\}.
+#' @param lower Numeric scalar. Lower bound for the variable.
+#' @param upper Numeric scalar. Upper bound for the variable.
+#'
+#' @details
+#' Bounds must be numeric scalars. If you want to bind each index of the variable separately,
+#' use [lp_constraint()].
+#'
+#' @returns An [lp_problem()] object.
 #' @export
+#'
+#' @examples
 lp_variable <- function(.problem, definition,
                         integer = FALSE, binary = FALSE,
                         lower = -Inf, upper = +Inf) {
