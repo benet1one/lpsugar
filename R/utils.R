@@ -43,5 +43,5 @@ is_lp_variable <- function(x) {
 
 check_problem <- function(x) {
     if (!is_problem(x))
-        abort("`.problem` must be a lp_problem.", call = parent.frame())
+        abort("`.problem` must be an lp_problem.", call = parent.frame())
 }
