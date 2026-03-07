@@ -5,15 +5,17 @@
 Ops.lp_variable <- function(x, y) {
     op <- format(.Generic)
 
-    # Arithmetic ---------------
-    # +x or -x
+    # Arithmetic and Logic ---------------
+    # +x, -x, !x
     if (rlang::is_missing(y)) {
         if (op == "+") {
             return(x)
         } else if (op == "-") {
             return(minus_v(x))
+        } else if (op == "!") {
+            return(negate_v(x))
         }
-        abort("unsupported operation {op}")
+        abort("unsupported operation `{op}`")
     }
 
     if (op == "+") {
@@ -88,6 +90,18 @@ divide_lp <- function(x, y) {
 power_lp <- function(...) {
     abort("cannot use powers or exponentials in a linear problem.")
 }
+
+horizontal_multiply <- function(x, c) {
+    stopifnot(nrow(x) == length(c))
+    out <- array(dim = dim(x))
+
+    for (i in 1:nrow(x)) {
+        out[i, ] <- x[i, ] * c[i]
+    }
+
+    out
+}
+
 
 # -var
 minus_v <- function(x) {
@@ -176,14 +190,20 @@ divide_a_v <- function(...) {
     abort("cannot divide by a variable in a linear problem.")
 }
 
-horizontal_multiply <- function(x, c) {
-    stopifnot(nrow(x) == length(c))
-    out <- array(dim = dim(x))
 
-    for (i in 1:nrow(x)) {
-        out[i, ] <- x[i, ] * c[i]
+
+# Logic ------------------------
+
+negate_v <- function(x) {
+    if (!x$raw || !x$binary) {
+        abort("negation `!{x$name}` is only supported for binary variables.")
     }
 
-    out
+    # 1 - x
+    x$coef <- -x$coef
+    x$add <- -x$add + 1
+    x$raw <- FALSE
+
+    return(x)
 }
 
