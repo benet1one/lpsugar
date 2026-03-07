@@ -4,6 +4,19 @@
 #' @export
 Ops.lp_variable <- function(x, y) {
     op <- format(.Generic)
+    op_text <- if (rlang::is_missing(y)) {
+        paste0(
+            op,
+            rlang::enexpr(x) |> format()
+        )
+    } else {
+        paste(
+            rlang::enexpr(x) |> format(),
+            op,
+            rlang::enexpr(y) |> format()
+        )
+    }
+    call <- str2lang(op_text)
 
     # Arithmetic and Logic ---------------
     # +x, -x, !x
@@ -13,82 +26,82 @@ Ops.lp_variable <- function(x, y) {
         } else if (op == "-") {
             return(minus_v(x))
         } else if (op == "!") {
-            return(negate_v(x))
+            return(negate_v(x, call))
         }
-        abort("unsupported operation `{op}`")
+        abort("unsupported operation `{op}`", call = call)
     }
 
     if (op == "+") {
-        return(add_lp(x, y))
+        return(add_lp(x, y, call))
     } else if (op == "-") {
-        return(subtract_lp(x, y))
+        return(subtract_lp(x, y, call))
     } else if (op == "*") {
-        return(multiply_lp(x, y))
+        return(multiply_lp(x, y, call))
     } else if (op == "/") {
-        return(divide_lp(x, y))
+        return(divide_lp(x, y, call))
     } else if (op == "^") {
-        return(power_lp(x, y))
+        return(power_lp(x, y, call))
     }
 
-    # TODO
+    abort("unsupported operation `{op}`", call = call)
 }
 
 
 # Math -----------------------
 
-add_lp <- function(x, y) {
+add_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
 
     if (xv && yv) {
-        add_v_v(x, y)
+        add_v_v(x, y, call)
     } else if (xv) {
-        add_v_c(x, y)
+        add_v_c(x, y, call)
     } else if (yv) {
-        add_v_c(y, x)
+        add_v_c(y, x, call)
     } else {
-        abort("none are lp_variables")
+        abort("none are lp_variables", call = call)
     }
 }
-subtract_lp <- function(x, y) {
+subtract_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
 
     if (xv && yv) {
-        subtract_v_v(x, y)
+        subtract_v_v(x, y, call)
     } else if (xv) {
-        subtract_v_c(x, y)
+        subtract_v_c(x, y, call)
     } else if (yv) {
-        subtract_c_v(x, y)
+        subtract_c_v(x, y, call)
     } else {
-        abort("none are lp_variables")
+        abort("none are lp_variables", call = call)
     }
 }
-multiply_lp <- function(x, y) {
+multiply_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
 
     if (xv && yv) {
-        multiply_v_v(x, y)
+        multiply_v_v(x, y, call)
     } else if (xv) {
-        multiply_v_c(x, y)
+        multiply_v_c(x, y, call)
     } else if (yv) {
-        multiply_v_c(y, x)
+        multiply_v_c(y, x, call)
     } else {
-        abort("none are lp_variables")
+        abort("none are lp_variables", call = call)
     }
 }
-divide_lp <- function(x, y) {
+divide_lp <- function(x, y, call) {
     if (is_lp_variable(y)) {
-        divide_a_v()
+        divide_a_v(x, y, call)
     } else if (is_lp_variable(x)) {
-        divide_v_c(x, y)
+        divide_v_c(x, y, call)
     } else {
-        abort("none are lp_variables")
+        abort("none are lp_variables", call = call)
     }
 }
-power_lp <- function(...) {
-    abort("cannot use powers or exponentials in a linear problem.")
+power_lp <- function(x, y, call) {
+    abort("cannot use powers or exponentials in a linear problem.", call = call)
 }
 
 horizontal_multiply <- function(x, c) {
@@ -109,17 +122,14 @@ minus_v <- function(x) {
 }
 
 # var + var
-add_v_v <- function(x, y) {
+add_v_v <- function(x, y, call) {
     if (non_conformable(x, y)) {
-        abort("non-conformable arrays", call = parent.frame())
+        abort("non-conformable arrays", call = call)
     }
 
     max_n <- max(length(x), length(y))
     x <- recycle_var(x, max_n)
     y <- recycle_var(y, max_n)
-
-    if (!all(dim(x) == dim(y)))
-        browser()
 
     z <- x
     z$coef <- x$coef + y$coef
@@ -129,9 +139,9 @@ add_v_v <- function(x, y) {
     return(z)
 }
 # var + constant
-add_v_c <- function(x, c) {
+add_v_c <- function(x, c, call) {
     if (non_conformable(x, c)) {
-        abort("non-conformable arrays", call = parent.frame())
+        abort("non-conformable arrays", call = call)
     }
 
     max_n <- max(length(x), length(c))
@@ -146,22 +156,22 @@ add_v_c <- function(x, c) {
 
 
 # var - var
-subtract_v_v <- function(x, y) {
-    add_v_v(x, minus_v(y))
+subtract_v_v <- function(x, y, call) {
+    add_v_v(x, minus_v(y), call)
 }
 # var - constant
-subtract_v_c <- function(x, c) {
-    add_v_c(x, -c)
+subtract_v_c <- function(x, c, call) {
+    add_v_c(x, -c, call)
 }
 # constant - var
-subtract_c_v <- function(c, x) {
-    add_v_c(minus_v(x), c)
+subtract_c_v <- function(c, x, call) {
+    add_v_c(minus_v(x), c, call)
 }
 
 # var * constant
-multiply_v_c <- function(x, c) {
+multiply_v_c <- function(x, c, call) {
     if (non_conformable(x, c)) {
-        abort("non-conformable arrays", call = parent.frame())
+        abort("non-conformable arrays", call = call)
     }
 
     max_n <- max(length(x), length(c))
@@ -175,28 +185,28 @@ multiply_v_c <- function(x, c) {
     return(x)
 }
 # var / constant
-divide_v_c <- function(x, c) {
-    multiply_v_c(x, 1/c)
+divide_v_c <- function(x, c, call) {
+    multiply_v_c(x, 1/c, call = call)
 }
 
 # Illegal operations:
 
 # var * var
-multiply_v_v <- function(...) {
-    abort("cannot multiply two variables in a linear problem.")
+multiply_v_v <- function(x, y, call) {
+    abort("cannot multiply two variables in a linear problem.", call = call)
 }
 # any / var
-divide_a_v <- function(...) {
-    abort("cannot divide by a variable in a linear problem.")
+divide_a_v <- function(x, y, call) {
+    abort("cannot divide by a variable in a linear problem.", call = call)
 }
 
 
 
 # Logic ------------------------
 
-negate_v <- function(x) {
+negate_v <- function(x, call) {
     if (!x$raw || !x$binary) {
-        abort("negation `!{x$name}` is only supported for binary variables.")
+        abort("negation `!{x$name}` is only supported for binary variables.", call = call)
     }
 
     # 1 - x
@@ -206,4 +216,5 @@ negate_v <- function(x) {
 
     return(x)
 }
+
 
