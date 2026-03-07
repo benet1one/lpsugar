@@ -252,11 +252,11 @@ compare_lp <- function(x, y, op, call) {
 
 #' @export
 t.lp_variable <- function(x) {
-    # if (length(dim(x)) > 2L) {
+    # if (ndim(x) > 2L) {
     #     x$ind <- drop(x$ind)
     # }
 
-    if (length(dim(x)) != 2L) {
+    if (ndim(x) != 2L) {
         abort("variable must be two-dimensional.")
     }
 

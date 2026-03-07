@@ -34,6 +34,13 @@ abort <- function(message, call = parent.frame(), ...) {
 
 # Safety ------------------------
 
+ndim <- function(x) {
+    if (is.null(dim(x))) {
+        1L
+    } else {
+        length(dim(x))
+    }
+}
 non_conformable <- function(x, y) {
     length(x) > 1L && length(y) > 1L && length(x) != length(y)
 }
