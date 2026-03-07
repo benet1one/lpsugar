@@ -114,13 +114,12 @@ power_lp <- function(x, y, call) {
 
 horizontal_multiply <- function(x, c) {
     stopifnot(nrow(x) == length(c))
-    out <- array(dim = dim(x))
 
     for (i in 1:nrow(x)) {
-        out[i, ] <- x[i, ] * c[i]
+        x[i, ] <- x[i, ] * c[i]
     }
 
-    out
+    x
 }
 
 
