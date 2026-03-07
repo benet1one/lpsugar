@@ -43,6 +43,14 @@ Ops.lp_variable <- function(x, y) {
         return(power_lp(x, y, call))
     }
 
+    # Comparison -----------------------
+    comparison_ops <- c("<", "<=", "==", ">=", ">")
+    if (op %in% comparison_ops) {
+        return(compare_lp(x, y, op, call))
+    } else if (op == "!=") {
+        abort("inequality `!=` is not supported in constraints.", call = call)
+    }
+
     abort("unsupported operation `{op}`", call = call)
 }
 
@@ -218,3 +226,24 @@ negate_v <- function(x, call) {
 }
 
 
+# Comparison --------------------
+
+compare_lp <- function(x, y, op, call) {
+    if (non_conformable(x, y)) {
+        abort("non-conformable arrays", call = call)
+    }
+
+    if (op == "<") {
+        op <- "<="
+    } else if (op == ">") {
+        op <- ">="
+    }
+
+    lhs <- x - y
+    rhs <- -lhs$add
+    lhs <- lhs$coef
+    dir <- rep(op, length(rhs))
+
+    list(lhs = lhs, dir = dir, rhs = rhs) |>
+        structure(class = "lp_constraint")
+}
