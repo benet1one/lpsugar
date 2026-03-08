@@ -1,11 +1,17 @@
 
 lp_objective <- function(.problem, objective) {
+
+    quosure <- rlang::enquo(objective)
+    objective <- rlang::eval_tidy(quosure, data = data_mask(.problem))
+    expr <- rlang::quo_squash(quosure) |> format()
+
     if (is.numeric(objective) && length(objective) == 1L && objective == 0) {
         rlang::inform("setting objective to 0 and finding feasible solution instead.",
                       call = parent.frame())
 
         .problem$objective$coef[] <- 0
         .problem$objective$add[] <- 0
+        .problem$objective$expr <- ""
         return(.problem)
     }
 
@@ -16,16 +22,16 @@ lp_objective <- function(.problem, objective) {
         abort("`objective` evaluated to a variable of length 0.")
     }
 
-    obj_expr <- format(rlang::enexpr(objective))
-
     if (length(objective) > 1L) {
-        obj_expr <- paste0("sum(", obj_expr, ")")
-        inform("Summing variables in objective. Write {obj_expr} to suppress this message.")
+        expr <- paste0("sum(", expr, ")")
+        inform("Summing variables in objective. Write `{expr}` to suppress this message.",
+               call = parent.frame())
         objective <- sum(objective)
     }
 
     .problem$objective$coef[] <- objective$coef
     .problem$objective$add[] <- objective$add
+    .problem$objective$expr <- expr
     return(.problem)
 }
 
@@ -54,15 +60,30 @@ lp_objective <- function(.problem, objective) {
 #' @rdname lp_objective
 lp_minimize <- function(.problem, objective) {
     .problem$objective$direction <- "minimize"
-    lp_objective(.problem, objective)
+    lp_objective(.problem, {{ objective }})
 }
 #' @rdname lp_objective
 #' @export
 lp_maximize <- function(.problem, objective) {
     .problem$objective$direction <- "maximize"
-    lp_objective(.problem, objective)
+    lp_objective(.problem, {{ objective }})
 }
 
+
+# Methods ----------------------
+
+print.lp_objective <- function(x, ...) {
+    cat(x$direction, x$expr, "\n\n")
+    print(x$coef)
+
+    if (x$add > 0) {
+        glue::glue("\n\n(coef*vars + {x$add})") |> cat()
+    } else if (x$add < 0) {
+        glue::glue("\n\n(coef*vars - {-x$add})") |> cat()
+    }
+}
+
+# Utils ------------------------
 
 update_objective <- function(.problem) {
     total_vars <- .problem$.nvar
