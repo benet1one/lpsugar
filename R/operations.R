@@ -250,22 +250,10 @@ compare_lp <- function(x, y, op, call) {
 # Math ------------------------------
 
 #' @export
-t.lp_variable <- function(x) {
-    # if (ndim(x) > 2L) {
-    #     x$ind <- drop(x$ind)
-    # }
 
-    if (ndim(x) != 2L) {
-        abort("variable must be two-dimensional.")
     }
 
-    present_ind <- x$ind
-    present_ind[] <- 1:length(present_ind)
-    present_ind <- t(present_ind)
-    present_ind <- c(present_ind)
 
-    x$ind <- t(x$ind)
     x$raw <- FALSE
 
-    x[present_ind]
 }
