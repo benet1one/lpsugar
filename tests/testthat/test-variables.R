@@ -70,3 +70,14 @@ testthat::test_that("operations", {
     testthat::expect_error(x^2)
     testthat::expect_error(2/x)
 })
+
+testthat::test_that("sum", {
+    testthat::expect_identical(
+        sum(x, y, 2*z, 1),
+        x + y[1] + y[2] + y[3] + 2*sum(z) + 1
+    )
+    testthat::expect_identical(
+        sum(z[1:5]) $ coef,
+        cumsum(z)[5] $ coef
+    )
+})
