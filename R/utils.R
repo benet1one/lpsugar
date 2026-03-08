@@ -138,7 +138,7 @@ for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) 
         }
 
         if (evaluate) {
-            return(rlang::eval_tidy(quo_id, data = data))
+            return(rlang::eval_tidy(quo_i, data = data))
         } else {
             return(quo_i)
         }

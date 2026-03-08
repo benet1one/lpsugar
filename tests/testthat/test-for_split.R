@@ -46,11 +46,13 @@ q5 <- rlang::quo(
 
 for_split(q1)
 for_split(q2)
-for_split(q5) |> purrr::list_flatten(name_spec = "{outer}{inner}")
+for_split(q5) |>
+    purrr::list_flatten(name_spec = "{outer}{inner}")
 
 for_split(q1, evaluate = TRUE, data = data_mask(p))
 for_split(q2, evaluate = TRUE, data = data_mask(p))
-for_split(q5, evaluate = TRUE, data = data_mask(p))
+for_split(q5, evaluate = TRUE, data = data_mask(p)) |>
+    purrr::list_flatten(name_spec = "{outer}{inner}")
 
 
 test_that("for_split", {
