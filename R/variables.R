@@ -183,8 +183,9 @@ print.lp_variable <- function(x, ...) {
     } else if (x$bound[2L] != +Inf) {
         cat("\n", x$name, " <= ", x$bound[2L], sep = "")
     }
+
     cat("\n")
-    return(x)
+    invisible(x)
 }
 #' @export
 dim.lp_variable <- function(x) {
