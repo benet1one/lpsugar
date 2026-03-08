@@ -1,27 +1,5 @@
 
-# Misc --------------------------
-
-inside <- function(expr) {
-    if (rlang::is_symbol(expr)) {
-        return(expr)
-    }
-
-    stopifnot(rlang::is_symbolic(expr))
-
-    if (expr[[1L]] == quote(`(`)) {
-        return(expr[[2]])
-    }
-
-    if (expr[[1L]] == quote(`{`)) {
-        if (length(expr) > 2) {
-            stop("Expression enclosed by `{` has more than one line.")
-        } else {
-            return(expr[[2]])
-        }
-    }
-
-    expr
-}
+# Messages --------------------------
 
 inform <- function(message, call = parent.frame(), ...) {
     message <- glue::glue(message, .envir = parent.frame())
@@ -83,3 +61,37 @@ check_problem <- function(x) {
     if (!is_problem(x))
         abort("`.problem` must be an lp_problem.", call = parent.frame())
 }
+
+# Evaluation --------------------
+
+data_mask <- function(.problem) {
+    # TODO Add aliases
+    .problem$variables
+}
+
+inside <- function(expr) {
+    if (rlang::is_quosure(expr)) {
+        env <- rlang::quo_get_env(expr)
+        expr <- rlang::quo_get_expr(expr)
+        expr <- inside(expr)
+        return(rlang::new_quosure(expr, env))
+    }
+
+    if (rlang::is_symbol(expr)) {
+        return(expr)
+    }
+
+    stopifnot(rlang::is_symbolic(expr))
+
+    if (expr[[1L]] == quote(`(`)) {
+        return(expr[[2]])
+    }
+
+    if (expr[[1L]] == quote(`{`) && length(expr) == 2L) {
+        return(expr[[2]])
+    }
+
+    expr
+}
+
+
