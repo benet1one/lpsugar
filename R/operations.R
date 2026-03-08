@@ -3,7 +3,7 @@
 
 #' @export
 Ops.lp_variable <- function(e1, e2) {
-    op <- format(.Generic)
+    op <- .Generic
     op_text <- if (rlang::is_missing(e2)) {
         paste0(
             op,
