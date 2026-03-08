@@ -198,13 +198,13 @@ c.lp_variable <- function(x, ...) {
 # Indexing ----------------------
 
 #' @export
-`[.lp_variable` <- function(x, ...) {
+`[.lp_variable` <- function(x, ..., drop = FALSE) {
     old_ind <- x$ind
     old_ind[] <- 1:length(old_ind)
-    old_ind <- old_ind[...]
+    old_ind <- old_ind[..., drop = drop]
     old_ind <- c(old_ind)
 
-    x$ind <- x$ind[...]
+    x$ind <- x$ind[..., drop = drop]
     x$raw <- FALSE
 
     x$coef <- x$coef[old_ind, ]
