@@ -9,13 +9,13 @@ parse_variable_definition(t[a, b = 1:5])
 
 
 test_that("variable definitions", {
-    testthat::expect_error(
+    expect_error(
         parse_variable_definition(x[, 1:3])
     )
-    testthat::expect_error(
+    expect_error(
         parse_variable_definition(x[b])
     )
-    testthat::expect_error(
+    expect_error(
         parse_variable_definition(mean(1))
     )
 })
@@ -56,31 +56,31 @@ x6 <- multiply_v_c(x5, 3)
 x7 <- multiply_v_c(x5, 3:1)
 
 
-testthat::test_that("variable indexing", {
-    testthat::expect_error(y[4])
-    testthat::expect_error(y[0])
-    testthat::expect_error(y["d"])
-    testthat::expect_identical(rev(y), y[rev(a)])
+test_that("variable indexing", {
+    expect_error(y[4])
+    expect_error(y[0])
+    expect_error(y["d"])
+    expect_identical(rev(y), y[rev(a)])
 })
 
-testthat::test_that("operations", {
-    testthat::expect_identical(x, +x)
-    testthat::expect_identical(x/2, x*0.5)
-    testthat::expect_identical(1-y, !y)
-    testthat::expect_identical(2*y, y + y)
-    testthat::expect_identical(-z, z - 2*z)
-    testthat::expect_error(x*x)
-    testthat::expect_error(x^2)
-    testthat::expect_error(2/x)
-    testthat::expect_error(!x)
+test_that("operations", {
+    expect_identical(x, +x)
+    expect_identical(x/2, x*0.5)
+    expect_identical(1-y, !y)
+    expect_identical(2*y, y + y)
+    expect_identical(-z, z - 2*z)
+    expect_error(x*x)
+    expect_error(x^2)
+    expect_error(2/x)
+    expect_error(!x)
 })
 
-testthat::test_that("sum", {
-    testthat::expect_identical(
+test_that("sum", {
+    expect_identical(
         sum(x, y, 2*z, 1:4),
         x + y[1] + y[2] + y[3] + 2*sum(z) + sum(1:4)
     )
-    testthat::expect_identical(
+    expect_identical(
         sum(z[1:5]) $ coef,
         cumsum(z)[5] $ coef
     )

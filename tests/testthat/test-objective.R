@@ -11,6 +11,6 @@ p |> lp_minimize(y)
 p |> lp_minimize(sum(y))
 
 
-testthat::test_that("objective", {
-    testthat::expect_message(lp_minimize(p, y))
+test_that("objective", {
+    expect_message(lp_minimize(p, y))
 })
