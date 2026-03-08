@@ -42,6 +42,9 @@ rev(y)
 t(z)
 z[2:1, ]
 
+z[1, ] $ ind
+z[1, , drop = TRUE] $ ind
+
 
 x2 <- x + y
 x3 <- x2 + y
@@ -69,12 +72,13 @@ testthat::test_that("operations", {
     testthat::expect_error(x*x)
     testthat::expect_error(x^2)
     testthat::expect_error(2/x)
+    testthat::expect_error(!x)
 })
 
 testthat::test_that("sum", {
     testthat::expect_identical(
-        sum(x, y, 2*z, 1),
-        x + y[1] + y[2] + y[3] + 2*sum(z) + 1
+        sum(x, y, 2*z, 1:4),
+        x + y[1] + y[2] + y[3] + 2*sum(z) + sum(1:4)
     )
     testthat::expect_identical(
         sum(z[1:5]) $ coef,
