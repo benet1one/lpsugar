@@ -142,18 +142,6 @@ update_variables <- function(.problem) {
 
     .problem
 }
-update_objective <- function(.problem) {
-    total_vars <- .problem$.nvar
-    objective_len <- length(.problem$objective)
-
-    .problem$objective <- c(
-        .problem$objective,
-        numeric(total_vars - objective_len)
-    )
-
-    names(.problem$objective) <- .problem$.varnames
-    .problem
-}
 
 # Methods --------------------
 
