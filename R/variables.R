@@ -276,7 +276,7 @@ parse_variable_definition <- function(definition, envir = parent.frame()) {
         return(list(name = name, sets = sets))
     }
 
-    abort("Failed to parse variable `{format(def)}`.")
+    abort("Failed to parse variable.", call = parent.frame())
 }
 interpret_bound <- function(bound, default) {
     if (length(bound) > 1L) {
