@@ -107,7 +107,7 @@ lp_variable <- function(.problem, definition,
         ind = ind,
         coef = NULL, # Created and updated later
         add = add,
-        raw = TRUE,
+        raw = TRUE
 
     ) |> structure(class = "lp_variable")
 
