@@ -242,8 +242,10 @@ compare_lp <- function(x, y, op, call) {
     rhs <- -lhs$add
     lhs <- lhs$coef
     dir <- rep(op, length(rhs))
+    call <- rep(format(call), length(rhs))
+    name <- character(length(rhs))
 
-    list(lhs = lhs, dir = dir, rhs = rhs, call = format(call)) |>
+    list(lhs = lhs, dir = dir, rhs = rhs, name = name, call = call) |>
         structure(class = "lp_constraint")
 }
 

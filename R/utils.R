@@ -56,10 +56,17 @@ is_problem <- function(x) {
 is_lp_variable <- function(x) {
     inherits(x, "lp_variable")
 }
+is_lp_constraint <- function(x) {
+    inherits(x, "lp_constraint")
+}
+is_for_split <- function(x) {
+    inherits(x, "for_split")
+}
 
 check_problem <- function(x) {
-    if (!is_problem(x))
+    if (!is_problem(x)) {
         abort("`.problem` must be an lp_problem.", call = parent.frame())
+    }
 }
 
 # Evaluation --------------------
@@ -125,7 +132,7 @@ for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) 
 
     result <- lapply(sequence, function(i) {
         loop_env[[variable]] <- i
-        interior_i <- substituteDirect(interior, frame = loop_env)
+        interior_i <- methods::substituteDirect(interior, frame = loop_env)
         quo_i <- rlang::new_quosure(interior_i, env = env)
 
         if (recursive) {
@@ -145,6 +152,10 @@ for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) 
     })
 
     names(result) <- paste0("[", variable, "=", sequence, "]")
+    class(result) <- c("for_split", "list")
     result
 }
 
+flatten <- function(x, is_node = NULL, name_spec = "{outer}{inner}", ...) {
+    purrr::list_flatten(x, is_node = is_node, name_spec = name_spec, ...)
+}
