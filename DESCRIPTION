@@ -7,7 +7,7 @@ Authors@R:
 Description: Algebraic Modeling Language inspired in R's vectorized
     syntax.  Define and solve Linear Programming Problems by calling
     'lpSolveAPI', which supports Mixed Integer Linear Programming.
-License: MIT + file LICENSE
+License: GPL (>= 3)
 URL: https://github.com/benet1one/sugarlp
 BugReports: https://github.com/benet1one/sugarlp/issues
 Depends:
