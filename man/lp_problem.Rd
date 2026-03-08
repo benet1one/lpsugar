@@ -7,7 +7,12 @@
 lp_problem()
 }
 \value{
-An \code{lp_problem} object.
+An \code{lp_problem} object with fields:
+\describe{
+\item{variables}{List of \code{\link[=lp_variable]{lp_variable()}}s.}
+\item{objective}{List with information about the objective function.}
+\item{constraints}{List of constraints.}
+}
 }
 \description{
 Use \code{\link[=lp_variable]{lp_variable()}} to define the variables,

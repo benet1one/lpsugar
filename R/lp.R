@@ -6,15 +6,20 @@
 #' [lp_constraint()] to add constraints and
 #' [lp_solve()] to solve it.
 #'
-#' @returns An `lp_problem` object.
+#' @returns An `lp_problem` object with fields:
+#' \describe{
+#'   \item{variables}{List of [lp_variable()]s.}
+#'   \item{objective}{List with information about the objective function.}
+#'   \item{constraints}{List of constraints.}
+#' }
 #' @export
 #'
 #' @examples
 lp_problem <- function() {
     list(
         variables = list(),
-        objective = numeric(),
-        direction = "",
+        objective = list(coef = numeric(), add = 0, direction = "") |>
+            structure(class = "lp_objective"),
         constraints = list(),
 
         # Must equal length of objective coefficients.
@@ -34,7 +39,7 @@ print.lp_problem <- function(x, ...) {
         print(x$variables)
     }
 
-    if (any(x$objective != 0L)) {
+    if (any(x$objective$coef != 0L)) {
         cat("-- $objective --\n")
         print(x$objective)
     }
