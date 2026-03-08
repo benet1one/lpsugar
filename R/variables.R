@@ -149,18 +149,31 @@ update_variables <- function(.problem) {
 print.lp_variable <- function(x, ...) {
     if (!x$raw) {
         unclass(x)[c("coef", "add")] |> print()
-        return(x)
+        return(invisible(x))
     }
 
-    cat("Linear Programming Variable '", x$name, "'", sep = "")
+    if (x$binary) {
+        cat("Binary ")
+    } else if (x$integer) {
+        cat("Integer ")
+    } else {
+        cat("Real ")
+    }
 
-    if (x$binary)
-        cat(" <binary>")
-    else if (x$integer)
-        cat(" <integer>")
+    if (length(x) == 1L) {
+        cat("scalar ")
+    } else {
+        cat("variable ")
+    }
 
-    if (length(x$ind) > 1L)
-        cat("\nWith sets: [", paste(names(x$sets), collapse = ", "), "]")
+    cat("'")
+    cat(x$name)
+
+    if (length(x) > 1L) {
+        cat("[", paste(names(x$sets), collapse = ", "), "]", sep = "")
+    }
+
+    cat("'")
 
     if (all(x$bound != c(-Inf, +Inf))) {
         cat("\n")
