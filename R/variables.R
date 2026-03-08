@@ -107,9 +107,7 @@ lp_variable <- function(.problem, definition,
         ind = ind,
         coef = NULL, # Created and updated later
         add = add,
-
         raw = TRUE,
-        indexable = TRUE
 
     ) |> structure(class = "lp_variable")
 
@@ -213,10 +211,6 @@ c.lp_variable <- function(x, ...) {
 
 #' @export
 `[.lp_variable` <- function(x, ...) {
-    if (!x$indexable) {
-        abort("Cannot index this result.")
-    }
-
     old_ind <- x$ind
     old_ind[] <- 1:length(old_ind)
     old_ind <- old_ind[...]
