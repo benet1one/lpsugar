@@ -123,7 +123,7 @@ for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) 
 
     loop_env <- rlang::new_environment()
 
-    lapply(sequence, function(i) {
+    result <- lapply(sequence, function(i) {
         loop_env[[variable]] <- i
         interior_i <- substituteDirect(interior, frame = loop_env)
         quo_i <- rlang::new_quosure(interior_i, env = env)
@@ -143,5 +143,8 @@ for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) 
             return(quo_i)
         }
     })
+
+    names(result) <- paste0("[", variable, "=", sequence, "]")
+    result
 }
 
