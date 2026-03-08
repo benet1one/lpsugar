@@ -4,23 +4,26 @@
 #' Use [lp_variable()] to define the variables,
 #' [lp_minimize()] or [lp_maximize()] to define the objective function,
 #' [lp_constraint()] to add constraints and
-#' [lp_solve()] to solve it.
+#' [lp_solve()] to find the optimum.
 #'
 #' @returns An `lp_problem` object with fields:
-#' \describe{
-#'   \item{variables}{List of [lp_variable()]s.}
-#'   \item{objective}{List with information about the objective function.}
-#'   \item{constraints}{List of constraints.}
-#' }
+#'   - `$variables` : List of [lp_variable()]s.
+#'   - `$objective` : List with information about the objective function,
+#'   set with [lp_minimize()] or [lp_maximize()].
+#'   - `$constraints` : List of constraints added with [lp_constraint()].
 #' @export
 #'
 #' @examples
 lp_problem <- function() {
     list(
         variables = list(),
-        objective = list(coef = numeric(), add = 0, direction = "") |>
-            structure(class = "lp_objective"),
         constraints = list(),
+        objective = list(
+            coef = numeric(),
+            add = 0,
+            direction = "",
+            expr = ""
+        ) |> structure(class = "lp_objective"),
 
         # Must equal length of objective coefficients.
         .nvar = 0L,

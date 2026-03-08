@@ -8,15 +8,16 @@ lp_problem()
 }
 \value{
 An \code{lp_problem} object with fields:
-\describe{
-\item{variables}{List of \code{\link[=lp_variable]{lp_variable()}}s.}
-\item{objective}{List with information about the objective function.}
-\item{constraints}{List of constraints.}
+\itemize{
+\item \verb{$variables} : List of \code{\link[=lp_variable]{lp_variable()}}s.
+\item \verb{$objective} : List with information about the objective function,
+set with \code{\link[=lp_minimize]{lp_minimize()}} or \code{\link[=lp_maximize]{lp_maximize()}}.
+\item \verb{$constraints} : List of constraints added with \code{\link[=lp_constraint]{lp_constraint()}}.
 }
 }
 \description{
 Use \code{\link[=lp_variable]{lp_variable()}} to define the variables,
 \code{\link[=lp_minimize]{lp_minimize()}} or \code{\link[=lp_maximize]{lp_maximize()}} to define the objective function,
 \code{\link[=lp_constraint]{lp_constraint()}} to add constraints and
-\code{\link[=lp_solve]{lp_solve()}} to solve it.
+\code{\link[=lp_solve]{lp_solve()}} to find the optimum.
 }
