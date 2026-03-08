@@ -95,3 +95,53 @@ inside <- function(expr) {
 }
 
 
+for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) {
+    if (!rlang::quo_is_symbolic(quosure)) {
+        if (evaluate) {
+            return(rlang::eval_tidy(quosure, data = data))
+        } else {
+            return(quosure)
+        }
+    }
+
+    expr <- rlang::quo_get_expr(quosure)
+    env <- rlang::quo_get_env(quosure)
+
+    expr <- inside(expr)
+
+    if (expr[[1]] != quote(`for`)) {
+        if (evaluate) {
+            return(rlang::eval_tidy(quosure, data = data))
+        } else {
+            return(quosure)
+        }
+    }
+
+    variable <- expr[[2L]] |> format()
+    sequence <- expr[[3L]] |> rlang::eval_tidy(data = data, env = env)
+    interior <- expr[[4L]]
+
+    loop_env <- rlang::new_environment()
+
+    lapply(sequence, function(i) {
+        loop_env[[variable]] <- i
+        interior_i <- substituteDirect(interior, frame = loop_env)
+        quo_i <- rlang::new_quosure(interior_i, env = env)
+
+        if (recursive) {
+            return(for_split(
+                quo_i,
+                evaluate = evaluate,
+                data = data,
+                recursive = recursive
+            ))
+        }
+
+        if (evaluate) {
+            return(rlang::eval_tidy(quo_id, data = data))
+        } else {
+            return(quo_i)
+        }
+    })
+}
+
