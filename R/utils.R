@@ -23,6 +23,10 @@ inside <- function(expr) {
     expr
 }
 
+inform <- function(message, call = parent.frame(), ...) {
+    message <- glue::glue(message, .envir = parent.frame())
+    rlang::inform(message = message, call = call, ...)
+}
 warn <- function(message, call = parent.frame(), ...) {
     message <- glue::glue(message, .envir = parent.frame())
     rlang::warn(message = message, call = call, ...)
