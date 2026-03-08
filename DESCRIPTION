@@ -1,6 +1,6 @@
 Package: sugarlp
 Type: Package
-Title: Readable Vectorized Syntax for Linear Problems
+Title: Algebraic Modeling Language for Linear Problems
 Version: 0.1.0
 Authors@R: c(
     person(
@@ -9,8 +9,8 @@ Authors@R: c(
       role = c("aut", "cre")
     )
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
+Description: Algebraic Modeling Language inspired in R's vectorized syntax.
+    Define and solve Linear Programming Problems by calling 'lpSolveAPI'.
 License: MIT + file LICENSE
 Depends:
     R (>= 4.1.0)
