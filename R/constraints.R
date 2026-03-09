@@ -49,6 +49,12 @@ lp_constraint_internal <- function(quosure, data, name) {
         con <- do.call(rbind.lp_constraint, fs)
         con$name[] <- name
 
+        expr_str <- format(expr)
+
+        if (length(expr_str) == 1L) {
+            con$call[] <- format(expr)
+        }
+
         return(con)
     }
 
@@ -108,14 +114,25 @@ as.array.lp_constraint <- function(x, ...) {
 }
 
 #' @export
-print.lp_constraint <- function(x, ...) {
-    m <- as.matrix.lp_constraint(x)
+print.lp_constraint <- function(x, compact = FALSE, ...) {
+    if (!compact) {
+        m <- as.matrix.lp_constraint(x)
+    }
 
     for (call in unique(x$call)) {
-        mc <- m[x$call == call, ]
         nam <- x$name[x$call == call][1L]
-        cat("\n", nam, "|", call, "\n\n")
-        print(mc, quote = FALSE)
+
+        if (nam == "") {
+            nam <- "<unnamed>"
+        }
+
+        cat("\n", nam, "|", call)
+
+        if (!compact) {
+            cat("\n\n")
+            mc <- m[x$call == call, ]
+            print(mc, quote = FALSE)
+        }
     }
 
     invisible(x)

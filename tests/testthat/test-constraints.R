@@ -8,7 +8,11 @@ p <- lp_problem() |>
         my_fs = for (i in 1:3) {
             x[i, ] <= y[, i]
         },
+        one_line_fs = for (i in 1:3) x[i, ] >= y[, i] - 10
     )
+
+p
+p$constraints
 
 x <- p$variables$x
 y <- p$variables$y

@@ -49,7 +49,7 @@ print.lp_problem <- function(x, ...) {
 
     if (length(x$constraints) > 0L) {
         cat("-- $constraints --")
-        print(x$constraints)
+        print(x$constraints, compact = TRUE)
     }
 
     cat("\n")
