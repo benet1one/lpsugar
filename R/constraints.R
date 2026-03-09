@@ -64,7 +64,16 @@ lp_constraint_internal <- function(quosure, data, name) {
 # List of Constraints --------------------
 
 update_constraints <- function(.problem) {
-    # TODO
+    if (length(.problem$constraints) == 0L) {
+        return(.problem)
+    }
+
+    lhs <- .problem$constraints$lhs
+    to_bind <- matrix(0, nrow = nrow(lhs), ncol = .problem$.nvar - ncol(lhs))
+    lhs <- cbind(lhs, to_bind)
+    colnames(lhs) <- .problem$.varnames
+
+    .problem$constraints$lhs <- lhs
     .problem
 }
 

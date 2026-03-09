@@ -21,3 +21,6 @@ z <- p$variables$z
 x >= t(y) + 1
 
 rbind(x[1, ] == 2, y + x >= 0)
+
+
+p |> lp_variable(z[1:2]) |> _$constraints
