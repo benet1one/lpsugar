@@ -9,14 +9,36 @@ parse_variable_definition(t[a, b = 1:5])
 
 
 test_that("variable definitions", {
+    expect_snapshot(
+        parse_variable_definition(t[a, b = 1:5])
+    )
+    expect_snapshot(
+        parse_variable_definition(t[b = a, 1:5])
+    )
+})
+
+test_that("variable definition errors", {
     expect_error(
-        parse_variable_definition(x[, 1:3])
+        lp_problem() |> lp_variable(x[b])
     )
     expect_error(
-        parse_variable_definition(x[b])
+        lp_problem() |> lp_variable()
     )
     expect_error(
-        parse_variable_definition(mean(1))
+        lp_problem() |> lp_variable(x[, 1:3]),
+        "cannot be missing."
+    )
+    expect_error(
+        lp_problem() |> lp_variable(x[1:3, ]),
+        "cannot be missing."
+    )
+    expect_error(
+        lp_problem() |> lp_variable(mean(1)),
+        "Failed to parse variable"
+    )
+    expect_error(
+        lp_problem() |> lp_variable(mean()[1]),
+        "Failed to parse variable"
     )
 })
 
@@ -57,9 +79,10 @@ x7 <- multiply_v_c(x5, 3:1)
 
 
 test_that("variable indexing", {
-    expect_error(y[4])
-    expect_error(y[0])
-    expect_error(y["d"])
+    expect_error(y[4], "out of bounds")
+    expect_error(y[-4], "out of bounds")
+    expect_error(y[0], "invalid subscript")
+    expect_error(y["d"], "invalid subscript 'd'")
     expect_identical(rev(y), y[rev(a)])
 })
 
@@ -69,10 +92,10 @@ test_that("operations", {
     expect_identical(1-y, !y)
     expect_identical(2*y, y + y)
     expect_identical(-z, z - 2*z)
-    expect_error(x*x)
-    expect_error(x^2)
-    expect_error(2/x)
-    expect_error(!x)
+    expect_error(x*y, "cannot multiply two variables")
+    expect_error(x^2, "cannot use powers or exponentials")
+    expect_error(2/x, "cannot divide by a variable")
+    expect_error(!x, "only supported for binary variables")
 })
 
 test_that("sum", {
