@@ -107,6 +107,14 @@ as.array.lp_constraint <- function(x, ...) {
 }
 
 #' @export
+length.lp_constraint <- function(x) {
+    length(x$dir)
+}
+#' @export
+dim.lp_constraint <- function(x) {
+    c(length(x$dir), NA)
+}
+#' @export
 `[.lp_constraint` <- function(x, ...) {
     dots <- rlang::dots_list(..., .preserve_empty = TRUE, .ignore_empty = "none")
 
