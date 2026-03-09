@@ -163,6 +163,7 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
             cat("\n\n")
             mc <- m[x$call == call, ]
             print(mc, quote = FALSE)
+            cat("\n")
         }
     }
 
