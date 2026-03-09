@@ -6,7 +6,7 @@
 \alias{sugarlp-package}
 \title{sugarlp: Algebraic Modeling Language for Linear Problems}
 \description{
-Algebraic Modeling Language inspired in R's vectorized syntax. Define and solve Linear Programming Problems by calling 'lpSolveAPI', which supports Mixed Integer Linear Programming.
+Algebraic Modeling Language inspired in R's vectorized syntax. Define Mixed Integer Linear Programming (MILP) problems and solve them with 'lpSolveAPI'.
 }
 \seealso{
 Useful links:

@@ -5,8 +5,8 @@ Version: 0.1.0
 Authors@R: 
     person("benet", , , "benet1one@gmail.com", role = c("aut", "cre"))
 Description: Algebraic Modeling Language inspired in R's vectorized
-    syntax.  Define and solve Linear Programming Problems by calling
-    'lpSolveAPI', which supports Mixed Integer Linear Programming.
+    syntax.  Define Mixed Integer Linear Programming (MILP) problems and
+    solve them with 'lpSolveAPI'.
 License: GPL (>= 3)
 URL: https://github.com/benet1one/sugarlp
 BugReports: https://github.com/benet1one/sugarlp/issues
