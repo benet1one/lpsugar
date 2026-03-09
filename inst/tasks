@@ -1,8 +1,6 @@
 
 Code
-- Do we need variable$selected ?
 - check dimensions better in operations between variables
-- update_constraints()
 - try to document the fact that sum(x, 1) works but sum(1, x) does not.
 - should lp_minimize(0) work or should it be lp_find_feasible() ?
 
