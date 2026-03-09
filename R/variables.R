@@ -257,6 +257,7 @@ t.lp_variable <- function(x) {
 
 parse_variable_definition <- function(definition, envir = parent.frame()) {
     def <- rlang::enexpr(definition) |> inside()
+    error_msg <- "Failed to parse variable. See ?lp_variable for details on how to define a variable"
 
     if (rlang::is_symbol(def)) {
         name <- def |> format()
@@ -264,12 +265,22 @@ parse_variable_definition <- function(definition, envir = parent.frame()) {
         return(list(name = name, sets = sets))
 
     } else if (def[[1]] == quote(`[`)) {
-        name <- def[[2]] |> format()
+        name <- def[[2]]
+
+        if (!rlang::is_symbol(name)) {
+            abort(error_msg, call = parent.frame())
+        }
+
+        name <- format(name)
         sets_exprs <- as.list(def[3:length(def)])
 
         sets_names <- rlang::names2(sets_exprs)
         unnamed <- sets_names == ""
         sets_names[unnamed] <- sets_exprs[unnamed] |> sapply(format)
+
+        for (s in sets_exprs) if (rlang::is_missing(s)) {
+            abort("Sets in `{name}[...]` cannot be missing.", call = parent.frame())
+        }
 
         sets <- sets_exprs |>
             lapply(eval, envir = envir) |>
@@ -278,7 +289,7 @@ parse_variable_definition <- function(definition, envir = parent.frame()) {
         return(list(name = name, sets = sets))
     }
 
-    abort("Failed to parse variable.", call = parent.frame())
+    abort(error_msg, call = parent.frame())
 }
 interpret_bound <- function(bound, default) {
     if (length(bound) > 1L) {
