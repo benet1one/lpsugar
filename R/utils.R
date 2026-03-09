@@ -72,8 +72,7 @@ check_problem <- function(x) {
 # Evaluation --------------------
 
 data_mask <- function(.problem) {
-    # TODO Add aliases
-    .problem$variables
+    c(.problem$variables, .problem$aliases)
 }
 
 inside <- function(expr) {

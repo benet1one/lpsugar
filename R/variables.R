@@ -50,6 +50,8 @@ lp_variable <- function(.problem, definition,
 
     if (name %in% names(.problem$variables)) {
         abort("Variable `{name}` already exists in this problem.")
+    } else if (name %in% names(.problem$aliases)) {
+        abort("Cannot override alias `{name}`.")
     }
 
     stopifnot(

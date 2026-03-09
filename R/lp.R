@@ -25,6 +25,9 @@ lp_problem <- function() {
             expr = ""
         ) |> structure(class = "lp_objective"),
 
+        # Aka implicit variables (impvar)
+        aliases = list(),
+
         # Must equal length of objective coefficients.
         .nvar = 0L,
         # Names of variables with their respective indices, e.g. "x[A, 2]".
