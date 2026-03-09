@@ -60,6 +60,8 @@ lp_alias_fs <- function(fs, data) {
     abort("not yet supported", call = parent.frame())
 }
 
+# Alias --------------------
+
 #' @rdname lp_alias
 #' @export
 lp_implicit_variable <- lp_alias

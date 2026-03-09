@@ -145,6 +145,12 @@ update_variables <- function(.problem) {
     .problem
 }
 
+# Alias ----------------------
+
+#' @rdname lp_variable
+#' @export
+lp_var <- lp_variable
+
 # Methods --------------------
 
 #' @export

@@ -2,9 +2,19 @@
 % Please edit documentation in R/variables.R
 \name{lp_variable}
 \alias{lp_variable}
+\alias{lp_var}
 \title{Define a variable for an \code{\link[=lp_problem]{lp_problem()}}}
 \usage{
 lp_variable(
+  .problem,
+  definition,
+  integer = FALSE,
+  binary = FALSE,
+  lower = -Inf,
+  upper = +Inf
+)
+
+lp_var(
   .problem,
   definition,
   integer = FALSE,
