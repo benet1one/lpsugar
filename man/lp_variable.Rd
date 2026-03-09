@@ -2,7 +2,7 @@
 % Please edit documentation in R/variables.R
 \name{lp_variable}
 \alias{lp_variable}
-\title{Define a variable for a Linear Problem}
+\title{Define a variable for an \code{\link[=lp_problem]{lp_problem()}}}
 \usage{
 lp_variable(
   .problem,
@@ -22,7 +22,7 @@ lp_variable(
 \itemize{
 \item \code{lp_variable(x)}
 }
-\item If the variable is a vector, type it's name and indices. Indices can also be named. e.g.
+\item If the variable is a vector, type it's name and indices. Indices can also be named.
 \itemize{
 \item \code{lp_variable( v[1:5] )}
 \item \code{lp_variable( v[letters[1:5]] )}
@@ -48,7 +48,7 @@ for every dimension (\code{\link[base:dimnames]{base::dimnames()}}), comma-separ
 \item{upper}{Numeric scalar. Upper bound for the variable.}
 }
 \value{
-An \code{\link[=lp_problem]{lp_problem()}} object.
+An \code{\link[=lp_problem]{lp_problem()}} object with an added variable in \verb{$variables}.
 }
 \description{
 Add a variable to a problem by defining it's name, dimensions, type, and bounds.

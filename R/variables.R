@@ -1,5 +1,5 @@
 
-#' Define a variable for a Linear Problem
+#' Define a variable for an [lp_problem()]
 #'
 #' Add a variable to a problem by defining it's name, dimensions, type, and bounds.
 #'
@@ -8,7 +8,7 @@
 #' - If the variable is a scalar, simply type it's name.
 #'   - `lp_variable(x)`
 #'
-#' - If the variable is a vector, type it's name and indices. Indices can also be named. e.g.
+#' - If the variable is a vector, type it's name and indices. Indices can also be named.
 #'   - `lp_variable( v[1:5] )`
 #'   - `lp_variable( v[letters[1:5]] )`
 #'   - `lp_variable( v[ind = letters[1:5]] )`
@@ -30,7 +30,7 @@
 #' Bounds must be numeric scalars. If you want to bind each index of the variable separately,
 #' use [lp_constraint()].
 #'
-#' @returns An [lp_problem()] object.
+#' @returns An [lp_problem()] object with an added variable in `$variables`.
 #' @export
 #'
 #' @examples

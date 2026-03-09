@@ -2,7 +2,7 @@
 % Please edit documentation in R/lp.R
 \name{lp_problem}
 \alias{lp_problem}
-\title{Create a Linear Problem.}
+\title{Create a Linear Problem}
 \usage{
 lp_problem()
 }

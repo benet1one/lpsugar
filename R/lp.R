@@ -1,5 +1,5 @@
 
-#' Create a Linear Problem.
+#' Create a Linear Problem
 #'
 #' Use [lp_variable()] to define the variables,
 #' [lp_minimize()] or [lp_maximize()] to define the objective function,

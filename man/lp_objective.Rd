@@ -3,14 +3,14 @@
 \name{lp_minimize}
 \alias{lp_minimize}
 \alias{lp_maximize}
-\title{Set an objective function.}
+\title{Set an objective function}
 \usage{
 lp_minimize(.problem, objective)
 
 lp_maximize(.problem, objective)
 }
 \arguments{
-\item{.problem}{An \code{\link[=lp_problem]{lp_problem()}} object.}
+\item{.problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
 
 \item{objective}{Expression to optimize, which must evaluate to an \code{lp_variable} object.
 Alternatively, set \code{objective = 0} to remove the objective function and let the solver

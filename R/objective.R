@@ -39,11 +39,11 @@ lp_objective <- function(.problem, objective) {
     return(.problem)
 }
 
-#' Set an objective function.
+#' Set an objective function
 #'
 #' Minimize of maximize an expression.
 #'
-#' @param .problem An [lp_problem()] object.
+#' @param .problem An [lp_problem()].
 #' @param objective Expression to optimize, which must evaluate to an `lp_variable` object.
 #' Alternatively, set `objective = 0` to remove the objective function and let the solver
 #' find a feasible solution instead of optimizing.
@@ -76,6 +76,7 @@ lp_maximize <- function(.problem, objective) {
 
 # Methods ----------------------
 
+#' @export
 print.lp_objective <- function(x, ...) {
     cat(x$direction, x$expr, "\n\n")
     print(x$coef)

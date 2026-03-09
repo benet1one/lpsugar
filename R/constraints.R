@@ -1,4 +1,31 @@
 
+#' Add constraints to an [lp_problem()]
+#'
+#' Restrict the variables in an [lp_problem()] with linear constraints.
+#'
+#' @param .problem An [lp_problem()].
+#' @param ... One or more linear constraints. Can be named. They must:
+#' - Contain one or more variables defined with [lp_variable()]
+#' - Contain a comparison operator (`< / <= / == / => / >`)
+#'
+#' @returns An [lp_problem()] with added `$constraints`. (Note: previous constraints are not
+#' overritten).
+#'
+#' Constraints can be represented as `lhs * vars <dir> rhs`.
+#'
+#' The `$constraints` field has the following subfields:
+#' - `$lhs` : Matrix where each row is a constraint, each column is a variable,
+#' and the values represent coefficients.
+#' - `$dir` : Character vector with elements `"<="`, `"=="`, or `">="`,
+#' the direction of each constraint.
+#' - `$rhs` : Numeric column vector representing the right hand side of each constraint.
+#' - `$name` : Character vector with the names of the constraints, if `...` is named,
+#' or `""` for unnamed constraints.
+#' - `$call` : Expression that defined each constraint.
+#'
+#' @export
+#'
+#' @examples
 lp_constraint <- function(.problem, ...) {
     data <- data_mask(.problem)
     quos <- rlang::enquos(...)
@@ -60,6 +87,16 @@ lp_constraint_internal <- function(quosure, data, name) {
 
     abort(non_constraint_error, call = expr)
 }
+
+# Alias ----------------------------------
+
+#' @rdname lp_constraint
+#' @export
+lp_con <- lp_constraint
+#' @rdname lp_constraint
+#' @export
+lp_subject_to <- lp_constraint
+
 
 # List of Constraints --------------------
 
