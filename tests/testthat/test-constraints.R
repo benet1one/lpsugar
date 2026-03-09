@@ -24,3 +24,16 @@ rbind(x[1, ] == 2, y + x >= 0)
 
 
 p |> lp_variable(z[1:2]) |> _$constraints
+
+p$constraints[1:3]
+p$constraints[1:3, ]
+p$constraints["my_con"][2]
+p$constraints["my_con", ][2, ]
+p$constraints[c("my_con", "one_line_fs")]
+
+test_that("wrong_index", {
+    expect_error(p$constraints[])
+    expect_error(p$constraints[, 1])
+    expect_error(p$constraints[1, 1])
+    expect_error(p$constraints[1, , ])
+})

@@ -108,18 +108,32 @@ as.array.lp_constraint <- function(x, ...) {
 
 #' @export
 `[.lp_constraint` <- function(x, ...) {
-    dots <- rlang::dots_list(...)
+    dots <- rlang::dots_list(..., .preserve_empty = TRUE, .ignore_empty = "none")
 
     wrong_index <-
+        length(dots) == 0L ||
+        rlang::is_missing(dots[[1L]]) ||
         length(dots) > 2L ||
-        (length(dots) == 2L && rlang::is_missing(dots[[2L]]))
+        (length(dots) == 2L && !rlang::is_missing(dots[[2L]]))
 
     if (wrong_index) {
         xname <- rlang::enexpr(x) |> format()
-        abort("index constraints with `{xname}[i]` or `{xname}[i, ]`")
+        abort("index constraints with `con[i]` or `con[i, ]`")
     }
 
-    # TODO
+    i <- dots[[1L]]
+
+    if (is.character(i)) {
+        i <- x$name %in% i
+    }
+
+    x$lhs <- x$lhs[i, ]
+    x$rhs <- x$rhs[i, ]
+    x$dir <- x$dir[i]
+    x$call <- x$call[i]
+    x$name <- x$name[i]
+
+    return(x)
 }
 
 #' @export
