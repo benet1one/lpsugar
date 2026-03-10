@@ -11,8 +11,8 @@ p <- lp_problem() |>
         },
     )
 
-p
-p$constraints
+print(p$constraints)
+print(p$constraints, compact = TRUE)
 
 x <- p$variables$x
 y <- p$variables$y

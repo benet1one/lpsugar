@@ -68,8 +68,20 @@ test_that("variable definition errors", {
         lp_problem() |> lp_variable(mean()[1]),
         "Failed to parse variable"
     )
-})
 
+    expect_error(
+        lp_problem() |> lp_variable(x, integer = TRUE) |> lp_variable(x[1:5]),
+        "already exists"
+    )
+    expect_error(
+        lp_problem() |> lp_variable(x, lower = 2, upper = 1),
+        "is greater than upper bound"
+    )
+    expect_warning(
+        lp_problem() |> lp_variable(x, binary = TRUE, lower = 0, upper = 1),
+        "Ignoring bounds"
+    )
+})
 
 
 test_that("variable indexing", {
