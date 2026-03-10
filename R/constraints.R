@@ -27,6 +27,7 @@
 #'
 #' @examples
 lp_constraint <- function(.problem, ...) {
+    check_problem(.problem)
     data <- data_mask(.problem)
     quos <- rlang::enquos(...)
     cons <- purrr::map2(quos, rlang::names2(quos), function(q, name) {

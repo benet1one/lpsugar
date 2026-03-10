@@ -1,6 +1,5 @@
 
 lp_objective <- function(.problem, objective) {
-
     quosure <- rlang::enquo(objective)
     objective <- rlang::eval_tidy(quosure, data = data_mask(.problem))
     expr <- rlang::quo_squash(quosure) |> format()
@@ -63,12 +62,14 @@ lp_objective <- function(.problem, objective) {
 #'
 #' @rdname lp_objective
 lp_minimize <- function(.problem, objective) {
+    check_problem(.problem)
     .problem$objective$direction <- "minimize"
     lp_objective(.problem, {{ objective }})
 }
 #' @rdname lp_objective
 #' @export
 lp_maximize <- function(.problem, objective) {
+    check_problem(.problem)
     .problem$objective$direction <- "maximize"
     lp_objective(.problem, {{ objective }})
 }

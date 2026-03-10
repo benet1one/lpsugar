@@ -9,6 +9,7 @@
 #'
 #' @examples
 lp_alias <- function(.problem, ...) {
+    check_problem(.problem)
     dots <- rlang::enquos(...)
     nams <- rlang::names2(dots)
 
