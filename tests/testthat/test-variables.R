@@ -70,12 +70,39 @@ test_that("variable definition errors", {
     )
 
     expect_error(
-        lp_problem() |> lp_variable(x, integer = TRUE) |> lp_variable(x[1:5]),
+        lp_problem() |> lp_variable(x) |> lp_variable(x[1:5]),
         "already exists"
     )
+})
+
+test_that("variable bounds", {
     expect_error(
         lp_problem() |> lp_variable(x, lower = 2, upper = 1),
         "is greater than upper bound"
+    )
+    expect_error(
+        lp_problem() |> lp_variable(x, lower = +Inf),
+        "cannot be \\+Inf"
+    )
+    expect_error(
+        lp_problem() |> lp_variable(x, upper = -Inf),
+        "cannot be \\-Inf"
+    )
+
+    expect_warning(
+        lp_problem() |> lp_variable(x, lower = NULL)
+    )
+    expect_warning(
+        lp_problem() |> lp_variable(x, upper = NA)
+    )
+
+    expect_error(
+        lp_problem() |> lp_variable(x, upper = "3"),
+        "must be numeric scalars"
+    )
+    expect_error(
+        lp_problem() |> lp_variable(x[1:2], lower = c(1, 1)),
+        "must be numeric scalars"
     )
     expect_warning(
         lp_problem() |> lp_variable(x, binary = TRUE, lower = 0, upper = 1),

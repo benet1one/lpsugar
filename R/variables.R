@@ -59,12 +59,16 @@ lp_variable <- function(.problem, definition,
         rlang::is_bool(binary)
     )
 
-    # Corrects NULL and NA bounds as well as checking they are numeric scalars
+    # Check if they are numeric scalars, warns if they're `NA` or `NULL`.
     lower <- interpret_bound(lower, default = -Inf)
     upper <- interpret_bound(upper, default = +Inf)
 
     if (lower > upper) {
         abort("Lower bound ({lower}) is greater than upper bound ({upper}).")
+    } else if (lower == +Inf) {
+        abort("Lower bound cannot be +Inf.")
+    } else if (upper == -Inf) {
+        abort("Upper bound cannot be -Inf.")
     }
 
     if (binary) {
@@ -301,6 +305,7 @@ interpret_bound <- function(bound, default) {
         abort("Lower and upper bounds must be numeric scalars.", call = parent.frame())
     }
     if (length(bound) == 0L || is.na(bound)) {
+        warn("Bound is `NA` or `NULL`, setting to {default}.", call = parent.frame())
         return(default)
     }
     if (!is.numeric(bound)) {
