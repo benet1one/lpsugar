@@ -99,7 +99,6 @@ lp_variable <- function(.problem, definition,
 
     new_variable <- list(
         name = name,
-        sets = sets,
         bound = c(Lower = lower, Upper = upper),
 
         type = type,
@@ -178,7 +177,7 @@ print.lp_variable <- function(x, ...) {
     cat(x$name)
 
     if (length(x) > 1L) {
-        cat("[", paste(names(x$sets), collapse = ", "), "]", sep = "")
+        cat("[", paste(names(dimnames(x)), collapse = ", "), "]", sep = "")
     }
 
     cat("'")
@@ -253,10 +252,10 @@ t.lp_variable <- function(x) {
     present_ind <- t(present_ind)
     present_ind <- c(present_ind)
 
-    x$ind <- t(x$ind)
-    x$raw <- FALSE
+    y <- x[present_ind]
+    y$ind <- t(x$ind)
 
-    x[present_ind]
+    return(y)
 }
 
 # Utils ----------------------
