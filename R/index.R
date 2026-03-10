@@ -13,7 +13,7 @@ robust_index <- function(x) {
         d <- dim(x)
 
         if (...length() != length(d)) {
-            abort("incorrect number of dimensions.")
+            abort("Incorrect number of dimensions.")
         }
 
         dots <- rlang::dots_list(..., .ignore_empty = "none", .preserve_empty = TRUE)
@@ -36,7 +36,7 @@ robust_index <- function(x) {
 
     } else if (is.vector(x)) {
         if (...length() != 1L) {
-            abort("incorrect number of dimensions.")
+            abort("Incorrect number of dimensions.")
         }
 
         check_index_valid_vector(x, index = im)
@@ -48,25 +48,25 @@ robust_index <- function(x) {
 check_index_valid_array <- function(x, margin, index, call = parent.frame()) {
     if (is.logical(index)) {
         if (anyNA(index)) {
-            abort("subscript is NA", call = call)
+            abort("Subscript is NA", call = call)
         }
 
         if (length(index) != dim(x)[margin]) {
-            abort("subscript length mismatch in dimension {margin}", call = call)
+            abort("Subscript length mismatch in dimension {margin}", call = call)
         }
 
     } else if (is.numeric(index)) {
         zero <- match(TRUE, index > -1L & index < 1L)
 
         if (!is.na(zero)) {
-            abort("invalid subscript ({index[zero]}) in dimension {margin}.", call = call)
+            abort("Invalid subscript ({index[zero]}) in dimension {margin}.", call = call)
         }
 
         cap <- dim(x)[margin]
         oob <- match(TRUE, index <= -cap - 1L | index >= cap + 1L)
 
         if (!is.na(oob)) {
-            abort("subscript ({index[oob]}) out of bounds in dimension {margin}.", call = call)
+            abort("Subscript ({index[oob]}) out of bounds in dimension {margin}.", call = call)
         }
 
     } else if (is.character(index) || is.factor(index)) {
@@ -74,41 +74,41 @@ check_index_valid_array <- function(x, margin, index, call = parent.frame()) {
         nams <- dimnames(x)[[margin]]
 
         if (is.null(nams)) {
-            abort("dimension {margin} is unnamed.", call = call)
+            abort("Dimension {margin} is unnamed.", call = call)
         }
 
         missing_name <- match(TRUE, !is.element(index, nams))
 
         if (!is.na(missing_name)) {
-            abort("invalid subscript '{index[missing_name]}' in dimension {margin}.", call = call)
+            abort("Invalid subscript '{index[missing_name]}' in dimension {margin}.", call = call)
         }
 
     } else {
-        abort("invalid subscript of class `{class(index)}`.", call = call)
+        abort("Invalid subscript of class `{class(index)}`.", call = call)
     }
 }
 check_index_valid_vector <- function(x, index, call = parent.frame()) {
     if (is.logical(index)) {
         if (anyNA(index)) {
-            abort("subscript is NA", call = call)
+            abort("Subscript is NA", call = call)
         }
 
         if (length(index) != length(x)) {
-            abort("subscript length mismatch", call = call)
+            abort("Subscript length mismatch", call = call)
         }
 
     } else if (is.numeric(index)) {
         zero <- match(TRUE, index > -1L & index < 1L)
 
         if (!is.na(zero)) {
-            abort("invalid subscript ({index[zero]}).", call = call)
+            abort("Invalid subscript ({index[zero]}).", call = call)
         }
 
         cap <- length(x)
         oob <- match(TRUE, index <= -cap - 1L | index >= cap + 1L)
 
         if (!is.na(oob)) {
-            abort("subscript ({index[oob]}) out of bounds.", call = call)
+            abort("Subscript ({index[oob]}) out of bounds.", call = call)
         }
 
     } else if (is.character(index) || is.factor(index)) {
@@ -116,16 +116,16 @@ check_index_valid_vector <- function(x, index, call = parent.frame()) {
         nams <- names(x)
 
         if (is.null(nams)) {
-            abort("vector is unnamed.", call = call)
+            abort("Vector is unnamed.", call = call)
         }
 
         missing_name <- match(TRUE, !is.element(index, nams))
 
         if (!is.na(missing_name)) {
-            abort("invalid subscript '{index[missing_name]}'.", call = call)
+            abort("Invalid subscript '{index[missing_name]}'.", call = call)
         }
 
     } else {
-        abort("invalid subscript of class `{class(index)}`.", call = call)
+        abort("Invalid subscript of class `{class(index)}`.", call = call)
     }
 }

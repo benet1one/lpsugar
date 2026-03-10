@@ -37,9 +37,9 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
     }
 
     if (new_alias$name %in% names(.problem$variables)) {
-        abort("cannot override variable `{new_alias$name}`", call = parent.frame())
+        abort("Cannot override variable `{new_alias$name}`", call = parent.frame())
     } else if (new_alias$name %in% names(.problem$aliases)) {
-        inform("overriding alias `{new_alias$name}`", call = parent.frame())
+        inform("Overriding alias `{new_alias$name}`", call = parent.frame())
     }
 
     .problem$aliases[[new_alias$name]] <- new_alias$value
@@ -50,14 +50,14 @@ lp_alias_named <- function(quosure, name, data) {
     value <- rlang::eval_tidy(quosure, data = data)
 
     if (!is_lp_variable(value)) {
-        abort("did not evaluate to a variable", call = quosure)
+        abort("Did not evaluate to a variable", call = quosure)
     }
 
     list(name = name, value = value)
 }
 
 lp_alias_fs <- function(fs, data) {
-    abort("not yet supported", call = parent.frame())
+    abort("Not yet supported", call = parent.frame())
 }
 
 # Alias --------------------

@@ -28,7 +28,7 @@ Ops.lp_variable <- function(e1, e2) {
         } else if (op == "!") {
             return(negate_v(e1, call))
         }
-        abort("unsupported operation `{op}`", call = call)
+        abort("Unsupported operation `{op}`", call = call)
     }
 
     if (op == "+") {
@@ -48,10 +48,10 @@ Ops.lp_variable <- function(e1, e2) {
     if (op %in% comparison_ops) {
         return(compare_lp(e1, e2, op, call))
     } else if (op == "!=") {
-        abort("inequality `!=` is not supported in constraints.", call = call)
+        abort("Inequality `!=` is not supported in constraints.", call = call)
     }
 
-    abort("unsupported operation `{op}`", call = call)
+    abort("Unsupported operation `{op}`", call = call)
 }
 
 
@@ -68,7 +68,7 @@ add_lp <- function(x, y, call) {
     } else if (yv) {
         add_v_c(y, x, call)
     } else {
-        abort("none are lp_variables", call = call)
+        abort("None are lp_variables", call = call)
     }
 }
 subtract_lp <- function(x, y, call) {
@@ -82,7 +82,7 @@ subtract_lp <- function(x, y, call) {
     } else if (yv) {
         subtract_c_v(x, y, call)
     } else {
-        abort("none are lp_variables", call = call)
+        abort("None are lp_variables", call = call)
     }
 }
 multiply_lp <- function(x, y, call) {
@@ -96,7 +96,7 @@ multiply_lp <- function(x, y, call) {
     } else if (yv) {
         multiply_v_c(y, x, call)
     } else {
-        abort("none are lp_variables", call = call)
+        abort("None are lp_variables", call = call)
     }
 }
 divide_lp <- function(x, y, call) {
@@ -105,11 +105,11 @@ divide_lp <- function(x, y, call) {
     } else if (is_lp_variable(x)) {
         divide_v_c(x, y, call)
     } else {
-        abort("none are lp_variables", call = call)
+        abort("None are lp_variables", call = call)
     }
 }
 power_lp <- function(x, y, call) {
-    abort("cannot use powers or exponentials in a linear problem.", call = call)
+    abort("Cannot use powers or exponentials in a linear problem.", call = call)
 }
 
 horizontal_multiply <- function(x, c) {
@@ -131,7 +131,7 @@ minus_v <- function(x) {
 # var + var
 add_v_v <- function(x, y, call) {
     if (non_conformable(x, y)) {
-        abort("non-conformable arrays", call = call)
+        abort("Non-conformable arrays", call = call)
     }
 
     max_n <- max(length(x), length(y))
@@ -148,7 +148,7 @@ add_v_v <- function(x, y, call) {
 # var + constant
 add_v_c <- function(x, c, call) {
     if (non_conformable(x, c)) {
-        abort("non-conformable arrays", call = call)
+        abort("Non-conformable arrays", call = call)
     }
 
     max_n <- max(length(x), length(c))
@@ -178,7 +178,7 @@ subtract_c_v <- function(c, x, call) {
 # var * constant
 multiply_v_c <- function(x, c, call) {
     if (non_conformable(x, c)) {
-        abort("non-conformable arrays", call = call)
+        abort("Non-conformable arrays", call = call)
     }
 
     max_n <- max(length(x), length(c))
@@ -200,11 +200,11 @@ divide_v_c <- function(x, c, call) {
 
 # var * var
 multiply_v_v <- function(x, y, call) {
-    abort("cannot multiply two variables in a linear problem.", call = call)
+    abort("Cannot multiply two variables in a linear problem.", call = call)
 }
 # any / var
 divide_a_v <- function(x, y, call) {
-    abort("cannot divide by a variable in a linear problem.", call = call)
+    abort("Cannot divide by a variable in a linear problem.", call = call)
 }
 
 

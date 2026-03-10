@@ -126,7 +126,7 @@ rbind.lp_constraint <- function(..., deparse.level = 1) {
     dots <- rlang::dots_list(...)
 
     for (d in dots) if (!is_lp_constraint(d)) {
-        abort("cannot `rbind.lp_constraint` with other classes.")
+        abort("Cannot `rbind.lp_constraint` with other classes.")
     }
 
     out <- purrr::list_transpose(dots, simplify = FALSE)
@@ -169,7 +169,7 @@ dim.lp_constraint <- function(x) {
 
     if (wrong_index) {
         xname <- rlang::enexpr(x) |> format()
-        abort("index constraints with `con[i]` or `con[i, ]`")
+        abort("Index constraints with `con[i]` or `con[i, ]`")
     }
 
     i <- dots[[1L]]

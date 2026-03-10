@@ -64,7 +64,7 @@ lp_variable <- function(.problem, definition,
     upper <- interpret_bound(upper, default = +Inf)
 
     if (lower > upper) {
-        abort("Lower bound {lower} is greater than upper bound {upper}.")
+        abort("Lower bound ({lower}) is greater than upper bound ({upper}).")
     }
 
     if (binary) {
@@ -244,7 +244,7 @@ t.lp_variable <- function(x) {
     # }
 
     if (ndim(x) != 2L) {
-        abort("variable must be two-dimensional.")
+        abort("Variable must be two-dimensional.")
     }
 
     present_ind <- x$ind
@@ -329,7 +329,7 @@ recycle_var <- function(x, n) {
         return(x)
     }
 
-    abort("attempt to recycle variable of length {length(x)} to length {n}")
+    abort("Attempt to recycle variable of length ({length(x)}) to length ({n}).")
 }
 recycle_const <- function(x, n) {
     if (length(x) == n) {
@@ -338,6 +338,6 @@ recycle_const <- function(x, n) {
         return(rep(x, n))
     }
 
-    abort("attempt to recycle array of length {length(x)} to length {n}")
+    abort("Attempt to recycle array of length ({length(x)}) to length ({n}).")
 }
 

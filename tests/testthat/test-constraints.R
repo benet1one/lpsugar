@@ -41,10 +41,10 @@ test_that("indexing constraints", {
     p$constraints["my_con", ][2, ]
     p$constraints[c("my_con", "one_line_fs")]
 
-    expect_error(p$constraints[], "index constraints with")
-    expect_error(p$constraints[, 1], "index constraints with")
-    expect_error(p$constraints[1, 1], "index constraints with")
-    expect_error(p$constraints[1, , ], "index constraints with")
+    expect_error(p$constraints[], "Index constraints with")
+    expect_error(p$constraints[, 1], "Index constraints with")
+    expect_error(p$constraints[1, 1], "Index constraints with")
+    expect_error(p$constraints[1, , ], "Index constraints with")
 })
 
 test_that("rbind constraints", {

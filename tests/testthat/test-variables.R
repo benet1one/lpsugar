@@ -87,11 +87,12 @@ test_that("variable definition errors", {
 test_that("variable indexing", {
     expect_error(y[4], "out of bounds")
     expect_error(y[-4], "out of bounds")
-    expect_error(y[0], "invalid subscript")
-    expect_error(y["d"], "invalid subscript 'd'")
+    expect_error(y[0], "Invalid subscript")
+    expect_error(y["d"], "Invalid subscript 'd'")
     expect_identical(rev(y), y[rev(a)])
     expect_identical(z$coef, t(t(z))$coef)
     expect_snapshot(t(z))
+    expect_error(t(y), "two-dimensional")
 })
 
 test_that("operations", {
@@ -100,9 +101,9 @@ test_that("operations", {
     expect_identical(1-y, !y)
     expect_identical(2*y, y + y)
     expect_identical(-z, z - 2*z)
-    expect_error(x*y, "cannot multiply two variables")
-    expect_error(x^2, "cannot use powers or exponentials")
-    expect_error(2/x, "cannot divide by a variable")
+    expect_error(x*y, "Cannot multiply two variables")
+    expect_error(x^2, "Cannot use powers or exponentials")
+    expect_error(2/x, "Cannot divide by a variable")
     expect_error(!x, "only supported for binary variables")
 })
 
