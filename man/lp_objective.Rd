@@ -3,11 +3,17 @@
 \name{lp_minimize}
 \alias{lp_minimize}
 \alias{lp_maximize}
+\alias{lp_min}
+\alias{lp_max}
 \title{Set an objective function}
 \usage{
 lp_minimize(.problem, objective)
 
 lp_maximize(.problem, objective)
+
+lp_min(.problem, objective)
+
+lp_max(.problem, objective)
 }
 \arguments{
 \item{.problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
