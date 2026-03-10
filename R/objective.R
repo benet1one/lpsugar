@@ -5,8 +5,8 @@ lp_objective <- function(.problem, objective) {
     expr <- rlang::quo_squash(quosure) |> format()
 
     if (is.numeric(objective) && length(objective) == 1L && objective == 0) {
-        rlang::inform("setting objective to 0 and finding feasible solution instead.",
-                      call = parent.frame())
+        inform("Setting objective to 0 and finding feasible solution instead.",
+               call = parent.frame())
 
         .problem$objective$coef[] <- 0
         .problem$objective$add[] <- 0
