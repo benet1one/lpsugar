@@ -124,7 +124,8 @@ rbind.lp_constraint <- function(..., deparse.level = 1) {
         abort("cannot `rbind.lp_constraint` with other classes.")
     }
 
-    out <- purrr::list_transpose(dots)
+    out <- purrr::list_transpose(dots, simplify = FALSE)
+
     out$lhs <- do.call(what = rbind, out$lhs) |> robust_index()
     out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()
     out$dir <- unlist(out$dir)
