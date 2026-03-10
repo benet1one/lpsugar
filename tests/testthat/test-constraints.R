@@ -25,12 +25,16 @@ p |> lp_variable(z[1:2]) |> lp_constraint(x[2] <= 4*z[2])
 
 test_that("non constraint", {
     expect_error(
-        lp_constraint(p, 1 <= 2),
+        p |> lp_constraint(1 <= 2),
         "does not contain any variables"
     )
     expect_error(
-        lp_constraint(p, 2*x),
+        p |> lp_constraint(2*x),
         "did not evaluate to a constraint"
+    )
+    expect_error(
+        p |> lp_constraint(y[1] != 0),
+        "Inequality"
     )
 })
 
