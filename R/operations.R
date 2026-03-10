@@ -218,7 +218,7 @@ divide_a_v <- function(x, y, call) {
 
 negate_v <- function(x, call) {
     if (!x$raw || !x$binary) {
-        abort("negation `!{x$name}` is only supported for binary variables.", call = call)
+        abort("Negation `!{x$name}` is only supported for binary variables.", call = call)
     }
 
     # 1 - x
@@ -234,7 +234,7 @@ negate_v <- function(x, call) {
 
 compare_lp <- function(x, y, op, call) {
     if (non_conformable(x, y)) {
-        abort("non-conformable arrays", call = call)
+        abort("Non-conformable arrays", call = call)
     }
 
     if (op == "<") {
@@ -259,7 +259,7 @@ compare_lp <- function(x, y, op, call) {
 #' @export
 sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     if (!identical(na.rm, FALSE)) {
-        warn("ignoring `na.rm`")
+        warn("Ignoring `na.rm`")
     }
 
     varnames <- colnames(x$coef)
@@ -302,7 +302,7 @@ Math.lp_variable <- function(x, ...) {
         abort(message, call = call)
     }
 
-    abort("function `{fun}` is not supported in a linear problem.", call = call)
+    abort("Function `{fun}` is not supported in a linear problem.", call = call)
 }
 
 cumsum_v <- function(x, call) {
