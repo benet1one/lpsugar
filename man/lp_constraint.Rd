@@ -18,7 +18,7 @@ lp_subject_to(.problem, ...)
 \item{...}{One or more linear constraints. Can be named. They must:
 \itemize{
 \item Contain one or more variables defined with \code{\link[=lp_variable]{lp_variable()}}
-\item Contain a comparison operator (\verb{< / <= / == / => / >})
+\item Contain a comparison operator ( \verb{< / <= / == / => / >} )
 }}
 }
 \value{
