@@ -74,7 +74,7 @@ lp_maximize <- function(.problem, objective) {
     lp_objective(.problem, {{ objective }})
 }
 
-# Alias ------------------------
+# Aliases ----------------------
 
 #' @rdname lp_objective
 #' @export
