@@ -6,7 +6,7 @@
 #' @param .problem An [lp_problem()].
 #' @param ... One or more linear constraints. Can be named. They must:
 #' - Contain one or more variables defined with [lp_variable()]
-#' - Contain a comparison operator (`< / <= / == / => / >`)
+#' - Contain a comparison operator ( `< / <= / == / => / >` )
 #'
 #' @returns An [lp_problem()] with added `$constraints`. (Note: previous constraints are not
 #' overritten).
@@ -45,9 +45,14 @@ lp_constraint <- function(.problem, ...) {
 }
 
 lp_constraint_internal <- function(quosure, data, name) {
-    con <- for_split(quosure, evaluate = TRUE, data = data)
-
     expr <- rlang::quo_get_expr(quosure)
+    vars <- all.vars(expr)
+
+    if (!any(vars %in% names(data))) {
+        abort("Constraint does not contain any variables.", call = expr)
+    }
+
+    con <- for_split(quosure, evaluate = TRUE, data = data)
     non_constraint_error <- glue::glue(
         "Expression did not evaluate to a constraint.\n",
         "Did you forget the comparison operator? `<=/==/>=`"

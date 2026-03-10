@@ -18,28 +18,38 @@ x <- p$variables$x
 y <- p$variables$y
 z <- p$variables$z
 
-
+# Updates
 p |> lp_variable(z[1:2]) |> _$constraints
-
-p$constraints[1:3]
-p$constraints[1:3, ]
-p$constraints["my_con"][2]
-p$constraints["my_con", ][2, ]
-p$constraints[c("my_con", "one_line_fs")]
+p |> lp_variable(z[1:2]) |> lp_constraint(x[2] <= 4*z[2])
 
 
-wrong_index_error <- "index constraints with"
-
-test_that("wrong_index", {
-    expect_error(p$constraints[], wrong_index_error)
-    expect_error(p$constraints[, 1], wrong_index_error)
-    expect_error(p$constraints[1, 1], wrong_index_error)
-    expect_error(p$constraints[1, , ], wrong_index_error)
+test_that("non constraint", {
+    expect_error(
+        lp_constraint(p, 1 <= 2),
+        "does not contain any variables"
+    )
+    expect_error(
+        lp_constraint(p, 2*x),
+        "did not evaluate to a constraint"
+    )
 })
 
-test_that("transposition", {
-    expect_snapshot(x < t(y))
+test_that("indexing constraints", {
+    p$constraints[1:3]
+    p$constraints[1:3, ]
+    p$constraints["my_con"][2]
+    p$constraints["my_con", ][2, ]
+    p$constraints[c("my_con", "one_line_fs")]
+
+    expect_error(p$constraints[], "index constraints with")
+    expect_error(p$constraints[, 1], "index constraints with")
+    expect_error(p$constraints[1, 1], "index constraints with")
+    expect_error(p$constraints[1, , ], "index constraints with")
 })
+
+# test_that("transposition", {
+#     expect_snapshot(x < t(y))
+# })
 
 test_that("rbind constraints", {
     expect_no_error(rbind(x == 1, y >= 0))
