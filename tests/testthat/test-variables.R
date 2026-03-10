@@ -132,6 +132,13 @@ test_that("operations", {
     expect_error(x^2, "Cannot use powers or exponentials")
     expect_error(2/x, "Cannot divide by a variable")
     expect_error(!x, "only supported for binary variables")
+    expect_error(
+        x & sum({
+            k <- 2
+            k*y
+        }),
+        "Unsupported operation"
+    )
 })
 
 test_that("sum", {

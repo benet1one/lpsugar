@@ -16,7 +16,12 @@ Ops.lp_variable <- function(e1, e2) {
             rlang::enexpr(e2) |> format()
         )
     }
-    call <- str2lang(op_text)
+
+    call <- if (length(op_text) == 1L) {
+        str2lang(op_text)
+    } else {
+        parent.frame()
+    }
 
     # Arithmetic and Logic ---------------
     # +x, -x, !x
