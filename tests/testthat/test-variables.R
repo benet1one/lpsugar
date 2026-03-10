@@ -1,11 +1,39 @@
 
 a <- letters[1:3]
 
-parse_variable_definition(x)
-parse_variable_definition((x))
-parse_variable_definition({x})
-parse_variable_definition(y[a, 1:5])
-parse_variable_definition(t[a, b = 1:5])
+p <- lp_problem() |>
+    lp_variable(x, integer = TRUE) |>
+    lp_variable(y[a], binary = TRUE) |>
+    lp_variable(z[1:2, a], lower = 0)
+
+print(p)
+x <- p$variables$x
+y <- p$variables$y
+z <- p$variables$z
+
+y[1:2]
+y[-3]
+y[c(TRUE, TRUE, FALSE)]
+
+y["b"]
+y[c("a", "b")]
+
+rev(y)
+t(z)
+z[2:1, ]
+
+z[1, ] $ ind
+z[1, , drop = TRUE] $ ind
+
+
+x2 <- x + y
+x3 <- x2 + y
+
+x4 <- add_v_c(x3, 2)
+x5 <- add_v_c(x3, 2:4)
+
+x6 <- multiply_v_c(x5, 3)
+x7 <- multiply_v_c(x5, 3:1)
 
 
 test_that("variable definitions", {
@@ -43,40 +71,6 @@ test_that("variable definition errors", {
 })
 
 
-p <- lp_problem() |>
-    lp_variable(x, integer = TRUE) |>
-    lp_variable(y[a], binary = TRUE) |>
-    lp_variable(z[1:2, a], lower = 0)
-
-print(p)
-x <- p$variables$x
-y <- p$variables$y
-z <- p$variables$z
-
-y[1:2]
-y[-3]
-y[c(TRUE, TRUE, FALSE)]
-
-y["b"]
-y[c("a", "b")]
-
-rev(y)
-t(z)
-z[2:1, ]
-
-z[1, ] $ ind
-z[1, , drop = TRUE] $ ind
-
-
-x2 <- x + y
-x3 <- x2 + y
-
-x4 <- add_v_c(x3, 2)
-x5 <- add_v_c(x3, 2:4)
-
-x6 <- multiply_v_c(x5, 3)
-x7 <- multiply_v_c(x5, 3:1)
-
 
 test_that("variable indexing", {
     expect_error(y[4], "out of bounds")
@@ -84,6 +78,8 @@ test_that("variable indexing", {
     expect_error(y[0], "invalid subscript")
     expect_error(y["d"], "invalid subscript 'd'")
     expect_identical(rev(y), y[rev(a)])
+    expect_identical(z$coef, t(t(z))$coef)
+    expect_snapshot(t(z))
 })
 
 test_that("operations", {

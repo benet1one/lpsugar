@@ -47,10 +47,6 @@ test_that("indexing constraints", {
     expect_error(p$constraints[1, , ], "index constraints with")
 })
 
-# test_that("transposition", {
-#     expect_snapshot(x < t(y))
-# })
-
 test_that("rbind constraints", {
     expect_no_error(rbind(x == 1, y >= 0))
     expect_error(rbind(x == 1, y), "with other classes")
