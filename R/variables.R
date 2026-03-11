@@ -121,30 +121,30 @@ lp_variable <- function(.problem, definition,
         list(new_variable) |> rlang::set_names(name)
     )
 
-    .problem <- update_variables(.problem)
+    .problem <- update_variables(.problem, field = "variables")
+    .problem <- update_variables(.problem, field = "aliases")
     .problem <- update_objective(.problem)
     .problem <- update_constraints(.problem)
     .problem
 }
 
 
-update_variables <- function(.problem) {
+update_variables <- function(.problem, field = "variables") {
     total_vars <- .problem$.nvar
     varnames <- .problem$.varnames
+    vars <- .problem[[field]]
 
-    for (i in names(.problem$variables)) {
-        x <- .problem$variables[[i]]
+    for (i in names(vars)) {
+        x <- vars[[i]]
 
         x$coef <- matrix(0, nrow = length(x), ncol = total_vars) |> robust_index()
         x$coef[, x$ind] <- diag(length(x))
         colnames(x$coef) <- varnames
 
-        # v$selected <- numeric(total_vars)
-        # v$selected[v$ind] <- TRUE
-
-        .problem$variables[[i]] <- x
+        vars[[i]] <- x
     }
 
+    .problem[[field]] <- vars
     .problem
 }
 
