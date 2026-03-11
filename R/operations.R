@@ -322,3 +322,38 @@ cumsum_v <- function(x, call) {
 
     return(x)
 }
+
+# Custom Data Mask ------------------------
+
+custom_fun <- function() {
+    e <- rlang::env()
+
+    e$diag <- function(x = 1, nrow, ncol, names = TRUE) {
+        if (!is_lp_variable(x)) {
+            return(base::diag(x, nrow, ncol, names))
+        }
+
+        warn_changed_args(nrow = , ncol = , names = TRUE)
+        diag_v(x)
+    }
+
+    return(e)
+}
+
+diag_v <- function(x) {
+    if (ndim(x) != 2L) {
+        abort("Variable is not two-dimensional.")
+    }
+
+    present_ind <- x$ind
+    present_ind[] <- 1:length(present_ind)
+
+    if (!is.matrix(present_ind)) {
+        browser()
+    }
+
+    present_ind <- base::diag(present_ind)
+
+    x[present_ind]
+}
+

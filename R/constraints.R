@@ -30,8 +30,10 @@ lp_constraint <- function(.problem, ...) {
     check_problem(.problem)
     data <- data_mask(.problem)
     quos <- rlang::enquos(...)
+    varnames <- c(names(.problem$variables), names(.problem$aliases))
+
     cons <- purrr::map2(quos, rlang::names2(quos), function(q, name) {
-        lp_constraint_internal(quosure = q, data = data, name = name)
+        lp_constraint_internal(quosure = q, name = name, data = data, varnames = varnames)
     })
 
     cons <- do.call(rbind.lp_constraint, cons)
@@ -45,11 +47,11 @@ lp_constraint <- function(.problem, ...) {
     return(.problem)
 }
 
-lp_constraint_internal <- function(quosure, data, name) {
+lp_constraint_internal <- function(quosure, name, data, varnames) {
     expr <- rlang::quo_get_expr(quosure)
     vars <- all.vars(expr)
 
-    if (!any(vars %in% names(data))) {
+    if (!any(vars %in% varnames)) {
         abort("Constraint does not contain any variables.", call = expr)
     }
 

@@ -13,6 +13,20 @@ abort <- function(message, call = parent.frame(), ...) {
     message <- glue::glue(message, .envir = parent.frame())
     rlang::abort(message = message, call = call, ...)
 }
+warn_changed_args <- function(..., env = parent.frame(), call = env) {
+    expected <- rlang::enexprs(..., .named = TRUE, .homonyms = "error")
+
+    for (arg in names(expected)) {
+        if (!exists(arg, envir = env, inherits = FALSE)) {
+            warn("Internal warning: unexistant argument `{arg}`.", call = env)
+            next
+        }
+
+        if (expected[[arg]] != env[[arg]]) {
+            warn("Ignoring argument `{arg}`.", call = call)
+        }
+    }
+}
 
 # Safety ------------------------
 
@@ -72,7 +86,16 @@ check_problem <- function(x) {
 # Evaluation --------------------
 
 data_mask <- function(.problem) {
-    c(.problem$variables, .problem$aliases)
+    fun <- custom_fun()
+    var <- rlang::new_environment(.problem$variables, parent = fun)
+    als <- rlang::new_environment(.problem$aliases, parent = var)
+
+    rlang::new_data_mask(bottom = als, top = fun)
+}
+lp_eval <- function(.problem, expr) {
+    quosure <- rlang::enquo(expr)
+    data <- data_mask(.problem)
+    rlang::eval_tidy(quosure, data = data)
 }
 
 inside <- function(expr) {
