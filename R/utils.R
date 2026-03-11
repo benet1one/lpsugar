@@ -1,4 +1,12 @@
 
+# Misc ------------------------------
+
+large_to_infinity <- function(x, threshold = 1e30) {
+    x[x >= +threshold] <- +Inf
+    x[x <= -threshold] <- -Inf
+    return(x)
+}
+
 # Messages --------------------------
 
 inform <- function(message, call = parent.frame(), ...) {
