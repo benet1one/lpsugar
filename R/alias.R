@@ -43,6 +43,8 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
         inform("Overriding alias `{new_alias$name}`", call = parent.frame())
     }
 
+    # $value is an lp_variable(), so its name is overwritten
+    new_alias$value$name <- new_alias$name
     .problem$aliases[[new_alias$name]] <- new_alias$value
     return(.problem)
 }
