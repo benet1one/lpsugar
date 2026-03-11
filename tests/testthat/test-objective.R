@@ -12,7 +12,7 @@ test_that("objective snaps", {
 })
 
 test_that("sum message", {
-    expect_message(lp_minimize(p, y), "sum\(y\)")
+    expect_message(lp_minimize(p, y), "sum\\(y\\)")
     expect_message(
         p |> lp_minimize({
             k <- 2
