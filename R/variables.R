@@ -103,7 +103,8 @@ lp_variable <- function(.problem, definition,
 
     new_variable <- list(
         name = name,
-        bound = c(Lower = lower, Upper = upper),
+        lower = lower,
+        upper = upper,
 
         type = type,
         integer = integer,
