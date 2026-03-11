@@ -95,6 +95,8 @@ print.lp_objective <- function(x, ...) {
     } else if (x$add < 0) {
         glue::glue("\n\n(coef*vars - {-x$add})") |> cat()
     }
+
+    cat("\n")
 }
 
 # Utils ------------------------
