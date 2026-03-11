@@ -36,6 +36,10 @@ Ops.lp_variable <- function(e1, e2) {
         abort("Unsupported operation `{op}`", call = call)
     }
 
+    # Error if anyNA
+    check_no_na(e1, e2, call)
+
+    # Two element arithmetic
     if (op == "+") {
         return(add_lp(e1, e2, call))
     } else if (op == "-") {
@@ -59,6 +63,14 @@ Ops.lp_variable <- function(e1, e2) {
     abort("Unsupported operation `{op}`", call = call)
 }
 
+check_no_na <- function(e1, e2, call) {
+    if (!is_lp_variable(e1) && anyNA(e1)) {
+        abort("Left-hand-side object contains NA values.", call = call)
+    }
+    if (!is_lp_variable(e2) && anyNA(e2)) {
+        abort("Right-hand-side object contains NA values.", call = call)
+    }
+}
 
 # Arithmetics -----------------------
 

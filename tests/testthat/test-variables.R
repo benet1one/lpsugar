@@ -128,14 +128,20 @@ test_that("operations", {
     expect_identical(1-y, !y)
     expect_identical(2*y, y + y)
     expect_identical(-z, z - 2*z)
+
+    expect_error(c(1, 2, NA) + y, "Left-hand-side object contains NA values")
+    expect_error(y / c(1, 2, NA), "Right-hand-side object contains NA values")
+
     expect_error(y + z, "Non-conformable")
     expect_error(y * 1:2, "Non-conformable")
     expect_error(x*y, "Cannot multiply two variables")
     expect_error(x^2, "Cannot use powers or exponentials")
     expect_error(2/x, "Cannot divide by a variable")
     expect_error(!x, "only supported for binary variables")
+
     expect_error(abs(x), "absolute value")
     expect_error(exp(x), "exp")
+
     expect_error(y | y, "Unsupported operation")
     expect_error(y & y, "Unsupported operation")
     expect_error(y %% y, "Unsupported operation")
