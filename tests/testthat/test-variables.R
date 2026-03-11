@@ -158,4 +158,11 @@ test_that("sum", {
         sum(z[1:5]) $ coef,
         cumsum(z)[5] $ coef
     )
+
+    expect_no_error(
+        sum(y, c(1, 1, NA), na.rm = TRUE)
+    )
+    expect_error(
+        sum(y, c(1, 1, NA), na.rm = FALSE) # Default
+    )
 })

@@ -258,10 +258,6 @@ compare_lp <- function(x, y, op, call) {
 
 #' @export
 sum.lp_variable <- function(x, ..., na.rm = FALSE) {
-    if (!identical(na.rm, FALSE)) {
-        warn("Ignoring `na.rm`")
-    }
-
     varnames <- colnames(x$coef)
     x$ind <- x$ind[1]
     x$coef <- colSums(x$coef) |>
@@ -274,8 +270,7 @@ sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     colnames(x$coef) <- varnames
 
     if (...length() > 0L) {
-        dots <- sum(...)
-        x <- x + dots
+        x <- x + sum(..., na.rm = na.rm)
     }
 
     x$raw <- FALSE
