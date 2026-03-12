@@ -99,7 +99,9 @@ lp_variable <- function(.problem, definition,
         name_variable(name, sets)
     )
 
-    add <- matrix(0, ncol = 1L, nrow = length(ind)) |> robust_index()
+    add <- matrix(0, nrow = length(ind), ncol = 1L) |> robust_index()
+    coef <- matrix(0, nrow = length(ind), ncol = .problem$.nvar) |> robust_index()
+    coef[, ind] <- diag(length(ind))
 
     new_variable <- list(
         name = name,
@@ -111,7 +113,7 @@ lp_variable <- function(.problem, definition,
         binary = binary,
 
         ind = ind,
-        coef = NULL, # Created and updated later
+        coef = coef,
         add = add,
         raw = TRUE
 
@@ -138,8 +140,12 @@ update_variables <- function(.problem, field = "variables") {
     for (i in names(vars)) {
         x <- vars[[i]]
 
-        x$coef <- matrix(0, nrow = length(x), ncol = total_vars) |> robust_index()
-        x$coef[, x$ind] <- diag(length(x))
+        x$coef <- cbind(
+            x$coef,
+            matrix(0, nrow = nrow(x$coef), ncol = total_vars - ncol(x$coef))
+        )
+
+        x$coef <- robust_index(x$coef)
         colnames(x$coef) <- varnames
 
         vars[[i]] <- x
