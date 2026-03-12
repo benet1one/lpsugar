@@ -193,13 +193,13 @@ print.lp_variable <- function(x, ...) {
 
     cat("'")
 
-    if (all(x$bound != c(-Inf, +Inf))) {
+    if (x$lower != -Inf && x$upper != +Inf) {
         cat("\n")
-        cat(x$bound[1L], "<=", x$name, "<=", x$bound[2L])
-    } else if (x$bound[1L] != -Inf) {
-        cat("\n", x$name, " >= ", x$bound[1L], sep = "")
-    } else if (x$bound[2L] != +Inf) {
-        cat("\n", x$name, " <= ", x$bound[2L], sep = "")
+        cat(x$lower, "<=", x$name, "<=", x$upper)
+    } else if (x$lower != -Inf) {
+        cat("\n", x$name, " >= ", x$lower, sep = "")
+    } else if (x$upper != +Inf) {
+        cat("\n", x$name, " <= ", x$upper, sep = "")
     }
 
     cat("\n")
