@@ -4,7 +4,6 @@ Code
 - try to document the fact that sum(x, 1) works but sum(1, x) does not.
 - should lp_minimize(0) work or should it be lp_find_feasible() ?
 - document lp_variable output fields
-- document lp_solve output fields
 - figure out alias definitions
 - check error for solving problems with no constraints
 - why do rownames(ptr) not work?

@@ -45,6 +45,17 @@ see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}.Some c
 \item{...}{Control parameters passed to \code{\link[lpSolveAPI:lp.control]{lpSolveAPI::lp.control()}}. For a full list of
 options see \code{\link[lpSolveAPI:lp.control.options]{lpSolveAPI::lp.control.options()}}.}
 }
+\value{
+A list with the following fields:
+\itemize{
+\item \verb{$objective} : Numeric scalar, value of the objective function at the optimal.
+\item \verb{$variables} : Named list with the optimal value for each variable.
+\item \verb{$aliases} : Named list with the value of each \code{\link[=lp_alias]{lp_alias()}}.
+\item \verb{$status_number} : Integer indicating the status of the solver.
+\item \verb{$status_description} : String describing the status of the solver.
+\item \verb{$pointer} : Pointer to the \code{lpSolveAPI} model, class \code{lpExtPtr}.
+}
+}
 \description{
 Attempt to compute the optimal solution of an \code{\link[=lp_problem]{lp_problem()}}.
 }

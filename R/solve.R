@@ -26,7 +26,13 @@
 #' - `"detailed"` : Detailed messages are reported. Like model size, continuing B&B improvements, etc.
 #' - `"full"` : All messages are reported. Useful for debugging purposes and small models.
 #'
-#' @returns
+#' @returns A list with the following fields:
+#' - `$objective` : Numeric scalar, value of the objective function at the optimal.
+#' - `$variables` : Named list with the optimal value for each variable.
+#' - `$aliases` : Named list with the value of each [lp_alias()].
+#' - `$status_number` : Integer indicating the status of the solver.
+#' - `$status_description` : String describing the status of the solver.
+#' - `$pointer` : Pointer to the `lpSolveAPI` model, class `lpExtPtr`.
 #' @export
 #'
 #' @examples
@@ -46,6 +52,17 @@ lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
 
 # Steps -------------------
 
+#' Make a Linear Program Model
+#'
+#' Create an `lpExtPtr` pointer from the `lpSolveAPI` package.
+#' Used internally in [lp_solve()].
+#'
+#' @inheritParams lp_solve
+#'
+#' @returns An `lpExtPtr` pointer from the `lpSolveAPI` package.
+#' @export
+#'
+#' @examples
 make_model <- function(problem, verbose = "severe", ...) {
     check_problem(problem)
 
@@ -101,6 +118,25 @@ make_model <- function(problem, verbose = "severe", ...) {
     ptr
 }
 
+#' Solve a Model
+#'
+#' Find the optimal solution of a model created with [make_model()] or [lpSolveAPI::make.lp()].
+#' Used internally in [lp_solve()].
+#'
+#' @param model A pointer of class `lpExtPtr` created with [make_model()] or [lpSolveAPI::make.lp()].
+#' @inheritParams lp_solve
+#'
+#' @section Value:
+#'  A list with fields:
+#' - `$objective` : Numeric scalar, value of the objective function at the optimum.
+#' NOTE: This value does not include the addend `(problem$objective$add)`.
+#' - `$variables` : Numeric vector with the value of the variables at the optimum.
+#' - `$status_number` : Integer indicating the status of the solver.
+#' - `$status_description` : String describing the status of the solver.
+#' - `$pointer` : Pointer to the `lpSolveAPI` model, class `lpExtPtr`.
+#' @export
+#'
+#' @examples
 solve_model <- function(model, report_status = FALSE) {
     if (!inherits(model, "lpExtPtr")) {
         abort("Model must be an `lpExtPtr` object created with `make_model()`.")
@@ -142,7 +178,17 @@ solve_model <- function(model, report_status = FALSE) {
     )
 }
 
-pretty_solution <- function(problem, solution = solve_model(problem),
+#' Prettify the Solution of a Model.
+#'
+#' Takes a problem and its solution and prettifies the solution. Used internally
+#' in [lp_solve()].
+#'
+#' @param solution A list created with [solve_model()].
+#' @inherit lp_solve
+#' @export
+#'
+#' @examples
+pretty_solution <- function(problem, solution,
                             binary_as_logical = FALSE, unbound_as_inf = TRUE) {
     check_problem(problem)
     if (unbound_as_inf) {
