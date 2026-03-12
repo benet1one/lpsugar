@@ -3,6 +3,7 @@ Code
 - check dimensions better in operations between variables
 - try to document the fact that sum(x, 1) works but sum(1, x) does not.
 - should lp_minimize(0) work or should it be lp_find_feasible() ?
+- check that objective function has been set (but allow it to be 0)
 - document lp_variable output fields
 - figure out alias definitions
 - check error for solving problems with no constraints
