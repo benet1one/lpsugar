@@ -86,6 +86,8 @@ make_model <- function(problem, ...) {
         )
     }
 
+    # rownames(ptr) <- problem$constraints$name
+    colnames(ptr) <- problem$.varnames
     ptr
 }
 
