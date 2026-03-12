@@ -32,6 +32,7 @@
 #' @examples
 lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
                      report_status = FALSE, verbose = "severe", ...) {
+    check_problem(.problem)
     model <- make_model(.problem, verbose = verbose, ...)
     solution_raw <- solve_model(model, report_status = report_status)
 
@@ -143,6 +144,7 @@ solve_model <- function(model, report_status = FALSE) {
 
 pretty_solution <- function(problem, solution = solve_model(problem),
                             binary_as_logical = FALSE, unbound_as_inf = TRUE) {
+    check_problem(problem)
     if (unbound_as_inf) {
         solution$objective <- solution$objective |> large_to_infinity()
         solution$variables <- solution$variables |> large_to_infinity()
