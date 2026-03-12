@@ -7,9 +7,15 @@ Code
 - document lp_solve output fields
 - figure out alias definitions
 - check error for solving problems with no constraints
+- why do rownames(ptr) not work?
+- support multivariate bounds $lower and $upper
 
-- diag, colSums, rowSums
+- mean
+- apply, colSums, rowSums, colMeans, rowMeans
 
 Docs
 - Readme
 - Vignettes
+
+Decisions
+- sugarlp, lpsugar, lpsyntax, lpnotation
