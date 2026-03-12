@@ -9,6 +9,7 @@ lp_solve(
   binary_as_logical = FALSE,
   unbound_as_inf = TRUE,
   report_status = FALSE,
+  verbose = "severe",
   ...
 )
 }
@@ -22,12 +23,23 @@ are returned as \verb{\{0, 1\}}. If \code{TRUE}, binary variables are returned a
 very small numbers with \code{-Inf}.}
 
 \item{report_status}{Boolean, whether to emit a message indicating the status number and
-description of the solver. Some common status are:
+description of the solver. For a full list of status and their meaning
+see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}.Some common status are:
 \itemize{
 \item \verb{0 | optimal solution found}
 \item \verb{2 | the model is infeasible}
 \item \verb{3 | the model is unbounded}
-For a full list of status and their meaning see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}.
+}}
+
+\item{verbose}{String indicating the severity of messages reported by \code{lp_solve}.
+\itemize{
+\item \code{"neutral"} : No reporting.
+\item \code{"critical"} : Only critical messages are reported. Hard errors like instability, out of memory, etc.
+\item \code{"severe"} :    Only severe messages are reported. Errors.
+\item \code{"important"} : Only important messages are reported. Warnings and Errors.
+\item \code{"normal"} :    Normal messages are reported.
+\item \code{"detailed"} : Detailed messages are reported. Like model size, continuing B&B improvements, etc.
+\item \code{"full"} : All messages are reported. Useful for debugging purposes and small models.
 }}
 
 \item{...}{Control parameters passed to \code{\link[lpSolveAPI:lp.control]{lpSolveAPI::lp.control()}}. For a full list of

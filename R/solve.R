@@ -9,21 +9,30 @@
 #' @param unbound_as_inf Boolean, whether to replace very large numbers with `+Inf` and
 #' very small numbers with `-Inf`.
 #' @param report_status Boolean, whether to emit a message indicating the status number and
-#' description of the solver. Some common status are:
+#' description of the solver. For a full list of status and their meaning
+#' see [lpSolveAPI::solve.lpExtPtr()].Some common status are:
 #' - `0 | optimal solution found`
 #' - `2 | the model is infeasible`
 #' - `3 | the model is unbounded`
-#' For a full list of status and their meaning see [lpSolveAPI::solve.lpExtPtr()].
+#'
 #' @param ... Control parameters passed to [lpSolveAPI::lp.control()]. For a full list of
 #' options see [lpSolveAPI::lp.control.options()].
+#' @param verbose String indicating the severity of messages reported by `lp_solve`.
+#' - `"neutral"` : No reporting.
+#' - `"critical"` : Only critical messages are reported. Hard errors like instability, out of memory, etc.
+#' - `"severe"` :	Only severe messages are reported. Errors.
+#' - `"important"` : Only important messages are reported. Warnings and Errors.
+#' - `"normal"` :	Normal messages are reported.
+#' - `"detailed"` : Detailed messages are reported. Like model size, continuing B&B improvements, etc.
+#' - `"full"` : All messages are reported. Useful for debugging purposes and small models.
 #'
 #' @returns
 #' @export
 #'
 #' @examples
 lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
-                     report_status = FALSE, ...) {
-    model <- make_model(.problem, ...)
+                     report_status = FALSE, verbose = "severe", ...) {
+    model <- make_model(.problem, verbose = verbose, ...)
     solution_raw <- solve_model(model, report_status = report_status)
 
     pretty_solution(
@@ -36,7 +45,7 @@ lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
 
 # Steps -------------------
 
-make_model <- function(problem, ...) {
+make_model <- function(problem, verbose = "severe", ...) {
     check_problem(problem)
 
     if (problem$.nvar == 0L) {
@@ -54,7 +63,7 @@ make_model <- function(problem, ...) {
     ptr <- lpSolveAPI::make.lp(
         nrow = 0,
         ncol = problem$.nvar,
-        verbose = "full" # for now
+        verbose = verbose
     )
 
     lpSolveAPI::set.objfn(ptr, problem$objective$coef)
@@ -119,9 +128,13 @@ solve_model <- function(model, report_status = FALSE) {
         inform("Status = {status_number} | {status_description}.")
     }
 
+    objective <- lpSolveAPI::get.objective(model)
+    variables <- lpSolveAPI::get.variables(model) |>
+        rlang::set_names(colnames(model))
+
     list(
-        objective = lpSolveAPI::get.objective(model),
-        variables = lpSolveAPI::get.variables(model),
+        objective = objective,
+        variables = variables,
         status_number = status_number,
         status_description = status_description,
         pointer = model
