@@ -38,7 +38,7 @@ lp_problem <- function() {
 
 #' @export
 print.lp_problem <- function(x, ...) {
-    cat("<SugarLP Linear Problem>\n\n")
+    cat("<lpsugar Linear Problem>\n\n")
 
     if (length(x$variables) > 0L) {
         cat("-- $variables --\n")
