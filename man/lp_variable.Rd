@@ -53,9 +53,9 @@ for every dimension (\code{\link[base:dimnames]{base::dimnames()}}), comma-separ
 
 \item{binary}{Boolean, whether to treat variable as binary, \{0, 1\}.}
 
-\item{lower}{Numeric scalar. Lower bound for the variable.}
+\item{lower}{Numeric scalar or array. Lower bound for the variable.}
 
-\item{upper}{Numeric scalar. Upper bound for the variable.}
+\item{upper}{Numeric scalar or array. Upper bound for the variable.}
 }
 \value{
 An \code{\link[=lp_problem]{lp_problem()}} object with an added variable in \verb{$variables}.

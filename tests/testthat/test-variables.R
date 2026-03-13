@@ -43,7 +43,7 @@ test_that("variable definition errors", {
 test_that("variable bounds", {
     expect_error(
         lp_problem() |> lp_variable(x, lower = 2, upper = 1),
-        "is greater than upper bound"
+        "cannot be greater than `upper` bound"
     )
     expect_error(
         lp_problem() |> lp_variable(x, lower = +Inf),
@@ -55,24 +55,32 @@ test_that("variable bounds", {
     )
 
     expect_warning(
-        lp_problem() |> lp_variable(x, lower = NULL)
+        p1 <- lp_problem() |> lp_variable(x, lower = NULL),
+        "`NULL` or zero-length, setting to -Inf"
     )
+    expect_equal(p1$variables$x$lower, -Inf)
+
+
     expect_warning(
-        lp_problem() |> lp_variable(x, upper = NA)
+        p2 <- lp_problem() |> lp_variable(x[1:3], upper = c(2, NA, 1)),
+        "containts NA values, setting to Inf"
     )
+    expect_equal(p2$variables$x$upper, c(2, +Inf, 1))
 
     expect_error(
         lp_problem() |> lp_variable(x, upper = "3"),
-        "must be numeric scalars"
+        "not numeric"
     )
+
     expect_error(
-        lp_problem() |> lp_variable(x[1:2], lower = c(1, 1)),
-        "must be numeric scalars"
+        lp_problem() |> lp_variable(x[1:2, 1:3], lower = matrix(0, nrow = 3, ncol = 2)),
+        "`dim\\(lower\\)` different"
     )
-    expect_warning(
-        lp_problem() |> lp_variable(x, binary = TRUE, lower = 0, upper = 1),
-        "Ignoring bounds"
-    )
+
+    # expect_warning(
+    #     lp_problem() |> lp_variable(x, binary = TRUE, lower = 0, upper = 1),
+    #     "Ignoring bounds"
+    # )
 })
 
 

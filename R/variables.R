@@ -23,8 +23,8 @@
 #'
 #' @param integer Boolean, whether to treat variable as integer.
 #' @param binary Boolean, whether to treat variable as binary, \{0, 1\}.
-#' @param lower Numeric scalar. Lower bound for the variable.
-#' @param upper Numeric scalar. Upper bound for the variable.
+#' @param lower Numeric scalar or array. Lower bound for the variable.
+#' @param upper Numeric scalar or array. Upper bound for the variable.
 #'
 #' @details
 #' Bounds must be numeric scalars. If you want to bind each index of the variable separately,
@@ -59,34 +59,37 @@ lp_variable <- function(.problem, definition,
         rlang::is_bool(binary)
     )
 
-    # Check if they are numeric scalars, warns if they're `NA` or `NULL`.
-    lower <- interpret_bound(lower, default = -Inf)
-    upper <- interpret_bound(upper, default = +Inf)
+    lower <- interpret_bound(lower, "lower", default = -Inf, dim = lengths(sets))
+    upper <- interpret_bound(upper, "upper", default = +Inf, dim = lengths(sets))
 
-    if (lower > upper) {
-        abort("Lower bound ({lower}) is greater than upper bound ({upper}).")
-    } else if (lower == +Inf) {
-        abort("Lower bound cannot be +Inf.")
-    } else if (upper == -Inf) {
-        abort("Upper bound cannot be -Inf.")
+    if (any(lower > upper)) {
+        abort("`lower` bound ({lower}) cannot be greater than `upper` bound ({upper}).")
+    } else if (any(lower == +Inf)) {
+        abort("`lower` bound cannot be +Inf.")
+    } else if (any(upper == -Inf)) {
+        abort("`upper` bound cannot be -Inf.")
     }
 
     if (binary) {
-        if (lower != -Inf || upper != +Inf) {
-            warn("Ignoring bounds for binary variable `{name}`.")
+        if (any(lower > 1)) {
+            abort("`lower` bound cannot be greater than 1 for a binary variable.")
+        }
+        if (any(upper < 0)) {
+            abort("`upper` bound cannot be less than 0 for a binary variable.")
         }
 
-        integer <- FALSE
-        lower <- 0
-        upper <- 1
+        integer <- TRUE
+        lower <- pmax(lower, 0)
+        upper <- pmin(upper, 1)
     }
 
-    type <- if (binary)
+    type <- if (binary) {
         "binary"
-    else if (integer)
+    } else if (integer) {
         "integer"
-    else
+    } else {
         "real"
+    }
 
     # Index array of variable.
     # Indicates which objective coefficients correspond to this variable.
@@ -193,13 +196,15 @@ print.lp_variable <- function(x, ...) {
 
     cat("'")
 
-    if (x$lower != -Inf && x$upper != +Inf) {
-        cat("\n")
-        cat(x$lower, "<=", x$name, "<=", x$upper)
-    } else if (x$lower != -Inf) {
-        cat("\n", x$name, " >= ", x$lower, sep = "")
-    } else if (x$upper != +Inf) {
-        cat("\n", x$name, " <= ", x$upper, sep = "")
+    if (length(x$lower) == 1L && length(x$upper) == 1L) {
+        if (x$lower != -Inf && x$upper != +Inf) {
+            cat("\n")
+            cat(x$lower, "<=", x$name, "<=", x$upper)
+        } else if (x$lower != -Inf) {
+            cat("\n", x$name, " >= ", x$lower, sep = "")
+        } else if (x$upper != +Inf) {
+            cat("\n", x$name, " <= ", x$upper, sep = "")
+        }
     }
 
     cat("\n")
@@ -307,16 +312,25 @@ parse_variable_definition <- function(definition, envir = parent.frame()) {
 
     abort(error_msg, call = parent.frame())
 }
-interpret_bound <- function(bound, default) {
-    if (length(bound) > 1L) {
-        abort("Lower and upper bounds must be numeric scalars.", call = parent.frame())
-    }
-    if (length(bound) == 0L || is.na(bound)) {
-        warn("Bound is `NA` or `NULL`, setting to {default}.", call = parent.frame())
+interpret_bound <- function(bound, bound_name, default, dim) {
+    if (length(bound) == 0L) {
+        warn("`{bound_name}` bound is `NULL` or zero-length, setting to {default}.",
+             call = parent.frame())
         return(default)
     }
+
+    if (length(bound) > 1L && !all(dim2(bound) == dim)) {
+        abort("`dim({bound_name})` different from `dim(variable)`.",
+              call = parent.frame())
+    }
+
+    if (anyNA(bound)) {
+        warn("`{bound_name}` bound containts NA values, setting to {default}.", call = parent.frame())
+        bound[is.na(bound)] <- default
+    }
+
     if (!is.numeric(bound)) {
-        abort("Lower and upper bounds must be numeric scalars.", call = parent.frame())
+        abort("`{bound_name}` bound is not numeric.", call = parent.frame())
     }
 
     bound

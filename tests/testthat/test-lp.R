@@ -26,3 +26,18 @@ pretty_solution(p, sol)
 
 
 p_updated |> lp_solve()
+
+
+
+test_that("solving with multivariate bounds", {
+    s <- lp_problem() |>
+        lp_variable(x[1:2, 1:2], lower = matrix(1:4, 2, 2), upper = 10) |>
+        lp_minimize(x[1] + x[2] + x[3] - x[4]) |>
+        lp_solve()
+
+    expect_equal(
+        s$variables$x,
+        matrix(c(1, 2, 3, 10), 2, 2),
+        ignore_attr = TRUE
+    )
+})
