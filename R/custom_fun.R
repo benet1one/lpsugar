@@ -96,6 +96,18 @@ custom_fun <- function() {
         apply_v(X, MARGIN, FUN, ...)
     }
 
+    e$rowSums <- function(x, na.rm = FALSE, dims = 1L) {
+        if (!is_lp_variable(x)) {
+            return(base::rowSums(x, na.rm, dims = dims))
+        }
+
+        warn_changed_args(na.rm = FALSE, dims = 1L)
+        apply_v(x, 1L, sum)
+    }
+
+    # TODO
+    # other margin sums and means
+
     return(e)
 }
 

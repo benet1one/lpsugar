@@ -114,4 +114,7 @@ test_that("apply", {
     deepmeans_z <- p |> lp_eval(apply(z, 3, mean))
     deepmeans_z
     deepmeans_z$ind
+
+
+    p |> lp_eval(rowSums(y))
 })
