@@ -23,3 +23,6 @@ sol <- solve_model(ptr)
 sol
 
 pretty_solution(p, sol)
+
+
+p_updated |> lp_solve()
