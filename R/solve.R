@@ -101,19 +101,22 @@ make_model <- function(problem, verbose = "severe", ...) {
         )
     }
 
-    con <- problem$constraints
-    con$dir <- ifelse(con$dir == "==", yes = "=", no = con$dir)
+    if (length(problem$constraints) > 0L) {
+        con <- problem$constraints
+        con$dir <- ifelse(con$dir == "==", yes = "=", no = con$dir)
 
-    for (i in seq_along(con)) {
-        lpSolveAPI::add.constraint(
-            ptr,
-            xt = con$lhs[i, ],
-            type = con$dir[i],
-            rhs = con$rhs[i]
-        )
+        for (i in seq_along(con)) {
+            lpSolveAPI::add.constraint(
+                ptr,
+                xt = con$lhs[i, ],
+                type = con$dir[i],
+                rhs = con$rhs[i]
+            )
+        }
+
+        # rownames(ptr) <- problem$constraints$name
     }
 
-    # rownames(ptr) <- problem$constraints$name
     colnames(ptr) <- problem$.varnames
     ptr
 }
