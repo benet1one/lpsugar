@@ -107,9 +107,22 @@ test_that("variable indexing", {
     expect_error(y[-4], "out of bounds")
     expect_error(y[0], "Invalid subscript")
     expect_error(y["d"], "Invalid subscript 'd'")
+
+    # Transpose
     expect_identical(z$coef, t(t(z))$coef)
     expect_snapshot(t(z))
     expect_error(t(y), "two-dimensional")
+
+    p2 <- lp_problem() |> lp_variable(ThreeD[1:2, 1:3, 1:3])
+    ThreeD <- p2$variables$ThreeD
+
+    expect_error(
+        t(ThreeD[, , 1]),
+        "Index it with"
+    )
+    expect_snapshot(
+        t(ThreeD[, , 1, drop = TRUE])
+    )
 })
 
 test_that("operations", {

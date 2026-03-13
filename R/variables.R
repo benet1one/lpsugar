@@ -255,11 +255,14 @@ c.lp_variable <- function(x, ...) {
 }
 #' @export
 t.lp_variable <- function(x) {
-    # if (ndim(x) > 2L) {
-    #     x$ind <- drop(x$ind)
-    # }
+    if (ndim(x) > 2L) {
+        msg <- glue::glue(
+            "Variable must be two-dimensional. ",
+            "Index it with `{x$name}[..., drop = TRUE]` to drop unnecessary dimensions."
+        )
+        abort(msg)
 
-    if (ndim(x) != 2L) {
+    } else if (ndim(x) < 2L) {
         abort("Variable must be two-dimensional.")
     }
 
