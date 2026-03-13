@@ -1,42 +1,7 @@
 
-a <- letters[1:3]
-
-p <- lp_problem() |>
-    lp_variable(x, integer = TRUE) |>
-    lp_variable(y[a], binary = TRUE) |>
-    lp_variable(z[1:2, a], lower = 0)
-
-print(p)
-x <- p$variables$x
-y <- p$variables$y
-z <- p$variables$z
-
-y[1:2]
-y[-3]
-y[c(TRUE, TRUE, FALSE)]
-
-y["b"]
-y[c("a", "b")]
-
-rev(y)
-t(z)
-z[2:1, ]
-
-z[1, ] $ ind
-z[1, , drop = TRUE] $ ind
-
-
-x2 <- x + y
-x3 <- x2 + y
-
-x4 <- add_v_c(x3, 2)
-x5 <- add_v_c(x3, 2:4)
-
-x6 <- multiply_v_c(x5, 3)
-x7 <- multiply_v_c(x5, 3:1)
-
-
 test_that("variable definitions", {
+    a <- letters[1:3]
+
     expect_snapshot(
         parse_variable_definition(t[a, b = 1:5])
     )
@@ -112,17 +77,39 @@ test_that("variable bounds", {
 
 
 test_that("variable indexing", {
+    a <- letters[1:3]
+    p <- problem_variables()
+    x <- p$variables$x
+    y <- p$variables$y
+    z <- p$variables$z
+
+    expect_identical(y[1:2], y[-3])
+    expect_identical(y[1:2], y[c(TRUE, TRUE, FALSE)])
+    expect_identical(y[1:2], y[c("a", "b")])
+    expect_identical(rev(y), y[3:1])
+    expect_identical(rev(y), y[rev(a)])
+
+    z1 <- z[1, ] $ ind
+    z1_dropped <- z[1, , drop = TRUE] $ ind
+
+    expect_all_true(dim(z1) == c(1, 3))
+    expect_true(is.null(dim(z1_dropped)))
+
     expect_error(y[4], "out of bounds")
     expect_error(y[-4], "out of bounds")
     expect_error(y[0], "Invalid subscript")
     expect_error(y["d"], "Invalid subscript 'd'")
-    expect_identical(rev(y), y[rev(a)])
     expect_identical(z$coef, t(t(z))$coef)
     expect_snapshot(t(z))
     expect_error(t(y), "two-dimensional")
 })
 
 test_that("operations", {
+    p <- problem_variables()
+    x <- p$variables$x
+    y <- p$variables$y
+    z <- p$variables$z
+
     expect_identical(x, +x)
     expect_identical(x/2, x*0.5)
     expect_identical(1-y, !y)
@@ -156,6 +143,11 @@ test_that("operations", {
 })
 
 test_that("sum", {
+    p <- problem_variables()
+    x <- p$variables$x
+    y <- p$variables$y
+    z <- p$variables$z
+
     expect_identical(
         sum(x, y, 2*z, 1:4),
         x + y[1] + y[2] + y[3] + 2*sum(z) + sum(1:4)

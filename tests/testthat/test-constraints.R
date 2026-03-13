@@ -1,29 +1,19 @@
 
-p <- lp_problem() |>
-    lp_variable(x[1:3, 1:2]) |>
-    lp_variable(y[1:2, 1:3]) |>
-    lp_constraint(
-        x[1] == 0,
-        my_con = x < t(y),
-        one_line_fs = for (i in 1:3) x[i, ] >= y[, i] - 10,
-        my_fs = for (i in 1:3) {
-            x[i, ] <= y[, i]
-        },
-    )
+test_that("printing", {
+    p <- problem_constraints()
+    print(p$constraints)
+    print(p$constraints, compact = TRUE)
+})
 
-print(p$constraints)
-print(p$constraints, compact = TRUE)
-
-x <- p$variables$x
-y <- p$variables$y
-z <- p$variables$z
-
-# Updates
-p |> lp_variable(z[1:2]) |> _$constraints
-p |> lp_variable(z[1:2]) |> lp_constraint(x[2] <= 4*z[2])
-
+test_that("constraint updates", {
+    p <- problem_constraints()
+    p |> lp_variable(z[1:2]) |> _$constraints
+    p |> lp_variable(z[1:2]) |> lp_constraint(x[2] <= 4*z[2]) |> _$constraints
+})
 
 test_that("non constraint", {
+    p <- problem_constraints()
+
     expect_error(
         p |> lp_constraint(1 <= 2),
         "does not contain any variables"
@@ -39,6 +29,8 @@ test_that("non constraint", {
 })
 
 test_that("indexing constraints", {
+    p <- problem_constraints()
+
     p$constraints[1:3]
     p$constraints[1:3, ]
     p$constraints["my_con"][2]
@@ -52,6 +44,10 @@ test_that("indexing constraints", {
 })
 
 test_that("rbind constraints", {
+    p <- problem_constraints()
+    x <- p$variables$x
+    y <- p$variables$y
+
     expect_no_error(rbind(x == 1, y >= 0))
     expect_error(rbind(x == 1, y), "with other classes")
     expect_error(rbind(0, x == 1), "with other classes")
