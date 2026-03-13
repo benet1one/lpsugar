@@ -88,6 +88,10 @@ custom_fun <- function() {
     }
 
     e$apply <- function(X, MARGIN, FUN, ..., simplify = TRUE) {
+        if (!is_lp_variable(X)) {
+            return(base::apply(X, MARGIN, FUN, ..., simplify))
+        }
+
         warn_changed_args(simplify = TRUE)
         apply_v(X, MARGIN, FUN, ...)
     }
@@ -108,7 +112,6 @@ diag_v <- function(x) {
     }
 
     present_ind <- base::diag(present_ind)
-
     x[present_ind]
 }
 
@@ -117,7 +120,33 @@ apply_v <- function(x, margin, fun, ...) {
     ind[] <- 1:length(ind)
     ind_list <- apply(ind, margin, identity, simplify = FALSE)
 
-    # TODO
-    # Get prototype dim by applying to ind?
-    # Concatenate variables? What happens to ind then?
+    i1 <- ind_list[[1]]
+    ptype <- fun(x[i1])
+
+    if (!is_lp_variable(ptype)) {
+        return(vapply(ind_list, \(i) fun(x[i]), ptype))
+    }
+
+    y <- ptype
+
+    for (i in ind_list[-1]) {
+        y_i <- fun(x[i])
+        y$coef <- rbind(y$coef, y_i$coef)
+        y$add <- rbind(y$add, y_i$add)
+    }
+
+    y$coef <- y$coef |> robust_index()
+    y$add <- y$add |> robust_index()
+
+    y_ind <- apply(ind, margin, fun, ..., simplify = FALSE) |>
+        simplify2array(higher = TRUE, except = 0)
+
+    if (is.array(y_ind)) {
+        y_ind[] <- 1:length(y_ind)
+        y$ind <- y_ind |> robust_index()
+    } else {
+        y$ind <- 1:nrow(y$coef)
+    }
+
+    return(y)
 }

@@ -83,3 +83,35 @@ test_that("sum", {
         "must be empty" # dots
     )
 })
+
+test_that("apply", {
+    p <- lp_problem() |>
+        lp_var(y[1:2, 1:2]) |>
+        lp_var(z[1:2, 1:2, 1:2])
+
+    p |> lp_eval(apply(matrix(1, 2, 3), 1, sum))
+    p |> lp_eval(apply(matrix(1, 2, 3), 2, sum))
+
+    p |> lp_eval(apply(y, 1, mean))
+    p |> lp_eval(apply(y, 2, mean))
+
+    rowmeans_z <- p |> lp_eval(apply(z, 1, mean))
+    rowmeans_z
+    rowmeans_z$ind
+
+    expect_all_true(
+        dim(rowmeans_z$ind) == c(1, 2)
+    )
+
+    rowcolmeans_z <- p |> lp_eval(apply(z, 1:2, mean))
+    rowcolmeans_z
+    rowcolmeans_z$ind
+
+    expect_all_true(
+        dim(rowcolmeans_z$ind) == c(2, 2)
+    )
+
+    deepmeans_z <- p |> lp_eval(apply(z, 3, mean))
+    deepmeans_z
+    deepmeans_z$ind
+})
