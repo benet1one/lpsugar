@@ -38,6 +38,13 @@ warn_changed_args <- function(..., env = parent.frame(), call = env) {
 
 # Safety ------------------------
 
+dim2 <- function(x) {
+    if (is.null(dim(x))) {
+        length(x)
+    } else {
+        dim(x)
+    }
+}
 ndim <- function(x) {
     if (is.null(dim(x))) {
         1L
