@@ -118,7 +118,7 @@ test_that("variable indexing", {
 
     expect_error(
         t(ThreeD[, , 1]),
-        "Index it with"
+        "Index it with `ThreeD"
     )
     expect_snapshot(
         t(ThreeD[, , 1, drop = TRUE])

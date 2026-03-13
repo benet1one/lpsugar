@@ -57,8 +57,9 @@ test_that("sum", {
         "Right-hand-side object contains NA values"
     )
 
-    expect_no_error(
-        p |> lp_eval(sum(x, NA, na.rm = TRUE))
+    expect_equal(
+        p |> lp_eval(sum(x, NA, na.rm = TRUE)),
+        p |> lp_eval(sum(x))
     )
     expect_true({
         x2 <- p |> lp_eval(sum(c(1, NA, 1), x, na.rm = TRUE))
