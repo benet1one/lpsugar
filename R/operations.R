@@ -337,6 +337,12 @@ custom_fun <- function() {
         diag_v(x)
     }
 
+    e$sum <- function(..., na.rm = FALSE) {
+        rlang::dots_list(...) |>
+            purrr::map(base::sum, na.rm = na.rm) |>
+            purrr::reduce(`+`)
+    }
+
     return(e)
 }
 

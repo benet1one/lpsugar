@@ -31,3 +31,37 @@ test_that("diag", {
     )
 
 })
+
+test_that("sum", {
+    p <- lp_problem() |>
+        lp_variable(x[1:2]) |>
+        lp_variable(y)
+
+    expect_equal(
+        p |> lp_eval(sum(1:2, 1)),
+        4
+    )
+
+    expect_equal(
+        p |> lp_eval(sum(1:2, x)),
+        p |> lp_eval(sum(x, 1:2))
+    )
+
+    expect_equal(
+        p |> lp_eval(sum(x, y)),
+        p |> lp_eval(sum(x) + y)
+    )
+
+    expect_error(
+        p |> lp_eval(sum(x, NA)),
+        "Right-hand-side object contains NA values"
+    )
+
+    expect_no_error(
+        p |> lp_eval(sum(x, NA, na.rm = TRUE))
+    )
+    expect_true({
+        x2 <- p |> lp_eval(sum(c(1, NA, 1), x, na.rm = TRUE))
+        x2$add == 2
+    })
+})
