@@ -202,7 +202,11 @@ pretty_solution <- function(problem, solution,
     vars <- list()
 
     for (x in problem$variables) {
-        vars[[x$name]] <- solution$variables[x$ind]
+        vars[[x$name]] <- array(
+            solution$variables[x$ind],
+            dim = dim(x$ind),
+            dimnames = dimnames(x$ind)
+        )
 
         if (x$binary && binary_as_logical) {
             vars[[x$name]] <- vars[[x$name]] > 0.5
