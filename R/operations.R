@@ -288,6 +288,16 @@ sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     x$raw <- FALSE
     return(x)
 }
+#' @export
+mean.lp_variable <- function(x, ...) {
+    sum(x) / length(x)
+}
+#' @export
+weighted.mean.lp_variable <- function(x, w, ..., na.rm = FALSE) {
+    warn_changed_args(na.rm = FALSE)
+    rlang::check_dots_empty()
+    stats:::weighted.mean.default(x, w)
+}
 
 #' @export
 Math.lp_variable <- function(x, ...) {

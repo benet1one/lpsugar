@@ -65,4 +65,21 @@ test_that("sum", {
         x2 <- p |> lp_eval(sum(c(1, NA, 1), x, na.rm = TRUE))
         x2$add == 2
     })
+
+    expect_true({
+        mean_x <- p |> lp_eval(mean(x))
+        all(mean_x$coef == c(1/2, 1/2, 0))
+    })
+    expect_true({
+        w_mean_x <- p |> lp_eval(weighted.mean(x, w = c(1, 3)))
+        all(w_mean_x$coef == c(1/4, 3/4, 0))
+    })
+    expect_warning(
+        p |> lp_eval(weighted.mean(x, 1:2, na.rm = TRUE)),
+        "Ignoring argument `na.rm`"
+    )
+    expect_error(
+        p |> lp_eval(weighted.mean(x, 1:2, hi = "hi")),
+        "must be empty" # dots
+    )
 })
