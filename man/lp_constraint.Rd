@@ -22,7 +22,7 @@ lp_subject_to(.problem, ...)
 }}
 }
 \value{
-An \code{\link[=lp_problem]{lp_problem()}} with added \verb{$constraints}. (Note: previous constraints are not
+The \code{.problem} with added \verb{$constraints}. (Note: previous constraints are not
 overritten).
 
 Constraints can be represented as \verb{lhs * vars <dir> rhs}.

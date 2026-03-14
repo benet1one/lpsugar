@@ -8,7 +8,7 @@
 #' - Contain one or more variables defined with [lp_variable()]
 #' - Contain a comparison operator ( `< / <= / == / => / >` )
 #'
-#' @returns An [lp_problem()] with added `$constraints`. (Note: previous constraints are not
+#' @returns The `.problem` with added `$constraints`. (Note: previous constraints are not
 #' overritten).
 #'
 #' Constraints can be represented as `lhs * vars <dir> rhs`.

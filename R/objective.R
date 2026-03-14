@@ -57,7 +57,7 @@ lp_objective <- function(.problem, objective) {
 #' If `objective` evaluates to a multivariate variable instead of a scalar, it will
 #' apply `sum(objective)` and display a message.
 #'
-#' @returns An [lp_problem()] object with the updated objective function.
+#' @returns The `.problem` with the updated objective function.
 #' @export
 #'
 #' @rdname lp_objective

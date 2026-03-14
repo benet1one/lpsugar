@@ -23,7 +23,7 @@ Alternatively, set \code{objective = 0} to remove the objective function and let
 find a feasible solution instead of optimizing.}
 }
 \value{
-An \code{\link[=lp_problem]{lp_problem()}} object with the updated objective function.
+The \code{.problem} with the updated objective function.
 }
 \description{
 Minimize of maximize an expression.

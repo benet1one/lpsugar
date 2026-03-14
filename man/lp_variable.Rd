@@ -58,7 +58,7 @@ for every dimension (\code{\link[base:dimnames]{base::dimnames()}}), comma-separ
 \item{upper}{Numeric scalar or array. Upper bound for the variable.}
 }
 \value{
-An \code{\link[=lp_problem]{lp_problem()}} object with an added variable in \verb{$variables}.
+The \code{.problem} with an added variable in \verb{$variables}.
 }
 \description{
 Add a variable to a problem by defining it's name, dimensions, type, and bounds.

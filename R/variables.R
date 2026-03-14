@@ -30,7 +30,7 @@
 #' Bounds must be numeric scalars. If you want to bind each index of the variable separately,
 #' use [lp_constraint()].
 #'
-#' @returns An [lp_problem()] object with an added variable in `$variables`.
+#' @returns The `.problem` with an added variable in `$variables`.
 #' @export
 #'
 #' @examples
