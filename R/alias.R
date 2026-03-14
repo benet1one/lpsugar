@@ -1,10 +1,14 @@
 
 #' Define an Alias or Implicit Variable (IMPVAR)
 #'
-#' @param .problem An [lp_problem()].
-#' @param ...
+#' Create a 'fake' variable that can be used in constraints and objective without adding
+#' complexity to the problem.
 #'
-#' @returns
+#' @param .problem An [lp_problem()].
+#' @param ... Name-value pairs. The name will be the name of the alias. The value must be
+#' a linear function of previously defined variables or aliases.
+#'
+#' @returns The `.problem` with the added `$aliases`.
 #' @export
 #'
 #' @examples

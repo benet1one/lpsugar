@@ -15,8 +15,13 @@ lp_impvar(.problem, ...)
 \arguments{
 \item{.problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
 
-\item{...}{}
+\item{...}{Name-value pairs. The name will be the name of the alias. The value must be
+a linear function of previously defined variables or aliases.}
+}
+\value{
+The \code{.problem} with the added \verb{$aliases}.
 }
 \description{
-Define an Alias or Implicit Variable (IMPVAR)
+Create a 'fake' variable that can be used in constraints and objective without adding
+complexity to the problem.
 }
