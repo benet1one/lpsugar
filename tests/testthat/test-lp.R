@@ -41,3 +41,20 @@ test_that("solving with multivariate bounds", {
         ignore_attr = TRUE
     )
 })
+
+test_that("feasible", {
+    no_obj <- lp_problem() |>
+        lp_variable(x, lower = 5, upper = 10)
+
+    expect_error(
+        lp_solve(no_obj),
+        "Did you forget to set the objective function"
+    )
+
+    no_obj |>
+        lp_minimize(0) |>
+        lp_solve()
+
+    no_obj |>
+        lp_find_feasible()
+})

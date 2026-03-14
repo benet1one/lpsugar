@@ -75,7 +75,15 @@ make_model <- function(problem, verbose = "severe", ...) {
     } else if (problem$objective$direction == "maximize") {
         "max"
     } else {
-        abort("`$objective$direction` should be either 'minimize' or 'maximize'.")
+        rlang::abort(c(
+            "`$objective$direction` should be either 'minimize' or 'maximize'.",
+            ">" = "Did you forget to set the objective function?",
+            "i" = paste(
+                "If you wish to find any feasible solution, use `lp_find_feasible()`",
+                "or set the objective function to 0 with `lp_minimize(0)`",
+                sep = "\n"
+            )
+        ))
     }
 
     ptr <- lpSolveAPI::make.lp(
