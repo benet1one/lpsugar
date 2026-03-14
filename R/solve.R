@@ -234,6 +234,10 @@ pretty_solution <- function(problem, solution,
             dimnames = dimnames(x$ind)
         )
 
+        if (length(x) == 1L) {
+            vars[[x$name]] <- vars[[x$name]][1] |> unname()
+        }
+
         if (x$binary && binary_as_logical) {
             vars[[x$name]] <- vars[[x$name]] > 0.5
         }
