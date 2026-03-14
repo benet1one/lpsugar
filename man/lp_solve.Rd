@@ -2,9 +2,19 @@
 % Please edit documentation in R/solve.R
 \name{lp_solve}
 \alias{lp_solve}
+\alias{lp_find_feasible}
 \title{Solve a Linear Problem}
 \usage{
 lp_solve(
+  .problem,
+  binary_as_logical = FALSE,
+  unbound_as_inf = TRUE,
+  report_status = FALSE,
+  verbose = "severe",
+  ...
+)
+
+lp_find_feasible(
   .problem,
   binary_as_logical = FALSE,
   unbound_as_inf = TRUE,
@@ -57,5 +67,6 @@ A list with the following fields:
 }
 }
 \description{
-Attempt to compute the optimal solution of an \code{\link[=lp_problem]{lp_problem()}}.
+\code{lp_solve()} computes the optimal solution of an \code{\link[=lp_problem]{lp_problem()}}, whereas
+\code{lp_find_feasible()} returns an arbitrary feasible solution.
 }

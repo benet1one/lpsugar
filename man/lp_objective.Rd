@@ -20,7 +20,7 @@ lp_max(.problem, objective)
 
 \item{objective}{Expression to optimize, which must evaluate to an \code{lp_variable} object.
 Alternatively, set \code{objective = 0} to remove the objective function and let the solver
-find a feasible solution instead of optimizing.}
+find a feasible solution instead of optimizing, like \code{\link[=lp_find_feasible]{lp_find_feasible()}}.}
 }
 \value{
 The \code{.problem} with the updated \verb{$objective} function, a list with these fields:

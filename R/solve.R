@@ -1,7 +1,8 @@
 
 #' Solve a Linear Problem
 #'
-#' Attempt to compute the optimal solution of an [lp_problem()].
+#' `lp_solve()` computes the optimal solution of an [lp_problem()], whereas
+#' `lp_find_feasible()` returns an arbitrary feasible solution.
 #'
 #' @param .problem An [lp_problem()].
 #' @param binary_as_logical Boolean. If `FALSE` (the default), binary variables
@@ -48,6 +49,23 @@ lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
         binary_as_logical = binary_as_logical,
         unbound_as_inf = unbound_as_inf
     )
+}
+
+#' @rdname lp_solve
+#' @export
+lp_find_feasible <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
+                             report_status = FALSE, verbose = "severe", ...) {
+    check_problem(.problem)
+
+    .problem |>
+        lp_minimize(0) |>
+        lp_solve(
+            binary_as_logical = binary_as_logical,
+            unbound_as_inf = unbound_as_inf,
+            report_status = report_status,
+            verbose = verbose,
+            ...
+        )
 }
 
 # Steps -------------------

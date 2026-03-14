@@ -44,8 +44,8 @@ lp_objective <- function(.problem, objective) {
 #'
 #' @param .problem An [lp_problem()].
 #' @param objective Expression to optimize, which must evaluate to an `lp_variable` object.
-#' Alternatively, set `objective = 0` to remove the objective function and let the solver
-#' find a feasible solution instead of optimizing.
+#' Alternatively, set `objective = 0` to make the solver find a feasible solution
+#' instead of optimizing, just like [lp_find_feasible()] does.
 #'
 #' @details
 #' If `objective` evaluates to a multivariate variable instead of a scalar, it will
@@ -60,6 +60,7 @@ lp_objective <- function(.problem, objective) {
 #' @export
 #'
 #' @rdname lp_objective
+#' @examples
 lp_minimize <- function(.problem, objective) {
     check_problem(.problem)
     .problem$objective$direction <- "minimize"
