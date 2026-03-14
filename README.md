@@ -16,7 +16,7 @@ You can install the development version of lpsugar from
 pak::pak("benet1one/lpsugar")
 ```
 
-## Example
+## Quick Example
 
 Start with a simple problem to show the basic syntax.
 
@@ -42,42 +42,18 @@ my_problem <- lp_problem() |>
         2*x + 3*y <= 12
     )
 
-lp_solve(my_problem)
-#> $objective
-#> [1] 5
-#> 
-#> $variables_vec
-#> x y 
-#> 3 2 
-#> 
-#> $variables
-#> $variables$x
+my_solution <- lp_solve(my_problem)
+my_solution$variables
+#> $x
 #> [1] 3
 #> 
-#> $variables$y
+#> $y
 #> [1] 2
-#> 
-#> 
-#> $aliases
-#> list()
-#> 
-#> $status_number
-#> [1] 0
-#> 
-#> $status_description
-#> [1] "optimal solution found"
-#> 
-#> $pointer
-#> Model name: 
-#>              x     y        
-#> Maximize     1     1        
-#> R1           2     1  <=   8
-#> R2           2     3  <=  12
-#> Kind       Std   Std        
-#> Type      Real  Real        
-#> Upper      Inf   Inf        
-#> Lower     -Inf  -Inf
+my_solution$objective
+#> [1] 5
 ```
+
+## Tranportation Problem
 
 Here’s an example solving the classic transportation problem. We shall
 transport `u[f, w]` units from factory `f` to warehousse `w`.
@@ -109,35 +85,14 @@ transportation_problem <- lp_problem() |>
         for (w in warehouse) sum(u[, w]) >= demand[w]
     )
 
-lp_solve(transportation_problem)
-#> $objective
-#> [1] 70
-#> 
-#> $variables_vec
-#> u[1,A] u[2,A] u[3,A] u[1,B] u[2,B] u[3,B] u[1,C] u[2,C] u[3,C] u[1,D] u[2,D] 
-#>      8      0      0      0     10      0      0      0     12     10      0 
-#> u[3,D] 
-#>      0 
-#> 
-#> $variables
-#> $variables$u
+transportation_solution <- lp_solve(transportation_problem)
+transportation_solution$variables
+#> $u
 #>        warehouse
 #> factory A  B  C  D
 #>       1 8  0  0 10
 #>       2 0 10  0  0
 #>       3 0  0 12  0
-#> 
-#> 
-#> $aliases
-#> list()
-#> 
-#> $status_number
-#> [1] 0
-#> 
-#> $status_description
-#> [1] "optimal solution found"
-#> 
-#> $pointer
-#> Model name: 
-#>   a linear program with 12 decision variables and 7 constraints
+transportation_solution$objective
+#> [1] 70
 ```

@@ -27,7 +27,7 @@ You can install the development version of lpsugar from [GitHub](https://github.
 pak::pak("benet1one/lpsugar")
 ```
 
-## Example
+## Quick Example
 
 Start with a simple problem to show the basic syntax.
 
@@ -53,8 +53,12 @@ my_problem <- lp_problem() |>
         2*x + 3*y <= 12
     )
 
-lp_solve(my_problem)
+my_solution <- lp_solve(my_problem)
+my_solution$variables
+my_solution$objective
 ```
+
+## Tranportation Problem
 
 Here's an example solving the classic transportation problem. We shall transport
 `u[f, w]` units from factory `f` to warehousse `w`.
@@ -86,6 +90,8 @@ transportation_problem <- lp_problem() |>
         for (w in warehouse) sum(u[, w]) >= demand[w]
     )
 
-lp_solve(transportation_problem)
+transportation_solution <- lp_solve(transportation_problem)
+transportation_solution$variables
+transportation_solution$objective
 ```
 
