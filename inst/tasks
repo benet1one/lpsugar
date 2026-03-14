@@ -1,15 +1,13 @@
 
-Code
+First Release
 - check dimensions better in operations between variables
-- should lp_minimize(0) work or should it be lp_find_feasible() ?
-- check that objective function has been set (but allow it to be 0)
-- document lp_variable output fields
-- document lp_objective output fields
+- how to implement parameter()
+- Readme and examples
+
+Code
+- remove constraints
 - why do rownames(ptr) not work?
 
 Docs
 - Readme
 - Vignettes
-
-Decisions
-- sugarlp, lpsugar, lpsyntax, lpnotation
