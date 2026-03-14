@@ -51,10 +51,8 @@ test_that("feasible", {
         "Did you forget to set the objective function"
     )
 
-    no_obj |>
-        lp_minimize(0) |>
-        lp_solve()
-
-    no_obj |>
-        lp_find_feasible()
+    expect_equal(
+        no_obj |> lp_minimize(0) |> lp_solve(),
+        no_obj |> lp_find_feasible()
+    )
 })
