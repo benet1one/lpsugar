@@ -23,20 +23,19 @@ Alternatively, set \code{objective = 0} to remove the objective function and let
 find a feasible solution instead of optimizing.}
 }
 \value{
-The \code{.problem} with the updated objective function.
+The \code{.problem} with the updated \verb{$objective} function, a list with these fields:
+\itemize{
+\item \verb{$coef} : Vector with the coefficients for each variable.
+\item \verb{$add} : Numeric, addend to the final value. It is not used in the solver.
+\item \verb{$direction} : String, goal of the solver. Can be \code{"minimize"} or \code{"maximize"}.
+\item \verb{$expr} : String, expression that defined the objective function.
+}
 }
 \description{
 Minimize of maximize an expression.
 }
 \details{
-The objective function can be found in \code{.problem$objective}, a list with the following
-information:
-\itemize{
-\item \verb{$coef} : Vector with the coefficients for each variable.
-\item \verb{$add} : Numeric, addend to the final value. It is not used in the solver.
-\item \verb{$direction} : Character, goal of the solver. Can be \code{"minimize"} or \code{"maximize"}.
-}
-
 If \code{objective} evaluates to a multivariate variable instead of a scalar, it will
-apply \code{sum(objective)} and display a message.
+apply \code{sum(objective)} and display a message. Suppress this message by writing
+the \code{sum} yourself.
 }

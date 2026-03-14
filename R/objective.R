@@ -48,16 +48,15 @@ lp_objective <- function(.problem, objective) {
 #' find a feasible solution instead of optimizing.
 #'
 #' @details
-#' The objective function can be found in `.problem$objective`, a list with the following
-#' information:
+#' If `objective` evaluates to a multivariate variable instead of a scalar, it will
+#' apply `sum(objective)` and display a message. Suppress this message by writing
+#' the `sum` yourself.
+#'
+#' @returns The `.problem` with the updated `$objective` function, a list with these fields:
 #' - `$coef` : Vector with the coefficients for each variable.
 #' - `$add` : Numeric, addend to the final value. It is not used in the solver.
-#' - `$direction` : Character, goal of the solver. Can be `"minimize"` or `"maximize"`.
-#'
-#' If `objective` evaluates to a multivariate variable instead of a scalar, it will
-#' apply `sum(objective)` and display a message.
-#'
-#' @returns The `.problem` with the updated objective function.
+#' - `$direction` : String, goal of the solver. Can be `"minimize"` or `"maximize"`.
+#' - `$expr` : String, expression that defined the objective function.
 #' @export
 #'
 #' @rdname lp_objective

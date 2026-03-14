@@ -59,11 +59,30 @@ for every dimension (\code{\link[base:dimnames]{base::dimnames()}}), comma-separ
 }
 \value{
 The \code{.problem} with an added variable in \verb{$variables}.
+The fields of \code{lp_variable} objects are intended for internal use, modifying them is
+highly discouraged.
+\itemize{
+\item \verb{$name} : String, name of the variable.
+\item \verb{$lower} and \verb{$upper} : Bounds.
+\item \verb{$type} : String, one of \code{"real"}, \code{"integer"} or \code{"binary"}.
+\item \verb{$integer} and \verb{$binary} : Booleans. If \verb{$binary} is true, then \verb{$integer} is also true.
+}
+
+The following fields are meant for internal use only.
+\itemize{
+\item \verb{$ind} : Integer array. Indicates which indices correspond to this variable.
+Meant for internal use only.
+\item \verb{$coef} : Numeric matrix. The number of rows is the length of the variable, the number
+of columns is the total amount of variables in the problem.
+The values represent coefficients that are modified when adding variables or multiplying
+by a constant. Used for objective, constraints and aliases.
+\item \verb{$add} : Numeric column vector. The number of rows is the length of the variable.
+The values represent addends, modified when adding the variable and a constant.
+Used for objective, constraints and aliases.
+\item \verb{$raw} : Boolean indicating if the variable has been modified in any way
+(indexed, multiplied, summed, ...) or remains as defined.
+}
 }
 \description{
 Add a variable to a problem by defining it's name, dimensions, type, and bounds.
-}
-\details{
-Bounds must be numeric scalars. If you want to bind each index of the variable separately,
-use \code{\link[=lp_constraint]{lp_constraint()}}.
 }

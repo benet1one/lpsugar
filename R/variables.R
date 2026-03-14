@@ -26,11 +26,31 @@
 #' @param lower Numeric scalar or array. Lower bound for the variable.
 #' @param upper Numeric scalar or array. Upper bound for the variable.
 #'
-#' @details
-#' Bounds must be numeric scalars. If you want to bind each index of the variable separately,
-#' use [lp_constraint()].
-#'
 #' @returns The `.problem` with an added variable in `$variables`.
+#' The fields of `lp_variable` objects are intended for internal use, modifying them is
+#' highly discouraged.
+#' - `$name` : String, name of the variable.
+#' - `$lower` and `$upper` : Bounds.
+#' - `$type` : String, one of `"real"`, `"integer"` or `"binary"`.
+#' - `$integer` and `$binary` : Booleans. If `$binary` is true, then `$integer` is also true.
+#'
+#' The following fields are meant for internal use only.
+#'
+#' - `$ind` : Integer array. Indicates which indices correspond to this variable.
+#' Meant for internal use only.
+#'
+#' - `$coef` : Numeric matrix. The number of rows is the length of the variable, the number
+#' of columns is the total amount of variables in the problem.
+#' The values represent coefficients that are modified when adding variables or multiplying
+#' by a constant. Used for objective, constraints and aliases.
+#'
+#' - `$add` : Numeric column vector. The number of rows is the length of the variable.
+#' The values represent addends, modified when adding the variable and a constant.
+#' Used for objective, constraints and aliases.
+#'
+#' - `$raw` : Boolean indicating if the variable has been modified in any way
+#' (indexed, multiplied, summed, ...) or remains as defined.
+#'
 #' @export
 #'
 #' @examples
