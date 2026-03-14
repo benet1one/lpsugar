@@ -104,9 +104,30 @@ custom_fun <- function() {
         warn_changed_args(na.rm = FALSE, dims = 1L)
         apply_v(x, 1L, sum)
     }
+    e$colSums <- function(x, na.rm = FALSE, dims = 1L) {
+        if (!is_lp_variable(x)) {
+            return(base::colSums(x, na.rm, dims = dims))
+        }
 
-    # TODO
-    # other margin sums and means
+        warn_changed_args(na.rm = FALSE, dims = 1L)
+        apply_v(x, 2L, sum)
+    }
+    e$rowMeans <- function(x, na.rm = FALSE, dims = 1L) {
+        if (!is_lp_variable(x)) {
+            return(base::rowMeans(x, na.rm, dims = dims))
+        }
+
+        warn_changed_args(na.rm = FALSE, dims = 1L)
+        apply_v(x, 1L, mean)
+    }
+    e$colMeans <- function(x, na.rm = FALSE, dims = 1L) {
+        if (!is_lp_variable(x)) {
+            return(base::colMeans(x, na.rm, dims = dims))
+        }
+
+        warn_changed_args(na.rm = FALSE, dims = 1L)
+        apply_v(x, 2L, mean)
+    }
 
     return(e)
 }

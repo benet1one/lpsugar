@@ -10,8 +10,6 @@ Code
 - why do rownames(ptr) not work?
 - support multivariate bounds $lower and $upper
 
-- mean
-- apply, colSums, rowSums, colMeans, rowMeans
 
 Docs
 - Readme
