@@ -27,9 +27,10 @@ mean.lp_variable <- function(x, ...) {
 }
 #' @export
 weighted.mean.lp_variable <- function(x, w, ..., na.rm = FALSE) {
-    warn_changed_args(na.rm = FALSE)
     rlang::check_dots_empty()
-    stats:::weighted.mean.default(x, w)
+    warn_changed_args(na.rm = FALSE)
+    na.rm <- FALSE
+    NextMethod()
 }
 
 #' @export
