@@ -115,6 +115,16 @@ test_that("apply", {
     deepmeans_z
     deepmeans_z$ind
 
-
-    p |> lp_eval(rowSums(y))
+    expect_equal(
+        p |> lp_eval(rowSums(y)),
+        p |> lp_eval(apply(y, 1L, sum))
+    )
+    expect_equal(
+        p |> lp_eval(rowSums(matrix(1, 2, 2))),
+        rowSums(matrix(1, 2, 2))
+    )
+    expect_warning(
+        p |> lp_eval(rowSums(y, dims = 3L)),
+        "Ignoring argument `dims`"
+    )
 })
