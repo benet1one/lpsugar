@@ -6,6 +6,7 @@ First Release
 Code
 - remove constraints
 - better error handling for constraints (purrr::map2)
+- better error handling for parameter_matrix
 - why do rownames(ptr) not work?
 
 Docs
