@@ -9,7 +9,7 @@ vectorized syntax. Define and Mixed Integer Linear Programs (MILP).
 ## Installation
 
 You can install the development version of lpsugar from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/benet1one/lpsugar) with:
 
 ``` r
 # install.packages("pak")
@@ -53,7 +53,7 @@ my_solution$objective
 #> [1] 5
 ```
 
-## Tranportation Problem
+## Transportation Problem
 
 Here’s an example solving the classic transportation problem. We shall
 transport `u[f, w]` units from factory `f` to warehousse `w`.
