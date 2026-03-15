@@ -1,6 +1,5 @@
 
 First Release
-- how to implement parameter()
 - Readme and examples
 
 Code
@@ -8,6 +7,7 @@ Code
 - better error handling for constraints (purrr::map2)
 - better error handling for parameter_matrix
 - why do rownames(ptr) not work?
+- sensitivity
 
 Docs
 - Readme
