@@ -4,17 +4,13 @@
 #' @export
 Ops.lp_variable <- function(e1, e2) {
     op <- .Generic
+    e1_text <- rlang::enexpr(e1) |> format()
+    e2_text <- rlang::enexpr(e2) |> format()
+
     op_text <- if (rlang::is_missing(e2)) {
-        paste0(
-            op,
-            rlang::enexpr(e1) |> format()
-        )
+        paste0(op, e1_text)
     } else {
-        paste(
-            rlang::enexpr(e1) |> format(),
-            op,
-            rlang::enexpr(e2) |> format()
-        )
+        paste(e1_text, op, e2_text)
     }
 
     call <- if (length(op_text) == 1L) {
@@ -23,7 +19,7 @@ Ops.lp_variable <- function(e1, e2) {
         parent.frame()
     }
 
-    # Arithmetic and Logic ---------------
+    # Single Element --------------------
     # +x, -x, !x
     if (rlang::is_missing(e2)) {
         if (op == "+") {
@@ -36,8 +32,18 @@ Ops.lp_variable <- function(e1, e2) {
         abort("Unsupported operation `{op}`", call = call)
     }
 
+    # Checks ----------------------------
+
     # Error if anyNA
     check_no_na(e1, e2, call)
+
+    # Compatible dims
+    comp <- compatible_dimensions(e1, e2, drop_dim = TRUE)
+
+    if (!comp) {
+        why <- attr(comp, "cnd")
+        rlang::abort(why$message, call = call)
+    }
 
     # Two element arithmetic
     if (op == "+") {
@@ -195,7 +201,7 @@ subtract_c_v <- function(c, x, call) {
 # var * constant
 multiply_v_c <- function(x, c, call) {
     if (non_conformable(x, c)) {
-        abort("Non-conformable arrays", call = call)
+        abort("non-conformable arrays", call = call)
     }
 
     max_n <- max(length(x), length(c))

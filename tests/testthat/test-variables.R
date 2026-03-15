@@ -126,6 +126,7 @@ test_that("variable indexing", {
 })
 
 test_that("operations", {
+    a <- letters[1:3]
     p <- problem_variables()
     x <- p$variables$x
     y <- p$variables$y
@@ -140,8 +141,6 @@ test_that("operations", {
     expect_error(c(1, 2, NA) + y, "Left-hand-side object contains NA values")
     expect_error(y / c(1, 2, NA), "Right-hand-side object contains NA values")
 
-    expect_error(y + z, "Non-conformable")
-    expect_error(y * 1:2, "Non-conformable")
     expect_error(x*y, "Cannot multiply two variables")
     expect_error(x^2, "Cannot use powers or exponentials")
     expect_error(2/x, "Cannot divide by a variable")
@@ -161,6 +160,31 @@ test_that("operations", {
         }),
         "Unsupported operation"
     )
+
+
+    expect_error(y + z, "non-conformable")
+    expect_error(y * 1:2, "non-conformable")
+    expect_error(z + t(z), "non-conformable")
+
+    p2 <- lp_problem() |>
+        lp_variable(u[1:2, 1:2, 1:3]) |>
+        lp_variable(t[1:2, 1:3, 1:2])
+
+
+    u <- p2$variables$u
+    t <- p2$variables$t
+    b <- array(5, c(2, 2, 3))
+
+    u[1,,] + u[,1,]
+    u[,1,1] + u[1,,1]
+    u + b
+
+    u[,,1] - t[,1,]
+    u[1,,1] - t[,1,1]
+    u[1,1,] - t[1,,1]
+
+    expect_error(u[1,,] + t[1,,], "non-conformable")
+    expect_error(t + b, "non-conformable")
 })
 
 test_that("sum", {

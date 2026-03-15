@@ -70,7 +70,7 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
 
     attempt <- rlang::try_fetch(x + y, warning = identity, error = identity)
 
-    if (rlang::is_condition(attempt)) {
+    if (rlang::is_error(attempt)) {
         return(structure(FALSE, cnd = attempt))
     } else {
         return(TRUE)
