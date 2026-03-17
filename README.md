@@ -53,6 +53,44 @@ my_solution$objective
 #> [1] 5
 ```
 
+## Production Problem
+
+Given a set of limited `resources`, we can make `products`. Each product
+takes a certain amount of resources and sells at a `price`. We wish to
+maximize earnings.
+
+``` r
+available <- c(Material = 20, labour = 10)
+price <- c(A = 150, B = 220)
+
+resources <- names(available)
+products <- names(price)
+
+requires <- c(
+    # A, B
+      6, 3, # Material
+      2, 4  # Labour
+      
+) |> parameter(resources, products)
+
+
+production_problem <- lp_problem() |> 
+    lp_var(units[products], integer = TRUE) |> 
+    lp_max(sum(price * units)) |> 
+    lp_con(
+        for (r in resources) 
+            sum(requires[r, ] * units) <= available[r]
+    )
+
+production_solution <- lp_solve(production_problem)
+production_solution$objective
+#> [1] 590
+production_solution$variables$units
+#> products
+#> A B 
+#> 1 2
+```
+
 ## Transportation Problem
 
 Here’s an example solving the classic transportation problem. We shall
@@ -86,6 +124,8 @@ transportation_problem <- lp_problem() |>
     )
 
 transportation_solution <- lp_solve(transportation_problem)
+transportation_solution$objective
+#> [1] 70
 transportation_solution$variables
 #> $u
 #>        warehouse
@@ -93,6 +133,4 @@ transportation_solution$variables
 #>       1 8  0  0 10
 #>       2 0 10  0  0
 #>       3 0  0 12  0
-transportation_solution$objective
-#> [1] 70
 ```
