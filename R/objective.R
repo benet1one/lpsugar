@@ -86,14 +86,17 @@ lp_max <- lp_maximize
 # Methods ----------------------
 
 #' @export
-print.lp_objective <- function(x, ...) {
+print.lp_objective <- function(x, compact = length(x$coef) > 20L, ...) {
     cat(x$direction, x$expr, "\n\n")
-    print(x$coef)
 
-    if (x$add > 0) {
-        glue::glue("\n\n(coef*vars + {x$add})") |> cat()
-    } else if (x$add < 0) {
-        glue::glue("\n\n(coef*vars - {-x$add})") |> cat()
+    if (!compact) {
+        print(x$coef)
+
+        if (x$add > 0) {
+            glue::glue("\n\n(coef*vars + {x$add})") |> cat()
+        } else if (x$add < 0) {
+            glue::glue("\n\n(coef*vars - {-x$add})") |> cat()
+        }
     }
 
     cat("\n")
