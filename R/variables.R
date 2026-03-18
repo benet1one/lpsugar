@@ -53,7 +53,7 @@
 #'
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_variable.R
 lp_variable <- function(.problem, definition,
                         integer = FALSE, binary = FALSE,
                         lower = -Inf, upper = +Inf) {
