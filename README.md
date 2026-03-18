@@ -60,7 +60,7 @@ takes a certain amount of resources and sells at a `price`. We wish to
 maximize earnings.
 
 ``` r
-available <- c(Material = 20, labour = 10)
+available <- c(Material = 20, Labour = 10)
 price <- c(A = 150, B = 220)
 
 resources <- names(available)
@@ -73,9 +73,15 @@ requires <- c(
       
 ) |> parameter(resources, products)
 
+# parameter() sets the dimensions and names
+requires
+#>           products
+#> resources  A B
+#>   Material 6 3
+#>   Labour   2 4
 
 production_problem <- lp_problem() |> 
-    lp_var(units[products], integer = TRUE) |> 
+    lp_var(units[products], integer = TRUE, lower = 0) |> 
     lp_max(sum(price * units)) |> 
     lp_con(
         for (r in resources) 
@@ -85,7 +91,8 @@ production_problem <- lp_problem() |>
 production_solution <- lp_solve(production_problem)
 production_solution$objective
 #> [1] 590
-production_solution$variables$units
+production_solution$variables
+#> $units
 #> products
 #> A B 
 #> 1 2
@@ -94,26 +101,30 @@ production_solution$variables$units
 ## Transportation Problem
 
 Here’s an example solving the classic transportation problem. We shall
-transport `u[f, w]` units from factory `f` to warehousse `w`.
+transport `u[f, w]` units from factory `f` to warehousse `w`, subject to
+a `supply[f]` and a `demand[w]`. We will minimize the total `cost`.
 
 ``` r
-factory <- 1:3
+factory <- paste0("fct", 1:3)
 warehouse <- c("A", "B", "C", "D")
 
-supply <- c(20, 25, 15)
-names(supply) <- factory
-
-demand <- c(8, 10, 12, 10)
-names(demand) <- warehouse
+supply <- c(20, 25, 15) |> parameter(factory)
+demand <- c(8, 10, 12, 10) |> parameter(warehouse)
 
 cost <- c(
-    2, 7, 3, 1,
-    6, 2, 9, 2,
-    4, 6, 2, 8
-)
+    # A, B, C, D
+      2, 7, 3, 1,
+      6, 2, 9, 2,
+      4, 6, 2, 8
+      
+) |> parameter(factory, warehouse)
 
-cost <- matrix(cost, nrow = 3, byrow = TRUE)
-dimnames(cost) <- list(factory = factory, warehouse = warehouse)
+cost
+#>        warehouse
+#> factory A B C D
+#>    fct1 2 7 3 1
+#>    fct2 6 2 9 2
+#>    fct3 4 6 2 8
 
 transportation_problem <- lp_problem() |> 
     lp_variable(u[factory, warehouse], integer = TRUE, lower = 0) |> 
@@ -121,6 +132,9 @@ transportation_problem <- lp_problem() |>
     lp_constraint(
         for (f in factory)   sum(u[f, ]) <= supply[f],
         for (w in warehouse) sum(u[, w]) >= demand[w]
+        # Alternatively, using vectorization:
+        # rowSums(u) <= supply,
+        # colSums(u) >= demand
     )
 
 transportation_solution <- lp_solve(transportation_problem)
@@ -130,7 +144,7 @@ transportation_solution$variables
 #> $u
 #>        warehouse
 #> factory A  B  C  D
-#>       1 8  0  0 10
-#>       2 0 10  0  0
-#>       3 0  0 12  0
+#>    fct1 8  0  0 10
+#>    fct2 0 10  0  0
+#>    fct3 0  0 12  0
 ```
