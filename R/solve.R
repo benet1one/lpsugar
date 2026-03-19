@@ -217,30 +217,33 @@ pretty_solution <- function(problem, solution,
         solution$variables <- solution$variables |> large_to_infinity()
     }
 
-    vars <- list()
-
-    for (x in problem$variables) {
-        vars[[x$name]] <- array(
+    vars <- purrr::map(problem$variables, function(x) {
+        out <- array(
             solution$variables[x$ind],
             dim = dim(x$ind),
             dimnames = dimnames(x$ind)
         )
 
         if (length(x) == 1L) {
-            vars[[x$name]] <- vars[[x$name]][1] |> unname()
+            out <- unname(out[1])
         }
 
         if (x$binary && binary_as_logical) {
-            vars[[x$name]] <- vars[[x$name]] > 0.5
+            out <- out > 0.5
         }
-    }
 
-    als <- list()
+        out
+    })
 
-    for (a in problem$aliases) {
-        als[[a$name]] <- tcrossprod(a$coef, solution$variables) + a$add
-        als[[a$name]] <- als[[a$name]] |> as.matrix()
-    }
+    als <- purrr::map(problem$aliases, function(a) {
+        out <- tcrossprod(a$coef, solution$variables) + a$add
+
+        if (length(out) == 1L) {
+            unname(out[1])
+        } else {
+            out
+        }
+    })
 
     objective <- solution$objective + problem$objective$add
 
