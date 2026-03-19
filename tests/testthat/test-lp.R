@@ -70,3 +70,79 @@ test_that("feasible", {
 
     expect_equal(s, f)
 })
+
+test_that("no variables", {
+    expect_error(
+        lp_problem() |> lp_min(0) |> lp_solve(),
+        "no variables"
+    )
+})
+
+test_that("pretty solution optimal", {
+    r <- letters[1:2]
+    c <- LETTERS[1:3]
+
+    p <- lp_problem() |>
+        lp_variable(x[r, c], binary = TRUE) |>
+        lp_alias(total = sum(x)) |>
+        lp_maximize(total + 1)
+
+    s <- lp_solve(p)
+
+    expect_equal(s$status_number, 0)
+    expect_equal(s$objective, s$aliases$total + 1)
+
+    expect_equal(
+        dimnames(s$variables$x),
+        list(r = r, c = c)
+    )
+
+    ## Even if the variable is an integer, the storage mode needs to be double
+    ## so it supports infinity.
+    expect_equal(
+        storage.mode(s$variables$x),
+        "double"
+    )
+
+    sl <- lp_solve(p, binary_as_logical = TRUE)
+
+    expect_equal(
+        storage.mode(sl$variables$x),
+        "logical"
+    )
+})
+
+test_that("pretty solution unbounded", {
+    p <- lp_problem() |>
+        lp_var(y, integer = TRUE) |>
+        lp_max(y)
+
+    s_large <- lp_solve(p, unbound_as_inf = FALSE)
+    expect_equal(s_large$variables$y, 1e30)
+
+    # unbounded status does not work. this is a problem with lpSolveAPI
+    # expect_equal(s_large$status_number, 3)
+
+    s_inf <- lp_solve(p, unbound_as_inf = TRUE)
+    expect_equal(s_inf$variables$y, Inf)
+})
+
+test_that("infeasible", {
+    p <- lp_problem() |>
+        lp_variable(z[1:3]) |>
+        lp_alias(a = 2*z[1]) |>
+        lp_constraint(z <= z - 1)
+
+    s <- lp_find_feasible(p)
+
+    expect_equal(s$status_number, 2)
+    expect_equal(s$status_description, "the model is infeasible")
+
+    expect_true(is.na(s$objective))
+    expect_true(is.na(s$aliases$a))
+    expect_true( all(is.na(s$variables$z)) )
+    expect_equal(
+        dimnames(p$variables$z),
+        dimnames(s$variables$z)
+    )
+})
