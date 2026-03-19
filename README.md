@@ -9,7 +9,8 @@
 # lpsugar
 
 lpsugar is an AML (Algebraic Modeling Language) inspired in R’s
-vectorized syntax. Define and Mixed Integer Linear Programs (MILP).
+vectorized syntax, used to define and solve Mixed Integer Linear
+Programs (MILP).
 
 ## Installation
 
