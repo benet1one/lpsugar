@@ -85,8 +85,11 @@ production_problem <- lp_problem() |>
     lp_var(units[products], integer = TRUE, lower = 0) |> 
     lp_max(sum(price * units)) |> 
     lp_con(
-        for (r in resources) 
-            sum(requires[r, ] * units) <= available[r]
+        for (r in resources) {
+            req_r <- requires[r, ]
+            used_r <- sum(req_r * units)
+            (used_r <= available[r])
+        }
     )
 
 production_solution <- lp_solve(production_problem)
