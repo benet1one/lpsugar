@@ -1,4 +1,3 @@
-
 # Diet problem
 ## You can only eat as much as you have of each food.
 

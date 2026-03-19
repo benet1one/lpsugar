@@ -25,7 +25,7 @@
 #'
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_constraint.R
 lp_constraint <- function(.problem, ...) {
     check_problem(.problem)
     data <- data_mask(.problem)

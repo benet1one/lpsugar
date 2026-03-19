@@ -87,7 +87,6 @@ Used for objective, constraints and aliases.
 Add a variable to a problem by defining it's name, dimensions, type, and bounds.
 }
 \examples{
-
 # Diet problem
 ## You can only eat as much as you have of each food.
 
