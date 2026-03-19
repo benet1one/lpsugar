@@ -190,6 +190,11 @@ solve_model <- function(model) {
     variables <- lpSolveAPI::get.variables(model) |>
         rlang::set_names(colnames(model))
 
+    if (status_number %in% c(2, 5, 6, 7, 10, 13)) {
+        objective[] <- NA_real_
+        variables[] <- NA_real_
+    }
+
     list(
         objective = objective,
         variables = variables,
