@@ -32,6 +32,13 @@ A list with the following fields:
 \item \verb{$status_description} : String describing the status of the solver.
 \item \verb{$pointer} : Pointer to the \code{lpSolveAPI} model, class \code{lpExtPtr}.
 }
+
+For a full list of status and their meaning
+see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}. Some common status are:
+\itemize{
+\item \verb{0 | optimal solution found}
+\item \verb{2 | the model is infeasible}
+}
 }
 \description{
 Takes a problem and its solution and prettifies the solution. Used internally

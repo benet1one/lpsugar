@@ -4,19 +4,10 @@
 \alias{solve_model}
 \title{Solve a Model}
 \usage{
-solve_model(model, report_status = FALSE)
+solve_model(model)
 }
 \arguments{
 \item{model}{A pointer of class \code{lpExtPtr} created with \code{\link[=make_model]{make_model()}} or \code{\link[lpSolveAPI:make.lp]{lpSolveAPI::make.lp()}}.}
-
-\item{report_status}{Boolean, whether to emit a message indicating the status number and
-description of the solver. For a full list of status and their meaning
-see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}.Some common status are:
-\itemize{
-\item \verb{0 | optimal solution found}
-\item \verb{2 | the model is infeasible}
-\item \verb{3 | the model is unbounded}
-}}
 }
 \description{
 Find the optimal solution of a model created with \code{\link[=make_model]{make_model()}} or \code{\link[lpSolveAPI:make.lp]{lpSolveAPI::make.lp()}}.

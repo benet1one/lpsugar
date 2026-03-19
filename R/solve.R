@@ -9,13 +9,6 @@
 #' are returned as `{0, 1}`. If `TRUE`, binary variables are returned as logical `{FALSE, TRUE}`.
 #' @param unbound_as_inf Boolean, whether to replace very large numbers with `+Inf` and
 #' very small numbers with `-Inf`.
-#' @param report_status Boolean, whether to emit a message indicating the status number and
-#' description of the solver. For a full list of status and their meaning
-#' see [lpSolveAPI::solve.lpExtPtr()].Some common status are:
-#' - `0 | optimal solution found`
-#' - `2 | the model is infeasible`
-#' - `3 | the model is unbounded`
-#'
 #' @param ... Control parameters passed to [lpSolveAPI::lp.control()]. For a full list of
 #' options see [lpSolveAPI::lp.control.options()].
 #' @param verbose String indicating the severity of messages reported by `lp_solve`.
@@ -34,14 +27,19 @@
 #' - `$status_number` : Integer indicating the status of the solver.
 #' - `$status_description` : String describing the status of the solver.
 #' - `$pointer` : Pointer to the `lpSolveAPI` model, class `lpExtPtr`.
+#'
+#' For a full list of status and their meaning
+#' see [lpSolveAPI::solve.lpExtPtr()]. Some common status are:
+#' - `0 | optimal solution found`
+#' - `2 | the model is infeasible`
 #' @export
 #'
 #' @examples
 lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
-                     report_status = FALSE, verbose = "severe", ...) {
+                     verbose = "severe", ...) {
     check_problem(.problem)
     model <- make_model(.problem, verbose = verbose, ...)
-    solution_raw <- solve_model(model, report_status = report_status)
+    solution_raw <- solve_model(model)
 
     pretty_solution(
         .problem,
@@ -54,7 +52,7 @@ lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
 #' @rdname lp_solve
 #' @export
 lp_find_feasible <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
-                             report_status = FALSE, verbose = "severe", ...) {
+                             verbose = "severe", ...) {
     check_problem(.problem)
 
     .problem |>
@@ -62,7 +60,6 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, unbound_as_inf
         lp_solve(
             binary_as_logical = binary_as_logical,
             unbound_as_inf = unbound_as_inf,
-            report_status = report_status,
             verbose = verbose,
             ...
         )
@@ -153,7 +150,6 @@ make_model <- function(problem, verbose = "severe", ...) {
 #' Used internally in [lp_solve()].
 #'
 #' @param model A pointer of class `lpExtPtr` created with [make_model()] or [lpSolveAPI::make.lp()].
-#' @inheritParams lp_solve
 #'
 #' @section Value:
 #'  A list with fields:
@@ -166,7 +162,7 @@ make_model <- function(problem, verbose = "severe", ...) {
 #' @export
 #'
 #' @examples
-solve_model <- function(model, report_status = FALSE) {
+solve_model <- function(model) {
     if (!inherits(model, "lpExtPtr")) {
         abort("Model must be an `lpExtPtr` object created with `make_model()`.")
     }
@@ -189,10 +185,6 @@ solve_model <- function(model, report_status = FALSE) {
         "13" = "no feasible branch and bound solution was found",
         "undocumented status"
     )
-
-    if (report_status) {
-        inform("Status = {status_number} | {status_description}.")
-    }
 
     objective <- lpSolveAPI::get.objective(model)
     variables <- lpSolveAPI::get.variables(model) |>

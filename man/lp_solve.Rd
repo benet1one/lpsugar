@@ -9,7 +9,6 @@ lp_solve(
   .problem,
   binary_as_logical = FALSE,
   unbound_as_inf = TRUE,
-  report_status = FALSE,
   verbose = "severe",
   ...
 )
@@ -18,7 +17,6 @@ lp_find_feasible(
   .problem,
   binary_as_logical = FALSE,
   unbound_as_inf = TRUE,
-  report_status = FALSE,
   verbose = "severe",
   ...
 )
@@ -31,15 +29,6 @@ are returned as \verb{\{0, 1\}}. If \code{TRUE}, binary variables are returned a
 
 \item{unbound_as_inf}{Boolean, whether to replace very large numbers with \code{+Inf} and
 very small numbers with \code{-Inf}.}
-
-\item{report_status}{Boolean, whether to emit a message indicating the status number and
-description of the solver. For a full list of status and their meaning
-see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}.Some common status are:
-\itemize{
-\item \verb{0 | optimal solution found}
-\item \verb{2 | the model is infeasible}
-\item \verb{3 | the model is unbounded}
-}}
 
 \item{verbose}{String indicating the severity of messages reported by \code{lp_solve}.
 \itemize{
@@ -64,6 +53,13 @@ A list with the following fields:
 \item \verb{$status_number} : Integer indicating the status of the solver.
 \item \verb{$status_description} : String describing the status of the solver.
 \item \verb{$pointer} : Pointer to the \code{lpSolveAPI} model, class \code{lpExtPtr}.
+}
+
+For a full list of status and their meaning
+see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}. Some common status are:
+\itemize{
+\item \verb{0 | optimal solution found}
+\item \verb{2 | the model is infeasible}
 }
 }
 \description{
