@@ -1,0 +1,107 @@
+---
+title: "Regression"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Regression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(lpsugar)
+```
+
+This vignette focuses on different regression techniques that can be solved
+using linear models.
+
+$$
+y_i = \sum_{j=1}^k{\beta_j x_{ij}} + e_i
+$$
+We start by generating the data we'll use.
+
+```{r}
+set.seed(123)
+n <- 50
+k <- 3
+
+true_beta <- c(2, 3, -5)
+
+x <- matrix(rpois(n*k, 6), nrow = n, ncol = k)
+x[, 1] <- 1
+
+e <- rnorm(n)
+y <- (x %*% true_beta) + e
+
+head(x)
+head(y)
+```
+
+
+## Least Absolute Deviation
+
+The objective of Least Absolute Deviation (LAD) regression is to minimize the absolute
+residuals.
+
+$$
+\min{\sum_{i=1}^n{|e_i|}}
+$$
+
+The absolute value function $|e|$ is not linear, so we have to separate each $e_i$ into:
+
+$$
+e_i = e_i^+ - e_i^-
+$$
+$$
+e_i^+ \ge 0,\ e_i^- \ge 0
+$$
+Then the problem can be written like this:
+
+$$
+\begin{array}{rl}
+  \min & \sum_{i=1}^n{e_i^+ + e_i^-} \\
+  \text{st} & e_i^+ \ge + y_i - \sum_{j=1}^k{\beta_j x_{ij}} \\
+            & e_i^- \ge - y_i + \sum_{j=1}^k{\beta_j x_{ij}} \\
+            & e_i^+ \ge 0 \\
+            & e_i^- \ge 0
+\end{array}
+$$
+
+This works. The objective function attempts to push both $e_i^+$ and $e_i^-$ down,
+but the constraints ensure that:
+
+- If $e_i > 0\ \Rightarrow\ e_i^+ = e_i,\ e_i^- = 0$.
+
+- If $e_i < 0\ \Rightarrow\ e_i^+ = 0,\ e_i^- = |e_i|$.
+
+Let's write the problem in `lpsugar`.
+
+```{r}
+n <- nrow(x)
+k <- ncol(x)
+
+lad <- lp_problem() |> 
+    lp_var(beta[1:k]) |> 
+    lp_var(e_pos[1:n], lower = 0) |> 
+    lp_var(e_neg[1:n], lower = 0) |> 
+    lp_min(sum(e_pos + e_neg)) |> 
+    lp_con(
+        pos = for (i in 1:n)
+            e_pos[i] >= +y[i] - sum(beta * x[i, ]),
+        neg = for (i in 1:n)
+            e_neg[i] >= -y[i] + sum(beta * x[i, ])
+    ) |> 
+    lp_solve()
+
+cbind(
+    true_beta = true_beta,
+    lad_beta = lad$variables$beta |> round(2)
+)
+```
+

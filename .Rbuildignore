@@ -4,3 +4,5 @@
 ^README\.Rmd$
 ^inst/tasks$
 ^\.github$
+^doc$
+^Meta$
