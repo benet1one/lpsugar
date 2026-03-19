@@ -1,6 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/benet1one/lpsugar/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/benet1one/lpsugar/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 # lpsugar
 
 lpsugar is an AML (Algebraic Modeling Language) inspired in R’s
