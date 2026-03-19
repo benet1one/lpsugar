@@ -34,7 +34,7 @@
 #' - `2 | the model is infeasible`
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_solve.R
 lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
                      verbose = "severe", ...) {
     check_problem(.problem)
