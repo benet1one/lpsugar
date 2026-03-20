@@ -1,11 +1,12 @@
 
 First Release
-- Readme and examples
+- Examples
 
 Code
 - remove constraints
 - better error handling for constraints (purrr::map2)
 - better error handling for parameter_matrix
+- print.lp_solution
 - why do rownames(ptr) not work?
 - sensitivity
 
