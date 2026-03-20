@@ -56,15 +56,14 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
     }
 
     con <- for_split(quosure, evaluate = TRUE, data = data)
-    non_constraint_error <- glue::glue(
-        "Expression did not evaluate to a constraint.\n",
-        "Did you forget the comparison operator? `<=/==/>=`"
+    non_constraint_error <- c(
+        "Expression did not evaluate to a constraint.",
+        i = "Did you forget the comparison operator? `<=/==/>=`"
     )
 
     if (is_lp_constraint(con)) {
         rownames(con$lhs) <- rep(name, nrow(con$lhs))
         con$name[] <- name
-        return(con)
 
     } else if (is_for_split(con)) {
         fs <- flatten(con)
@@ -74,7 +73,7 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
             ind <- names(fs)[k]
 
             if (!is_lp_constraint(c)) {
-                abort(non_constraint_error, call = expr)
+                rlang::abort(non_constraint_error, call = expr)
             }
 
             rownames(c$lhs) <- rep(paste0(name, ind), nrow(c$lhs))
@@ -84,16 +83,20 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
         con <- do.call(rbind.lp_constraint, fs)
         con$name[] <- name
 
-        expr_str <- format(expr)
-
-        if (length(expr_str) == 1L) {
-            con$call[] <- format(expr)
-        }
-
-        return(con)
+    } else {
+        rlang::abort(non_constraint_error, call = expr)
     }
 
-    abort(non_constraint_error, call = expr)
+    expr_str <- format(expr)
+
+    if (length(expr_str) == 1L) {
+        con$call[] <- expr_str
+    } else {
+        is_bracket <- expr_str[1] |> endsWith("{")
+        con$call[] <- paste(expr_str[1], "...", if (is_bracket) "}")
+    }
+
+    return(con)
 }
 
 # Alias ----------------------------------

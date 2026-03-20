@@ -1,8 +1,15 @@
 
 test_that("printing", {
+    plong <- lp_problem() |>
+        lp_var(x) |>
+        lp_con(x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x > 1)
+
+    print(plong$constraints)
+    print(plong$constraints, compact = TRUE) |> expect_snapshot()
+
     p <- problem_constraints()
     print(p$constraints)
-    print(p$constraints, compact = TRUE)
+    print(p$constraints, compact = TRUE) |> expect_snapshot()
 })
 
 test_that("constraint updates", {

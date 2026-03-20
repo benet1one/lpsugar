@@ -17,6 +17,6 @@ problem_constraints <- function() {
             one_line_fs = for (i in 1:3) x[i, ] >= y[, i] - 10,
             my_fs = for (i in 1:3) {
                 x[i, ] <= y[, i]
-            },
+            }
         )
 }
