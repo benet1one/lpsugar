@@ -77,7 +77,7 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, unbound_as_inf
 #' @returns An `lpExtPtr` pointer from the `lpSolveAPI` package.
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_solve_steps.R
 make_model <- function(problem, verbose = "severe", ...) {
     check_problem(problem)
 
@@ -161,7 +161,7 @@ make_model <- function(problem, verbose = "severe", ...) {
 #' - `$pointer` : Pointer to the `lpSolveAPI` model, class `lpExtPtr`.
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_solve_steps.R
 solve_model <- function(model) {
     if (!inherits(model, "lpExtPtr")) {
         abort("Model must be an `lpExtPtr` object created with `make_model()`.")
@@ -213,7 +213,7 @@ solve_model <- function(model) {
 #' @inherit lp_solve
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_solve_steps.R
 pretty_solution <- function(problem, solution,
                             binary_as_logical = FALSE, unbound_as_inf = TRUE) {
     check_problem(problem)
