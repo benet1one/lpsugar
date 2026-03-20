@@ -9,8 +9,6 @@
 #' are returned as `{0, 1}`. If `TRUE`, binary variables are returned as logical `{FALSE, TRUE}`.
 #' @param unbound_as_inf Boolean, whether to replace very large numbers with `+Inf` and
 #' very small numbers with `-Inf`.
-#' @param ... Control parameters passed to [lpSolveAPI::lp.control()]. For a full list of
-#' options see [lpSolveAPI::lp.control.options()].
 #' @param verbose String indicating the severity of messages reported by `lp_solve`.
 #' - `"neutral"` : No reporting.
 #' - `"critical"` : Only critical messages are reported. Hard errors like instability, out of memory, etc.
@@ -19,6 +17,8 @@
 #' - `"normal"` :	Normal messages are reported.
 #' - `"detailed"` : Detailed messages are reported. Like model size, continuing B&B improvements, etc.
 #' - `"full"` : All messages are reported. Useful for debugging purposes and small models.
+#' @param ... Control parameters passed to [lpSolveAPI::lp.control()]. For a full list of
+#' options see [lpSolveAPI::lp.control.options()].
 #'
 #' @returns A list with the following fields:
 #' - `$objective` : Numeric scalar, value of the objective function at the optimal.
