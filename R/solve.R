@@ -17,6 +17,10 @@
 #' - `"normal"` :	Normal messages are reported.
 #' - `"detailed"` : Detailed messages are reported. Like model size, continuing B&B improvements, etc.
 #' - `"full"` : All messages are reported. Useful for debugging purposes and small models.
+#' @param timeout Integer scalar, maximum time (in seconds) before the algorithm stops.
+#' If the algorithm finds the optimal solution before timeout, it returns a status 0 (optimal);
+#' if it finds a feasible solution but not the optimum, it returns a status 1 (sub-optimal);
+#' if it finds no feasible solution, it returns a status 7 (timeout).
 #' @param ... Control parameters passed to [lpSolveAPI::lp.control()]. For a full list of
 #' options see [lpSolveAPI::lp.control.options()].
 #'
@@ -31,14 +35,15 @@
 #' For a full list of status and their meaning
 #' see [lpSolveAPI::solve.lpExtPtr()]. Some common status are:
 #' - `0 | optimal solution found`
+#' - `1 | the model is sub-optimal`
 #' - `2 | the model is infeasible`
 #' @export
 #'
 #' @example inst/examples/example_solve.R
 lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
-                     verbose = "severe", ...) {
+                     verbose = "severe", timeout = NULL, ...) {
     check_problem(.problem)
-    model <- make_model(.problem, verbose = verbose, ...)
+    model <- make_model(.problem, verbose = verbose, timeout = timeout, ...)
     solution_raw <- solve_model(model)
 
     pretty_solution(
@@ -52,7 +57,7 @@ lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
 #' @rdname lp_solve
 #' @export
 lp_find_feasible <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
-                             verbose = "severe", ...) {
+                             verbose = "severe", timeout = NULL, ...) {
     check_problem(.problem)
 
     .problem |>
@@ -78,13 +83,15 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, unbound_as_inf
 #' @export
 #'
 #' @example inst/examples/example_solve_steps.R
-make_model <- function(problem, verbose = "severe", ...) {
+make_model <- function(problem, verbose = "severe", timeout = NULL, ...) {
     check_problem(problem)
 
+    # No variables
     if (problem$.nvar == 0L) {
         abort("Problem has no variables. Define them with `lp_variable()`.")
     }
 
+    # Direction
     dir <- if (problem$objective$direction == "minimize") {
         "min"
     } else if (problem$objective$direction == "maximize") {
@@ -101,6 +108,9 @@ make_model <- function(problem, verbose = "severe", ...) {
         ))
     }
 
+    # Timeout
+    timeout <- control_timeout(timeout)
+
     ptr <- lpSolveAPI::make.lp(
         nrow = 0,
         ncol = problem$.nvar,
@@ -108,7 +118,7 @@ make_model <- function(problem, verbose = "severe", ...) {
     )
 
     lpSolveAPI::set.objfn(ptr, problem$objective$coef)
-    lpSolveAPI::lp.control(ptr, sense = dir, ...)
+    lpSolveAPI::lp.control(ptr, sense = dir, timeout = timeout, ...)
 
     for (x in problem$variables) {
         lpSolveAPI::set.type(
@@ -262,3 +272,23 @@ pretty_solution <- function(problem, solution,
         pointer = solution$pointer
     )
 }
+
+# Control Helpers -----------------------------------
+
+control_timeout <- function(timeout = NULL) {
+    if (length(timeout) == 0L) {
+        return(0)
+    } else if (length(timeout) > 1L) {
+        abort("`timeout` needs to be length one integer.")
+    } else if (!is.numeric(timeout)) {
+        abort("`timeout` needs to be an integer scalar")
+    } else if (timeout <= 0) {
+        return(0)
+    } else if (timeout < 1) {
+        warn("`timeout` needs to be an integer scalar, rounding to 1 second")
+        return(1)
+    } else {
+        return(ceiling(timeout))
+    }
+}
+

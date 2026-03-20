@@ -37,6 +37,7 @@ For a full list of status and their meaning
 see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}. Some common status are:
 \itemize{
 \item \verb{0 | optimal solution found}
+\item \verb{1 | the model is sub-optimal}
 \item \verb{2 | the model is infeasible}
 }
 }

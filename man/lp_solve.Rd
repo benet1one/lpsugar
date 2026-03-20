@@ -10,6 +10,7 @@ lp_solve(
   binary_as_logical = FALSE,
   unbound_as_inf = TRUE,
   verbose = "severe",
+  timeout = NULL,
   ...
 )
 
@@ -18,6 +19,7 @@ lp_find_feasible(
   binary_as_logical = FALSE,
   unbound_as_inf = TRUE,
   verbose = "severe",
+  timeout = NULL,
   ...
 )
 }
@@ -41,6 +43,11 @@ very small numbers with \code{-Inf}.}
 \item \code{"full"} : All messages are reported. Useful for debugging purposes and small models.
 }}
 
+\item{timeout}{Integer scalar, maximum time (in seconds) before the algorithm stops.
+If the algorithm finds the optimal solution before timeout, it returns a status 0 (optimal);
+if it finds a feasible solution but not the optimum, it returns a status 1 (sub-optimal);
+if it finds no feasible solution, it returns a status 7 (timeout).}
+
 \item{...}{Control parameters passed to \code{\link[lpSolveAPI:lp.control]{lpSolveAPI::lp.control()}}. For a full list of
 options see \code{\link[lpSolveAPI:lp.control.options]{lpSolveAPI::lp.control.options()}}.}
 }
@@ -59,6 +66,7 @@ For a full list of status and their meaning
 see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}. Some common status are:
 \itemize{
 \item \verb{0 | optimal solution found}
+\item \verb{1 | the model is sub-optimal}
 \item \verb{2 | the model is infeasible}
 }
 }

@@ -4,7 +4,7 @@
 \alias{make_model}
 \title{Make a Linear Program Model}
 \usage{
-make_model(problem, verbose = "severe", ...)
+make_model(problem, verbose = "severe", timeout = NULL, ...)
 }
 \arguments{
 \item{problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
@@ -19,6 +19,11 @@ make_model(problem, verbose = "severe", ...)
 \item \code{"detailed"} : Detailed messages are reported. Like model size, continuing B&B improvements, etc.
 \item \code{"full"} : All messages are reported. Useful for debugging purposes and small models.
 }}
+
+\item{timeout}{Integer scalar, maximum time (in seconds) before the algorithm stops.
+If the algorithm finds the optimal solution before timeout, it returns a status 0 (optimal);
+if it finds a feasible solution but not the optimum, it returns a status 1 (sub-optimal);
+if it finds no feasible solution, it returns a status 7 (timeout).}
 
 \item{...}{Control parameters passed to \code{\link[lpSolveAPI:lp.control]{lpSolveAPI::lp.control()}}. For a full list of
 options see \code{\link[lpSolveAPI:lp.control.options]{lpSolveAPI::lp.control.options()}}.}
