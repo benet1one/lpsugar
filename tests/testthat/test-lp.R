@@ -169,8 +169,8 @@ test_that("timeout", {
 
     withr::local_seed(123)
 
-    n <- 500
-    m <- 40
+    n <- 250
+    m <- 30
     objective_coef <- runif(n)
     constraint_coef <- matrix(
         rpois(n*m, lambda = 2),
@@ -189,5 +189,5 @@ test_that("timeout", {
         s_slow <- lp_solve(p_slow, timeout = 1)
     )
 
-    expect_true(time[1] < 5)
+    expect_true(time[1] < 3) # user time
 })
