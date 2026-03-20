@@ -135,6 +135,7 @@ test_that("operations", {
     expect_identical(x, +x)
     expect_identical(x/2, x*0.5)
     expect_identical(1-y, !y)
+    expect_identical(1-y[1], !y[1])
     expect_identical(2*y, y + y)
     expect_identical(-z, z - 2*z)
 
@@ -145,6 +146,9 @@ test_that("operations", {
     expect_error(x^2, "Cannot use powers or exponentials")
     expect_error(2/x, "Cannot divide by a variable")
     expect_error(!x, "only supported for binary variables")
+
+    expect_error(!(y[1] + x), "only supported for binary variables")
+    expect_error(!(x + y[1]), "only supported for binary variables")
 
     expect_error(abs(x), "absolute value")
     expect_error(exp(x), "exp")

@@ -165,6 +165,7 @@ add_v_v <- function(x, y, call) {
     z$coef <- x$coef + y$coef
     z$add <- z$add + y$add
     z$raw <- FALSE
+    z$binary <- FALSE
 
     return(z)
 }
@@ -180,6 +181,7 @@ add_v_c <- function(x, c, call) {
 
     x$add <- x$add + c
     x$raw <- FALSE
+    x$binary <- FALSE
 
     return(x)
 }
@@ -211,6 +213,7 @@ multiply_v_c <- function(x, c, call) {
     x$coef <- horizontal_multiply(x$coef, c)
     x$add <- x$add * c
     x$raw <- FALSE
+    x$binary <- FALSE
 
     return(x)
 }
@@ -235,7 +238,7 @@ divide_a_v <- function(x, y, call) {
 # Logic ------------------------
 
 negate_v <- function(x, call) {
-    if (!x$raw || !x$binary) {
+    if (!x$binary) {
         abort("Negation `!{x$name}` is only supported for binary variables.", call = call)
     }
 
@@ -243,6 +246,7 @@ negate_v <- function(x, call) {
     x$coef <- -x$coef
     x$add <- -x$add + 1
     x$raw <- FALSE
+    x$binary <- FALSE
 
     return(x)
 }
