@@ -128,3 +128,58 @@ test_that("apply", {
         "Ignoring argument `dims`"
     )
 })
+
+test_that("ifelse1", {
+    n <- 10
+    upper <- 50
+
+    p <- lp_problem() |>
+        lp_var(y[1:n], upper = upper) |>
+        lp_var(less_than_index[1:n], binary = TRUE) |>
+        lp_max(sum(y)) |>
+        lp_con(sum(less_than_index) >= 5)
+
+    p1 <- p |> lp_con(
+        y <= ifelse(less_than_index, yes = 1:n, no = upper)
+    )
+    p2 <- p |> lp_con(
+        y <= ifelse(!less_than_index, yes = upper, no = 1:n)
+    )
+    p3 <- p |> lp_con(
+        for (i in 1:n) {
+            y[i] <= ifelse(less_than_index[i], yes = i, no = upper)
+        }
+    )
+
+    expect_equal(p1$constraints$lhs, p2$constraints$lhs)
+    expect_equal(p1$constraints$rhs, p2$constraints$rhs)
+
+    expect_equal(p1$constraints$lhs, p3$constraints$lhs, ignore_attr = TRUE)
+    expect_equal(p1$constraints$rhs, p3$constraints$rhs)
+
+    s <- lp_solve(p1)
+    s
+
+    expect_error(
+        p |> lp_con(ifelse(less_than_index, y <= 1:n, y <= upper)),
+        "`yes` and `no` cannot be constraints"
+    )
+})
+
+test_that("ifelse2", {
+    n <- 6
+    x_coef <- c(0.2, 1.4, 1.1, 0.8, 0.5, 2.6)
+
+    p <- lp_problem() |>
+        lp_var(x[1:n], lower = 0) |>
+        lp_var(cap[1:n], upper = 10) |>
+        lp_var(cap_special, upper = 10) |>
+        lp_con(
+            x < ifelse(1:n <= 2, cap_special, cap),
+            x > ifelse(1:n <= 3, 1:n, cap_special/10),
+            x == ifelse(1:n <= 4, 2, 8)
+        )
+
+    withr::local_options(width = 100)
+    expect_snapshot(p$constraints)
+})

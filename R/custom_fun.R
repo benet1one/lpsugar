@@ -88,6 +88,22 @@ custom_fun <- function() {
             purrr::reduce(`+`)
     }
 
+    e$ifelse <- function(test, yes, no) {
+        if (is_lp_constraint(test)) {
+            abort("The `test` condition must be a binary variable, not an equality or inequality.")
+        }
+        if (is_lp_constraint(yes) || is_lp_constraint(no)) {
+            abort("`yes` and `no` cannot be constraints.")
+        }
+        if (is_lp_variable(test)) {
+            ifelse_v(test, yes, no)
+        } else if (is_lp_variable(yes) || is_lp_variable(no)) {
+            ifelse_l(test, yes, no)
+        } else {
+            base::ifelse(test, yes, no)
+        }
+    }
+
     e$apply <- function(X, MARGIN, FUN, ..., simplify = TRUE) {
         if (!is_lp_variable(X)) {
             return(base::apply(X, MARGIN, FUN, ..., simplify))
@@ -183,4 +199,85 @@ apply_v <- function(x, margin, fun, ...) {
     }
 
     return(y)
+}
+
+ifelse_v <- function(test, yes, no) {
+    if (!test$binary) {
+        abort("`test` must be a binary variable.")
+    }
+    if (is_lp_variable(yes) || is_lp_variable(no)) {
+        abort("If `test` is a variable, `yes` and `no` must be numbers, not variables.")
+    }
+
+    no + test * (yes - no)
+}
+ifelse_l <- function(test, yes, no) {
+    if (is.atomic(test)) {
+        if (typeof(test) != "logical")
+            storage.mode(test) <- "logical"
+        if (length(test) == 1 && is.null(attributes(test))) {
+            if (is.na(test))
+                return(NA)
+            else if (test) {
+                if (length(yes) == 1) {
+                    yat <- attributes(yes)
+                    if (is.null(yat) || (is.function(yes) && identical(names(yat),
+                                                                       "srcref")))
+                        return(yes)
+                }
+            }
+            else if (length(no) == 1) {
+                nat <- attributes(no)
+                if (is.null(nat) || (is.function(no) && identical(names(nat),
+                                                                  "srcref")))
+                    return(no)
+            }
+        }
+    }
+    else test <- if (isS4(test))
+        methods::as(test, "logical")
+    else as.logical(test)
+
+
+    len <- length(test)
+
+    # One of them is a variable
+    if (is_lp_variable(yes)) {
+        yes_v <- recycle_var(yes, len)
+        v <- yes_v
+    }
+    if (is_lp_variable(no)) {
+        no_v <- recycle_var(no, len)
+        v <- no_v
+    }
+
+    if (!is_lp_variable(yes)) {
+        yes_v <- v
+        yes_v$coef[] <- 0
+        yes_v$add[] <- rep_len(yes, len)
+    }
+    if (!is_lp_variable(no)) {
+        no_v <- v
+        no_v$coef[] <- 0
+        no_v$add[] <- rep_len(no, len)
+    }
+
+    out <- v
+    out$add <- matrix(NA, nrow = len, ncol = 1L)
+    out$coef <- matrix(NA, nrow = len, ncol = ncol(v$coef))
+    colnames(out$coef) <- colnames(v$coef)
+
+    ypos <- which(test)
+    npos <- which(!test)
+
+    if (length(ypos) > 0L) {
+        out$coef[ypos, ] <- yes_v$coef[ypos, ]
+        out$add[ypos, ] <- yes_v$add[ypos, ]
+    }
+    if (length(npos) > 0L) {
+        out$coef[npos, ] <- no_v$coef[npos, ]
+        out$add[npos, ] <- no_v$add[npos, ]
+    }
+
+    out
 }
