@@ -136,6 +136,8 @@ test_that("operations", {
     expect_identical(x/2, x*0.5)
     expect_identical(1-y, !y)
     expect_identical(1-y[1], !y[1])
+    expect_true( (!y)$binary )
+
     expect_identical(2*y, y + y)
     expect_identical(-z, z - 2*z)
 
@@ -164,7 +166,6 @@ test_that("operations", {
         }),
         "Unsupported operation"
     )
-
 
     expect_error(y + z, "non-conformable")
     expect_error(y * 1:2, "non-conformable")

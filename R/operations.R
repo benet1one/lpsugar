@@ -197,7 +197,14 @@ subtract_v_c <- function(x, c, call) {
 }
 # constant - var
 subtract_c_v <- function(c, x, call) {
-    add_v_c(minus_v(x), c, call)
+    z <- add_v_c(minus_v(x), c, call)
+
+    # If its (1-x) and x is binary, it stays binary
+    if (x$binary && c == 1) {
+        z$binary <- TRUE
+    }
+
+    return(z)
 }
 
 # var * constant
@@ -246,7 +253,7 @@ negate_v <- function(x, call) {
     x$coef <- -x$coef
     x$add <- -x$add + 1
     x$raw <- FALSE
-    x$binary <- FALSE
+    # x$binary <- FALSE
 
     return(x)
 }
