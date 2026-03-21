@@ -58,7 +58,7 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
     con <- for_split(quosure, evaluate = TRUE, data = data)
     non_constraint_error <- c(
         "Expression did not evaluate to a constraint.",
-        i = "Did you forget the comparison operator? `<=/==/>=`"
+        ">" = "Did you forget the comparison operator? `<=/==/>=`"
     )
 
     if (is_lp_constraint(con)) {
