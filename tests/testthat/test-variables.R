@@ -97,6 +97,21 @@ test_that("variable indexing", {
     expect_identical(rev(y), y[3:1])
     expect_identical(rev(y), y[rev(a)])
 
+    expect_equal(
+        rep(x, 3) + y,
+        x + y
+    )
+
+    expect_equal(
+        rep(y, 2),
+        rep(y, length.out = 6)
+    )
+
+    expect_equal(
+        rep(y, each = 2),
+        y[c(1, 1, 2, 2, 3, 3)]
+    )
+
     z1 <- z[1, ] $ ind
     z1_dropped <- z[1, , drop = TRUE] $ ind
 

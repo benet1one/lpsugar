@@ -274,6 +274,11 @@ c.lp_variable <- function(x, ...) {
     abort("`lp_variable`s don't support double indexing `{x$name}[[i]]`. Use `{x$name}[i]` instead")
 }
 #' @export
+rep.lp_variable <- function(x, ...) {
+    ind <- rep(1:length(x), ...)
+    x[ind]
+}
+#' @export
 t.lp_variable <- function(x) {
     if (ndim(x) > 2L) {
         msg <- glue::glue(
