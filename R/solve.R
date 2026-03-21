@@ -251,7 +251,9 @@ pretty_solution <- function(problem, solution,
     })
 
     als <- purrr::map(problem$aliases, function(a) {
-        out <- tcrossprod(a$coef, solution$variables) + a$add
+        mat <- array(unclass(a$coef), dim = dim(a$coef))
+        add <- unclass(a$add)
+        out <- tcrossprod(mat, solution$variables) + add
 
         if (length(out) == 1L) {
             unname(out[1])
@@ -264,13 +266,13 @@ pretty_solution <- function(problem, solution,
 
     list(
         objective = objective,
-        variables_vec = solution$variables,
         variables = vars,
         aliases = als,
+        variables_vec = solution$variables,
         status_number = solution$status_number,
         status_description = solution$status_description,
         pointer = solution$pointer
-    )
+    ) |> structure(class = "lp_solution")
 }
 
 # Control Helpers -----------------------------------
@@ -292,3 +294,21 @@ control_timeout <- function(timeout = NULL) {
     }
 }
 
+# Methods --------------------------------------
+
+#' @export
+print.lp_solution <- function(x, ...) {
+    if (!is.na(x$objective)) {
+        print(x["variables"])
+
+        if (length(x$aliases) > 0L) {
+            print(x["aliases"])
+        }
+
+        print(x["objective"])
+    }
+
+    cat("Status =", x$status_number, "|", x$status_description, "\n\n")
+    cat("Fields:\n")
+    cat(paste0("-- $", names(x), " --\n"), sep = "")
+}
