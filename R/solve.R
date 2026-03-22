@@ -147,7 +147,16 @@ make_model <- function(problem, verbose = "severe", timeout = NULL, ...) {
             )
         }
 
-        # rownames(ptr) <- problem$constraints$name
+        for (nam in unique(con$name))  if (nam != "") {
+            ind <- con$name == nam
+            n <- sum(ind)
+
+            rownames(ptr)[ind] <- if (n > 1L) {
+                paste0(nam, "[", 1:sum(ind), "]")
+            } else {
+                nam
+            }
+        }
     }
 
     colnames(ptr) <- problem$.varnames
