@@ -160,6 +160,9 @@ make_model <- function(problem, verbose = "severe", timeout = NULL, ...) {
     }
 
     colnames(ptr) <- problem$.varnames
+    attr(ptr, "original_colnames") <- colnames(ptr)
+    attr(ptr, "original_rownames") <- rownames(ptr)
+
     ptr
 }
 
