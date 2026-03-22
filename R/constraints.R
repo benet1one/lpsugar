@@ -30,11 +30,19 @@ lp_constraint <- function(.problem, ...) {
     check_problem(.problem)
     data <- data_mask(.problem)
     quos <- rlang::enquos(...)
+    nams <- rlang::names2(quos)
     varnames <- c(names(.problem$variables), names(.problem$aliases))
 
-    cons <- purrr::map2(quos, rlang::names2(quos), function(q, name) {
-        lp_constraint_internal(quosure = q, name = name, data = data, varnames = varnames)
-    })
+    cons <- list()
+
+    for (i in seq_along(quos)) {
+        cons[[i]] <- lp_constraint_internal(
+            quosure = quos[[i]],
+            name = nams[i],
+            data = data,
+            varnames = varnames
+        )
+    }
 
     cons <- do.call(rbind.lp_constraint, cons)
 
