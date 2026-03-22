@@ -31,6 +31,11 @@ test_that("parameter", {
     cm |> parameter(a, b, byrow = FALSE)
 
     expect_error(
+        c(1, 2, 3, 4, 5) |> parameter(a, b),
+        r"(`.x` is length \(5\) when it should be length \(6 = 2 x 3\))"
+    )
+
+    expect_error(
         1 |> parameter(a, b, 1:2),
         "Only vectors and matrices are supported"
     )
@@ -45,7 +50,7 @@ test_that("parameter", {
 
     expect_error(
         true_mat |> parameter(b, a),
-        "not equal to array extent"
+        r"(`.x` has dimensions \(2 x 3\), while `...` have dimensions \(3 x 2\))"
     )
 })
 

@@ -63,16 +63,29 @@ parameter_vector <- function(.x, dots) {
 }
 
 parameter_matrix <- function(.x, dots, byrow = TRUE) {
+    n <- lengths(dots)[1]
+    m <- lengths(dots)[2]
+
     if (ndim(.x) == 1L) {
+        if (length(.x) != 1L && length(.x) != n*m) {
+            abort("`.x` is length ({length(.x)}) when it should be length ({n*m} = {n} x {m})",
+                  call = parent.frame())
+        }
+
         return(matrix(
-            .x,
-            nrow = length(dots[[1]]),
-            ncol = length(dots[[2]]),
-            byrow = byrow,
-            dimnames = dots
+            .x, nrow = n, ncol = m,
+            byrow = byrow, dimnames = dots
         ))
 
     } else if (ndim(.x) == 2L) {
+        if (any(dim(.x) != lengths(dots))) {
+            msg <- glue::glue(
+                "`.x` has dimensions ({nrow(.x)} x {ncol(.x)}), ",
+                "while `...` have dimensions ({n} x {m})."
+            )
+            abort(msg, call = parent.frame())
+        }
+
         warn_changed_args(byrow = TRUE)
         dimnames(.x) <- dots
         return(.x)
