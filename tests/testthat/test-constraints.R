@@ -18,6 +18,38 @@ test_that("constraint updates", {
     p |> lp_variable(z[1:2]) |> lp_constraint(x[2] <= 4*z[2]) |> _$constraints
 })
 
+test_that("deleting constraints", {
+    p <- lp_problem() |>
+        lp_variable(x[1:3]) |>
+        lp_subject_to(
+            first = (x > 0),
+            second = for (i in 2:3) x[i] > x[i-1],
+            x[1] < 5
+        )
+
+    expect_true({
+        p2 <- p |> lp_delete_constraint(c("first"))
+        all(p2$constraints$name == c("second", "second", ""))
+    })
+    expect_true({
+        p3 <- p |> lp_delete_constraint(c("first", "second"))
+        p3$constraints$name == ""
+    })
+
+    expect_warning(
+        p |> lp_delete_constraint(c("second", "third", "fourth")),
+        'The following constraints are not defined.+"third", "fourth"'
+    )
+    expect_warning(
+        p |> lp_delete_constraint(c("second", "<unnamed>")),
+        "Cannot delete unnamed constraints"
+    )
+    expect_warning(
+        p |> lp_delete_constraint(c("second", "")),
+        "Cannot delete unnamed constraints"
+    )
+})
+
 test_that("non constraint", {
     p <- problem_constraints()
 

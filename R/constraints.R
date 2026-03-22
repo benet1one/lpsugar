@@ -107,6 +107,35 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
     return(con)
 }
 
+#' Delete constraints
+#'
+#' Remove named constraints from an [lp_problem()].
+#' @export
+lp_delete_constraint <- function(.problem, names) {
+    check_problem(.problem)
+    stopifnot(is.character(names))
+
+    if (any(names == "") || any(names == "<unnamed>")) {
+        warn("Cannot delete unnamed constraints.")
+        names <- names[names != "" & names != "<unnamed>"]
+    }
+
+    not_defined <- which(!(names %in% .problem$constraint$name))
+
+    if (length(not_defined) > 0L) {
+        not_defined <- names[not_defined] |>
+            head(3) |>
+            dQuote(q = FALSE) |>
+            paste(collapse = ", ")
+
+        warn("The following constraints are not defined: \n{not_defined}")
+    }
+
+    to_delete <- .problem$constraints$name %in% names
+    .problem$constraints <- .problem$constraints[!to_delete]
+    return(.problem)
+}
+
 # Alias ----------------------------------
 
 #' @rdname lp_constraint
