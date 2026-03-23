@@ -60,7 +60,7 @@ lp_objective <- function(.problem, objective) {
 #' @export
 #'
 #' @rdname lp_objective
-#' @examples
+#' @example inst/examples/example_objective.R
 lp_minimize <- function(.problem, objective) {
     check_problem(.problem)
     .problem$objective$direction <- "minimize"
