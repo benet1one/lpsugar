@@ -229,3 +229,37 @@ test_that("sum", {
         sum(y, c(1, 1, NA), na.rm = FALSE) # Default
     )
 })
+
+test_that("matrix operations", {
+    r <- 1:2
+    c <- 1:3
+
+    beta <- c(3, 2, -1)
+    gamma <- matrix(1:12, nrow = 3)
+
+    p <- lp_problem() |>
+        lp_variable(x[r, c])
+
+    p |> lp_eval(beta %*% matrix(2))
+    xb <- p |> lp_eval(x %*% beta)
+    bx <- p |> lp_eval(t(beta) %*% t(x))
+
+    expect_equal(
+        xb$ind,
+        t(bx)$ind
+    )
+    expect_equal(
+        xb$coef,
+        t(bx)$coef
+    )
+
+    expect_error(
+        p |> lp_eval(beta %*% x),
+        "non-conformable"
+    )
+
+    expect_error(
+        p |> lp_eval(x %*% x),
+        "Cannot matrix multiply `%\\*%` two variables"
+    )
+})
