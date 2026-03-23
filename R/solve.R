@@ -184,7 +184,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     als <- purrr::map(problem$aliases, function(a) {
         mat <- array(unclass(a$coef), dim = dim(a$coef))
         add <- unclass(a$add)
-        out <- tcrossprod(mat, solution$solution) + add
+        out <- mat %*% solution$solution + add
 
         if (length(out) == 1L) {
             unname(out[1])
