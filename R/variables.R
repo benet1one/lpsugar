@@ -104,11 +104,11 @@ lp_variable <- function(.problem, definition,
     }
 
     type <- if (binary) {
-        "binary"
+        "B"
     } else if (integer) {
-        "integer"
+        "I"
     } else {
-        "real"
+        "C"
     }
 
     # Index array of variable.

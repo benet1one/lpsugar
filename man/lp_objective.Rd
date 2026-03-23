@@ -53,6 +53,7 @@ p <- lp_problem() |>
 
 p$objective
 
+library(ROI)
 (s <- lp_solve(p))
 
 s$aliases$total_profit

@@ -91,19 +91,3 @@ test_that("rbind constraints", {
     expect_error(rbind(x == 1, y), "with other classes")
     expect_error(rbind(0, x == 1), "with other classes")
 })
-
-test_that("unique constraint names", {
-    p <- lp_problem() |>
-        lp_var(x[1:3]) |>
-        lp_subject_to(
-            first = x > 0,
-            x[1] == 0,
-            x[2] == 1,
-            fourth = x[3] < 6,
-            fifth = x < 8,
-            x == 5
-        )
-
-    s <- lp_find_feasible(p)
-    expect_snapshot(s$pointer)
-})

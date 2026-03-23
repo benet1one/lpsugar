@@ -48,6 +48,7 @@ Let's write the problem in lpsugar and solve it!
 
 ```{r example}
 library(lpsugar)
+library(ROI) # Needs to be loaded
 
 my_problem <- lp_problem() |> 
     lp_variable(x) |> 
