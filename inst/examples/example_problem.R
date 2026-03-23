@@ -1,3 +1,6 @@
+# ROI needs to be imported for lp_solve() to work
+library(ROI)
+
 lp_problem() |>
     lp_variable(x[1:2], lower = 0) |>
     lp_maximize(x[1] + x[2]) |>

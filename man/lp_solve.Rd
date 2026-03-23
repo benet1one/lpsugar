@@ -5,76 +5,28 @@
 \alias{lp_find_feasible}
 \title{Solve a Linear Problem}
 \usage{
-lp_solve(
-  .problem,
-  binary_as_logical = FALSE,
-  unbound_as_inf = TRUE,
-  verbose = "severe",
-  timeout = NULL,
-  ...
-)
+lp_solve(.problem, solver, binary_as_logical = FALSE, ...)
 
-lp_find_feasible(
-  .problem,
-  binary_as_logical = FALSE,
-  unbound_as_inf = TRUE,
-  verbose = "severe",
-  timeout = NULL,
-  ...
-)
+lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
 }
 \arguments{
 \item{.problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
 
+\item{solver}{String specifying the solver to use.
+If missing, then the default solver returned by \code{\link[ROI:ROI_options]{ROI::ROI_options()}} is used.}
+
 \item{binary_as_logical}{Boolean. If \code{FALSE} (the default), binary variables
 are returned as \verb{\{0, 1\}}. If \code{TRUE}, binary variables are returned as logical \verb{\{FALSE, TRUE\}}.}
 
-\item{unbound_as_inf}{Boolean, whether to replace very large numbers with \code{+Inf} and
-very small numbers with \code{-Inf}.}
-
-\item{verbose}{String indicating the severity of messages reported by \code{lp_solve}.
-\itemize{
-\item \code{"neutral"} : No reporting.
-\item \code{"critical"} : Only critical messages are reported. Hard errors like instability, out of memory, etc.
-\item \code{"severe"} :    Only severe messages are reported. Errors.
-\item \code{"important"} : Only important messages are reported. Warnings and Errors.
-\item \code{"normal"} :    Normal messages are reported.
-\item \code{"detailed"} : Detailed messages are reported. Like model size, continuing B&B improvements, etc.
-\item \code{"full"} : All messages are reported. Useful for debugging purposes and small models.
-}}
-
-\item{timeout}{Integer scalar, maximum time (in seconds) before the algorithm stops.
-If the algorithm finds the optimal solution before timeout, it returns a status 0 (optimal);
-if it finds a feasible solution but not the optimum, it returns a status 1 (sub-optimal);
-if it finds no feasible solution, it returns a status 7 (timeout).}
-
-\item{...}{Control parameters passed to \code{\link[lpSolveAPI:lp.control]{lpSolveAPI::lp.control()}}. For a full list of
-options see \code{\link[lpSolveAPI:lp.control.options]{lpSolveAPI::lp.control.options()}}.}
-}
-\value{
-A list with the following fields:
-\itemize{
-\item \verb{$objective} : Numeric scalar, value of the objective function at the optimal.
-\item \verb{$variables} : Named list with the optimal value for each variable.
-\item \verb{$aliases} : Named list with the value of each \code{\link[=lp_alias]{lp_alias()}}.
-\item \verb{$status_number} : Integer indicating the status of the solver.
-\item \verb{$status_description} : String describing the status of the solver.
-\item \verb{$pointer} : Pointer to the \code{lpSolveAPI} model, class \code{lpExtPtr}.
-}
-
-For a full list of status and their meaning
-see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}. Some common status are:
-\itemize{
-\item \verb{0 | optimal solution found}
-\item \verb{1 | the model is sub-optimal}
-\item \verb{2 | the model is infeasible}
-}
+\item{...}{Control arguments to be passed on to the solver.}
 }
 \description{
 \code{lp_solve()} computes the optimal solution of an \code{\link[=lp_problem]{lp_problem()}}, whereas
 \code{lp_find_feasible()} returns an arbitrary feasible solution.
 }
 \examples{
+library(ROI)
+
 r <- letters[1:2]
 c <- LETTERS[1:3]
 
@@ -82,10 +34,11 @@ c <- LETTERS[1:3]
 p_opt <- lp_problem() |>
     lp_variable(x[r, c], binary = TRUE) |>
     lp_alias(total = sum(x)) |>
-    lp_maximize(total + 1)
+    lp_maximize(total + 1) |>
+    lp_constraint(x[1, 1] + x[2, 1] <= 1L)
 
 s1 <- lp_solve(p_opt)
-s1$status_number; s1$status_description
+s1$status
 s1$objective
 s1$aliases$total
 s1$variables$x
@@ -100,11 +53,8 @@ p_unb <- lp_problem() |>
     lp_min(y[1])
 
 s3 <- lp_solve(p_unb)
+s3$status
 s3$variables$y
-
-s4 <- lp_solve(p_unb, unbound_as_inf = FALSE)
-s4$variables$y
-
 
 # Infeasible Problem
 p_no <- lp_problem() |>
@@ -113,7 +63,7 @@ p_no <- lp_problem() |>
 
 s5 <- lp_find_feasible(p_no)
 
-s5$status_number; s5$status_description
+s5$status
 s5$variables$z
 s5$objective
 }

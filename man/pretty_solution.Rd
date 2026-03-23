@@ -4,51 +4,27 @@
 \alias{pretty_solution}
 \title{Prettify the Solution of a Model.}
 \usage{
-pretty_solution(
-  problem,
-  solution,
-  binary_as_logical = FALSE,
-  unbound_as_inf = TRUE
-)
+pretty_solution(problem, solution, binary_as_logical = FALSE)
 }
 \arguments{
 \item{problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
 
-\item{solution}{A list created with \code{\link[=solve_model]{solve_model()}}.}
+\item{solution}{A list created with \code{\link[=solve_model]{solve_model()}} or \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}}.}
 
 \item{binary_as_logical}{Boolean. If \code{FALSE} (the default), binary variables
 are returned as \verb{\{0, 1\}}. If \code{TRUE}, binary variables are returned as logical \verb{\{FALSE, TRUE\}}.}
-
-\item{unbound_as_inf}{Boolean, whether to replace very large numbers with \code{+Inf} and
-very small numbers with \code{-Inf}.}
-}
-\value{
-A list with the following fields:
-\itemize{
-\item \verb{$objective} : Numeric scalar, value of the objective function at the optimal.
-\item \verb{$variables} : Named list with the optimal value for each variable.
-\item \verb{$aliases} : Named list with the value of each \code{\link[=lp_alias]{lp_alias()}}.
-\item \verb{$status_number} : Integer indicating the status of the solver.
-\item \verb{$status_description} : String describing the status of the solver.
-\item \verb{$pointer} : Pointer to the \code{lpSolveAPI} model, class \code{lpExtPtr}.
-}
-
-For a full list of status and their meaning
-see \code{\link[lpSolveAPI:solve.lpExtPtr]{lpSolveAPI::solve.lpExtPtr()}}. Some common status are:
-\itemize{
-\item \verb{0 | optimal solution found}
-\item \verb{1 | the model is sub-optimal}
-\item \verb{2 | the model is infeasible}
-}
 }
 \description{
 Takes a problem and its solution and prettifies the solution. Used internally
 in \code{\link[=lp_solve]{lp_solve()}}.
 }
 \examples{
+library(ROI)
+
 p <- lp_problem() |>
     lp_var(x[a = 1:2, b = 1:2], upper = 10) |>
-    lp_max(sum(x) + 5)
+    lp_alias(sum_x = sum(x)) |>
+    lp_max(sum_x + 5)
 
 # Solve directly with lp_solve()
 direct_solution <- lp_solve(p)
@@ -60,12 +36,15 @@ solution_raw <- solve_model(model)
 solution_pretty <- pretty_solution(problem = p, solution = solution_raw)
 
 # pretty_solution() gives each variable its dim and dimnames.
-solution_raw$variables
+solution_raw$solution
 solution_pretty$variables
+
+# It also computes aliases
+solution_pretty$aliases
 
 # Notice that in solution_raw, the objective value is 40 instead of 45.
 # The objective function is (sum(x) + 5), but the addend (+5) is irrelevant
-# for finding the optimum, so lpSolveAPI ignores it.
-solution_raw$objective
+# for finding the optimum, so ROI ignores it.
+solution_raw$objval
 solution_pretty$objective
 }

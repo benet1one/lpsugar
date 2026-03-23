@@ -141,6 +141,8 @@ test_that("apply", {
 })
 
 test_that("ifelse1", {
+    withr::local_package("ROI")
+
     n <- 10
     upper <- 50
 

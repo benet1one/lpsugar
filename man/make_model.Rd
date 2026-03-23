@@ -2,43 +2,27 @@
 % Please edit documentation in R/solve.R
 \name{make_model}
 \alias{make_model}
-\title{Make a Linear Program Model}
+\title{Make an Optimization Problem}
 \usage{
-make_model(problem, verbose = "severe", timeout = NULL, ...)
+make_model(problem)
 }
 \arguments{
 \item{problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
-
-\item{verbose}{String indicating the severity of messages reported by \code{lp_solve}.
-\itemize{
-\item \code{"neutral"} : No reporting.
-\item \code{"critical"} : Only critical messages are reported. Hard errors like instability, out of memory, etc.
-\item \code{"severe"} :    Only severe messages are reported. Errors.
-\item \code{"important"} : Only important messages are reported. Warnings and Errors.
-\item \code{"normal"} :    Normal messages are reported.
-\item \code{"detailed"} : Detailed messages are reported. Like model size, continuing B&B improvements, etc.
-\item \code{"full"} : All messages are reported. Useful for debugging purposes and small models.
-}}
-
-\item{timeout}{Integer scalar, maximum time (in seconds) before the algorithm stops.
-If the algorithm finds the optimal solution before timeout, it returns a status 0 (optimal);
-if it finds a feasible solution but not the optimum, it returns a status 1 (sub-optimal);
-if it finds no feasible solution, it returns a status 7 (timeout).}
-
-\item{...}{Control parameters passed to \code{\link[lpSolveAPI:lp.control]{lpSolveAPI::lp.control()}}. For a full list of
-options see \code{\link[lpSolveAPI:lp.control.options]{lpSolveAPI::lp.control.options()}}.}
 }
 \value{
-An \code{lpExtPtr} pointer from the \code{lpSolveAPI} package.
+An \code{OP} object as returned from \code{\link[ROI:OP]{ROI::OP()}}.
 }
 \description{
-Create an \code{lpExtPtr} pointer from the \code{lpSolveAPI} package.
-Used internally in \code{\link[=lp_solve]{lp_solve()}}.
+Translate an \code{\link[=lp_problem]{lp_problem()}} object to a \code{\link[ROI:OP]{ROI::OP()}} object. Used
+internally in \code{\link[=lp_solve]{lp_solve()}}.
 }
 \examples{
+library(ROI)
+
 p <- lp_problem() |>
     lp_var(x[a = 1:2, b = 1:2], upper = 10) |>
-    lp_max(sum(x) + 5)
+    lp_alias(sum_x = sum(x)) |>
+    lp_max(sum_x + 5)
 
 # Solve directly with lp_solve()
 direct_solution <- lp_solve(p)
@@ -50,12 +34,15 @@ solution_raw <- solve_model(model)
 solution_pretty <- pretty_solution(problem = p, solution = solution_raw)
 
 # pretty_solution() gives each variable its dim and dimnames.
-solution_raw$variables
+solution_raw$solution
 solution_pretty$variables
+
+# It also computes aliases
+solution_pretty$aliases
 
 # Notice that in solution_raw, the objective value is 40 instead of 45.
 # The objective function is (sum(x) + 5), but the addend (+5) is irrelevant
-# for finding the optimum, so lpSolveAPI ignores it.
-solution_raw$objective
+# for finding the optimum, so ROI ignores it.
+solution_raw$objval
 solution_pretty$objective
 }

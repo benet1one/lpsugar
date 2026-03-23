@@ -1,3 +1,5 @@
+library(ROI)
+
 r <- letters[1:2]
 c <- LETTERS[1:3]
 
@@ -5,10 +7,11 @@ c <- LETTERS[1:3]
 p_opt <- lp_problem() |>
     lp_variable(x[r, c], binary = TRUE) |>
     lp_alias(total = sum(x)) |>
-    lp_maximize(total + 1)
+    lp_maximize(total + 1) |>
+    lp_constraint(x[1, 1] + x[2, 1] <= 1L)
 
 s1 <- lp_solve(p_opt)
-s1$status_number; s1$status_description
+s1$status
 s1$objective
 s1$aliases$total
 s1$variables$x
@@ -23,11 +26,8 @@ p_unb <- lp_problem() |>
     lp_min(y[1])
 
 s3 <- lp_solve(p_unb)
+s3$status
 s3$variables$y
-
-s4 <- lp_solve(p_unb, unbound_as_inf = FALSE)
-s4$variables$y
-
 
 # Infeasible Problem
 p_no <- lp_problem() |>
@@ -36,6 +36,6 @@ p_no <- lp_problem() |>
 
 s5 <- lp_find_feasible(p_no)
 
-s5$status_number; s5$status_description
+s5$status
 s5$variables$z
 s5$objective
