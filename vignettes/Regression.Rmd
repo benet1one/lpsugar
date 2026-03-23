@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(lpsugar)
+library(ROI)
 ```
 
 This vignette focuses on different regression techniques that can be solved

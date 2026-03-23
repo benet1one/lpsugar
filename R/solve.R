@@ -5,85 +5,50 @@
 #' `lp_find_feasible()` returns an arbitrary feasible solution.
 #'
 #' @param .problem An [lp_problem()].
+#' @param solver String specifying the solver to use.
+#' If missing, then the default solver returned by [ROI::ROI_options()] is used.
 #' @param binary_as_logical Boolean. If `FALSE` (the default), binary variables
 #' are returned as `{0, 1}`. If `TRUE`, binary variables are returned as logical `{FALSE, TRUE}`.
-#' @param unbound_as_inf Boolean, whether to replace very large numbers with `+Inf` and
-#' very small numbers with `-Inf`.
-#' @param verbose String indicating the severity of messages reported by `lp_solve`.
-#' - `"neutral"` : No reporting.
-#' - `"critical"` : Only critical messages are reported. Hard errors like instability, out of memory, etc.
-#' - `"severe"` :	Only severe messages are reported. Errors.
-#' - `"important"` : Only important messages are reported. Warnings and Errors.
-#' - `"normal"` :	Normal messages are reported.
-#' - `"detailed"` : Detailed messages are reported. Like model size, continuing B&B improvements, etc.
-#' - `"full"` : All messages are reported. Useful for debugging purposes and small models.
-#' @param timeout Integer scalar, maximum time (in seconds) before the algorithm stops.
-#' If the algorithm finds the optimal solution before timeout, it returns a status 0 (optimal);
-#' if it finds a feasible solution but not the optimum, it returns a status 1 (sub-optimal);
-#' if it finds no feasible solution, it returns a status 7 (timeout).
-#' @param ... Control parameters passed to [lpSolveAPI::lp.control()]. For a full list of
-#' options see [lpSolveAPI::lp.control.options()].
+#' @param ... Control arguments to be passed on to the solver.
 #'
-#' @returns A list with the following fields:
-#' - `$objective` : Numeric scalar, value of the objective function at the optimal.
-#' - `$variables` : Named list with the optimal value for each variable.
-#' - `$aliases` : Named list with the value of each [lp_alias()].
-#' - `$status_number` : Integer indicating the status of the solver.
-#' - `$status_description` : String describing the status of the solver.
-#' - `$pointer` : Pointer to the `lpSolveAPI` model, class `lpExtPtr`.
-#'
-#' For a full list of status and their meaning
-#' see [lpSolveAPI::solve.lpExtPtr()]. Some common status are:
-#' - `0 | optimal solution found`
-#' - `1 | the model is sub-optimal`
-#' - `2 | the model is infeasible`
 #' @export
 #'
 #' @example inst/examples/example_solve.R
-lp_solve <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
-                     verbose = "severe", timeout = NULL, ...) {
+lp_solve <- function(.problem, solver, binary_as_logical = FALSE, ...) {
     check_problem(.problem)
-    model <- make_model(.problem, verbose = verbose, timeout = timeout, ...)
-    solution_raw <- solve_model(model)
+    model <- make_model(.problem)
+    solution_raw <- solve_model(model, solver, ...)
 
     pretty_solution(
         .problem,
         solution = solution_raw,
-        binary_as_logical = binary_as_logical,
-        unbound_as_inf = unbound_as_inf
+        binary_as_logical = binary_as_logical
     )
 }
 
 #' @rdname lp_solve
 #' @export
-lp_find_feasible <- function(.problem, binary_as_logical = FALSE, unbound_as_inf = TRUE,
-                             verbose = "severe", timeout = NULL, ...) {
+lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
     check_problem(.problem)
 
     .problem |>
         lp_minimize(0) |>
-        lp_solve(
-            binary_as_logical = binary_as_logical,
-            unbound_as_inf = unbound_as_inf,
-            verbose = verbose,
-            ...
-        )
+        lp_solve( binary_as_logical = binary_as_logical, ...)
 }
 
 # Steps -------------------
 
-#' Make a Linear Program Model
+#' Make an Optimization Problem
 #'
-#' Create an `lpExtPtr` pointer from the `lpSolveAPI` package.
-#' Used internally in [lp_solve()].
+#' Translate an [lp_problem()] object to a [ROI::OP()] object. Used
+#' internally in [lp_solve()].
 #'
-#' @inheritParams lp_solve
+#' @param problem An [lp_problem()].
+#' @returns An `OP` object as returned from [ROI::OP()].
 #'
-#' @returns An `lpExtPtr` pointer from the `lpSolveAPI` package.
 #' @export
-#'
 #' @example inst/examples/example_solve_steps.R
-make_model <- function(problem, verbose = "severe", timeout = NULL, ...) {
+make_model <- function(problem) {
     check_problem(problem)
 
     # No variables
@@ -92,10 +57,10 @@ make_model <- function(problem, verbose = "severe", timeout = NULL, ...) {
     }
 
     # Direction
-    dir <- if (problem$objective$direction == "minimize") {
-        "min"
+    maximize <- if (problem$objective$direction == "minimize") {
+        FALSE
     } else if (problem$objective$direction == "maximize") {
-        "max"
+        TRUE
     } else {
         rlang::abort(c(
             "`$objective$direction` should be either 'minimize' or 'maximize'.",
@@ -108,122 +73,75 @@ make_model <- function(problem, verbose = "severe", timeout = NULL, ...) {
         ))
     }
 
-    # Timeout
-    timeout <- control_timeout(timeout)
-
-    ptr <- lpSolveAPI::make.lp(
-        nrow = 0,
-        ncol = problem$.nvar,
-        verbose = verbose
+    objective <- ROI::L_objective(
+        problem$objective$coef,
+        names = problem$.varnames
     )
 
-    lpSolveAPI::set.objfn(ptr, problem$objective$coef)
-    lpSolveAPI::lp.control(ptr, sense = dir, timeout = timeout, ...)
+    types <- character(problem$.nvar)
+    lower <- numeric(problem$.nvar)
+    upper <- numeric(problem$.nvar)
 
     for (x in problem$variables) {
-        lpSolveAPI::set.type(
-            ptr,
-            columns = x$ind,
-            type = x$type
+        types[x$ind] <- x$type
+        lower[x$ind] <- x$lower
+        upper[x$ind] <- x$upper
+    }
+
+    # Bound indices and bounds
+    li <- which(lower != 0)
+    ui <- which(is.finite(upper))
+    lb <- lower[li]
+    ub <- upper[ui]
+
+    bounds <- ROI::V_bound(
+        li = li, ui = ui,
+        lb = lb, ub = ub,
+        nobj = problem$.nvar
+    )
+
+    constraints <- if (length(problem$constraints) > 0L) {
+        ROI::L_constraint(
+            L = problem$constraints$lhs,
+            dir = c(problem$constraints$dir),
+            rhs = c(problem$constraints$rhs)
         )
-        lpSolveAPI::set.bounds(
-            ptr,
-            columns = x$ind,
-            lower = rep_len(x$lower, length(x)),
-            upper = rep_len(x$upper, length(x))
+    } else {
+        ROI::L_constraint(
+            L = matrix(nrow = 0, ncol = problem$.nvar),
+            dir = character(0),
+            rhs = numeric(0)
         )
     }
 
-    if (length(problem$constraints) > 0L) {
-        con <- problem$constraints
-        con$dir <- ifelse(con$dir == "==", yes = "=", no = con$dir)
-
-        for (i in seq_along(con)) {
-            lpSolveAPI::add.constraint(
-                ptr,
-                xt = con$lhs[i, ],
-                type = con$dir[i],
-                rhs = con$rhs[i]
-            )
-        }
-
-        for (nam in unique(con$name))  if (nam != "") {
-            ind <- con$name == nam
-            n <- sum(ind)
-
-            rownames(ptr)[ind] <- if (n > 1L) {
-                paste0(nam, "[", 1:sum(ind), "]")
-            } else {
-                nam
-            }
-        }
-    }
-
-    colnames(ptr) <- problem$.varnames
-    attr(ptr, "original_colnames") <- colnames(ptr)
-    attr(ptr, "original_rownames") <- rownames(ptr)
-
-    ptr
+    ROI::OP(
+        objective = objective,
+        maximum = maximize,
+        types = types,
+        bounds = bounds,
+        constraints = constraints
+    )
 }
 
 #' Solve a Model
 #'
-#' Find the optimal solution of a model created with [make_model()] or [lpSolveAPI::make.lp()].
+#' Find the optimum of an Optimization Model created with [make_model()] or [ROI::OP()].
 #' Used internally in [lp_solve()].
 #'
-#' @param model A pointer of class `lpExtPtr` created with [make_model()] or [lpSolveAPI::make.lp()].
+#' @param model An `OP` object created with [make_model()] or [ROI::OP()].
+#' @inheritParams lp_solve
 #'
-#' @section Value:
-#'  A list with fields:
-#' - `$objective` : Numeric scalar, value of the objective function at the optimum.
-#' NOTE: This value does not include the addend `(problem$objective$add)`.
-#' - `$variables` : Numeric vector with the value of the variables at the optimum.
-#' - `$status_number` : Integer indicating the status of the solver.
-#' - `$status_description` : String describing the status of the solver.
-#' - `$pointer` : Pointer to the `lpSolveAPI` model, class `lpExtPtr`.
 #' @export
-#'
 #' @example inst/examples/example_solve_steps.R
-solve_model <- function(model) {
-    if (!inherits(model, "lpExtPtr")) {
-        abort("Model must be an `lpExtPtr` object created with `make_model()`.")
+solve_model <- function(model, solver, ...) {
+    if (!inherits(model, "OP")) {
+        abort("Model must be an `OP` object created with `make_model()`.")
     }
 
-    status_number <- lpSolveAPI::solve.lpExtPtr(model)
-    status_description <- switch(
-        as.character(status_number),
-        "0" = "optimal solution found",
-        "1" = "the model is sub-optimal",
-        "2" = "the model is infeasible",
-        "3" = "the model is unbounded",
-        "4" = "the model is degenerate",
-        "5" = "numerical failure encountered",
-        "6" = "process aborted",
-        "7" = "timeout",
-        "9" = "the model was solved by presolve",
-        "10" = "the branch and bound routine failed",
-        "11" = "the branch and bound was stopped because of a break-at-first or break-at-value",
-        "12" = "a feasible branch and bound solution was found",
-        "13" = "no feasible branch and bound solution was found",
-        "undocumented status"
-    )
-
-    objective <- lpSolveAPI::get.objective(model)
-    variables <- lpSolveAPI::get.variables(model) |>
-        rlang::set_names(colnames(model))
-
-    if (status_number %in% c(2, 5, 6, 7, 10, 13)) {
-        objective[] <- NA_real_
-        variables[] <- NA_real_
-    }
-
-    list(
-        objective = objective,
-        variables = variables,
-        status_number = status_number,
-        status_description = status_description,
-        pointer = model
-    )
+    dots <- rlang::dots_list(...)
+    out <- ROI::ROI_solve(model, solver = solver, control = dots)
+    out$model <- model
+    return(out)
 }
 
 #' Prettify the Solution of a Model.
@@ -231,22 +149,23 @@ solve_model <- function(model) {
 #' Takes a problem and its solution and prettifies the solution. Used internally
 #' in [lp_solve()].
 #'
-#' @param solution A list created with [solve_model()].
+#' @param problem An [lp_problem()].
+#' @param solution A list created with [solve_model()] or [ROI::ROI_solve()].
 #' @inherit lp_solve
 #' @export
 #'
 #' @example inst/examples/example_solve_steps.R
-pretty_solution <- function(problem, solution,
-                            binary_as_logical = FALSE, unbound_as_inf = TRUE) {
+pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     check_problem(problem)
-    if (unbound_as_inf) {
-        solution$objective <- solution$objective |> large_to_infinity()
-        solution$variables <- solution$variables |> large_to_infinity()
+
+    if (solution$status$code != 0L) {
+        solution$solution[] <- NA
+        solution$objval[] <- NA
     }
 
     vars <- purrr::map(problem$variables, function(x) {
         out <- array(
-            solution$variables[x$ind],
+            solution$solution[x$ind],
             dim = dim(x$ind),
             dimnames = dimnames(x$ind)
         )
@@ -265,7 +184,7 @@ pretty_solution <- function(problem, solution,
     als <- purrr::map(problem$aliases, function(a) {
         mat <- array(unclass(a$coef), dim = dim(a$coef))
         add <- unclass(a$add)
-        out <- tcrossprod(mat, solution$variables) + add
+        out <- tcrossprod(mat, solution$solution) + add
 
         if (length(out) == 1L) {
             unname(out[1])
@@ -274,36 +193,17 @@ pretty_solution <- function(problem, solution,
         }
     })
 
-    objective <- solution$objective + problem$objective$add
+    objective <- solution$objval + problem$objective$add
 
     list(
         objective = objective,
         variables = vars,
         aliases = als,
-        variables_vec = solution$variables,
-        status_number = solution$status_number,
-        status_description = solution$status_description,
-        pointer = solution$pointer
+        variables_vec = solution$solution,
+        status = solution$status,
+        message = solution$message,
+        model = solution$model
     ) |> structure(class = "lp_solution")
-}
-
-# Control Helpers -----------------------------------
-
-control_timeout <- function(timeout = NULL) {
-    if (length(timeout) == 0L) {
-        return(0)
-    } else if (length(timeout) > 1L) {
-        abort("`timeout` needs to be length one integer.")
-    } else if (!is.numeric(timeout)) {
-        abort("`timeout` needs to be an integer scalar")
-    } else if (timeout <= 0) {
-        return(0)
-    } else if (timeout < 1) {
-        warn("`timeout` needs to be an integer scalar, rounding to 1 second")
-        return(1)
-    } else {
-        return(ceiling(timeout))
-    }
 }
 
 # Methods --------------------------------------
@@ -320,7 +220,13 @@ print.lp_solution <- function(x, ...) {
         print(x["objective"])
     }
 
-    cat("Status =", x$status_number, "|", x$status_description, "\n\n")
-    cat("Fields:\n")
+    if (x$status$code == 0) {
+        cat("$status$code = 0 : Optimal\n")
+    } else {
+        cat("$status$code =", x$status$code, ": \n")
+        print(x$status$msg)
+    }
+
+    cat("\nFields:\n")
     cat(paste0("-- $", names(x), " --\n"), sep = "")
 }

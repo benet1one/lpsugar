@@ -38,6 +38,11 @@ Let’s write the problem in lpsugar and solve it!
 
 ``` r
 library(lpsugar)
+library(ROI) # Needs to be loaded
+#> Warning: package 'ROI' was built under R version 4.5.3
+#> ROI: R Optimization Infrastructure
+#> Registered solver plugins: nlminb, glpk, highs, lpsolve.
+#> Default solver: auto.
 
 my_problem <- lp_problem() |> 
     lp_variable(x) |> 

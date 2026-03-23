@@ -6,7 +6,7 @@
 \alias{lpsugar-package}
 \title{lpsugar: Algebraic Modeling Language for Linear Problems}
 \description{
-Algebraic Modeling Language inspired in R's vectorized syntax. Define Mixed Integer Linear Programming (MILP) problems and solve them with 'lpSolveAPI'.
+Algebraic Modeling Language inspired in R's vectorized syntax. Define Mixed Integer Linear Programming (MILP) problems and solve them with 'ROI'.
 }
 \seealso{
 Useful links:

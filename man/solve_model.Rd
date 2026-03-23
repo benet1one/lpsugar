@@ -4,32 +4,27 @@
 \alias{solve_model}
 \title{Solve a Model}
 \usage{
-solve_model(model)
+solve_model(model, solver, ...)
 }
 \arguments{
-\item{model}{A pointer of class \code{lpExtPtr} created with \code{\link[=make_model]{make_model()}} or \code{\link[lpSolveAPI:make.lp]{lpSolveAPI::make.lp()}}.}
+\item{model}{An \code{OP} object created with \code{\link[=make_model]{make_model()}} or \code{\link[ROI:OP]{ROI::OP()}}.}
+
+\item{solver}{String specifying the solver to use.
+If missing, then the default solver returned by \code{\link[ROI:ROI_options]{ROI::ROI_options()}} is used.}
+
+\item{...}{Control arguments to be passed on to the solver.}
 }
 \description{
-Find the optimal solution of a model created with \code{\link[=make_model]{make_model()}} or \code{\link[lpSolveAPI:make.lp]{lpSolveAPI::make.lp()}}.
+Find the optimum of an Optimization Model created with \code{\link[=make_model]{make_model()}} or \code{\link[ROI:OP]{ROI::OP()}}.
 Used internally in \code{\link[=lp_solve]{lp_solve()}}.
 }
-\section{Value}{
-
-A list with fields:
-\itemize{
-\item \verb{$objective} : Numeric scalar, value of the objective function at the optimum.
-NOTE: This value does not include the addend \code{(problem$objective$add)}.
-\item \verb{$variables} : Numeric vector with the value of the variables at the optimum.
-\item \verb{$status_number} : Integer indicating the status of the solver.
-\item \verb{$status_description} : String describing the status of the solver.
-\item \verb{$pointer} : Pointer to the \code{lpSolveAPI} model, class \code{lpExtPtr}.
-}
-}
-
 \examples{
+library(ROI)
+
 p <- lp_problem() |>
     lp_var(x[a = 1:2, b = 1:2], upper = 10) |>
-    lp_max(sum(x) + 5)
+    lp_alias(sum_x = sum(x)) |>
+    lp_max(sum_x + 5)
 
 # Solve directly with lp_solve()
 direct_solution <- lp_solve(p)
@@ -41,12 +36,15 @@ solution_raw <- solve_model(model)
 solution_pretty <- pretty_solution(problem = p, solution = solution_raw)
 
 # pretty_solution() gives each variable its dim and dimnames.
-solution_raw$variables
+solution_raw$solution
 solution_pretty$variables
+
+# It also computes aliases
+solution_pretty$aliases
 
 # Notice that in solution_raw, the objective value is 40 instead of 45.
 # The objective function is (sum(x) + 5), but the addend (+5) is irrelevant
-# for finding the optimum, so lpSolveAPI ignores it.
-solution_raw$objective
+# for finding the optimum, so ROI ignores it.
+solution_raw$objval
 solution_pretty$objective
 }
