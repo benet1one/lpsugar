@@ -124,7 +124,7 @@ lp_delete_constraint <- function(.problem, names) {
 
     if (length(not_defined) > 0L) {
         not_defined <- names[not_defined] |>
-            head(3) |>
+            utils::head(6) |>
             dQuote(q = FALSE) |>
             paste(collapse = ", ")
 
