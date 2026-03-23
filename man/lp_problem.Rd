@@ -21,3 +21,15 @@ Use \code{\link[=lp_variable]{lp_variable()}} to define the variables,
 \code{\link[=lp_constraint]{lp_constraint()}} to add constraints and
 \code{\link[=lp_solve]{lp_solve()}} to find the optimum.
 }
+\examples{
+lp_problem() |>
+    lp_variable(x[1:2], lower = 0) |>
+    lp_maximize(x[1] + x[2]) |>
+    lp_constraint(
+        2*x[1] +   x[2] <= 8,
+        2*x[1] + 3*x[2] <= 12
+    ) |>
+    lp_solve()
+
+# For a Quick Start guide see `vignette("lpsugar", package = "lpsugar")`
+}

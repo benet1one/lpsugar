@@ -13,7 +13,7 @@
 #'   - `$constraints` : List of constraints added with [lp_constraint()].
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_problem.R
 lp_problem <- function() {
     list(
         variables = list(),
