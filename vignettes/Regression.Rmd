@@ -66,10 +66,11 @@ Then the problem can be written like this:
 $$
 \begin{array}{rl}
   \min & \sum_{i=1}^n{e_i^+ + e_i^-} \\
-  \text{st} & e_i^+ \ge + y_i - \sum_{j=1}^k{\beta_j x_{ij}} \\
-            & e_i^- \ge - y_i + \sum_{j=1}^k{\beta_j x_{ij}} \\
+  \text{st} & e_i^+ \ge + y_i - \hat{y_i} \\
+            & e_i^- \ge - y_i + \hat{y_i} \\
             & e_i^+ \ge 0 \\
-            & e_i^- \ge 0
+            & e_i^- \ge 0 \\
+  \text{where} & \hat{y_i} = \sum_{j=1}^k{\beta_j x_{ij}}
 \end{array}
 $$
 
@@ -87,15 +88,16 @@ n <- nrow(x)
 k <- ncol(x)
 
 lad <- lp_problem() |> 
-    lp_var(beta[1:k]) |> 
+    lp_var(beta[1:k, 1]) |> 
     lp_var(e_pos[1:n], lower = 0) |> 
     lp_var(e_neg[1:n], lower = 0) |> 
     lp_min(sum(e_pos + e_neg)) |> 
+    lp_alias(yhat = x %*% beta) |> 
     lp_con(
         pos = for (i in 1:n)
-            e_pos[i] >= +y[i] - sum(beta * x[i, ]),
+            e_pos[i] >= y[i] - yhat[i],
         neg = for (i in 1:n)
-            e_neg[i] >= -y[i] + sum(beta * x[i, ])
+            e_neg[i] >= yhat[i] - y[i]
     ) |> 
     lp_solve()
 
