@@ -87,19 +87,17 @@ lp_max <- lp_maximize
 
 #' @export
 print.lp_objective <- function(x, compact = length(x$coef) > 20L, ...) {
-    cat(x$direction, x$expr, "\n\n")
+    cat(x$direction, x$expr, "\n")
 
     if (!compact) {
-        print(x$coef)
-
         if (x$add > 0) {
-            glue::glue("\n\n(coef*vars + {x$add})") |> cat()
+            glue::glue("         sum(coef*vars) + {x$add}\n\n") |> cat()
         } else if (x$add < 0) {
-            glue::glue("\n\n(coef*vars - {-x$add})") |> cat()
+            glue::glue("         sum(coef*vars) - {-x$add}\n\n") |> cat()
         }
-    }
 
-    cat("\n")
+        print(x["coef"])
+    }
 }
 
 # Utils ------------------------
