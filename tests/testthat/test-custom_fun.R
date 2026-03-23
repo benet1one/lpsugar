@@ -74,6 +74,13 @@ test_that("sum", {
         w_mean_x <- p |> lp_eval(weighted.mean(x, w = c(1, 3)))
         all(w_mean_x$coef == c(1/4, 3/4, 0))
     })
+    expect_true({
+        w_mean_x <- p |> lp_eval(weighted.mean(x, w = c(0, 5)))
+        all(w_mean_x$coef == c(0, 1, 0))
+    })
+    expect_no_error(
+        p |> lp_eval(weighted.mean(1:2, 2:3))
+    )
     expect_warning(
         p |> lp_eval(weighted.mean(x, 1:2, na.rm = TRUE)),
         "Ignoring argument `na.rm`"
@@ -81,6 +88,10 @@ test_that("sum", {
     expect_error(
         p |> lp_eval(weighted.mean(x, 1:2, hi = "hi")),
         "must be empty" # dots
+    )
+    expect_error(
+        p |> lp_eval(weighted.mean(1:2, w = x)),
+        "Weights `w` cannot be a variable"
     )
 })
 

@@ -25,13 +25,6 @@ sum.lp_variable <- function(x, ..., na.rm = FALSE) {
 mean.lp_variable <- function(x, ...) {
     sum(x) / length(x)
 }
-#' @export
-weighted.mean.lp_variable <- function(x, w, ..., na.rm = FALSE) {
-    rlang::check_dots_empty()
-    warn_changed_args(na.rm = FALSE)
-    na.rm <- FALSE
-    NextMethod()
-}
 
 #' @export
 Math.lp_variable <- function(x, ...) {
@@ -87,6 +80,22 @@ custom_fun <- function() {
             purrr::map(base::sum, na.rm = na.rm) |>
             purrr::reduce(`+`)
     }
+
+    # If weighted.mean is a method, it only covers the case where x is a variable
+    # and not when w is a variable (which should throw an error because it's not linear)
+    e$weighted.mean <- function(x, w, ..., na.rm = FALSE) {
+        if (!missing(w) && is_lp_variable(w)) {
+            abort("Weights `w` cannot be a variable")
+        }
+        if (is_lp_variable(x)) {
+            rlang::check_dots_empty()
+            warn_changed_args(na.rm = FALSE)
+            na.rm <- FALSE
+        }
+
+        return(stats::weighted.mean(x, w, ..., na.rm))
+    }
+
 
     e$ifelse <- function(test, yes, no) {
         if (is_lp_constraint(test)) {
