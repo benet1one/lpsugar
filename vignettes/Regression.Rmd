@@ -67,8 +67,8 @@ Then the problem can be written like this:
 $$
 \begin{array}{rl}
   \min & \sum_{i=1}^n{e_i^+ + e_i^-} \\
-  \text{st} & e_i^+ \ge + y_i - \hat{y_i} \\
-            & e_i^- \ge - y_i + \hat{y_i} \\
+  \text{st} & e_i^+ \ge y_i - \hat{y_i} \\
+            & e_i^- \ge \hat{y_i} - y_i \\
             & e_i^+ \ge 0 \\
             & e_i^- \ge 0 \\
   \text{where} & \hat{y_i} = \sum_{j=1}^k{\beta_j x_{ij}}
@@ -95,16 +95,14 @@ lad <- lp_problem() |>
     lp_min(sum(e_pos + e_neg)) |> 
     lp_alias(yhat = x %*% beta) |> 
     lp_con(
-        pos = for (i in 1:n)
-            e_pos[i] >= y[i] - yhat[i],
-        neg = for (i in 1:n)
-            e_neg[i] >= yhat[i] - y[i]
+        pos = e_pos >= y - yhat,
+        neg = e_neg >= yhat - y
     ) |> 
     lp_solve()
 
 cbind(
     true_beta = true_beta,
-    lad_beta = lad$variables$beta |> round(2)
+    lad_beta = lad$variables$beta[, 1] |> round(2)
 )
 ```
 
