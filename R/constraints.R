@@ -110,7 +110,14 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
 #' Delete constraints
 #'
 #' Remove named constraints from an [lp_problem()].
+#'
+#' @param .problem An [lp_problem()].
+#' @param names Characted vector with the names of constraints to be deleted.
+#' It is not possible to delete unnamed constraints, so make sure to name them
+#' if you plan to delete them later.
+#'
 #' @export
+#' @examples
 lp_delete_constraint <- function(.problem, names) {
     check_problem(.problem)
     stopifnot(is.character(names))
