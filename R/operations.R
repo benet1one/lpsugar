@@ -240,8 +240,6 @@ divide_a_v <- function(x, y, call) {
     abort("Cannot divide by a variable in a linear problem.", call = call)
 }
 
-
-
 # Logic ------------------------
 
 negate_v <- function(x, call) {
@@ -258,6 +256,30 @@ negate_v <- function(x, call) {
     return(x)
 }
 
+# Methods -----------------------
+
+#' @export
+diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
+    if (length(lag) != 1L || length(differences) != 1L || lag < 1L || differences < 1L) {
+        abort("`lag` and `differences` must be integers >= 1")
+    }
+
+    xlen <- length(x)
+
+    if (lag * differences >= xlen) {
+        return(x[integer()])
+    }
+
+    i1 <- -seq_len(lag)
+    y <- x
+
+    for (i in seq_len(differences)) {
+        ylen <- length(y)
+        y <- y[i1] - y[-ylen:-(ylen - lag + 1L)]
+    }
+
+    y
+}
 
 # Comparison --------------------
 

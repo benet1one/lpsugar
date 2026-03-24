@@ -213,6 +213,17 @@ test_that("operations", {
 
     expect_error(u[1,,] + t[1,,], "non-conformable")
     expect_error(t + b, "non-conformable")
+
+    expect_snapshot(diff(y) $ coef)
+    expect_snapshot(diff(y, lag = 2) $ coef)
+    expect_equal(
+        diff(z, differences = 2),
+        diff(diff(z))
+    )
+    expect_equal(
+        diff(z, lag = 2, differences = 2),
+        z |> diff(lag = 2) |> diff(lag = 2)
+    )
 })
 
 test_that("sum", {

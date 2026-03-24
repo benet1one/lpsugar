@@ -109,3 +109,24 @@
       [1] "robust_index" "matrix"       "array"       
       
 
+# operations
+
+    Code
+      diff(y)$coef
+    Output
+           x y[a] y[b] y[c] z[1,a] z[2,a] z[1,b] z[2,b] z[1,c] z[2,c]
+      [1,] 0   -1    1    0      0      0      0      0      0      0
+      [2,] 0    0   -1    1      0      0      0      0      0      0
+      attr(,"class")
+      [1] "robust_index" "matrix"       "array"       
+
+---
+
+    Code
+      diff(y, lag = 2)$coef
+    Output
+           x y[a] y[b] y[c] z[1,a] z[2,a] z[1,b] z[2,b] z[1,c] z[2,c]
+      [1,] 0   -1    0    1      0      0      0      0      0      0
+      attr(,"class")
+      [1] "robust_index" "matrix"       "array"       
+
