@@ -56,4 +56,5 @@ print.lp_problem <- function(x, ...) {
     }
 
     cat("\n")
+    invisible(x)
 }
