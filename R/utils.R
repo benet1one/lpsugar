@@ -114,6 +114,10 @@ lp_eval <- function(.problem, expr) {
 }
 
 inside <- function(expr) {
+    if (!rlang::is_symbolic(expr)) {
+        return(expr)
+    }
+
     if (rlang::is_quosure(expr)) {
         env <- rlang::quo_get_env(expr)
         expr <- rlang::quo_get_expr(expr)
@@ -124,8 +128,6 @@ inside <- function(expr) {
     if (rlang::is_symbol(expr)) {
         return(expr)
     }
-
-    stopifnot(rlang::is_symbolic(expr))
 
     if (expr[[1L]] == quote(`(`)) {
         return(expr[[2]])

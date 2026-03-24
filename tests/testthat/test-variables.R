@@ -8,6 +8,14 @@ test_that("variable definitions", {
     expect_snapshot(
         parse_variable_definition(t[b = a, 1:5])
     )
+    expect_equal(
+        parse_variable_definition(ayo),
+        parse_variable_definition("ayo")
+    )
+    expect_equal(
+        parse_variable_definition(x[a]),
+        parse_variable_definition("x"[a])
+    )
 })
 
 test_that("variable definition errors", {

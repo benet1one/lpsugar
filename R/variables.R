@@ -60,10 +60,7 @@ lp_variable <- function(.problem, definition,
 
     check_problem(.problem)
 
-    def <- parse_variable_definition(
-        !!rlang::enexpr(definition),
-        envir = parent.frame()
-    )
+    def <- parse_variable_definition({{ definition }})
 
     name <- def$name
     sets <- def$sets
@@ -304,24 +301,33 @@ t.lp_variable <- function(x) {
 
 # Utils ----------------------
 
-parse_variable_definition <- function(definition, envir = parent.frame()) {
-    def <- rlang::enexpr(definition) |> inside()
+parse_variable_definition <- function(definition) {
+    def <- rlang::enquo(definition) |> inside()
+    expr <- rlang::get_expr(def)
+    env  <- rlang::get_env(def)
+
     error_msg <- "Failed to parse variable. See ?lp_variable for details on how to define a variable"
 
-    if (rlang::is_symbol(def)) {
-        name <- def |> format()
+
+    if (rlang::is_string(expr)) {
+        expr <- rlang::sym(expr)
+        def <- rlang::as_quosure(expr, env = env)
+    }
+
+    if (rlang::is_symbol(expr)) {
+        name <- expr |> format()
         sets <- list(scalar = "")
         return(list(name = name, sets = sets))
 
-    } else if (def[[1]] == quote(`[`)) {
-        name <- def[[2]]
+    } else if (expr[[1]] == quote(`[`)) {
+        name <- expr[[2]]
 
-        if (!rlang::is_symbol(name)) {
+        if (!rlang::is_symbol(name) && !rlang::is_string(name)) {
             abort(error_msg, call = parent.frame())
         }
 
         name <- format(name)
-        sets_exprs <- as.list(def[3:length(def)])
+        sets_exprs <- as.list(expr[3:length(expr)])
 
         sets_names <- rlang::names2(sets_exprs)
         unnamed <- sets_names == ""
@@ -332,7 +338,7 @@ parse_variable_definition <- function(definition, envir = parent.frame()) {
         }
 
         sets <- sets_exprs |>
-            lapply(eval, envir = envir) |>
+            lapply(eval, envir = env) |>
             rlang::set_names(sets_names)
 
         return(list(name = name, sets = sets))
