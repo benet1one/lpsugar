@@ -104,13 +104,15 @@ make_model <- function(problem) {
         ROI::L_constraint(
             L = problem$constraints$lhs,
             dir = c(problem$constraints$dir),
-            rhs = c(problem$constraints$rhs)
+            rhs = c(problem$constraints$rhs),
+            names = problem$.varnames
         )
     } else {
         ROI::L_constraint(
             L = matrix(nrow = 0, ncol = problem$.nvar),
             dir = character(0),
-            rhs = numeric(0)
+            rhs = numeric(0),
+            names = problem$.varnames
         )
     }
 
