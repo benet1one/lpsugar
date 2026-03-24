@@ -38,6 +38,37 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
 
 # Steps -------------------
 
+#' @importFrom ROI as.L_objective
+#' @export
+as.L_objective.lp_problem <- function(x) {
+    ROI::L_objective(
+        x$objective$coef,
+        names = x$.varnames
+    )
+}
+
+#' @importFrom ROI as.L_constraint
+#' @export
+as.L_constraint.lp_problem <- function(x, ...) {
+    rlang::check_dots_empty()
+
+    if (length(x$constraints) > 0L) {
+        ROI::L_constraint(
+            L = x$constraints$lhs,
+            dir = c(x$constraints$dir),
+            rhs = c(x$constraints$rhs),
+            names = x$.varnames
+        )
+    } else {
+        ROI::L_constraint(
+            L = matrix(nrow = 0, ncol = x$.nvar),
+            dir = character(0),
+            rhs = numeric(0),
+            names = x$.varnames
+        )
+    }
+}
+
 #' Make an Optimization Problem
 #'
 #' Translate an [lp_problem()] object to a [ROI::OP()] object. Used
@@ -73,10 +104,8 @@ make_model <- function(problem) {
         ))
     }
 
-    objective <- ROI::L_objective(
-        problem$objective$coef,
-        names = problem$.varnames
-    )
+    objective <- as.L_objective.lp_problem(problem)
+    constraints <- as.L_constraint.lp_problem(problem)
 
     types <- character(problem$.nvar)
     lower <- numeric(problem$.nvar)
@@ -99,22 +128,6 @@ make_model <- function(problem) {
         lb = lb, ub = ub,
         nobj = problem$.nvar
     )
-
-    constraints <- if (length(problem$constraints) > 0L) {
-        ROI::L_constraint(
-            L = problem$constraints$lhs,
-            dir = c(problem$constraints$dir),
-            rhs = c(problem$constraints$rhs),
-            names = problem$.varnames
-        )
-    } else {
-        ROI::L_constraint(
-            L = matrix(nrow = 0, ncol = problem$.nvar),
-            dir = character(0),
-            rhs = numeric(0),
-            names = problem$.varnames
-        )
-    }
 
     ROI::OP(
         objective = objective,
