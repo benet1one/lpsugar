@@ -108,6 +108,25 @@ test_that("infeasible", {
     )
 })
 
+test_that("binary bounds", {
+    withr::local_package("ROI.plugin.highs")
+    set <- letters[1:2]
+    l <- c(0, 0.7) |> parameter(set)
+    u <- c(
+        0.8, 1,
+        1, 1
+    ) |> parameter(set, set)
+
+    s <- lp_problem() |>
+        lp_var(x[set, set], binary = TRUE, upper = u) |>
+        lp_var(y[set], binary = TRUE, lower = l) |>
+        lp_max(sum(x) - sum(y)) |>
+        lp_solve("highs")
+
+    expect_equal(s$variables$x, floor(u), ignore_attr = TRUE)
+    expect_equal(s$variables$y, ceiling(l), ignore_attr = TRUE)
+})
+
 # test_that("timeout", {
 #     skip_on_cran()
 #

@@ -100,9 +100,9 @@ lp_variable <- function(.problem, definition,
         upper <- pmin(upper, 1)
     }
 
-    type <- if (binary) {
+    type <- if (binary && all(lower == 0) && all(upper == 1)) {
         "B"
-    } else if (integer) {
+    } else if (binary || integer) {
         "I"
     } else {
         "C"
