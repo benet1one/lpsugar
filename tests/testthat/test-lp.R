@@ -1,14 +1,18 @@
 
 test_that("printing", {
-    lp_problem() |>
+    withr::local_package("ROI")
+    p <- lp_problem() |>
         lp_variable(x, lower = 0) |>
         lp_variable(y, lower = 0, integer = TRUE) |>
         lp_maximize(x + y) |>
         lp_constraint(
             x + 2*y <= 10,
             2*x + y <= 10
-        ) |>
-        print()
+        )
+
+    s <- lp_solve(p)
+    expect_snapshot(p)
+    expect_snapshot(s)
 })
 
 test_that("solving with multivariate bounds", {
