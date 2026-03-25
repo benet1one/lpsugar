@@ -24,7 +24,7 @@ Suggests:
     dplyr,
     knitr,
     rmarkdown,
-    ROI.plugin.glpk,
+    ROI.plugin.highs,
     testthat (>= 3.0.0),
     withr
 VignetteBuilder: 
