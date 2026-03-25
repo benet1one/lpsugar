@@ -99,9 +99,6 @@ test_that("infeasible", {
 
     s <- lp_find_feasible(p)
 
-    expect_true(is.na(s$objective))
-    expect_true(is.na(s$aliases$a))
-    expect_true( all(is.na(s$variables$z)) )
     expect_equal(
         dimnames(p$variables$z),
         dimnames(s$variables$z)

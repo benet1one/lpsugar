@@ -84,11 +84,6 @@ test_that("variable bounds", {
         lp_problem() |> lp_variable(x[1:2, 1:3], lower = matrix(0, nrow = 3, ncol = 2)),
         "`dim\\(lower\\)` different"
     )
-
-    # expect_warning(
-    #     lp_problem() |> lp_variable(x, binary = TRUE, lower = 0, upper = 1),
-    #     "Ignoring bounds"
-    # )
 })
 
 

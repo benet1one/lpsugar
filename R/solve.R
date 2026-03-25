@@ -177,11 +177,6 @@ solve_model <- function(model, solver, ...) {
 pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     check_problem(problem)
 
-    if (solution$status$code != 0L) {
-        solution$solution[] <- NA
-        solution$objval[] <- NA
-    }
-
     vars <- purrr::map(problem$variables, function(x) {
         out <- array(
             solution$solution[x$ind],
