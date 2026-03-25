@@ -247,7 +247,10 @@ names.lp_variable <- function(x) {
 c.lp_variable <- function(x, ...) {
     abort("concatenating `lp_variable`s is not supported.")
 }
-
+#' @export
+as.logical.lp_variable <- function(x, ...) {
+    abort("Variables cannot be coerced to type 'logical'.")
+}
 
 # Indexing ----------------------
 
