@@ -106,7 +106,7 @@ test_that("infeasible", {
 })
 
 test_that("binary bounds", {
-    withr::local_package("ROI.plugin.highs")
+    withr::local_package("ROI")
     set <- letters[1:2]
     l <- c(0, 0.7) |> parameter(set)
     u <- c(
