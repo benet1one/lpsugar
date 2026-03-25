@@ -85,8 +85,16 @@ is_problem <- function(x) {
 is_lp_variable <- function(x) {
     inherits(x, "lp_variable")
 }
-is_lp_constraint <- function(x) {
-    inherits(x, "lp_constraint")
+is_lp_constraint <- function(x, empty_valid = TRUE) {
+    is_con <- inherits(x, "lp_constraint")
+    if (empty_valid) {
+        is_con
+    } else {
+        is_con && !is_empty_lp_constraint(x)
+    }
+}
+is_empty_lp_constraint <- function(x) {
+    inherits(x, "empty_lp_constraint")
 }
 is_for_split <- function(x) {
     inherits(x, "for_split")

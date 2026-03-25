@@ -69,7 +69,10 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
         ">" = "Did you forget the comparison operator? `<=/==/>=`"
     )
 
-    if (is_lp_constraint(con)) {
+    if (is.null(con)) {
+        return(empty_constraint())
+
+    } else if (is_lp_constraint(con)) {
         rownames(con$lhs) <- rep(name, nrow(con$lhs))
         con$name[] <- name
 
@@ -80,7 +83,11 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
             c <- fs[[k]]
             ind <- names(fs)[k]
 
-            if (!is_lp_constraint(c)) {
+            if (is.null(c)) {
+                fs[[k]] <- empty_constraint()
+                next
+
+            } else if (!is_lp_constraint(c)) {
                 rlang::abort(non_constraint_error, call = expr)
             }
 
@@ -153,7 +160,7 @@ lp_con <- lp_constraint
 lp_subject_to <- lp_constraint
 
 
-# List of Constraints --------------------
+# Utils --------------------
 
 update_constraints <- function(.problem) {
     if (length(.problem$constraints) == 0L) {
@@ -169,17 +176,37 @@ update_constraints <- function(.problem) {
     .problem
 }
 
+empty_constraint <- function() {
+    list(
+        lhs = matrix(nrow = 0, ncol = 0),
+        dir = character(0),
+        rhs = matrix(nrow = 0, ncol = 1),
+        call = character(0),
+        name = character(0)
+    ) |> structure(class = c("empty_lp_constraint", "lp_constraint"))
+}
+
+
 # Methods ----------------------
 
 #' @export
 rbind.lp_constraint <- function(..., deparse.level = 1) {
     dots <- rlang::dots_list(...)
+    real_con <- list()
 
-    for (d in dots) if (!is_lp_constraint(d)) {
-        abort("Cannot `rbind.lp_constraint` with other classes.")
+    for (d in dots) {
+        if (is_lp_constraint(d, empty_valid = FALSE)) {
+            real_con <- c(real_con, list(d))
+        } else if (!is_empty_lp_constraint(d) && !is.null(d)) {
+            abort("Cannot `rbind.lp_constraint` with other classes.")
+        }
     }
 
-    out <- purrr::list_transpose(dots, simplify = FALSE)
+    if (length(real_con) == 0L) {
+        return(empty_constraint())
+    }
+
+    out <- purrr::list_transpose(real_con, simplify = FALSE)
 
     out$lhs <- do.call(what = rbind, out$lhs) |> robust_index()
     out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()

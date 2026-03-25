@@ -17,7 +17,7 @@
 lp_problem <- function() {
     list(
         variables = list(),
-        constraints = list(),
+        constraints = empty_constraint(),
         objective = list(
             coef = numeric(),
             add = 0,

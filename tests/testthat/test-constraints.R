@@ -103,3 +103,42 @@ test_that("rbind constraints", {
     expect_error(rbind(x == 1, y), "with other classes")
     expect_error(rbind(0, x == 1), "with other classes")
 })
+
+test_that("conditional constraints", {
+    cond <- c(FALSE, TRUE, TRUE, FALSE, TRUE)
+    n <- length(cond)
+
+    p <- lp_problem() |> lp_var(x[1:n], binary = TRUE)
+
+    p |>
+        lp_con(if (FALSE) x[1] == 2) |>
+        _$constraints
+
+    p |>
+        lp_con(if (FALSE) x[1] == 2) |>
+        lp_con(x[2] >= 5) |>
+        _$constraints
+
+
+    expect_snapshot({
+        p_if_for <- p
+
+        for (i in 1:n) {
+            p_if_for <- p_if_for |> lp_con(
+                cc = if (cond[i]) x[i] <= 0
+            )
+        }
+
+        p_if_for$constraints
+    })
+
+    expect_snapshot({
+        p_for_if <- p |> lp_con(
+            cc = for (i in seq_along(x)) if (cond[i]) {
+                x[i] <= 0
+            }
+        )
+
+        p_for_if$constraints
+    })
+})
