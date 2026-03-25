@@ -256,6 +256,57 @@ negate_v <- function(x, call) {
     return(x)
 }
 
+# Matrix Operations -------------
+
+#' @export
+`%*%.lp_variable` <- function(x, y) {
+    call <- rlang::call2("%*%", rlang::enexpr(x), rlang::enexpr(y))
+    xv <- is_lp_variable(x)
+    yv <- is_lp_variable(y)
+
+    if (xv && yv) {
+        abort("Cannot matrix multiply `%*%` two variables.")
+    }
+
+    if (xv) {
+        matrix_multiply_v_c(x, y, call = call)
+    } else {
+        t(matrix_multiply_v_c(t(y), t(x), call = call))
+    }
+}
+
+# var %*% mat
+matrix_multiply_v_c <- function(x, y, call = parent.frame()) {
+    ptype <- rlang::try_fetch(x$ind %*% y, error = identity)
+
+    if (rlang::is_error(ptype)) {
+        abort(ptype$message, call = call)
+    }
+
+    if (!is.matrix(y)) {
+        y <- matrix(y, ncol = 1L)
+    }
+
+    out <- x
+    out$ind <- ptype
+    out$ind[] <- 1:length(out$ind)
+
+    out$coef <- out$coef[integer(), , drop = TRUE]
+    out$add <- out$add[integer(), , drop = TRUE]
+    out$raw <- FALSE
+
+    for (j in 1:ncol(y)) for (i in 1:nrow(x)) {
+        z <- sum(x[i, ] * y[, j])
+        out$coef <- rbind(out$coef, z$coef)
+        out$add <- rbind(out$add, z$add)
+    }
+
+    out$coef <- robust_index(out$coef)
+    out$add <- robust_index(out$add)
+    return(out)
+}
+
+
 # Methods -----------------------
 
 #' @export
