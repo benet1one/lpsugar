@@ -157,6 +157,20 @@ solve_model <- function(model, solver, ...) {
         abort("Model must be an `OP` object created with `make_model()`.")
     }
 
+    applicable <- ROI::ROI_applicable_solvers(model)
+
+    if (length(applicable) == 0L) {
+        rlang::abort(c(
+            "No applicable solvers loaded.",
+            ">" = "Use `library(ROI)` to load all installed solvers.",
+            ">" = "Use `library(ROI.plugin.<solver>)` to load a specific solver.",
+            "i" = glue::glue(
+                "See https://roi.r-forge.r-project.org/installation.html#ROI_plug-ins",
+                " for instructions on how to install each solver."
+            )
+        ))
+    }
+
     dots <- rlang::dots_list(...)
     out <- ROI::ROI_solve(model, solver = solver, control = dots)
     out$model <- model

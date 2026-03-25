@@ -23,6 +23,7 @@ Imports:
 Suggests: 
     dplyr,
     knitr,
+    pkgload,
     rmarkdown,
     ROI.plugin.highs,
     testthat (>= 3.0.0),

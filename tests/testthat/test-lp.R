@@ -124,6 +124,20 @@ test_that("binary bounds", {
     expect_equal(s$variables$y, ceiling(l), ignore_attr = TRUE)
 })
 
+test_that("no applicable solver", {
+    pkgload::unload("ROI")
+    pkgload::unload("ROI.plugin.highs")
+
+    p <- lp_problem() |>
+        lp_var(x, lower = 0) |>
+        lp_min(x)
+
+    expect_error(
+        lp_solve(p),
+        "No applicable solver"
+    )
+})
+
 # test_that("timeout", {
 #     skip_on_cran()
 #
