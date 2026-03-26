@@ -275,18 +275,23 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
         m <- as.matrix.lp_constraint(x)
     }
 
-    for (call in unique(x$call)) {
-        nam <- x$name[x$call == call][1L]
+    pairs <- purrr::map2(x$name, x$call, list)
 
-        if (nam == "") {
-            nam <- "<unnamed>"
+    for (pair in unique(pairs)) {
+        name <- pair[[1]]
+        call <- pair[[2]]
+
+        name_str <- if (name == "") {
+             "<unnamed>"
+        } else {
+            name
         }
 
-        cat("\n", nam, "|", call)
+        cat("\n", name_str, "|", call)
 
         if (!compact) {
             cat("\n\n")
-            mc <- m[x$call == call, ]
+            mc <- m[x$name == name & x$call == call, ]
             print(mc, quote = FALSE)
             cat("\n")
         }
