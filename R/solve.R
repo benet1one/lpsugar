@@ -209,18 +209,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
         out
     })
 
-    als <- purrr::map(problem$aliases, function(a) {
-        mat <- array(unclass(a$coef), dim = dim(a$coef))
-        add <- unclass(a$add)
-        out <- mat %*% solution$solution + add
-
-        if (length(out) == 1L) {
-            unname(out[1])
-        } else {
-            array(out, dim = dim2(a), dimnames = dimnames(a))
-        }
-    })
-
+    als <- compute_aliases(problem, solution$solution)
     objective <- solution$objval + problem$objective$add
 
     list(

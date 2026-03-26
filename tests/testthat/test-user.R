@@ -59,6 +59,7 @@ test_that("solution summary", {
     p <- lp_problem() |>
         lp_var(y, integer = TRUE) |>
         lp_var(x[1:2, 1:3], lower = 1) |>
+        lp_alias(x1 = x[1]) |>
         lp_max(sum(x) + y) |>
         lp_con(
             c1 = for (i in seq_along(x)) x[i] < 10,
@@ -73,11 +74,13 @@ test_that("solution summary", {
     slist$y <- NULL
     slist$x[1, 1] <- 50
     slist$x[2, 2] <- NA
+    slist$x[2, 3] <- -5
 
     expected <- s$variables_vec
     expected["y"] <- 0
     expected["x[1,1]"] <- 50
     expected["x[2,2]"] <- 1
+    expected["x[2,3]"] <- -5
 
     expect_equal(
         solution_to_vec(p, s),
@@ -96,6 +99,6 @@ test_that("solution summary", {
         "'y' should be integer"
     )
 
-    expect_snapshot(constraint_summary(p, slist))
+    expect_snapshot(solution_summary(p, slist))
 })
 

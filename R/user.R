@@ -114,14 +114,21 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 #'
 #' @examples
 solution_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- solution_to_vec(problem, solution)
+    solution <- solution_to_vec(problem, solution, call = environment())
+    aliases <- compute_aliases(problem, solution)
+    constraints <- constraint_summary(problem, solution, tol = tol)
+    bounds <- bound_summary(problem, solution, tol = tol)
 
     list(
-        constraints = constraint_summary(problem, solution, tol = tol)
+        aliases = aliases,
+        constraints = constraints,
+        bounds = bounds,
+        feasible = all(constraints$satisfied) && all(bounds$satisfied),
+        objective = compute_objective(problem, solution)
     )
 }
 
-solution_to_vec <- function(problem, solution, call = parent.frame()) {
+solution_to_vec <- function(problem, solution, call = environment()) {
     if (is_lp_solution(solution)) {
         return(solution$variables_vec)
 
@@ -199,19 +206,70 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
     saturated <- diff > -tol  &  diff < +tol
     saturated[!satisfied] <- NA
 
-    df <- data.frame(
+    data.frame(
         name = con$name,
         fullname = rownames(con),
         lhs = lhs,
         dir = dir,
         rhs = rhs,
-        diff = diff,
+        satisfied = satisfied,
+        saturated = saturated
+    )
+}
+
+#' @rdname solution_summary
+#' @export
+bound_summary <- function(problem, solution, tol = 2e-6) {
+    solution <- solution_to_vec(problem, solution)
+
+    lower <- numeric(problem$.nvar)
+    upper <- numeric(problem$.nvar)
+
+    for (x in problem$variables) {
+        lower[x$ind] <- x$lower
+        upper[x$ind] <- x$upper
+    }
+
+    satisfied <- (solution >= lower - tol) & (solution <= upper + tol)
+    saturated <- (solution <= lower + tol) | (solution >= upper - tol)
+    saturated[!satisfied] <- NA
+
+    df <- data.frame(
+        variable = problem$.varnames,
+        lower = lower,
+        value = solution,
+        upper = upper,
         satisfied = satisfied,
         saturated = saturated
     )
 
-    list(
-        data = df,
-        feasible = feasible
-    )
+    rownames(df) <- NULL
+    df
+}
+
+#' @rdname solution_summary
+#' @export
+compute_objective <- function(problem, solution) {
+    solution <- solution_to_vec(problem, solution)
+    out <- crossprod(problem$objective$coef, solution) +
+        problem$objective$add
+    out[1]
+}
+
+#' @rdname solution_summary
+#' @export
+compute_aliases <- function(problem, solution) {
+    solution <- solution_to_vec(problem, solution)
+
+    purrr::map(problem$aliases, function(a) {
+        mat <- array(unclass(a$coef), dim = dim(a$coef))
+        add <- unclass(a$add)
+        out <- mat %*% solution + add
+
+        if (length(out) == 1L) {
+            unname(out[1])
+        } else {
+            array(out, dim = dim2(a), dimnames = dimnames(a))
+        }
+    })
 }
