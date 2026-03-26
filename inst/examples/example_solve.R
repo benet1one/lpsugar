@@ -1,4 +1,4 @@
-library(ROI)
+library(ROI) |> suppressMessages()
 
 r <- letters[1:2]
 c <- LETTERS[1:3]

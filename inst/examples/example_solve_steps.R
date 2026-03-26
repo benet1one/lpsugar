@@ -1,4 +1,4 @@
-library(ROI)
+library(ROI) |> suppressMessages()
 
 p <- lp_problem() |>
     lp_var(x[a = 1:2, b = 1:2], upper = 10) |>

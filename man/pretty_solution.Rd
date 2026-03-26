@@ -19,7 +19,7 @@ Takes a problem and its solution and prettifies the solution. Used internally
 in \code{\link[=lp_solve]{lp_solve()}}.
 }
 \examples{
-library(ROI)
+library(ROI) |> suppressMessages()
 
 p <- lp_problem() |>
     lp_var(x[a = 1:2, b = 1:2], upper = 10) |>

@@ -22,8 +22,8 @@ Use \code{\link[=lp_variable]{lp_variable()}} to define the variables,
 \code{\link[=lp_solve]{lp_solve()}} to find the optimum.
 }
 \examples{
-# ROI needs to be imported for lp_solve() to work
-library(ROI)
+# ROI or a ROI plugin needs to be loaded for lp_solve() to work
+library(ROI) |> suppressMessages()
 
 lp_problem() |>
     lp_variable(x[1:2], lower = 0) |>

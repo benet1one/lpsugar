@@ -35,9 +35,9 @@ complexity to the problem.
 # z[i] = 2*x[i] + y[n-i+1]
 
 # One option is to use constraints
-n <- 4
+n <- 3
 set <- letters[1:n]
-obj_coef <- c(2, 1, 5, 6)
+obj_coef <- c(2, 1, 5)
 
 p0 <- lp_problem() |>
     lp_variable(x[set], lower = 1) |>
@@ -45,12 +45,13 @@ p0 <- lp_problem() |>
     lp_variable(z[set]) |>
     lp_minimize(sum(z * obj_coef)) |>
     lp_constraint(
-        some_constraint = x + y >= 4,
+        some_constraint = (x + y >= 4),
+        constraint_with_z = (z[1] <= 7),
         xyz = for (i in 1:n)  z[i] == 2*x[i] + y[n-i+1]
     )
 
-# But this problem has 3 variables and n extra constraints:
-p0
+# But this problem has 3 extra variables and 3 extra constraints:
+p0$constraints
 
 # Instead, we can define 'z' as an alias
 p1 <- lp_problem() |>
@@ -61,16 +62,17 @@ p1 <- lp_problem() |>
     ) |>
     lp_minimize(sum(z * obj_coef)) |>
     lp_constraint(
-        some_constraint = x + y >= 4
+        some_constraint = x + y >= 4,
+        constraint_with_z = (z[1] <= 7)
     )
 
-# This problem only has 2 variables and no constraints!
-p1
+# This problem no extra variables or constraints!
+p1$constraints
 
 # The solution is presented differently
-library(ROI)
-lp_solve(p0) [c("variables", "aliases")]
-lp_solve(p1) [c("variables", "aliases")]
+library(ROI) |> suppressMessages()
+lp_solve(p0) [c("variables", "aliases")] # z is a variable
+lp_solve(p1) [c("variables", "aliases")] # z is an alias
 
 
 
@@ -128,7 +130,7 @@ p1$variables
 p1$aliases
 
 # Aliases are computed from the final solution
-library(ROI)
+library(ROI) |> suppressMessages()
 s <- lp_solve(p1)
 s$variables
 s$aliases

@@ -19,7 +19,7 @@ Find the optimum of an Optimization Model created with \code{\link[=make_model]{
 Used internally in \code{\link[=lp_solve]{lp_solve()}}.
 }
 \examples{
-library(ROI)
+library(ROI) |> suppressMessages()
 
 p <- lp_problem() |>
     lp_var(x[a = 1:2, b = 1:2], upper = 10) |>

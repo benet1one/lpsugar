@@ -1,5 +1,5 @@
-# ROI needs to be imported for lp_solve() to work
-library(ROI)
+# ROI or a ROI plugin needs to be loaded for lp_solve() to work
+library(ROI) |> suppressMessages()
 
 lp_problem() |>
     lp_variable(x[1:2], lower = 0) |>

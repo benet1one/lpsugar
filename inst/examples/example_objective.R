@@ -11,7 +11,7 @@ p <- lp_problem() |>
 
 p$objective
 
-library(ROI)
+library(ROI) |> suppressMessages()
 (s <- lp_solve(p))
 
 s$aliases$total_profit

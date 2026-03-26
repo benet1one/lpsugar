@@ -25,7 +25,7 @@ are returned as \verb{\{0, 1\}}. If \code{TRUE}, binary variables are returned a
 \code{lp_find_feasible()} returns an arbitrary feasible solution.
 }
 \examples{
-library(ROI)
+library(ROI) |> suppressMessages()
 
 r <- letters[1:2]
 c <- LETTERS[1:3]
