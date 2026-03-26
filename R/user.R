@@ -144,6 +144,7 @@ solution_to_vec <- function(problem, solution, call = parent.frame()) {
         for (x in problem$variables) {
             xs <- solution[[x$name]]
             lower <- rep_len(x$lower, length(x))
+            if (x$integer) lower <- ceiling(lower)
             default <- pmax(0, lower)
 
             if (is.null(xs)) {
@@ -158,6 +159,10 @@ solution_to_vec <- function(problem, solution, call = parent.frame()) {
                 m <- length(xs)
                 abort("Variable '{x$name}' should be length ({n}) but is length ({m}) in `solution`.",
                       call = call)
+            }
+
+            if (x$integer && !rlang::is_integerish(xs)) {
+                warn("'{x$name}' should be integer.", call = call)
             }
 
             solution_vec[x$ind] <- xs

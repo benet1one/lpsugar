@@ -88,6 +88,14 @@ test_that("solution summary", {
         expected
     )
 
+    slist2 <- slist
+    slist2$y <- 2.5
+
+    expect_warning(
+        solution_to_vec(p, slist2),
+        "'y' should be integer"
+    )
+
     expect_snapshot(constraint_summary(p, slist))
 })
 
