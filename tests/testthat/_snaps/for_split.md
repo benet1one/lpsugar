@@ -9,16 +9,14 @@
       [1,] 0    1    0    0      0      0      0      0      0      0
       [2,] 0    0    1    0      0      0      0      0      0      0
       [3,] 0    0    0    1      0      0      0      0      0      0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       $add
            [,1]
       [1,]    0
       [2,]    0
       [3,]    0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       
       $`[i=2]`
@@ -27,16 +25,14 @@
       [1,] 0    4    0    0      0      0      0      0      0      0
       [2,] 0    0    4    0      0      0      0      0      0      0
       [3,] 0    0    0    4      0      0      0      0      0      0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       $add
            [,1]
       [1,]    0
       [2,]    0
       [3,]    0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       
       $`[i=3]`
@@ -45,16 +41,14 @@
       [1,] 0    9    0    0      0      0      0      0      0      0
       [2,] 0    0    9    0      0      0      0      0      0      0
       [3,] 0    0    0    9      0      0      0      0      0      0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       $add
            [,1]
       [1,]    0
       [2,]    0
       [3,]    0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       
       $`[i=4]`
@@ -63,16 +57,14 @@
       [1,] 0   16    0    0      0      0      0      0      0      0
       [2,] 0    0   16    0      0      0      0      0      0      0
       [3,] 0    0    0   16      0      0      0      0      0      0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       $add
            [,1]
       [1,]    0
       [2,]    0
       [3,]    0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       
       $`[i=5]`
@@ -81,16 +73,14 @@
       [1,] 0   25    0    0      0      0      0      0      0      0
       [2,] 0    0   25    0      0      0      0      0      0      0
       [3,] 0    0    0   25      0      0      0      0      0      0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       $add
            [,1]
       [1,]    0
       [2,]    0
       [3,]    0
-      attr(,"class")
-      [1] "robust_index" "matrix"       "array"       
+      with class 'robust_index' from package 'lpsugar'
       
       
       attr(,"class")

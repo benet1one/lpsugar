@@ -5,6 +5,13 @@ robust_index <- function(x) {
 }
 
 #' @export
+print.robust_index <- function(x, ...) {
+    print(unclass(x))
+    cat("with class 'robust_index' from package 'lpsugar'\n")
+    invisible(x)
+}
+
+#' @export
 `[.robust_index` <- function(x, ..., drop = FALSE) {
     if (...length() == 1L) {
         check_index_valid_vector(x, index = c(...))
