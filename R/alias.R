@@ -11,7 +11,7 @@
 #' @returns The `.problem` with the added `$aliases`.
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_alias.R
 lp_alias <- function(.problem, ...) {
     check_problem(.problem)
     dots <- rlang::enquos(...)
