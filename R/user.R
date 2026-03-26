@@ -95,3 +95,118 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
               call = parent.frame())
     }
 }
+
+
+#' Compute a Summary of a Solution or Point
+#'
+#' Check feasibility, constraint saturation, calculate objective value and aliases.
+#'
+#' @param problem An [lp_problem()].
+#' @param solution One of:
+#' - Named list of variables with their respective values.
+#' If a variable is missing, it is set to `max(0, lower)`.
+#' - An `lp_solution` object as returned by [lp_solve()].
+#' - A vector containing the values of each variable, one after another.
+#' @param tol Tolerance to use for checking constraint and bound feasibility
+#'
+#' @returns A named list with the computed statistics.
+#' @export
+#'
+#' @examples
+solution_summary <- function(problem, solution, tol = 2e-6) {
+    solution <- solution_vec(problem, solution)
+
+    list(
+        constraints = constraint_summary(problem, solution, tol = tol)
+    )
+}
+
+solution_vec <- function(problem, solution, call = parent.frame()) {
+    if (is_lp_solution(solution)) {
+        return(solution$variables_vec)
+
+    } else if (is.atomic(solution)) {
+        if (length(solution) != problem$.nvar) {
+            n <- problem$.nvar
+            m <- length(solution)
+            abort("`problem` has ({n}) variables but `solution` is length ({m}).",
+                  call = call)
+        }
+
+        num <- as.numeric(solution)
+        names(num) <- problem$.varnames
+        return(num)
+
+    } else if (is.list(solution)) {
+        solution_vec <- numeric(problem$.nvar)
+        names(solution_vec) <- problem$.varnames
+
+        for (x in problem$variables) {
+            xs <- solution[[x$name]]
+            lower <- rep_len(x$lower, length(x))
+            default <- pmax(0, lower)
+
+            if (is.null(xs)) {
+                xs <- default
+            } else {
+                xs <- as.numeric(xs)
+                xs[is.na(xs)] <- default[is.na(xs)]
+            }
+
+            if (length(xs) != length(x)) {
+                n <- length(x)
+                m <- length(xs)
+                abort("Variable '{x$name}' should be length ({n}) but is length ({m}) in `solution`.",
+                      call = call)
+            }
+
+            solution_vec[x$ind] <- xs
+        }
+
+        return(solution_vec)
+
+    } else {
+        abort("Unsupported type for `solution`.", call = call)
+    }
+}
+
+#' @rdname solution_summary
+#' @export
+constraint_summary <- function(problem, solution, tol = 2e-6) {
+    solution <- solution_vec(problem, solution)
+    con <- problem$constraints
+    lhs <- con$lhs %*% solution
+    lhs <- lhs[, 1]
+    dir <- con$dir
+    rhs <- con$rhs[, 1]
+    diff <- rhs - lhs
+
+    less_than <- lhs <= rhs + tol
+    greater_than <- lhs >= rhs - tol
+    equal_to <- less_than & greater_than
+
+    satisfied <- logical(length(dir))
+    satisfied[dir == "<="] <- less_than[dir == "<="]
+    satisfied[dir == ">="] <- greater_than[dir == ">="]
+    satisfied[dir == "=="] <- equal_to[dir == "=="]
+
+    feasible <- all(satisfied)
+    saturated <- diff > -tol  &  diff < +tol
+    saturated[!satisfied] <- NA
+
+    df <- data.frame(
+        name = con$name,
+        fullname = rownames(con),
+        lhs = lhs,
+        dir = dir,
+        rhs = rhs,
+        diff = diff,
+        satisfied = satisfied,
+        saturated = saturated
+    )
+
+    list(
+        data = df,
+        feasible = feasible
+    )
+}

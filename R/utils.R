@@ -99,6 +99,9 @@ is_empty_lp_constraint <- function(x) {
 is_for_split <- function(x) {
     inherits(x, "for_split")
 }
+is_lp_solution <- function(x) {
+    inherits(x, "lp_solution")
+}
 
 check_problem <- function(x) {
     if (!is_problem(x)) {

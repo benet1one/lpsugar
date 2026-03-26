@@ -54,3 +54,40 @@ test_that("parameter", {
     )
 })
 
+test_that("solution summary", {
+    withr::local_package("ROI")
+    p <- lp_problem() |>
+        lp_var(y, integer = TRUE) |>
+        lp_var(x[1:2, 1:3], lower = 1) |>
+        lp_max(sum(x) + y) |>
+        lp_con(
+            c1 = for (i in seq_along(x)) x[i] < 10,
+            c2 = 2*x/6 + y < 50,
+            x[1] + x[2] == 4
+        )
+
+    s <- lp_solve(p)
+    s
+
+    slist <- s$variables
+    slist$y <- NULL
+    slist$x[1, 1] <- 50
+    slist$x[2, 2] <- NA
+
+    expected <- s$variables_vec
+    expected["y"] <- 0
+    expected["x[1,1]"] <- 50
+    expected["x[2,2]"] <- 1
+
+    expect_equal(
+        solution_vec(p, s),
+        s$variables_vec
+    )
+    expect_equal(
+        solution_vec(p, slist),
+        expected
+    )
+
+    expect_snapshot(constraint_summary(p, slist))
+})
+
