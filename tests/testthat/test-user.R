@@ -80,11 +80,11 @@ test_that("solution summary", {
     expected["x[2,2]"] <- 1
 
     expect_equal(
-        solution_vec(p, s),
+        solution_to_vec(p, s),
         s$variables_vec
     )
     expect_equal(
-        solution_vec(p, slist),
+        solution_to_vec(p, slist),
         expected
     )
 

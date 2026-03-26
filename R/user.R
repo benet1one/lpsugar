@@ -114,14 +114,14 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 #'
 #' @examples
 solution_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- solution_vec(problem, solution)
+    solution <- solution_to_vec(problem, solution)
 
     list(
         constraints = constraint_summary(problem, solution, tol = tol)
     )
 }
 
-solution_vec <- function(problem, solution, call = parent.frame()) {
+solution_to_vec <- function(problem, solution, call = parent.frame()) {
     if (is_lp_solution(solution)) {
         return(solution$variables_vec)
 
@@ -173,7 +173,7 @@ solution_vec <- function(problem, solution, call = parent.frame()) {
 #' @rdname solution_summary
 #' @export
 constraint_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- solution_vec(problem, solution)
+    solution <- solution_to_vec(problem, solution)
     con <- problem$constraints
     lhs <- con$lhs %*% solution
     lhs <- lhs[, 1]
