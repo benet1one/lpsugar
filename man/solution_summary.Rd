@@ -3,11 +3,20 @@
 \name{solution_summary}
 \alias{solution_summary}
 \alias{constraint_summary}
+\alias{bound_summary}
+\alias{compute_objective}
+\alias{compute_aliases}
 \title{Compute a Summary of a Solution or Point}
 \usage{
 solution_summary(problem, solution, tol = 2e-06)
 
 constraint_summary(problem, solution, tol = 2e-06)
+
+bound_summary(problem, solution, tol = 2e-06)
+
+compute_objective(problem, solution)
+
+compute_aliases(problem, solution)
 }
 \arguments{
 \item{problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
