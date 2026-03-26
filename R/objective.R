@@ -22,12 +22,13 @@ lp_objective <- function(.problem, objective) {
     }
 
     if (length(objective) > 1L) {
-        if (length(expr) == 1L) {
-            inform("Summing variables in objective. Write `sum({expr})` to suppress this message.",
-                   call = parent.frame())
+        msg_expr <- if (length(expr) == 1L) {
+            expr
+        } else {
+            "..."
         }
 
-        inform("Summing variables in objective. Write `sum(...)` to suppress this message.",
+        inform("Summing variables in objective. Write `sum({msg_expr})` to suppress this message.",
                call = parent.frame())
         objective <- sum(objective)
     }
