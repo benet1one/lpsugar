@@ -217,7 +217,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
         if (length(out) == 1L) {
             unname(out[1])
         } else {
-            out
+            array(out, dim = dim2(a), dimnames = dimnames(a))
         }
     })
 
