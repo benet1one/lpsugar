@@ -235,6 +235,11 @@ dim.lp_constraint <- function(x) {
     c(length(x$dir), NA)
 }
 #' @export
+dimnames.lp_constraint <- function(x) {
+    list(rownames(x$lhs), NA)
+}
+
+#' @export
 `[.lp_constraint` <- function(x, ...) {
     dots <- rlang::dots_list(..., .preserve_empty = TRUE, .ignore_empty = "none")
 
