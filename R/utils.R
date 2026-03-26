@@ -206,6 +206,6 @@ for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) 
     result
 }
 
-flatten <- function(x, is_node = NULL, name_spec = "{outer}{inner}", ...) {
-    purrr::list_flatten(x, is_node = is_node, name_spec = name_spec, ...)
+flatten <- function(x, name_spec = "{outer}{inner}", ...) {
+    purrr::list_flatten(x, name_spec = name_spec, ...)
 }
