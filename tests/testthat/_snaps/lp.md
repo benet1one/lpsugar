@@ -37,6 +37,11 @@
       [1] 3
       
       
+      $aliases
+      $aliases$two_x
+      [1] 7
+      
+      
       $objective
       [1] 6.5
       
