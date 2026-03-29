@@ -16,3 +16,18 @@ if you plan to delete them later.}
 \description{
 Remove named constraints from an \code{\link[=lp_problem]{lp_problem()}}.
 }
+\examples{
+p <- lp_problem() |>
+    lp_variable(x) |>
+    lp_constraint(
+        c1 = x > 0,
+        c2 = x < 10
+    )
+
+some_condition <- TRUE
+if (some_condition) {
+    p <- p |> lp_delete_constraint("c1")
+}
+
+print(p)
+}

@@ -125,6 +125,19 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
 #'
 #' @export
 #' @examples
+#' p <- lp_problem() |>
+#'     lp_variable(x) |>
+#'     lp_constraint(
+#'         c1 = x > 0,
+#'         c2 = x < 10
+#'     )
+#'
+#' some_condition <- TRUE
+#' if (some_condition) {
+#'     p <- p |> lp_delete_constraint("c1")
+#' }
+#'
+#' print(p)
 lp_delete_constraint <- function(.problem, names) {
     check_problem(.problem)
     stopifnot(is.character(names))
