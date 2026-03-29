@@ -105,6 +105,20 @@ test_that("solution summary", {
         "'y' should be integer"
     )
 
+    slist3 <- slist
+    slist3$x <- slist$x[1:2, 1:2]
+
+    expect_error(
+        solution_to_vec(p, slist3),
+        r"(Variable 'x' in `solution` is length \(4\) when it should be length \(6\))"
+    )
+
+    svec <- s$variables_vec |> head(4)
+    expect_error(
+        solution_to_vec(p, svec),
+        r"(`problem` has \(7\) variables but `solution` is length \(4\))"
+    )
+
     expect_snapshot(solution_summary(p, slist))
 })
 

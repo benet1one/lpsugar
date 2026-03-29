@@ -206,7 +206,7 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
     saturated <- diff > -tol  &  diff < +tol
     saturated[!satisfied] <- NA
 
-    data.frame(
+    df <- data.frame(
         name = con$name,
         fullname = rownames(con),
         lhs = lhs,
@@ -215,6 +215,9 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
         satisfied = satisfied,
         saturated = saturated
     )
+
+    rownames(df) <- NULL
+    df
 }
 
 #' @rdname solution_summary
