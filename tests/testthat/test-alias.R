@@ -22,4 +22,23 @@ test_that("alias", {
         lp_alias(p, sum(x)),
         "must be named"
     )
+
+    expect_message(
+        p2 <- p |>
+            lp_alias(s = x[1]) |>
+            lp_alias(s = x[2]),
+        "Overriding alias `s`"
+    )
+    expect_true(
+        all(p2$aliases$s$coef == c(0, "x[2,1]" = 1, 0, 0, 0, 0))
+    )
+
+    expect_error(
+        p |> lp_alias(x = x[1]),
+        "Cannot override variable `x`"
+    )
+    expect_error(
+        p |> lp_alias(y = 1:3),
+        "Did not evaluate to a variable"
+    )
 })

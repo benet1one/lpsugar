@@ -31,9 +31,9 @@ lp_alias <- function(.problem, ...) {
 
 lp_alias_internal <- function(.problem, quosure, name, data) {
     if (name %in% names(.problem$variables)) {
-        abort("Cannot override variable `{new_alias$name}`.", call = parent.frame())
+        abort("Cannot override variable `{name}`.", call = parent.frame())
     } else if (name %in% names(.problem$aliases)) {
-        inform("Overriding alias `{new_alias$name}`.", call = parent.frame())
+        inform("Overriding alias `{name}`.", call = parent.frame())
     }
 
     value <- rlang::eval_tidy(quosure, data = data)
