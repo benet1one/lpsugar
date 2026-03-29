@@ -88,13 +88,6 @@ test_that("pretty solution optimal", {
     )
 })
 
-test_that("pretty solution unbounded", {
-    withr::local_package("ROI")
-    p <- lp_problem() |>
-        lp_var(y, integer = TRUE) |>
-        lp_max(y)
-})
-
 test_that("infeasible", {
     withr::local_package("ROI")
     p <- lp_problem() |>
@@ -143,47 +136,3 @@ test_that("no applicable solver", {
     )
 })
 
-# test_that("timeout", {
-#     skip_on_cran()
-#
-#     p_fast <- lp_problem() |>
-#         lp_var(x, lower = 0) |>
-#         lp_min(x)
-#
-#     lp_solve(p_fast, timeout = NULL)
-#     lp_solve(p_fast, timeout = 0)
-#     lp_solve(p_fast, timeout = -1)
-#
-#     expect_warning(
-#         lp_solve(p_fast, timeout = 0.2),
-#         "rounding to 1"
-#     )
-#
-#     expect_error(lp_solve(p_fast, timeout = 2:3))
-#     expect_error(lp_solve(p_fast, timeout = "3"))
-#
-#
-#     withr::local_seed(123)
-#
-#     n <- 250
-#     m <- 30
-#     objective_coef <- runif(n)
-#     constraint_coef <- matrix(
-#         rpois(n*m, lambda = 2),
-#         nrow = m, ncol = n
-#     )
-#
-#     p_slow <- lp_problem() |>
-#         lp_var(x[1:n], lower = 0, upper = 10, integer = TRUE) |>
-#         lp_max(sum(x * objective_coef)) |>
-#         lp_con(
-#             for (i in 1:m)
-#                 sum(x * constraint_coef[i, ]) <= 5*n
-#         )
-#
-#     time <- system.time(
-#         s_slow <- lp_solve(p_slow, timeout = 1)
-#     )
-#
-#     expect_true(time[1] < 3) # user time
-# })
