@@ -24,16 +24,34 @@ compute_aliases(problem, solution)
 \item{solution}{One of:
 \itemize{
 \item Named list of variables with their respective values.
-If a variable is missing, it is set to \code{max(0, lower)}.
+If a variable is missing, it is set to \code{pmax(0, lower)}.
 \item An \code{lp_solution} object as returned by \code{\link[=lp_solve]{lp_solve()}}.
 \item A vector containing the values of each variable, one after another.
 }}
 
-\item{tol}{Tolerance to use for checking constraint and bound feasibility}
+\item{tol}{Tolerance to use for constraint and bound satisfaction.}
 }
 \value{
 A named list with the computed statistics.
 }
 \description{
 Check feasibility, constraint saturation, calculate objective value and aliases.
+}
+\examples{
+problem <- lp_problem() |>
+    lp_var(x, lower = 0) |>
+    lp_var(y[1:3], integer = TRUE) |>
+    lp_alias(sum_y = sum(y)) |>
+    lp_min(x + y[1]) |>
+    lp_con(
+        c1 = 2*x - y[3] == 10,
+        c2 = for (i in 1:3) y[i] <= i
+    )
+
+unfeasible_solution <- list(
+    x = -1,
+    y = c(4, 2, -3)
+)
+
+solution_summary(problem, unfeasible_solution)
 }

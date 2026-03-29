@@ -104,15 +104,15 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 #' @param problem An [lp_problem()].
 #' @param solution One of:
 #' - Named list of variables with their respective values.
-#' If a variable is missing, it is set to `max(0, lower)`.
+#' If a variable is missing, it is set to `pmax(0, lower)`.
 #' - An `lp_solution` object as returned by [lp_solve()].
 #' - A vector containing the values of each variable, one after another.
-#' @param tol Tolerance to use for checking constraint and bound feasibility
+#' @param tol Tolerance to use for constraint and bound satisfaction.
 #'
 #' @returns A named list with the computed statistics.
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_solution_summary.R
 solution_summary <- function(problem, solution, tol = 2e-6) {
     solution <- solution_to_vec(problem, solution, call = environment())
     aliases <- compute_aliases(problem, solution)
