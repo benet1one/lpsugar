@@ -164,7 +164,7 @@ solution_to_vec <- function(problem, solution, call = environment()) {
             if (length(xs) != length(x)) {
                 n <- length(x)
                 m <- length(xs)
-                abort("Variable '{x$name}' should be length ({n}) but is length ({m}) in `solution`.",
+                abort("Variable '{x$name}' in `solution` is length ({m}) when it should be length ({n}).",
                       call = call)
             }
 

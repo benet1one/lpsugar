@@ -35,11 +35,6 @@ test_that("parameter", {
         r"(`.x` is length \(5\) when it should be length \(6 = 2 x 3\))"
     )
 
-    expect_error(
-        1 |> parameter(a, b, 1:2),
-        "Only vectors and matrices are supported"
-    )
-
     true_mat <- matrix(cm, 2, 3, byrow = TRUE)
     true_mat |> parameter(a, b)
 
@@ -51,6 +46,17 @@ test_that("parameter", {
     expect_error(
         true_mat |> parameter(b, a),
         r"(`.x` has dimensions \(2 x 3\), while `...` have dimensions \(3 x 2\))"
+    )
+
+    arr <- array(dim = c(2, 3, 1))
+
+    expect_error(
+        arr |> parameter(a, b, 1),
+        "Only vectors and matrices are supported"
+    )
+    expect_error(
+        mat |> parameter(a, b, a),
+        "Only vectors and matrices are supported"
     )
 })
 
