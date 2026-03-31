@@ -7,7 +7,7 @@
 #' [lp_solve()] to find the optimum.
 #'
 #' @returns An `lp_problem` object with fields:
-#'   - `$variables` : List of [lp_variable()]s.
+#'   - `$variables` : List of variables defined with [lp_variable()].
 #'   - `$objective` : List with information about the objective function,
 #'   set with [lp_minimize()] or [lp_maximize()].
 #'   - `$constraints` : List of constraints added with [lp_constraint()].

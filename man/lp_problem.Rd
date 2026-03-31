@@ -9,7 +9,7 @@ lp_problem()
 \value{
 An \code{lp_problem} object with fields:
 \itemize{
-\item \verb{$variables} : List of \code{\link[=lp_variable]{lp_variable()}}s.
+\item \verb{$variables} : List of variables defined with \code{\link[=lp_variable]{lp_variable()}}.
 \item \verb{$objective} : List with information about the objective function,
 set with \code{\link[=lp_minimize]{lp_minimize()}} or \code{\link[=lp_maximize]{lp_maximize()}}.
 \item \verb{$constraints} : List of constraints added with \code{\link[=lp_constraint]{lp_constraint()}}.
