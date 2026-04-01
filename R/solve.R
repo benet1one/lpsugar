@@ -238,7 +238,7 @@ print.lp_solution <- function(x, ...) {
     }
 
     if (x$status$code == 0) {
-        cat("$status$code = 0 : Optimal\n")
+        cat("$status$code = 0  (Optimal)\n")
     } else {
         cat("$status$code =", x$status$code, "\n")
         cat("$status$msg\n")

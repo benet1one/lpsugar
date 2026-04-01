@@ -45,7 +45,7 @@
       $objective
       [1] 6.5
       
-      $status$code = 0 : Optimal
+      $status$code = 0  (Optimal)
       
       Fields:
       -- $objective --
