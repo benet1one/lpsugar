@@ -19,3 +19,22 @@ test_that("splice", {
 
     expect_snapshot(p$constraints)
 })
+
+test_that("for with no slpit", {
+    p <- lp_problem() |>
+        lp_var(x) |>
+        lp_con(
+            mycon = {
+                k <- 0
+                y <- x
+                for (i in 2:4) {
+                    k <- k + i
+                    y <- y * i
+                }
+                y <= k
+            }
+        )
+
+    expect_true(p$constraints$lhs == 24)
+    expect_true(p$constraints$rhs == 9)
+})
