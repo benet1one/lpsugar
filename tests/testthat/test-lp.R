@@ -57,9 +57,11 @@ test_that("pretty solution optimal", {
     withr::local_package("ROI")
     r <- letters[1:2]
     c <- LETTERS[1:3]
+    len1set <- c("s")
 
     p <- lp_problem() |>
         lp_variable(x[r, c], binary = TRUE) |>
+        lp_variable(y[len1set]) |>
         lp_alias(total = sum(x)) |>
         lp_maximize(total + 1)
 
@@ -71,6 +73,11 @@ test_that("pretty solution optimal", {
     expect_equal(
         dimnames(s$variables$x),
         list(r = r, c = c)
+    )
+
+    expect_equal(
+        dimnames(s$variables$y),
+        list("len1set" = "s")
     )
 
     ## Even if the variable is an integer, the storage mode needs to be double

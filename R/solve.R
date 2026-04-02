@@ -198,7 +198,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
             dimnames = dimnames(x$ind)
         )
 
-        if (length(x) == 1L) {
+        if (length(x) == 1L  &&  identical(names(dimnames(x)), "scalar")) {
             out <- unname(out[1])
         }
 
