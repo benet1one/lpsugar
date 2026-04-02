@@ -1,11 +1,10 @@
 
 First Release
 - Quick Start
+- Check argument types in functions
 
 Code
-- figure out presolve
-- sensitivity
+- sensitivity?
 
 Docs
-- Readme
 - Vignettes
