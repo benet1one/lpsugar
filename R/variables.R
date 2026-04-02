@@ -334,7 +334,7 @@ parse_variable_definition <- function(definition) {
 
         sets_names <- rlang::names2(sets_exprs)
         unnamed <- sets_names == ""
-        sets_names[unnamed] <- sets_exprs[unnamed] |> sapply(format)
+        sets_names[unnamed] <- sets_exprs[unnamed] |> sapply(format1)
 
         for (s in sets_exprs) if (rlang::is_missing(s)) {
             abort("Sets in `{name}[...]` cannot be missing.", call = parent.frame())

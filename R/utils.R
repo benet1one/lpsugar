@@ -30,6 +30,17 @@ warn_changed_args <- function(..., env = parent.frame(), call = env) {
 
 # Safety ------------------------
 
+format1 <- function(x, ...) {
+    y <- format(x, ...)
+
+    if (length(y) == 1L) {
+        y
+    } else if (endsWith(y[1], "{")) {
+        paste(y[1], "... }")
+    } else {
+        paste(y[1], "...")
+    }
+}
 dim2 <- function(x) {
     if (is.null(dim(x))) {
         length(x)

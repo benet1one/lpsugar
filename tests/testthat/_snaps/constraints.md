@@ -4,7 +4,7 @@
       print(plong$constraints, compact = TRUE)
     Output
       
-       <unnamed> | x + x + x + x + x + x + x + x + x + x + x + x + x + x + x + x +  ... 
+       <unnamed> | x + x + x + x + x + x + x + x + x + x + x + x + x + x + x + x +  ...
 
 ---
 

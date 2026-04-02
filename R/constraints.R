@@ -102,15 +102,7 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
         rlang::abort(non_constraint_error, call = expr)
     }
 
-    expr_str <- format(expr)
-
-    if (length(expr_str) == 1L) {
-        con$call[] <- expr_str
-    } else {
-        is_bracket <- expr_str[1] |> endsWith("{")
-        con$call[] <- paste(expr_str[1], "...", if (is_bracket) "}")
-    }
-
+    con$call[] <- format1(expr)
     return(con)
 }
 
