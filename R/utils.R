@@ -48,11 +48,12 @@ dim2 <- function(x) {
         dim(x)
     }
 }
-ndim <- function(x) {
-    if (is.null(dim(x))) {
-        1L
+ndim <- function(x, drop = FALSE) {
+    if (drop) {
+        # Without max(1), scalars would return 0 dimensions
+        sum(dim2(x) > 1L) |> max(1)
     } else {
-        length(dim(x))
+        length(dim2(x))
     }
 }
 non_conformable <- function(x, y) {

@@ -38,3 +38,18 @@ test_that("for with no slpit", {
     expect_true(p$constraints$lhs == 24)
     expect_true(p$constraints$rhs == 9)
 })
+
+test_that("misc", {
+    colvec_set <- matrix(1:3, nrow = 3)
+    mat_set <- matrix(1:9, nrow = 3)
+
+    lp_problem() |> lp_var(y[colvec_set])
+
+    expect_warning(
+        lp_problem() |> lp_var(y[mat_set]),
+        "set `mat_set` is 2-dimensional, results may be unexpected"
+    )
+
+    # This should not throw an error, I guess...
+    lp_problem() |> lp_var( uhh[{hey <- 1:3; hey}] )
+})

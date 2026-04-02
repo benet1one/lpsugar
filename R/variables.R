@@ -344,6 +344,16 @@ parse_variable_definition <- function(definition) {
             lapply(eval, envir = env) |>
             rlang::set_names(sets_names)
 
+        for (s in seq_along(sets)) {
+            st <- sets[[s]]
+            nd <- ndim(st, drop = TRUE)
+
+            if (nd != 1L) {
+                nm <- names(sets)[s]
+                warn("set `{nm}` is {nd}-dimensional, results may be unexpected.")
+            }
+        }
+
         return(list(name = name, sets = sets))
     }
 
