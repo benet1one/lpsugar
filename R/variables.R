@@ -313,11 +313,10 @@ parse_variable_definition <- function(definition) {
 
 
     if (rlang::is_string(expr)) {
-        expr <- rlang::sym(expr)
-        def <- rlang::as_quosure(expr, env = env)
-    }
+        sets <- list(scalar = "")
+        return(list(name = expr, sets = sets))
 
-    if (rlang::is_symbol(expr)) {
+    } else if (rlang::is_symbol(expr)) {
         name <- expr |> format()
         sets <- list(scalar = "")
         return(list(name = name, sets = sets))
