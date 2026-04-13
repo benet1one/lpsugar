@@ -48,3 +48,27 @@ test_that("for_split works", {
         3 * p$variables$x - 3
     )
 })
+
+test_that("for split with interruption", {
+    q1 <- rlang::quo(for (i in 1:4) {
+        if (i == 3) {
+            return()
+        }
+        2*i
+    })
+    q2 <- rlang::quo(for (i in 1:4) {
+        if (i == 3) {
+            next
+        }
+        2*i
+    })
+
+    expect_error(
+        for_split(q1),
+        "Cannot use `return` or `next`"
+    )
+    expect_error(
+        for_split(q2),
+        "Cannot use `return` or `next`"
+    )
+})

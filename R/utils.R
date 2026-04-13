@@ -165,6 +165,7 @@ for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) 
         }
     }
 
+    check_for_split(quosure)
     expr <- rlang::quo_get_expr(quosure)
     env <- rlang::quo_get_env(quosure)
 
@@ -212,4 +213,12 @@ for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) 
 
 flatten <- function(x, name_spec = "{outer}{inner}", ...) {
     purrr::list_flatten(x, name_spec = name_spec, ...)
+}
+
+check_for_split <- function(quosure, call = parent.frame()) {
+    nams <- all.names(quosure)
+
+    if ("return" %in% nams || "next" %in% nams) {
+        abort("Cannot use `return` or `next`.", call = call)
+    }
 }
