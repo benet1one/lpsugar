@@ -1,7 +1,7 @@
 Type: Package
 Package: lpsugar
 Title: Algebraic Modeling Language for Linear Problems
-Version: 0.12.5
+Version: 0.12.6
 Authors@R: 
     person("benet", , , "benet1one@gmail.com", role = c("aut", "cre"))
 Description: Algebraic Modeling Language inspired in R's vectorized
