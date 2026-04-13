@@ -142,3 +142,13 @@ test_that("conditional constraints", {
         p_for_if$constraints
     })
 })
+
+test_that("quadruple for", {
+    p <- lp_problem() |>
+        lp_var(x[1:100]) |>
+        lp_con(for (i in 1:3) for (j in 1:2) for (k in 1:2) for (m in 1:2) {
+            x[i+j+k+m] <= i*j - k*m
+        })
+
+    expect_snapshot(rownames(p$constraints))
+})

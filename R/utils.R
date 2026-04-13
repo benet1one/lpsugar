@@ -211,8 +211,13 @@ for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) 
     result
 }
 
-flatten <- function(x, name_spec = "{outer}{inner}", ...) {
-    purrr::list_flatten(x, name_spec = name_spec, ...)
+flatten <- function(x, is_leaf = Negate(is_for_split)) {
+    if (is_leaf(x)) {
+        return(x)
+    }
+
+    l <- lapply(x, flatten, is_leaf = is_leaf)
+    purrr::list_flatten(l, name_spec = "{outer}{inner}")
 }
 
 check_for_split <- function(quosure, call = parent.frame()) {
