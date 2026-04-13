@@ -56,3 +56,20 @@
       -- $message --
       -- $model --
 
+---
+
+    Code
+      plong
+    Output
+      <lpsugar Linear Problem>
+      
+      -- $variables --
+      $x
+      Real variable 'x[1:1000]'
+      
+      -- $objective --
+      minimize x[2] 
+      
+      -- $constraints --
+       <unnamed> | for (i in 1:2) for (j in 1:3) i + j <= x[i * j]
+
