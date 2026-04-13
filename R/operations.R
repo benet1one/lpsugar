@@ -4,20 +4,7 @@
 #' @export
 Ops.lp_variable <- function(e1, e2) {
     op <- .Generic
-    e1_text <- rlang::enexpr(e1) |> format()
-    e2_text <- rlang::enexpr(e2) |> format()
-
-    op_text <- if (rlang::is_missing(e2)) {
-        paste0(op, e1_text)
-    } else {
-        paste(e1_text, op, e2_text)
-    }
-
-    call <- if (length(op_text) == 1L) {
-        str2lang(op_text)
-    } else {
-        parent.frame()
-    }
+    call <- call(op, substitute(e1), substitute(e2))
 
     # Single Element --------------------
     # +x, -x, !x
@@ -260,7 +247,7 @@ negate_v <- function(x, call) {
 
 #' @export
 `%*%.lp_variable` <- function(x, y) {
-    call <- rlang::call2("%*%", rlang::enexpr(x), rlang::enexpr(y))
+    call <- rlang::call2("%*%", substitute(x), substitute(y))
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
 

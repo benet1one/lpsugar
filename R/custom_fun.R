@@ -29,7 +29,7 @@ mean.lp_variable <- function(x, ...) {
 #' @export
 Math.lp_variable <- function(x, ...) {
     fun <- .Generic
-    call <- paste0(fun, "(", format(rlang::enexpr(x)), ")") |>
+    call <- paste0(fun, "(", format(substitute(x)), ")") |>
         str2lang()
 
     if (fun == "cumsum") {
