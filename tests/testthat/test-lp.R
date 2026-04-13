@@ -14,6 +14,16 @@ test_that("printing", {
     s <- lp_solve(p)
     expect_snapshot(p)
     expect_snapshot(s)
+
+
+    plong <- lp_problem() |>
+        lp_variable(x[1:1000]) |>
+        lp_minimize(x[2]) |>
+        lp_constraint(
+            for (i in 1:2) for (j in 1:3) i+j <= x[i*j]
+        )
+
+    expect_snapshot(plong)
 })
 
 test_that("solving with multivariate bounds", {
