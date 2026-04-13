@@ -349,7 +349,7 @@ compare_lp <- function(x, y, op, call) {
     rhs <- -lhs$add
     lhs <- lhs$coef
     dir <- rep(op, length(rhs))
-    call <- rep(format(call), length(rhs))
+    call <- rep(format1(call), length(rhs))
     name <- character(length(rhs))
 
     list(lhs = lhs, dir = dir, rhs = rhs, name = name, call = call) |>
