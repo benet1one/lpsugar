@@ -38,7 +38,7 @@ Let’s write the problem in lpsugar and solve it!
 
 ``` r
 library(lpsugar)
-library(ROI) |> suppressMessages() # Needs to be loaded
+library(ROI.plugin.highs) # Use any ROI solver you like!
 
 my_problem <- lp_problem() |> 
     lp_variable(x) |> 
@@ -73,7 +73,7 @@ price <- c(A = 150, B = 220)
 resources <- names(available)
 products <- names(price)
 
-requires <- c(
+required <- c(
     # A, B
       6, 3, # Material
       2, 4  # Labour
@@ -81,7 +81,7 @@ requires <- c(
 ) |> parameter(resources, products)
 
 # parameter() sets the dimensions and names
-requires
+required
 #>           products
 #> resources  A B
 #>   Material 6 3
@@ -92,9 +92,7 @@ production_problem <- lp_problem() |>
     lp_max(sum(price * units)) |> 
     lp_con(
         for (r in resources) {
-            req_r <- requires[r, ]
-            used_r <- sum(req_r * units)
-            (used_r <= available[r])
+            sum(units * required[r, ]) <= available[r]
         }
     )
 
