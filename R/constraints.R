@@ -255,7 +255,6 @@ dimnames.lp_constraint <- function(x) {
         (length(dots) == 2L && !rlang::is_missing(dots[[2L]]))
 
     if (wrong_index) {
-        xname <- rlang::enexpr(x) |> format()
         abort("Index constraints with `con[i]` or `con[i, ]`")
     }
 
