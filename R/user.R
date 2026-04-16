@@ -130,7 +130,18 @@ solution_summary <- function(problem, solution, tol = 2e-6) {
 
 solution_to_vec <- function(problem, solution, call = environment()) {
     if (is_lp_solution(solution)) {
-        return(solution$variables_vec)
+        var_vec <- solution_to_vec(problem, solution$variables, call = call)
+        true_vec <- solution$variables_vec
+
+        if (any(var_vec != true_vec)) {
+            rlang::abort(
+                c("`solution$variables` and `solution$variables_vec` do not match.",
+                  "i" = "You can use either one of them in this function."),
+                call = call
+            )
+        } else {
+            return(true_vec)
+        }
 
     } else if (is.atomic(solution)) {
         if (length(solution) != ncol(problem)) {

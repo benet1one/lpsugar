@@ -97,6 +97,14 @@ test_that("solution summary", {
         expected
     )
 
+    s2 <- s
+    s2$variables <- slist
+
+    expect_error(
+        solution_to_vec(p, s2),
+        "`solution\\$variables` and `solution\\$variables_vec` do not match"
+    )
+
     slist2 <- slist
     slist2$y <- 2.5
 
