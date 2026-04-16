@@ -108,7 +108,7 @@ print.lp_objective <- function(x, compact = length(x$coef) > 20L, ...) {
 # Utils ------------------------
 
 update_objective <- function(.problem) {
-    total_vars <- .problem$.nvar
+    total_vars <- ncol(.problem)
     objective_len <- length(.problem$objective$coef)
 
     .problem$objective$coef <- c(
@@ -116,6 +116,6 @@ update_objective <- function(.problem) {
         numeric(total_vars - objective_len)
     )
 
-    names(.problem$objective$coef) <- .problem$.varnames
+    names(.problem$objective$coef) <- attr(.problem, "varnames")
     return(.problem)
 }

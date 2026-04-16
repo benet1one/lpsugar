@@ -43,7 +43,7 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
 as.L_objective.lp_problem <- function(x) {
     ROI::L_objective(
         x$objective$coef,
-        names = x$.varnames
+        names = attr(x, "varnames")
     )
 }
 
@@ -57,14 +57,14 @@ as.L_constraint.lp_problem <- function(x, ...) {
             L = x$constraints$lhs,
             dir = c(x$constraints$dir),
             rhs = c(x$constraints$rhs),
-            names = x$.varnames
+            names = attr(x, "varnames")
         )
     } else {
         ROI::L_constraint(
-            L = matrix(nrow = 0, ncol = x$.nvar),
+            L = matrix(nrow = 0, ncol = ncol(x)),
             dir = character(0),
             rhs = numeric(0),
-            names = x$.varnames
+            names = attr(x, "varnames")
         )
     }
 }
@@ -83,7 +83,7 @@ make_model <- function(problem) {
     check_problem(problem)
 
     # No variables
-    if (problem$.nvar == 0L) {
+    if (ncol(problem) == 0L) {
         abort("Problem has no variables. Define them with `lp_variable()`.")
     }
 
@@ -107,9 +107,9 @@ make_model <- function(problem) {
     objective <- as.L_objective.lp_problem(problem)
     constraints <- as.L_constraint.lp_problem(problem)
 
-    types <- character(problem$.nvar)
-    lower <- numeric(problem$.nvar)
-    upper <- numeric(problem$.nvar)
+    types <- character(ncol(problem))
+    lower <- numeric(ncol(problem))
+    upper <- numeric(ncol(problem))
 
     for (x in problem$variables) {
         types[x$ind] <- x$type
@@ -126,7 +126,7 @@ make_model <- function(problem) {
     bounds <- ROI::V_bound(
         li = li, ui = ui,
         lb = lb, ub = ub,
-        nobj = problem$.nvar
+        nobj = ncol(problem)
     )
 
     ROI::OP(

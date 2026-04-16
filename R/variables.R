@@ -111,16 +111,16 @@ lp_variable <- function(.problem, definition,
     # Index array of variable.
     # Indicates which objective coefficients correspond to this variable.
     ind <- array(dim = lengths(sets), dimnames = sets) |> robust_index()
-    ind[] <- 1:length(ind) + .problem$.nvar
-    .problem$.nvar <- max(ind)
+    ind[] <- 1:length(ind) + ncol(.problem)
+    attr(.problem, "n_variables") <- max(ind)
 
-    .problem$.varnames <- c(
-        .problem$.varnames,
+    attr(.problem, "varnames") <- c(
+        attr(.problem, "varnames"),
         name_variable(name, sets)
     )
 
     add <- matrix(0, nrow = length(ind), ncol = 1L) |> robust_index()
-    coef <- matrix(0, nrow = length(ind), ncol = .problem$.nvar) |> robust_index()
+    coef <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> robust_index()
     coef[, ind] <- diag(length(ind))
 
     new_variable <- list(
@@ -151,10 +151,9 @@ lp_variable <- function(.problem, definition,
     .problem
 }
 
-
 update_variables <- function(.problem, field = "variables") {
-    total_vars <- .problem$.nvar
-    varnames <- .problem$.varnames
+    total_vars <- ncol(.problem)
+    varnames <- attr(.problem, "varnames")
     vars <- .problem[[field]]
 
     for (i in names(vars)) {

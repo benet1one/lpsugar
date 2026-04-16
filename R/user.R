@@ -133,20 +133,20 @@ solution_to_vec <- function(problem, solution, call = environment()) {
         return(solution$variables_vec)
 
     } else if (is.atomic(solution)) {
-        if (length(solution) != problem$.nvar) {
-            n <- problem$.nvar
+        if (length(solution) != ncol(problem)) {
+            n <- ncol(problem)
             m <- length(solution)
             abort("`problem` has ({n}) variables but `solution` is length ({m}).",
                   call = call)
         }
 
         num <- as.numeric(solution)
-        names(num) <- problem$.varnames
+        names(num) <- attr(problem, "varnames")
         return(num)
 
     } else if (is.list(solution)) {
-        solution_vec <- numeric(problem$.nvar)
-        names(solution_vec) <- problem$.varnames
+        solution_vec <- numeric(ncol(problem))
+        names(solution_vec) <- attr(problem, "varnames")
 
         for (x in problem$variables) {
             xs <- solution[[x$name]]
@@ -225,8 +225,8 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
 bound_summary <- function(problem, solution, tol = 2e-6) {
     solution <- solution_to_vec(problem, solution)
 
-    lower <- numeric(problem$.nvar)
-    upper <- numeric(problem$.nvar)
+    lower <- numeric(ncol(problem))
+    upper <- numeric(ncol(problem))
 
     for (x in problem$variables) {
         lower[x$ind] <- x$lower
@@ -238,7 +238,7 @@ bound_summary <- function(problem, solution, tol = 2e-6) {
     saturated[!satisfied] <- NA
 
     df <- data.frame(
-        variable = problem$.varnames,
+        variable = attr(problem, "varnames"),
         lower = lower,
         value = solution,
         upper = upper,

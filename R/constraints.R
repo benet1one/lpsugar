@@ -173,9 +173,9 @@ update_constraints <- function(.problem) {
     }
 
     lhs <- .problem$constraints$lhs
-    to_bind <- matrix(0, nrow = nrow(lhs), ncol = .problem$.nvar - ncol(lhs))
+    to_bind <- matrix(0, nrow = nrow(lhs), ncol = ncol(.problem) - ncol(lhs))
     lhs <- cbind(lhs, to_bind)
-    colnames(lhs) <- .problem$.varnames
+    colnames(lhs) <- attr(.problem, "varnames")
 
     .problem$constraints$lhs <- lhs
     .problem
