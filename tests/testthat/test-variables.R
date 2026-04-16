@@ -86,6 +86,29 @@ test_that("variable bounds", {
     )
 })
 
+test_that("variable concatenation", {
+    p <- lp_problem() |>
+        lp_var(x[1:3]) |>
+        lp_var(y[1:2, 1:2])
+
+    x <- p$variables$x
+    y <- p$variables$y
+
+    expect_error(
+        c(x, 2),
+        "Use `bind_vars\\(\\)` instead."
+    )
+    expect_snapshot(
+        bind_vars(1:2, y, x[1], 3)
+    )
+    expect_equal(
+        bind_vars(1, y, x[1:2]) $ ind,
+        1:7,
+        ignore_attr = TRUE
+    )
+
+    # Test len0 variables and numbers
+})
 
 test_that("variable indexing", {
     a <- letters[1:3]

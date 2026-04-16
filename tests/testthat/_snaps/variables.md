@@ -32,6 +32,36 @@
       
       
 
+# variable concatenation
+
+    Code
+      bind_vars(1:2, y, x[1], 3)
+    Output
+      $coef
+           x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
+      [1,]    0    0    0      0      0      0      0
+      [2,]    0    0    0      0      0      0      0
+      [3,]    0    0    0      1      0      0      0
+      [4,]    0    0    0      0      1      0      0
+      [5,]    0    0    0      0      0      1      0
+      [6,]    0    0    0      0      0      0      1
+      [7,]    1    0    0      0      0      0      0
+      [8,]    0    0    0      0      0      0      0
+      with class 'robust_index' from package 'lpsugar'
+      
+      $add
+           [,1]
+      [1,]    1
+      [2,]    2
+      [3,]    0
+      [4,]    0
+      [5,]    0
+      [6,]    0
+      [7,]    0
+      [8,]    3
+      with class 'robust_index' from package 'lpsugar'
+      
+
 # variable indexing
 
     Code

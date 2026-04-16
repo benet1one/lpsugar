@@ -243,13 +243,85 @@ names.lp_variable <- function(x) {
     names(x$ind)
 }
 #' @export
-c.lp_variable <- function(x, ...) {
-    abort("concatenating `lp_variable`s is not supported.")
-}
-#' @export
 as.logical.lp_variable <- function(x, ...) {
     abort("Variables cannot be coerced to type 'logical'.")
 }
+
+# Concatenation --------------------
+
+#' @export
+c.lp_variable <- function(..., recursive = TRUE) {
+    rlang::abort(c(
+        "Cannot use `c()` to concatenate `lp_variable`s.",
+        "i" = "Use `bind_vars()` instead."
+    ))
+}
+
+#' Concatenate variables and numbers.
+#'
+#' Bind multiple variables and/or constants together.
+#'
+#' @param ... Problem variables and/or numeric constants, vectors or arrays.
+#' @returns An `lp_variable`.
+#' @examples
+bind_vars <- function(...) {
+    dots <- rlang::dots_list(..., .ignore_empty = "all")
+    dots_expr <- rlang::enexprs(..., .ignore_empty = "all")
+
+    for (i in seq_along(dots)) {
+        x <- dots[[i]]
+        if (!is_lp_variable(x) && !is.numeric(x)) {
+            e <- dots_expr[[i]] |> format1()
+            abort("`{e}` is not numeric or an `lp_variable`.")
+        }
+    }
+
+    purrr::reduce(dots, function(x, y) {
+        xv <- is_lp_variable(x)
+        yv <- is_lp_variable(y)
+
+        if (xv && yv) {
+            bind_vv(x, y)
+        } else if (xv && !yv) {
+            bind_vc(x, y)
+        } else if (!xv && yv) {
+            bind_cv(x, y)
+        } else {
+            c(x, y)
+        }
+    })
+}
+bind_vv <- function(x, y) {
+    z <- x
+    z$ind  <- seq_len(length(x) + length(y)) |> unname() |> robust_index()
+    z$coef <- rbind(x$coef, y$coef) |> robust_index()
+    z$add  <- rbind(x$add,  y$add)  |> robust_index()
+    z$raw  <- FALSE
+    return(z)
+}
+bind_vc <- function(x, y) {
+    x$ind <- c(x$ind, numeric(length(y))) |> unname() |> robust_index()
+    x$ind[] <- 1:length(x$ind)
+
+    x$coef <- rbind(
+        x$coef,
+        matrix(0, nrow = length(y), ncol = ncol(x$coef))
+    ) |> robust_index()
+    x$add <- rbind(
+        x$add,
+        matrix(y, ncol = 1L)
+    ) |> robust_index()
+
+    x$raw <- FALSE
+    return(x)
+}
+bind_cv <- function(x, y) {
+    i <- c(seq_along(x) + length(y), seq_along(y))
+    z <- bind_vc(y, x)[i]
+    z$ind <- seq_along(i) |> robust_index()
+    return(z)
+}
+
 
 # Indexing ----------------------
 
