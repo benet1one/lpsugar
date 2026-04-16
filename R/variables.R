@@ -257,9 +257,16 @@ as.logical.lp_variable <- function(x, ...) {
 `[.lp_variable` <- function(x, ..., drop = FALSE) {
     old_ind <- x$ind
     old_ind[] <- 1:length(old_ind)
-    old_ind <- old_ind[..., drop = drop]
-    old_ind <- c(old_ind)
 
+    old_ind <- rlang::try_fetch(old_ind[..., drop = drop], error = identity)
+
+    if (rlang::is_condition(old_ind)) {
+        dots <- rlang::enexprs(..., .ignore_empty = "none")
+        call <- rlang::expr((!!substitute(x))[!!!dots])
+        abort(old_ind$message, call = call)
+    }
+
+    old_ind <- c(old_ind)
     x$ind <- x$ind[..., drop = drop]
     x$raw <- FALSE
 

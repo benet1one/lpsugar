@@ -125,6 +125,7 @@ test_that("variable indexing", {
     expect_error(y[-4], "out of bounds")
     expect_error(y[0], "Invalid subscript")
     expect_error(y["d"], "Invalid subscript 'd'")
+    expect_error(y[1,1], "Incorrect number of dimensions")
 
     # Transpose
     expect_identical(z$coef, t(t(z))$coef)
