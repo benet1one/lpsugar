@@ -17,6 +17,23 @@
        one_line_fs | for (i in 1:3) x[i, ] >= y[, i] - 10
        my_fs | for (i in 1:3) { ... }
 
+# bind constraints
+
+    Code
+      q$constraints
+    Output
+      
+       name_outer | for (i in 1:n) bind_cons(y[i] >= l + is_two[i] * (2 - l), y[i] <=  ...
+      
+                      y[1] y[2] y[3] is_two[1] is_two[2] is_two[3] dir  
+      name_outer[i=1] 1    0    0    -2        0         0         >=  0
+      name_outer[i=1] 1    0    0    3         0         0         <=  5
+      name_outer[i=2] 0    1    0    0         -2        0         >=  0
+      name_outer[i=2] 0    1    0    0         3         0         <=  5
+      name_outer[i=3] 0    0    1    0         0         -2        >=  0
+      name_outer[i=3] 0    0    1    0         0         3         <=  5
+      
+
 # conditional constraints
 
     Code

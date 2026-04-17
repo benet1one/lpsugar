@@ -1,0 +1,23 @@
+n <- 4
+
+lower <- 1
+value <- 3
+upper <- 7
+
+p <- lp_problem() |>
+    lp_var(y[1:n], lower = lower, upper = upper) |>
+    lp_var(is_value[1:n], binary = TRUE) |>
+    lp_max(y[1] + y[2] - y[3] - y[4]) |>
+    lp_con(
+        sum(is_value) == 2,
+        for (i in 1:n) bind_cons(
+            y[i] >= lower + is_value[i] * (value - lower),
+            y[i] <= upper - is_value[i] * (upper - value)
+        )
+    )
+
+p$constraints
+
+library(ROI)
+s <- lp_solve(p, binary_as_logical = TRUE)
+s$variables

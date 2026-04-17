@@ -94,14 +94,40 @@ test_that("indexing constraints", {
     expect_error(p$constraints[1, , ], "Index constraints with")
 })
 
-test_that("rbind constraints", {
+test_that("bind constraints", {
     p <- problem_constraints()
     x <- p$variables$x
     y <- p$variables$y
 
-    expect_no_error(rbind(x == 1, y >= 0))
-    expect_error(rbind(x == 1, y), "with other classes")
-    expect_error(rbind(0, x == 1), "with other classes")
+    expect_equal(
+        bind_cons(x == 1, y >= 0),
+        rbind(x == 1, y >= 0)
+    )
+
+    expect_error(
+        rbind(x == 1, y),
+        "`bind_cons\\(\\)` can only bind `lp_constraint`, not `lp_variable`"
+    )
+    expect_error(
+        rbind(0, x == 1),
+        "`bind_cons\\(\\)` can only bind `lp_constraint`, not `numeric`"
+    )
+
+    n <- 3
+    l <- 0
+    u <- 5
+
+    q <- lp_problem() |>
+        lp_var(y[1:n], lower = l, upper = u) |>
+        lp_var(is_two[1:n], binary = TRUE) |>
+        lp_con(
+            name_outer = for (i in 1:n) bind_cons(
+                y[i] >= l + is_two[i] * (2-l),
+                y[i] <= u - is_two[i] * (u-2)
+            )
+        )
+
+    expect_snapshot(q$constraints)
 })
 
 test_that("conditional constraints", {

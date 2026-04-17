@@ -44,12 +44,12 @@ lp_constraint <- function(.problem, ...) {
         )
     }
 
-    cons <- do.call(rbind.lp_constraint, cons)
+    cons <- bind_cons(!!!cons)
 
     if (length(.problem$constraints) == 0L) {
         .problem$constraints <- cons
     } else {
-        .problem$constraints <- rbind.lp_constraint(.problem$constraints, cons)
+        .problem$constraints <- bind_cons(.problem$constraints, cons)
     }
 
     return(.problem)
@@ -95,7 +95,7 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
             fs[[k]] <- c
         }
 
-        con <- do.call(rbind.lp_constraint, fs)
+        con <- bind_cons(!!!fs)
         con$name[] <- name
 
     } else {
@@ -191,27 +191,41 @@ empty_constraint <- function() {
     ) |> structure(class = c("empty_lp_constraint", "lp_constraint"))
 }
 
-
-# Methods ----------------------
-
+#' Bind constraints
+#'
+#' Define multiple constraints at once.
+#'
+#' @param ... Constraints. See [lp_constraint()].
+#'
 #' @export
-rbind.lp_constraint <- function(..., deparse.level = 1) {
+#' @example inst/examples/example_bind_cons.R
+bind_cons <- function(...) {
+    call <- environment()
+
     dots <- rlang::dots_list(...)
-    real_con <- list()
-
-    for (d in dots) {
-        if (is_lp_constraint(d, empty_valid = FALSE)) {
-            real_con <- c(real_con, list(d))
-        } else if (!is_empty_lp_constraint(d) && !is.null(d)) {
-            abort("Cannot `rbind.lp_constraint` with other classes.")
+    dots <- dots[lengths(dots) > 0]
+    dots <- purrr::keep(dots, function(d) {
+        if (!is_lp_constraint(d)) {
+            abort(
+                "`bind_cons()` can only bind `lp_constraint`, not `{class(d)[1]}`",
+                call = call
+            )
         }
-    }
 
-    if (length(real_con) == 0L) {
+        !is_empty_lp_constraint(d)
+    })
+
+    if (length(dots) == 0L) {
         return(empty_constraint())
     }
 
-    out <- purrr::list_transpose(real_con, simplify = FALSE)
+    out <- purrr::list_transpose(dots, simplify = FALSE)
+
+    # dots_names <- rlang::names2(dots)
+    #
+    # for (i in which(dots_names != "")) {
+    #     out$name[[i]] <- rep_len(dots_names[i], length(out$name[[i]]))
+    # }
 
     out$lhs <- do.call(what = rbind, out$lhs) |> robust_index()
     out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()
@@ -220,6 +234,14 @@ rbind.lp_constraint <- function(..., deparse.level = 1) {
     out$name <- unlist(out$name)
 
     structure(out, class = "lp_constraint")
+}
+
+# Methods ----------------------
+
+#' @export
+rbind.lp_constraint <- function(..., deparse.level = 1) {
+    warn_changed_args(deparse.level = 1)
+    bind_cons(...)
 }
 
 #' @export
