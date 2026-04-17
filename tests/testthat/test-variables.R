@@ -102,12 +102,31 @@ test_that("variable concatenation", {
         bind_vars(1:2, y, x[1], 3)
     )
     expect_equal(
+        bind_vars(1, 4:5),
+        c(1, 4:5)
+    )
+    expect_equal(
         bind_vars(1, y, x[1:2]) $ ind,
         1:7,
         ignore_attr = TRUE
     )
 
-    # Test len0 variables and numbers
+    expect_equal(
+        bind_vars(),
+        numeric(0)
+    )
+    expect_equal(
+        bind_vars(integer(0), NULL),
+        numeric(0)
+    )
+    expect_equal(
+        bind_vars(, x, NULL, integer(0), y, , 1, ),
+        bind_vars(x, y, 1)
+    )
+    expect_equal(
+        bind_vars(x, y[integer()]),
+        x
+    )
 })
 
 test_that("variable indexing", {

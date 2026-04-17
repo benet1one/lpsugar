@@ -268,6 +268,14 @@ bind_vars <- function(...) {
     dots <- rlang::dots_list(..., .ignore_empty = "all")
     dots_expr <- rlang::enexprs(..., .ignore_empty = "all")
 
+    len0 <- lengths(dots) == 0
+    dots <- dots[!len0]
+    dots_expr <- dots_expr[!len0]
+
+    if (length(dots) == 0) {
+        return(numeric())
+    }
+
     for (i in seq_along(dots)) {
         x <- dots[[i]]
         if (!is_lp_variable(x) && !is.numeric(x)) {
