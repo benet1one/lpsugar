@@ -95,6 +95,29 @@ test_that("sum", {
     )
 })
 
+test_that("sum over", {
+    a <- matrix(1:6, nrow = 3, ncol = 2)
+    p <- lp_problem() |>
+        lp_var(x[1:3])
+
+    s1 <- p |> lp_eval(sum_over(j = 1:2, x * a[, j]))
+    s2 <- p |> lp_eval(sum_over(i = 1:3, j = 1:2, x[i] * a[i, j]))
+
+    expect_equal(s1$coef, c(5, 7, 9), ignore_attr = TRUE)
+    expect_equal(s2$coef, c(5, 7, 9), ignore_attr = TRUE)
+
+    q <- lp_problem() |>
+        lp_var(y[1:3, 1:3])
+
+    s3 <-  q |> lp_eval(sum_over(i = 1:3, diag(y)[i] * i))
+
+    expect_equal(
+        s3$coef,
+        c(1, 0, 0, 0, 2, 0, 0, 0, 3),
+        ignore_attr = TRUE
+    )
+})
+
 test_that("apply", {
     p <- lp_problem() |>
         lp_var(y[1:2, 1:2]) |>

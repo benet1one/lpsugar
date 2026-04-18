@@ -1,4 +1,63 @@
 
+# Sum For ---------------------------------------
+
+#' Index Based Summation
+#'
+#' Sum over one or more indexing variables.
+#'
+#' @param ... The first argument(s) must be named: the name represents the indexing variable,
+#' and the values represent the sequence over which to sum.
+#'
+#' The last argument is the expression of the sum.
+#'
+#' @details
+#' The syntax is similar to the one used in math. For instance,
+#' \eqn{ \sum_{i=1}^n \sum_{j=1}^m {x_{ij} * c_j} }
+#' would be written as
+#' `sum_over(i = 1:n, j = 1:n, x[i,j] * c[j])`.
+#'
+#' @returns The value of the sum.
+#' @export
+#'
+#' @examples
+#' cost <- c(5, 2, 7)
+#' p <- lp_problem() |>
+#'   lp_variable(x[1:2, 1:3]) |>
+#'   lp_minimize(sum_over(i = 1:2, j = 1:3, x[i, j] * cost[j]))
+#' p$objective
+sum_over <- function(...) {
+    dots <- rlang::enquos(..., .homonyms = "error")
+    nams <- rlang::names2(dots)
+    n <- length(dots)
+
+    if (nams[n] != "") {
+        abort("Last element in `...` should be an unnamed expression to sum.")
+    }
+    if (any(nams[-n] == "")) {
+        # TODO Fix the grammar in this error message
+        abort("The first elements in `...` should be the named indices to sum across.")
+    }
+
+    env <- rlang::get_env(dots[[n]])
+    indices <- dots[-n] |> lapply(rlang::eval_tidy)
+    grid <- do.call(expand.grid, indices)
+    s <- 0
+
+    if (nrow(grid) > 0) for (i in 1:nrow(grid)) {
+        sub_frame <- grid[i, , drop = FALSE] |>
+            as.list()
+        expr <- dots[[n]] |>
+            rlang::get_expr() |>
+            methods::substituteDirect(sub_frame)
+
+        r <- rlang::eval_tidy(expr = expr, env = env)
+        s <- s + r
+    }
+
+    sum(s)
+}
+
+
 # Methods ---------------------------------------
 
 #' @export
