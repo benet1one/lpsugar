@@ -122,10 +122,15 @@ data_mask <- function(.problem) {
 
     rlang::new_data_mask(bottom = als, top = fun)
 }
-lp_eval <- function(.problem, expr) {
+lp_eval <- function(.problem, expr, split_for = FALSE) {
     quosure <- rlang::enquo(expr)
     data <- data_mask(.problem)
-    rlang::eval_tidy(quosure, data = data)
+
+    if (split_for) {
+        for_split(quosure, evaluate = TRUE, data = data)
+    } else {
+        rlang::eval_tidy(quosure, data = data)
+    }
 }
 
 inside <- function(expr) {
