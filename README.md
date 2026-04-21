@@ -72,42 +72,42 @@ maximize earnings.
 
 ``` r
 available <- c(Material = 20, Labour = 10)
-price <- c(A = 150, B = 220)
+price <- c(A = 150, B = 220, C = 160)
 
 resources <- names(available)
 products <- names(price)
 
 required <- c(
-    # A, B
-      6, 3, # Material
-      2, 4  # Labour
+    # A, B, C
+      6, 3, 4, # Material
+      2, 3, 1  # Labour
       
 ) |> parameter(resources, products)
 
 # parameter() sets the dimensions and names
 required
 #>           products
-#> resources  A B
-#>   Material 6 3
-#>   Labour   2 4
+#> resources  A B C
+#>   Material 6 3 4
+#>   Labour   2 3 1
 
 production_problem <- lp_problem() |> 
     lp_var(units[products], integer = TRUE, lower = 0) |> 
     lp_max(sum(price * units)) |> 
     lp_con(
         for (r in resources) {
-            sum(units * required[r, ]) <= available[r]
+            sum_over(p=products, units[p] * required[r,p]) <= available[r]
         }
     )
 
 production_solution <- lp_solve(production_problem)
 production_solution$objective
-#> [1] 590
+#> [1] 920
 production_solution$variables
 #> $units
 #> products
-#> A B 
-#> 1 2
+#> A B C 
+#> 0 2 3
 ```
 
 ## Transportation Problem
