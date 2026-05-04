@@ -10,6 +10,16 @@ test_that("printing", {
     p <- problem_constraints()
     print(p$constraints)
     print(p$constraints, compact = TRUE) |> expect_snapshot()
+
+    p_many_rows <- lp_problem() |>
+        lp_var(y[1:3]) |>
+        lp_con(
+            for (i in 1:50) y[i %% 3 + 1] <= i
+        )
+
+    expect_snapshot(
+        print(p_many_rows, compact = FALSE, max_rows = 5)
+    )
 })
 
 test_that("constraint updates", {
@@ -82,10 +92,20 @@ test_that("non constraint", {
 test_that("indexing constraints", {
     p <- problem_constraints()
 
-    p$constraints[1:3]
-    p$constraints[1:3, ]
-    p$constraints["my_con"][2]
-    p$constraints["my_con", ][2, ]
+    expect_equal(
+        p$constraints[1:3],
+        p$constraints[1:3, ]
+    )
+    expect_equal(
+        p$constraints["my_con"][2],
+        p$constraints["my_con", ][2, ]
+    )
+
+    expect_equal(
+        p$constraints["my_con"] |> head(2),
+        p$constraints["my_con"][1:2]
+    )
+
     p$constraints[c("my_con", "one_line_fs")]
 
     expect_error(p$constraints[], "Index constraints with")

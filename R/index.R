@@ -1,6 +1,10 @@
 
 # check out-of-bounds indices and makes drop = FALSE by default
 robust_index <- function(x) {
+    if (slam::is.simple_triplet_matrix(x)) {
+        warn("atempt to use robust_index() on a simple_triplet_matrix")
+        return(x)
+    }
     structure(x, class = c("robust_index", class(x)))
 }
 

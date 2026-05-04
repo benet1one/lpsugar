@@ -334,7 +334,7 @@ compare_lp <- function(x, y, op, call) {
 
     lhs <- x - y
     rhs <- -lhs$add
-    lhs <- lhs$coef
+    lhs <- slam::as.simple_triplet_matrix(lhs$coef)
     dir <- rep(op, length(rhs))
     call <- rep(format1(call), length(rhs))
     name <- character(length(rhs))

@@ -227,7 +227,7 @@ bind_cons <- function(...) {
     #     out$name[[i]] <- rep_len(dots_names[i], length(out$name[[i]]))
     # }
 
-    out$lhs <- do.call(what = rbind, out$lhs) |> robust_index()
+    out$lhs <- do.call(what = rbind, out$lhs)
     out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()
     out$dir <- unlist(out$dir)
     out$call <- unlist(out$call)
@@ -246,7 +246,7 @@ rbind.lp_constraint <- function(..., deparse.level = 1) {
 
 #' @export
 as.matrix.lp_constraint <- function(x, ...) {
-    cbind(x$lhs, dir = x$dir, rhs = x$rhs)
+    cbind(as.matrix(x$lhs), dir = x$dir, rhs = x$rhs)
 }
 #' @export
 as.array.lp_constraint <- function(x, ...) {
@@ -267,7 +267,15 @@ dimnames.lp_constraint <- function(x) {
 }
 
 #' @export
-`[.lp_constraint` <- function(x, ...) {
+head.lp_constraint <- function(x, n = 6L, ...) {
+    rlang::check_dots_empty()
+    stopifnot(rlang::is_integerish(n, n = 1L, finite = TRUE))
+    m <- min(length(x), n)
+    x[seq_len(m), ]
+}
+#' @export
+`[.lp_constraint` <- function(x, ..., drop = FALSE) {
+    warn_changed_args(drop = FALSE)
     dots <- rlang::dots_list(..., .preserve_empty = TRUE, .ignore_empty = "none")
 
     wrong_index <-
@@ -296,16 +304,13 @@ dimnames.lp_constraint <- function(x) {
 }
 
 #' @export
-print.lp_constraint <- function(x, compact = FALSE, ...) {
-    if (!compact) {
-        m <- as.matrix.lp_constraint(x)
-    }
+print.lp_constraint <- function(x, compact = FALSE, max_rows = 20L, ...) {
+    pairs <- cbind(x$name, x$call) |>
+        unique(MARGIN = 1L)
 
-    pairs <- purrr::map2(x$name, x$call, list)
-
-    for (pair in unique(pairs)) {
-        name <- pair[[1]]
-        call <- pair[[2]]
+    for (i in seq_len(nrow(pairs))) {
+        name <- pairs[i, 1]
+        call <- pairs[i, 2]
 
         name_str <- if (name == "") {
              "<unnamed>"
@@ -317,8 +322,20 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
 
         if (!compact) {
             cat("\n\n")
-            mc <- m[x$name == name & x$call == call, ]
+
+            ind <- x$name == name & x$call == call
+            mc <- x[ind, ] |>
+                head.lp_constraint(max_rows) |>
+                as.matrix.lp_constraint()
+
             print(mc, quote = FALSE)
+
+            more_rows <- sum(ind) - max_rows
+            if (more_rows > 0) {
+                cat("... and", more_rows, "more rows. Use print(max_rows = ...)",
+                    "to print more rows.")
+            }
+
             cat("\n")
         }
     }

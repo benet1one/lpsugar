@@ -18,6 +18,7 @@ Imports:
     purrr,
     rlang,
     ROI,
+    slam,
     stats,
     utils
 Suggests: 
