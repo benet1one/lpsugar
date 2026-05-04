@@ -357,6 +357,7 @@ bind_cv <- function(x, y) {
 }
 #' @export
 `[<-.lp_variable` <- function(x, i, j, ..., value) {
+    `(<-` <- `!<-` <- NULL
     xname <- rlang::sym(x$name)
     call <- rlang::expr((!!xname)[...] <- {{value}})
     abort("Cannot assign an element of an `lp_variable`.", call = call)
