@@ -6,8 +6,8 @@
       
        <unnamed> | x >= 5
       
-        x dir     
-        1  >=   5 
+       x dir  
+       1 >=  5
       
       
        k | for (i in 1:3) { ... }

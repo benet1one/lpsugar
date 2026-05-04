@@ -35,7 +35,7 @@ test_that("for with no slpit", {
             }
         )
 
-    expect_true(p$constraints$lhs == 24)
+    expect_true(p$constraints$lhs$v == 24)
     expect_true(p$constraints$rhs == 9)
 })
 
