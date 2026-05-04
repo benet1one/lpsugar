@@ -29,8 +29,8 @@ Constraints can be represented as \verb{lhs * vars <dir> rhs}.
 
 The \verb{$constraints} field has the following subfields:
 \itemize{
-\item \verb{$lhs} : Matrix where each row is a constraint, each column is a variable,
-and the values represent coefficients.
+\item \verb{$lhs} : \code{\link[slam:matrix]{slam::simple_triplet_matrix()}} where each row is a constraint,
+each column is a variable, and the values represent coefficients.
 \item \verb{$dir} : Character vector with elements \code{"<="}, \code{"=="}, or \code{">="},
 the direction of each constraint.
 \item \verb{$rhs} : Numeric column vector representing the right hand side of each constraint.

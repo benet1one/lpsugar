@@ -14,8 +14,8 @@
 #' Constraints can be represented as `lhs * vars <dir> rhs`.
 #'
 #' The `$constraints` field has the following subfields:
-#' - `$lhs` : Matrix where each row is a constraint, each column is a variable,
-#' and the values represent coefficients.
+#' - `$lhs` : [slam::simple_triplet_matrix()] where each row is a constraint,
+#' each column is a variable, and the values represent coefficients.
 #' - `$dir` : Character vector with elements `"<="`, `"=="`, or `">="`,
 #' the direction of each constraint.
 #' - `$rhs` : Numeric column vector representing the right hand side of each constraint.
