@@ -1,0 +1,180 @@
+---
+title: "lpsugar"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{lpsugar}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette will teach you the basic elements of a linear problem and
+how to define them with `lpsugar`.
+
+```{r setup}
+library(lpsugar)
+```
+
+## Quick Example: Transportation Problem
+
+The elements of a transportation problem are these:
+
+- Sets
+  - $F$ - `factory`
+  - $M$ - `market`
+  
+- Parameters
+  - $s$ - `supply` produced by each `factory`.
+  - $d$ - `demand` on each `market`.
+  - $c$ - `cost` to transport a unit from each `factory` to each `market`.
+  
+- Variable
+  - $t$ - `transport` products from each `factory` to each `market`.
+  
+- Objective Function
+  - $\min \sum_{f \in F} \sum_{m \in M} (c_{fm} t_{fm})$ - `minimize sum(cost * transport)`
+  
+- Constraints
+  - $\sum_{m\in M}({t_{fm}}) \le s_f \quad \forall f\in F$ - 
+  `for (f in factory) sum(transport[f, ]) <= supply[f]`
+  - $\sum_{f\in F}({t_{fm}}) \ge d_m \quad \forall m\in M$ - 
+  `for (m in market)  sum(transport[, m]) >= demand[m]`
+
+Let's define the problem in `lpsugar`.
+
+```{r}
+# Sets
+factory <- c("A", "B")
+market  <- c("Barcelona", "Paris", "Rome")
+
+# Parameters
+supply <- c(A = 20, B = 50)
+demand <- c(Barcelona = 30, Paris = 15, Rome = 25)
+cost <- c(
+    # Bar, Par, Rome
+       30,  12,  32,
+       16,  18,  40
+) |> parameter(factory, market)
+
+# Problem
+transportation_problem <- lp_problem() |> 
+    lp_variable(
+        transport[factory, market],
+        lower = 0
+    ) |> 
+    lp_minimize(
+        sum(cost * transport)
+    ) |> 
+    lp_constraint(
+        for (f in factory) sum(transport[f, ]) <= supply[f],
+        for (m in market)  sum(transport[, m]) >= demand[m]
+    )
+```
+
+To solve it, you can use any of `ROI`'s applicable solvers. One option is to
+load only the desired solver with `library(ROI.plugin.<solver>)` and another
+is to load all of `ROI` with `library(ROI)` and let it choose the solver automatically.
+
+```{r}
+library(ROI)
+solution <- lp_solve(transportation_problem)
+solution$objective
+solution$variables
+```
+
+
+<!-- ## Basic Elements -->
+
+<!-- ### Sets and Parameters -->
+
+<!-- Sets are vectors of indices that a variable or parameter will use. For instance, -->
+<!-- we could define a set $S=\{a,b,c\}$ to use for a parameter $\{w_i\}_{i \in S}$  -->
+<!-- and a variable $\{x_i\}_{i \in S}$. -->
+
+<!-- In `lpsugar` we define sets and parameters as base R objects. Variables are defined -->
+<!-- inside a problem. -->
+
+<!-- ```{r} -->
+<!-- S <- c("a", "b", "c") -->
+<!-- w <- c(a = 3, b = 2, c = 6) -->
+
+<!-- p <- lp_problem() |>  -->
+<!--     lp_variable(x[S]) -->
+
+<!-- w -->
+<!-- p$variables$x -->
+<!-- ``` -->
+
+
+<!-- ### Parameters -->
+
+<!-- Parameters are simply fixed values with named dimensions. It's not necessary to -->
+<!-- name their dimensions, but it's a good practice, and it pays off in the long run. -->
+
+<!-- For vectors, I recommend using R's name-value syntax, but it's also possible to use `parameter`. -->
+<!-- These are all different alternatives for defining $\{w_i\}_{i \in S}$: -->
+
+<!-- ```{r} -->
+<!-- S <- c("a", "b", "c") -->
+<!-- w <- c(a = 3, b = 2, c = 6) -->
+<!-- w <- c(3, 2, 6) |> stats::setNames(S) -->
+<!-- w <- c(3, 2, 6) |> parameter(S) -->
+<!-- ``` -->
+
+<!-- For matrices, you can use `parameter` to define them comfortable within the code. -->
+<!-- Let's define $\{m_{ij}\}_{i\in S,\ j\in R}$. -->
+
+<!-- ```{r} -->
+<!-- S <- c("a", "b", "c") -->
+<!-- R <- c("A", "B") -->
+
+<!-- m <- c( -->
+<!--     1, 2, -->
+<!--     3, 4, -->
+<!--     5, 6 -->
+<!-- ) |> parameter(S, R) -->
+
+<!-- m -->
+<!-- ``` -->
+<!-- Notice this works defining matrices by row (as in `matrix(data, byrow = TRUE)`). -->
+<!-- If an object is already a matrix, I recommend setting it's names using `rownames` and `colnames`. -->
+
+<!-- ```{r} -->
+<!-- m <- matrix(1:6, nrow = 3, byrow = TRUE) -->
+<!-- rownames(m) <- S -->
+<!-- colnames(m) <- R -->
+
+<!-- m -->
+<!-- ``` -->
+<!-- For n-dimensional arrays, `parameter` does not work (by design), so the only option is to  -->
+<!-- use `dimnames`. We will define a parameter $\{a_{ijk}\}_{i\in S,\ j\in R,\ k\in Q}$ -->
+
+<!-- ```{r} -->
+<!-- S <- c("a", "b", "c") -->
+<!-- R <- c("A", "B") -->
+<!-- Q <- c("Q1", "Q2") -->
+
+<!-- a <- array(1:12, dim = c(3, 2, 2)) -->
+<!-- dimnames(a) <- list(S=S, R=R, Q=Q) -->
+
+<!-- a -->
+<!-- ``` -->
+
+
+<!-- ### Variables -->
+
+<!-- Variables are numbers that the solver will change in order to find the -->
+<!-- optimal solution. In `lpsugar`, variables can be scalars, vectors, or n-dimensional arrays.  -->
+
+<!-- By default, their `lower` and `upper` bounds are `-Inf` to `+Inf`.  -->
+<!-- It's possible to set a variable to `integer` or `binary`. -->
+
+<!-- ### Objective Function -->
+
+<!-- ### Constraints -->
