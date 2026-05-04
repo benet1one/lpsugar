@@ -37,6 +37,8 @@ test_that("constraint updates", {
         dim(p3$constraints$lhs), c(5, 5)
     )
 
+    p$constraints
+    p2$constraints
     p3$constraints
 })
 

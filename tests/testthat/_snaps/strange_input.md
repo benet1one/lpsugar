@@ -18,3 +18,31 @@
       k[i=3] 3 <=  6
       
 
+# masking
+
+    Code
+      p1$constraints
+    Output
+      
+       <unnamed> | for (i in 1:3) x * 4 <= i
+      
+            x dir  
+      [i=1] 4 <=  1
+      [i=2] 4 <=  2
+      [i=3] 4 <=  3
+      
+
+---
+
+    Code
+      p2$constraints
+    Output
+      
+       <unnamed> | for (i in 1:3) { ... }
+      
+            x dir  
+      [i=1] 1 <=  3
+      [i=2] 1 <=  6
+      [i=3] 1 <=  9
+      
+

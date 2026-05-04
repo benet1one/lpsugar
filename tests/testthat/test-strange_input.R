@@ -39,6 +39,25 @@ test_that("for with no slpit", {
     expect_true(p$constraints$rhs == 9)
 })
 
+test_that("masking", {
+    i <- 4
+    p1 <- lp_problem() |>
+        lp_var(x) |>
+        lp_con(for (i in 1:3) x*!!i <= i)
+
+    expect_snapshot(p1$constraints)
+
+    v <- 3
+    p2 <- lp_problem() |>
+        lp_var(x) |>
+        lp_con(for (i in 1:3) {
+            v <- 3*i
+            x <= v
+        })
+
+    expect_snapshot(p2$constraints)
+})
+
 test_that("misc", {
     colvec_set <- matrix(1:3, nrow = 3)
     mat_set <- matrix(1:9, nrow = 3)
