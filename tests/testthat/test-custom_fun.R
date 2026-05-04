@@ -190,7 +190,11 @@ test_that("ifelse1", {
     expect_equal(p1$constraints$lhs, p2$constraints$lhs)
     expect_equal(p1$constraints$rhs, p2$constraints$rhs)
 
-    expect_equal(p1$constraints$lhs, p3$constraints$lhs, ignore_attr = TRUE)
+    expect_equal(
+        as.matrix(p1$constraints$lhs),
+        as.matrix(p3$constraints$lhs),
+        ignore_attr = TRUE
+    )
     expect_equal(p1$constraints$rhs, p3$constraints$rhs)
 
     s <- lp_solve(p1)

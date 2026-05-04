@@ -17,6 +17,29 @@
        one_line_fs | for (i in 1:3) x[i, ] >= y[, i] - 10
        my_fs | for (i in 1:3) { ... }
 
+---
+
+    Code
+      print(p_many_rows, compact = FALSE, max_rows = 5)
+    Output
+      <lpsugar Linear Problem>
+      
+      -- $variables --
+      $y
+      Real variable 'y[1:3]'
+      
+      -- $constraints --
+       <unnamed> | for (i in 1:50) y[i%%3 + 1] <= i
+      
+            y[1] y[2] y[3] dir  
+      [i=1] 0    1    0    <=  1
+      [i=2] 0    0    1    <=  2
+      [i=3] 1    0    0    <=  3
+      [i=4] 0    1    0    <=  4
+      [i=5] 0    0    1    <=  5
+      ... and 45 more rows. Use print(max_rows = ...) to print more rows.
+      
+
 # bind constraints
 
     Code

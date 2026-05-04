@@ -36,7 +36,7 @@ lp_problem <- function() {
 }
 
 #' @export
-print.lp_problem <- function(x, ...) {
+print.lp_problem <- function(x, compact = TRUE, ...) {
     cat("<lpsugar Linear Problem>\n\n")
 
     if (length(x$variables) > 0L) {
@@ -51,7 +51,7 @@ print.lp_problem <- function(x, ...) {
 
     if (length(x$constraints) > 0L) {
         cat("-- $constraints --")
-        print(x$constraints, compact = TRUE)
+        print(x$constraints, compact = compact, ...)
     }
 
     cat("\n")
