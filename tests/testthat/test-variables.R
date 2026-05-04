@@ -184,6 +184,20 @@ test_that("variable indexing", {
     expect_snapshot(
         t(ThreeD[, , 1, drop = TRUE])
     )
+
+    # Other errors
+    expect_error(
+        y[1] <- 2,
+        "Cannot assign an element of an `lp_variable`"
+    )
+    expect_error(
+        y[[1]],
+        "Double indexing `y\\[\\[i\\]\\]` not supported for `lp_variable`"
+    )
+    expect_error(
+        y[[1]] <- 2,
+        "Double indexing `y\\[\\[i\\]\\]` not supported for `lp_variable`"
+    )
 })
 
 test_that("operations", {

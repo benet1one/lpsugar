@@ -356,9 +356,23 @@ bind_cv <- function(x, y) {
     x
 }
 #' @export
-`[[.lp_variable` <- function(x, ...) {
-    abort("`lp_variable`s don't support double indexing `{x$name}[[i]]`. Use `{x$name}[i]` instead")
+`[<-.lp_variable` <- function(x, i, j, ..., value) {
+    xname <- rlang::sym(x$name)
+    call <- rlang::expr((!!xname)[...] <- {{value}})
+    abort("Cannot assign an element of an `lp_variable`.", call = call)
 }
+#' @export
+`[[.lp_variable` <- function(x, ...) {
+    rlang::abort(c(
+        glue::glue("Double indexing `{x$name}[[i]]` not supported for `lp_variable`."),
+        "i" = glue::glue("Use `{x$name}[i]` instead.")
+    ))
+}
+#' @export
+`[[<-.lp_variable` <- function(x, i, value) {
+    abort("Double indexing `{x$name}[[i]]` not supported for `lp_variable`.")
+}
+
 #' @export
 rep.lp_variable <- function(x, ...) {
     ind <- rep(1:length(x), ...)
