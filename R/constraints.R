@@ -324,12 +324,14 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
             name
         }
 
-        cat("\n", name_str, "|", call)
+        ind <- x$name == name & x$call == call
+        n <- sum(ind)
+
+        cat("\n", name_str, "| n =", n, "|", call)
 
         if (!compact) {
             cat("\n\n")
 
-            ind <- x$name == name & x$call == call
             mc <- x[ind, ] |> as.matrix.lp_constraint()
             print(mc, quote = FALSE)
             cat("\n")

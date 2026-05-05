@@ -4,13 +4,13 @@
       p$constraints
     Output
       
-       <unnamed> | x >= 5
+       <unnamed> | n = 1 | x >= 5
       
        x dir  
        1 >=  5
       
       
-       k | for (i in 1:3) { ... }
+       k | n = 3 | for (i in 1:3) { ... }
       
              x dir  
       k[i=1] 1 <=  2
@@ -24,7 +24,7 @@
       p1$constraints
     Output
       
-       <unnamed> | for (i in 1:3) x * 4 <= i
+       <unnamed> | n = 3 | for (i in 1:3) x * 4 <= i
       
             x dir  
       [i=1] 4 <=  1
@@ -38,7 +38,7 @@
       p2$constraints
     Output
       
-       <unnamed> | for (i in 1:3) { ... }
+       <unnamed> | n = 3 | for (i in 1:3) { ... }
       
             x dir  
       [i=1] 1 <=  3
