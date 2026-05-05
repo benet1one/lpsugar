@@ -4,7 +4,14 @@ First Release
 - Check argument types in functions
 
 Code
-- sensitivity?
+- drop R's colSums and export slam::col_sums?
+
+Quadratic
+- Definition
+- update_variables
+- update_objective
+- sum
+- custom_fun?
 
 Docs
 - Vignettes
