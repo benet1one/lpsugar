@@ -446,11 +446,15 @@ parse_variable_definition <- function(definition) {
 
         for (s in seq_along(sets)) {
             st <- sets[[s]]
+            nm <- names(sets)[s]
             nd <- ndim(st, drop = TRUE)
 
+            if (!rlang::is_atomic(st)) {
+                abort("Set `{nm}` is not atomic.")
+            }
+
             if (nd != 1L) {
-                nm <- names(sets)[s]
-                warn("set `{nm}` is {nd}-dimensional, results may be unexpected.")
+                warn("Set `{nm}` is {nd}-dimensional, results may be unexpected.")
             }
         }
 

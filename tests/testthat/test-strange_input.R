@@ -1,4 +1,13 @@
 
+test_that("strange variable sets", {
+    s <- 1:3
+    q <- list(1:4)
+    expect_error(
+        lp_problem() |> lp_var(x[s, q]),
+        "Set `q` is not atomic",
+    )
+})
+
 test_that("splice", {
     a <- alist(a = 2*x, b = a+1)
     c <- alist(
@@ -66,7 +75,7 @@ test_that("misc", {
 
     expect_warning(
         lp_problem() |> lp_var(y[mat_set]),
-        "set `mat_set` is 2-dimensional, results may be unexpected"
+        "Set `mat_set` is 2-dimensional, results may be unexpected"
     )
 
     # This should not throw an error, I guess...
