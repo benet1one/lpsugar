@@ -119,7 +119,11 @@ divide_lp <- function(x, y, call) {
     }
 }
 power_lp <- function(x, y, call) {
-    abort("Cannot use powers or exponentials in a linear problem.", call = call)
+    if (is_lp_variable(x) && !is_lp_variable(y)) {
+        power_v_c(x, y, call)
+    } else {
+        abort("Non-quadratic operation.", call = call)
+    }
 }
 
 horizontal_multiply <- function(x, c) {
@@ -204,6 +208,10 @@ multiply_v_c <- function(x, c, call) {
     x <- recycle_var(x, max_n)
     c <- recycle_const(c, max_n)
 
+    if (is_quadratic(x)) {
+        x$q_coef <- q_list_multiply(x$q_coef, c)
+    }
+
     x$coef <- horizontal_multiply(x$coef, c)
     x$add <- x$add * c
     x$raw <- FALSE
@@ -211,20 +219,75 @@ multiply_v_c <- function(x, c, call) {
 
     return(x)
 }
+# var * var
+multiply_v_v <- function(x, y, call) {
+    if (is_quadratic(x) || is_quadratic(y)) {
+        abort("Non-quadratic operation", call = call)
+    }
+
+    check_conformable(x, y, call)
+
+    max_n <- max(length(x), length(y))
+    x <- recycle_var(x, max_n)
+    y <- recycle_var(y, max_n)
+    m <- ncol(x$coef)
+    out <- x
+
+    out$q_coef <- lapply(seq_len(max_n), function(i) {
+        xi <- x$coef[rep(i, m), ]
+        yi <- y$coef[rep(i, m), ]
+        qi <- t(xi) * yi
+        rownames(qi) <- colnames(qi) <- colnames(x$coef)
+        qi
+    })
+
+    out$coef <-
+        horizontal_multiply(x$coef, y$add) +
+        horizontal_multiply(y$coef, x$add)
+
+    out$add <- x$add * y$add
+
+    out$raw <- FALSE
+    return(out)
+}
+
 # var / constant
 divide_v_c <- function(x, c, call) {
     multiply_v_c(x, 1/c, call = call)
 }
-
-# Illegal operations:
-
-# var * var
-multiply_v_v <- function(x, y, call) {
-    abort("Cannot multiply two variables in a linear problem.", call = call)
-}
 # any / var
 divide_a_v <- function(x, y, call) {
     abort("Cannot divide by a variable in a linear problem.", call = call)
+}
+
+# var ^ constant
+power_v_c <- function(x, c, call) {
+    if (is_quadratic(x)) {
+        abort("Non-quadratic operation", call = call)
+    }
+
+    check_conformable(x, c, call)
+
+    max_n <- max(length(x), length(y))
+    x <- recycle_var(x, max_n)
+    c <- recycle_const(c, max_n)
+
+    if (!all(c %in% 0:2)) {
+        abort("Exponent must be one of {0, 1, 2}", call = call)
+    }
+
+    if (any(c == 2)) {
+        x <- multiply_v_v(x, x, call)
+        x$q_coef[c != 2] <- q_list_multiply(
+            x$q_coef[c != 2],
+            rep(0, sum(c != 2))
+        )
+    }
+
+    x$coef[c == 0, ] <- 0
+    x$add[c == 0, ] <- 1
+    x$raw <- FALSE
+    return(x)
 }
 
 # Logic ------------------------
@@ -341,4 +404,15 @@ compare_lp <- function(x, y, op, call) {
 
     list(lhs = lhs, dir = dir, rhs = rhs, name = name, call = call) |>
         structure(class = "lp_constraint")
+}
+
+# Utils ----------------------
+
+q_list_multiply <- function(q, c) {
+    stopifnot(length(q) == length(c))
+    purrr::map2(q, c, `*`)
+}
+
+is_quadratic <- function(x) {
+    !is.null(x$q_coef)
 }

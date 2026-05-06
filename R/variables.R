@@ -185,7 +185,13 @@ lp_var <- lp_variable
 #' @export
 print.lp_variable <- function(x, ...) {
     if (!x$raw) {
-        unclass(x)[c("coef", "add")] |> print()
+        fields <- if (is_quadratic(x)) {
+            c(c("q_coef", "coef", "add"))
+        } else {
+            c("coef", "add")
+        }
+
+        unclass(x)[fields] |> print()
         return(invisible(x))
     }
 
