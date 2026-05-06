@@ -253,7 +253,7 @@ as.logical.lp_variable <- function(x, ...) {
 c.lp_variable <- function(..., recursive = TRUE) {
     rlang::abort(c(
         "Cannot use `c()` to concatenate `lp_variable`s.",
-        "i" = "Use `bind_vars()` instead."
+        ">" = "Use `bind_vars()` instead."
     ))
 }
 
@@ -366,7 +366,7 @@ bind_cv <- function(x, y) {
 `[[.lp_variable` <- function(x, ...) {
     rlang::abort(c(
         glue::glue("Double indexing `{x$name}[[i]]` not supported for `lp_variable`."),
-        "i" = glue::glue("Use `{x$name}[i]` instead.")
+        ">" = glue::glue("Use `{x$name}[i]` instead.")
     ))
 }
 #' @export
