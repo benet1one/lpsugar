@@ -59,6 +59,11 @@ ndim <- function(x, drop = FALSE) {
 non_conformable <- function(x, y) {
     length(x) > 1L && length(y) > 1L && length(x) != length(y)
 }
+check_conformable <- function(x, y, call = environment()) {
+    if (non_conformable(x, y)) {
+        abort("Non-conformable arrays", call = call)
+    }
+}
 compatible_dimensions <- function(x, y, drop_dim = TRUE) {
     if (is_lp_variable(x)) {
         x <- x$ind
@@ -160,6 +165,7 @@ inside <- function(expr) {
     expr
 }
 
+# For split ----------------------
 
 for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) {
     if (!rlang::quo_is_symbolic(quosure)) {

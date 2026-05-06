@@ -144,9 +144,7 @@ minus_v <- function(x) {
 
 # var + var
 add_v_v <- function(x, y, call) {
-    if (non_conformable(x, y)) {
-        abort("Non-conformable arrays", call = call)
-    }
+    check_conformable(x, y, call)
 
     max_n <- max(length(x), length(y))
     x <- recycle_var(x, max_n)
@@ -162,9 +160,7 @@ add_v_v <- function(x, y, call) {
 }
 # var + constant
 add_v_c <- function(x, c, call) {
-    if (non_conformable(x, c)) {
-        abort("Non-conformable arrays", call = call)
-    }
+    check_conformable(x, y, call)
 
     max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
@@ -200,9 +196,7 @@ subtract_c_v <- function(c, x, call) {
 
 # var * constant
 multiply_v_c <- function(x, c, call) {
-    if (non_conformable(x, c)) {
-        abort("non-conformable arrays", call = call)
-    }
+    check_conformable(x, y, call)
 
     max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
@@ -385,9 +379,7 @@ diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
 # Comparison --------------------
 
 compare_lp <- function(x, y, op, call) {
-    if (non_conformable(x, y)) {
-        abort("Non-conformable arrays", call = call)
-    }
+    check_conformable(x, y, call)
 
     if (op == "<") {
         op <- "<="
