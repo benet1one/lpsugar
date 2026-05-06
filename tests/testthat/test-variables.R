@@ -241,7 +241,7 @@ test_that("operations", {
     )
 
     expect_error(y + z, "non-conformable")
-    expect_error(y * 1:2, "non-conformable")
+    expect_error(y * 1:2, "Non-conformable")
     expect_error(z + t(z), "non-conformable")
 
     p2 <- lp_problem() |>

@@ -24,9 +24,21 @@ test_that("quadratic simple", {
         x*y + 2*y + x*3 + 2*3
     )
 
-    x^2
-    (x + 3)^2
-    (x + y)^2
+    expect_equal(
+        x*x,
+        x^2
+    )
+
+    x^c(0, 0, 1, 1, 2, 2)
+
+    expect_error(
+        x^3,
+        "Exponent must be 0, 1 or 2"
+    )
+    expect_error(
+        x^2 * y,
+        "Non-quadratic operation"
+    )
 })
 
 test_that("quadratic arrays", {
@@ -35,6 +47,6 @@ test_that("quadratic arrays", {
 
     z <- p$variables$z
 
-    (z * z[1] * 1:3) + z
-    z^c(0, 1, 2)
+    (z * z[1] * 3:5) + z
+    expect_snapshot(z^c(0, 1, 2))
 })

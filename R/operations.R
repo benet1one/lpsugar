@@ -149,7 +149,7 @@ add_v_v <- function(x, y, call) {
 }
 # var + constant
 add_v_c <- function(x, c, call) {
-    check_conformable(x, y, call)
+    check_conformable(x, c, call)
 
     max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
@@ -185,7 +185,7 @@ subtract_c_v <- function(c, x, call) {
 
 # var * constant
 multiply_v_c <- function(x, c, call) {
-    check_conformable(x, y, call)
+    check_conformable(x, c, call)
 
     max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
@@ -251,20 +251,24 @@ power_v_c <- function(x, c, call) {
 
     check_conformable(x, c, call)
 
-    max_n <- max(length(x), length(y))
+    max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
     c <- recycle_const(c, max_n)
 
     if (!all(c %in% 0:2)) {
-        abort("Exponent must be one of {0, 1, 2}", call = call)
+        abort("Exponent must be 0, 1 or 2", call = call)
     }
 
     if (any(c == 2)) {
-        x <- multiply_v_v(x, x, call)
-        x$q_coef[c != 2] <- q_list_multiply(
-            x$q_coef[c != 2],
-            rep(0, sum(c != 2))
-        )
+        i2 <- (c == 2)
+        xsquared <- multiply_v_v(x, x, call)
+
+        x$q_coef <- xsquared$q_coef
+        x$q_coef[!i2] <- x$q_coef[!i2] |>
+            lapply(\(q) q*0)
+
+        x$coef[i2, ] <- xsquared$coef[i2, ]
+        x$add[i2, ] <- xsquared$add[i2, ]
     }
 
     x$coef[c == 0, ] <- 0
@@ -297,8 +301,12 @@ negate_v <- function(x, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
 
+    if (is_quadratic(x) || is_quadratic(y)) {
+        abort("Non-quadratic operation", call = call)
+    }
+
     if (xv && yv) {
-        abort("Cannot matrix multiply `%*%` two variables.")
+        abort("Cannot matrix multiply `%*%` two variables.", call = call)
     }
 
     if (xv) {
@@ -405,5 +413,5 @@ q_list_multiply <- function(q, c) {
 }
 
 is_quadratic <- function(x) {
-    !is.null(x$q_coef)
+    is_lp_variable(x) && !is.null(x$q_coef)
 }
