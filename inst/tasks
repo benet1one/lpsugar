@@ -11,6 +11,8 @@ Quadratic
 - update_variables
 - update_objective
 - sum
+- %*%
+- bind_vars
 - custom_fun?
 
 Docs
