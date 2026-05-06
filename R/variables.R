@@ -445,23 +445,28 @@ parse_variable_definition <- function(definition) {
             rlang::set_names(sets_names)
 
         for (s in seq_along(sets)) {
-            st <- sets[[s]]
-            nm <- names(sets)[s]
-            nd <- ndim(st, drop = TRUE)
-
-            if (!rlang::is_atomic(st)) {
-                abort("Set `{nm}` is not atomic.")
-            }
-
-            if (nd != 1L) {
-                warn("Set `{nm}` is {nd}-dimensional, results may be unexpected.")
-            }
+            check_variable_set(
+                set = sets[[s]],
+                name = names(sets)[s],
+                call = parent.frame()
+            )
         }
 
         return(list(name = name, sets = sets))
     }
 
     abort(error_msg, call = parent.frame())
+}
+check_variable_set <- function(set, name, call = environment()) {
+    if (!rlang::is_atomic(set)) {
+        abort("Set `{name}` is not atomic.", call = call)
+    }
+
+    nd <- ndim(set, drop = TRUE)
+
+    if (nd != 1L) {
+        warn("Set `{name}` is {nd}-dimensional, results may be unexpected.", call = call)
+    }
 }
 interpret_bound <- function(bound, bound_name, default, dim) {
     if (length(bound) == 0L) {
