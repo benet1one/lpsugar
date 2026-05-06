@@ -14,11 +14,19 @@ test_that("printing", {
     p_many_rows <- lp_problem() |>
         lp_var(y[1:3]) |>
         lp_con(
-            for (i in 1:50) y[i %% 3 + 1] <= i
+            for (i in 1:20) y[i %% 3 + 1] <= i
         )
 
     expect_snapshot(
-        print(p_many_rows, compact = FALSE, max_rows = 5)
+        print(p_many_rows, compact = FALSE)
+    )
+
+    p_many_cols <- lp_problem() |>
+        lp_var(z[1:300]) |>
+        lp_con(z >= 0, z <= 10)
+
+    expect_snapshot(
+        print(p_many_cols, compact = FALSE)
     )
 })
 

@@ -304,9 +304,15 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 }
 
 #' @export
-print.lp_constraint <- function(x, compact = FALSE, max_rows = 20L, ...) {
+print.lp_constraint <- function(x, compact = FALSE, ...) {
     pairs <- cbind(x$name, x$call) |>
         unique(MARGIN = 1L)
+
+    if (!compact && ncol(x$lhs) > 200L) {
+        cat("\n")
+        inform("Problem has over 200 variables, printing with `compact = TRUE`.")
+        compact <- TRUE
+    }
 
     for (i in seq_len(nrow(pairs))) {
         name <- pairs[i, 1]
@@ -318,24 +324,16 @@ print.lp_constraint <- function(x, compact = FALSE, max_rows = 20L, ...) {
             name
         }
 
-        cat("\n", name_str, "|", call)
+        ind <- x$name == name & x$call == call
+        n <- sum(ind)
+
+        cat("\n", name_str, "| n =", n, "|", call)
 
         if (!compact) {
             cat("\n\n")
 
-            ind <- x$name == name & x$call == call
-            mc <- x[ind, ] |>
-                head.lp_constraint(max_rows) |>
-                as.matrix.lp_constraint()
-
+            mc <- x[ind, ] |> as.matrix.lp_constraint()
             print(mc, quote = FALSE)
-
-            more_rows <- sum(ind) - max_rows
-            if (more_rows > 0) {
-                cat("... and", more_rows, "more rows. Use print(max_rows = ...)",
-                    "to print more rows.")
-            }
-
             cat("\n")
         }
     }

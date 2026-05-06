@@ -21,8 +21,8 @@
       1 1 
       
       -- $constraints --
-       <unnamed> | x + 2 * y <= 10
-       <unnamed> | 2 * x + y <= 10
+       <unnamed> | n = 1 | x + 2 * y <= 10
+       <unnamed> | n = 1 | 2 * x + y <= 10
 
 ---
 
@@ -71,5 +71,5 @@
       minimize x[2] 
       
       -- $constraints --
-       <unnamed> | for (i in 1:2) for (j in 1:3) i + j <= x[i * j]
+       <unnamed> | n = 6 | for (i in 1:2) for (j in 1:3) i + j <= x[i * j]
 

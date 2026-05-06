@@ -96,7 +96,7 @@ make_model <- function(problem) {
         rlang::abort(c(
             "`$objective$direction` should be either 'minimize' or 'maximize'.",
             ">" = "Did you forget to set the objective function?",
-            "i" = paste(
+            ">" = paste(
                 "If you wish to find any feasible solution, use `lp_find_feasible()`",
                 "or set the objective function to 0 with `lp_minimize(0)`",
                 sep = "\n"

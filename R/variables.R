@@ -253,7 +253,7 @@ as.logical.lp_variable <- function(x, ...) {
 c.lp_variable <- function(..., recursive = TRUE) {
     rlang::abort(c(
         "Cannot use `c()` to concatenate `lp_variable`s.",
-        "i" = "Use `bind_vars()` instead."
+        ">" = "Use `bind_vars()` instead."
     ))
 }
 
@@ -366,7 +366,7 @@ bind_cv <- function(x, y) {
 `[[.lp_variable` <- function(x, ...) {
     rlang::abort(c(
         glue::glue("Double indexing `{x$name}[[i]]` not supported for `lp_variable`."),
-        "i" = glue::glue("Use `{x$name}[i]` instead.")
+        ">" = glue::glue("Use `{x$name}[i]` instead.")
     ))
 }
 #' @export
@@ -445,19 +445,35 @@ parse_variable_definition <- function(definition) {
             rlang::set_names(sets_names)
 
         for (s in seq_along(sets)) {
-            st <- sets[[s]]
-            nd <- ndim(st, drop = TRUE)
-
-            if (nd != 1L) {
-                nm <- names(sets)[s]
-                warn("set `{nm}` is {nd}-dimensional, results may be unexpected.")
-            }
+            check_variable_set(
+                set = sets[[s]],
+                name = names(sets)[s],
+                call = parent.frame()
+            )
         }
 
         return(list(name = name, sets = sets))
     }
 
     abort(error_msg, call = parent.frame())
+}
+check_variable_set <- function(set, name, call = environment()) {
+    if (!rlang::is_atomic(set)) {
+        abort("Set `{name}` is not atomic.", call = call)
+    }
+
+    nd <- ndim(set, drop = TRUE)
+
+    if (nd != 1L) {
+        warn("Set `{name}` is {nd}-dimensional, results may be unexpected.", call = call)
+    }
+
+    if (is.numeric(set) && any(set != seq_along(set))) {
+        rlang::abort(c(
+            glue::glue("Numeric sets like `{name}` must go from 1 to n."),
+            ">" = "Use character sets for more flexibility."
+        ))
+    }
 }
 interpret_bound <- function(bound, bound_name, default, dim) {
     if (length(bound) == 0L) {
