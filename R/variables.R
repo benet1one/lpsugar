@@ -467,6 +467,13 @@ check_variable_set <- function(set, name, call = environment()) {
     if (nd != 1L) {
         warn("Set `{name}` is {nd}-dimensional, results may be unexpected.", call = call)
     }
+
+    if (is.numeric(set) && any(set != seq_along(set))) {
+        rlang::abort(c(
+            glue::glue("Numeric sets like `{name}` must go from 1 to n."),
+            ">" = "Use character sets for more flexibility."
+        ))
+    }
 }
 interpret_bound <- function(bound, bound_name, default, dim) {
     if (length(bound) == 0L) {

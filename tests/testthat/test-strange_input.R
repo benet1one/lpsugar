@@ -2,9 +2,15 @@
 test_that("strange variable sets", {
     s <- 1:3
     q <- list(1:4)
+
     expect_error(
         lp_problem() |> lp_var(x[s, q]),
         "Set `q` is not atomic",
+    )
+
+    expect_error(
+        lp_problem() |> lp_var(x[0:10]),
+        "Numeric sets like `0:10` must go from 1 to n"
     )
 })
 
