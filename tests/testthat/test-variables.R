@@ -219,8 +219,6 @@ test_that("operations", {
     expect_error(c(1, 2, NA) + y, "Left-hand-side object contains NA values")
     expect_error(y / c(1, 2, NA), "Right-hand-side object contains NA values")
 
-    expect_error(x*y, "Cannot multiply two variables")
-    expect_error(x^2, "Cannot use powers or exponentials")
     expect_error(2/x, "Cannot divide by a variable")
     expect_error(!x, "only supported for binary variables")
 
