@@ -10,7 +10,7 @@ test_that("quadratic simple", {
     x*y
 
     expect_equal(
-        2*x * 3*y,
+        (2*x) * (3*y),
         6 * (x*y)
     )
 
@@ -29,8 +29,6 @@ test_that("quadratic simple", {
         x^2
     )
 
-    x^c(0, 0, 1, 1, 2, 2)
-
     expect_error(
         x^3,
         "Exponent must be 0, 1 or 2"
@@ -47,6 +45,22 @@ test_that("quadratic arrays", {
 
     z <- p$variables$z
 
-    (z * z[1] * 3:5) + z
+    expect_equal(
+        z + z^2,
+        z^2 + z
+    )
+
+    zr <- z * rev(z)
+    rz <- rev(z) * z
+    zr$ind <- NULL
+    rz$ind <- NULL
+
+    expect_equal(zr, rz)
+
+    expect_equal(
+        sum(z^2),
+        z[1]^2 + z[2]^2 + z[3]*z[3]
+    )
+
     expect_snapshot(z^c(0, 1, 2))
 })
