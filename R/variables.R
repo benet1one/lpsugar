@@ -518,6 +518,11 @@ recycle_var <- function(x, n) {
     } else if (length(x) == 1L) {
         i <- rep(1L, n)
         x$ind <- x$ind[i]
+
+        if (is_quadratic(x)) {
+            x$q_coef <- x$q_coef[i]
+        }
+
         x$coef <- x$coef[i, ]
         x$add <- x$add[i, ]
         x$raw <- FALSE
