@@ -229,14 +229,7 @@ multiply_v_v <- function(x, y, call) {
     out$q_coef <- lapply(seq_len(max_n), function(i) {
         xi <- x$coef[rep(i, m), ]
         yi <- y$coef[rep(i, m), ]
-        qi <- t(xi) * yi
-
-        ut <- upper.tri(qi)
-        lt <- lower.tri(qi)
-
-        qi[ut] <- qi[ut] + t(qi)[ut]
-        qi[lt] <- t(qi)[lt]
-        diag(qi) <- 2*diag(qi)
+        qi <- t(xi) * yi + xi * t(yi)
 
         rownames(qi) <- colnames(qi) <- colnames(x$coef)
         qi
