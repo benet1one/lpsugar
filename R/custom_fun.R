@@ -64,6 +64,11 @@ sum_over <- function(...) {
 sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     varnames <- colnames(x$coef)
     x$ind <- x$ind[1]
+
+    if (is_quadratic(x)) {
+        x$q_coef <- list(purrr::reduce(x$q_coef, `+`))
+    }
+
     x$coef <- colSums(x$coef) |>
         matrix(nrow = 1L) |>
         robust_index()

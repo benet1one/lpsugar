@@ -139,13 +139,23 @@ add_v_v <- function(x, y, call) {
     x <- recycle_var(x, max_n)
     y <- recycle_var(y, max_n)
 
-    z <- x
-    z$coef <- x$coef + y$coef
-    z$add <- z$add + y$add
-    z$raw <- FALSE
-    z$binary <- FALSE
+    out <- x
 
-    return(z)
+    qx <- is_quadratic(x)
+    qy <- is_quadratic(y)
+
+    if (qx && qy) {
+        out$q_coef <- purrr::map2(x$q_coef, y$q_coef, `+`)
+    } else if (qx || qy) {
+        out$q_coef <- x$q_coef %||% y$q_coef
+    }
+
+    out$coef <- x$coef + y$coef
+    out$add <- out$add + y$add
+    out$raw <- FALSE
+    out$binary <- FALSE
+
+    return(out)
 }
 # var + constant
 add_v_c <- function(x, c, call) {
@@ -173,14 +183,14 @@ subtract_v_c <- function(x, c, call) {
 }
 # constant - var
 subtract_c_v <- function(c, x, call) {
-    z <- add_v_c(minus_v(x), c, call)
+    out <- add_v_c(minus_v(x), c, call)
 
     # If its (1-x) and x is binary, it stays binary
     if (x$binary && c == 1) {
-        z$binary <- TRUE
+        out$binary <- TRUE
     }
 
-    return(z)
+    return(out)
 }
 
 # var * constant
