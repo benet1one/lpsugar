@@ -22,7 +22,7 @@
            z[1] z[2] z[3]
       z[1]    0    0    0
       z[2]    0    0    0
-      z[3]    0    0    1
+      z[3]    0    0    2
       with class 'robust_index' from package 'lpsugar'
       
       
