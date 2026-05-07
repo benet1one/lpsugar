@@ -173,7 +173,7 @@ custom_fun <- function() {
 
     e$apply <- function(X, MARGIN, FUN, ..., simplify = TRUE) {
         if (!is_lp_variable(X)) {
-            return(base::apply(X, MARGIN, FUN, ..., simplify))
+            return(base::apply(X, MARGIN, FUN, ..., simplify = simplify))
         }
 
         warn_changed_args(simplify = TRUE)
