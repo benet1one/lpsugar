@@ -123,10 +123,23 @@ test_that("apply", {
         lp_var(y[1:2, 1:2]) |>
         lp_var(z[1:2, 1:2, 1:2])
 
-    p |> lp_eval(apply(matrix(1, 2, 3), 1, sum))
-    p |> lp_eval(apply(matrix(1, 2, 3), 2, sum))
+    expect_equal(
+        p |> lp_eval(apply(matrix(1, 2, 3), 1, sum)),
+        apply(matrix(1, 2, 3), 1, sum)
+    )
+    expect_equal(
+        p |> lp_eval(apply(matrix(1, 2, 3), 1, sum, simplify = FALSE)),
+        apply(matrix(1, 2, 3), 1, sum, simplify = FALSE)
+    )
 
-    p |> lp_eval(apply(y, 1, mean))
+    rowmeans_y_1 <- p |> lp_eval(apply(y, 1, mean))
+    rowmeans_y_2 <- p |> lp_eval(bind_vars(
+        (y[1,1] + y[1,2]) / 2,
+        (y[2,1] + y[2,2]) / 2
+    ))
+
+    expect_equal(rowmeans_y_1$coef, rowmeans_y_2$coef)
+
     p |> lp_eval(apply(y, 2, mean))
 
     rowmeans_z <- p |> lp_eval(apply(z, 1, mean))
