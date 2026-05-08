@@ -269,10 +269,16 @@ c.lp_variable <- function(..., recursive = TRUE) {
 #'
 #' @param ... Problem variables and/or numeric constants, vectors or arrays.
 #' @returns An `lp_variable`.
+#' @export
 #' @examples
 bind_vars <- function(...) {
     dots <- rlang::dots_list(..., .ignore_empty = "all")
     dots_expr <- rlang::enexprs(..., .ignore_empty = "all")
+
+    nams <- rlang::names2(dots)
+    if (any(nams != "")) {
+        warn("ignoring named arguments in `bind_vars()`")
+    }
 
     len0 <- lengths(dots) == 0
     dots <- dots[!len0]
@@ -284,6 +290,7 @@ bind_vars <- function(...) {
 
     for (i in seq_along(dots)) {
         x <- dots[[i]]
+
         if (!is_lp_variable(x) && !is.numeric(x)) {
             e <- dots_expr[[i]] |> format1()
             abort("`{e}` is not numeric or an `lp_variable`.")

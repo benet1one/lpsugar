@@ -98,6 +98,10 @@ test_that("variable concatenation", {
         c(x, 2),
         "Use `bind_vars\\(\\)` instead."
     )
+    expect_warning(
+        bind_vars(x, a_name = 2),
+        "ignoring named arguments"
+    )
     expect_snapshot(
         bind_vars(1:2, y, x[1], 3)
     )

@@ -87,6 +87,7 @@ sum.lp_variable <- function(x, ..., na.rm = FALSE) {
 }
 #' @export
 mean.lp_variable <- function(x, ...) {
+    rlang::check_dots_empty(...)
     sum(x) / length(x)
 }
 
@@ -178,7 +179,7 @@ custom_fun <- function() {
 
     e$apply <- function(X, MARGIN, FUN, ..., simplify = TRUE) {
         if (!is_lp_variable(X)) {
-            return(base::apply(X, MARGIN, FUN, ..., simplify))
+            return(base::apply(X, MARGIN, FUN, ..., simplify = simplify))
         }
 
         warn_changed_args(simplify = TRUE)
@@ -237,40 +238,38 @@ diag_v <- function(x) {
     x[present_ind]
 }
 
-apply_v <- function(x, margin, fun, ...) {
+apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
+    fun <- match.fun(fun)
+    simplify <- isTRUE(simplify)
+
     ind <- x$ind
     ind[] <- 1:length(ind)
     ind_list <- apply(ind, margin, identity, simplify = FALSE)
 
-    i1 <- ind_list[[1]]
-    ptype <- fun(x[i1])
+    out_list <- purrr::map(ind_list, \(i) fun(x[i], ...))
 
-    if (!is_lp_variable(ptype)) {
-        return(vapply(ind_list, \(i) fun(x[i]), ptype))
+    if (!simplify) {
+        return(out_list)
     }
 
-    y <- ptype
+    out_list <- unname(out_list)
+    out <- bind_vars(!!!out_list)
 
-    for (i in ind_list[-1]) {
-        y_i <- fun(x[i])
-        y$coef <- rbind(y$coef, y_i$coef)
-        y$add <- rbind(y$add, y_i$add)
+    if (!is_lp_variable(out)) {
+        return(simplify2array(out))
     }
 
-    y$coef <- y$coef |> robust_index()
-    y$add <- y$add |> robust_index()
-
-    y_ind <- apply(ind, margin, fun, ..., simplify = FALSE) |>
+    out_ind <- apply(ind, margin, fun, ..., simplify = FALSE) |>
         simplify2array(higher = TRUE, except = 0)
 
-    if (is.array(y_ind)) {
-        y_ind[] <- 1:length(y_ind)
-        y$ind <- y_ind |> robust_index()
+    if (is.array(out_ind)) {
+        out_ind[] <- 1:length(out_ind)
+        out$ind <- out_ind |> robust_index()
     } else {
-        y$ind <- 1:nrow(y$coef)
+        out$ind <- 1:nrow(out$coef)
     }
 
-    return(y)
+    return(out)
 }
 
 ifelse_v <- function(test, yes, no) {
