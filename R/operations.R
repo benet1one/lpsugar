@@ -413,13 +413,9 @@ compare_lp <- function(x, y, op, call) {
 # Utils ----------------------
 
 horizontal_multiply <- function(x, c) {
-    stopifnot(nrow(x) == length(c))
-
-    for (i in 1:nrow(x)) {
-        x[i, ] <- x[i, ] * c[i]
-    }
-
-    x
+    stopifnot(length(c) == nrow(x) || length(c) == 1L)
+    c <- array(c, dim = dim(x))
+    x*c
 }
 
 q_list_multiply <- function(q, c) {
