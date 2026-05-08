@@ -191,6 +191,18 @@ solve_model <- function(model, solver, ...) {
 pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     check_problem(problem)
 
+    if (solution$status$code != 0) {
+        out <- list(
+            objective = NA,
+            variables_vec = solution$solution,
+            status = solution$status,
+            message = solution$message,
+            model = solution$model
+        ) |> structure(class = "lp_solution")
+
+        return(out)
+    }
+
     vars <- purrr::map(problem$variables, function(x) {
         out <- array(
             solution$solution[x$ind],
