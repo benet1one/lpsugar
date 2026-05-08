@@ -247,6 +247,7 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
         return(out_list)
     }
 
+    out_list <- unname(out_list)
     out <- bind_vars(!!!out_list)
 
     if (!is_lp_variable(out)) {
