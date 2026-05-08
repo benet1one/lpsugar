@@ -389,6 +389,10 @@ diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
 compare_lp <- function(x, y, op, call) {
     check_conformable(x, y, call)
 
+    if (is_quadratic(x) || is_quadratic(y)) {
+        abort("Quadratic constraints are not yet implemented.", call = call)
+    }
+
     if (op == "<") {
         op <- "<="
     } else if (op == ">") {
