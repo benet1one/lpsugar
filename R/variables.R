@@ -295,6 +295,10 @@ bind_vars <- function(...) {
             e <- dots_expr[[i]] |> format1()
             abort("`{e}` is not numeric or an `lp_variable`.")
         }
+        if (is_lp_variable(x) && is_quadratic(x)) {
+            e <- dots_expr[[i]] |> format1()
+            abort("Quadratic variables such as `{e}` are not currently supported in `bind_vars()`")
+        }
     }
 
     purrr::reduce(dots, function(x, y) {
