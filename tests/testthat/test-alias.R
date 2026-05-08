@@ -1,6 +1,6 @@
 
 test_that("alias", {
-    withr::local_package("ROI")
+    withr::local_package("ROI.plugin.highs")
 
     p <- lp_problem() |>
         lp_var(x[1:2, 1:3], lower = matrix(1:6, nrow = 2))

@@ -177,7 +177,7 @@ test_that("apply", {
 })
 
 test_that("ifelse1", {
-    withr::local_package("ROI")
+    withr::local_package("ROI.plugin.highs")
 
     n <- 10
     upper <- 50
