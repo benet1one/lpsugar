@@ -115,6 +115,17 @@ test_that("infeasible", {
     expect_no_error(lp_find_feasible(p))
 })
 
+test_that("unbounded", {
+    withr::local_package("ROI.plugin.highs")
+
+    p_unb <- lp_problem() |>
+        lp_variable(y[1:2]) |>
+        lp_min(y[1])
+
+    s3 <- lp_solve(p_unb)
+    expect_equal(s3$status$code, 1)
+})
+
 test_that("binary bounds", {
     withr::local_package("ROI.plugin.highs")
     set <- letters[1:2]
