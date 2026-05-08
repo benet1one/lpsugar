@@ -122,17 +122,6 @@ power_lp <- function(x, y, call) {
     abort("Cannot use powers or exponentials in a linear problem.", call = call)
 }
 
-horizontal_multiply <- function(x, c) {
-    stopifnot(nrow(x) == length(c))
-
-    for (i in 1:nrow(x)) {
-        x[i, ] <- x[i, ] * c[i]
-    }
-
-    x
-}
-
-
 # -var
 minus_v <- function(x) {
     multiply_v_c(x, -1)
@@ -341,4 +330,12 @@ compare_lp <- function(x, y, op, call) {
 
     list(lhs = lhs, dir = dir, rhs = rhs, name = name, call = call) |>
         structure(class = "lp_constraint")
+}
+
+# Utils ----------------------
+
+horizontal_multiply <- function(x, c) {
+    stopifnot(length(c) == nrow(x) || length(c) == 1L)
+    c <- array(c, dim = dim(x))
+    x*c
 }
