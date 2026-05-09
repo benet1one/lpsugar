@@ -135,6 +135,9 @@ make_model <- function(problem) {
 
 #' @importFrom ROI as.OP
 #' @export
+ROI::as.OP
+
+#' @export
 as.OP.lp_problem <- function(x) make_model(x)
 
 #' Solve a Model
