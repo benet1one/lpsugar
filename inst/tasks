@@ -7,8 +7,6 @@ Code
 - drop R's colSums and export slam::col_sums?
 
 Quadratic
-- update_objective
-- %*%
 - bind_vars
 - apply_v
 - custom_fun?
