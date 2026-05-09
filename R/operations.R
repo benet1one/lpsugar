@@ -480,5 +480,5 @@ q_list_multiply <- function(q, c) {
 }
 
 is_quadratic <- function(x) {
-    is_lp_variable(x) && !is.null(x$q_coef)
+    (is_lp_variable(x) || is_lp_objective(x)) && (!is.null(x$q_coef))
 }

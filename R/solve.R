@@ -41,10 +41,18 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
 #' @importFrom ROI as.L_objective
 #' @export
 as.L_objective.lp_problem <- function(x) {
-    ROI::L_objective(
-        x$objective$coef,
-        names = attr(x, "varnames")
-    )
+    if (is_quadratic(x$objective)) {
+        ROI::Q_objective(
+            Q = x$objective$q_coef,
+            L = x$objective$coef,
+            names = attr(x, "varnames")
+        )
+    } else {
+        ROI::L_objective(
+            L = x$objective$coef,
+            names = attr(x, "varnames")
+        )
+    }
 }
 
 #' @importFrom ROI as.L_constraint

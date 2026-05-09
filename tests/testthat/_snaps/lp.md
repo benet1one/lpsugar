@@ -15,11 +15,8 @@
       y >= 0
       
       -- $objective --
-      maximize x + y 
-      
-      $coef
-      x y 
-      1 1 
+      maximize linear function:
+      x + y
       
       -- $constraints --
        <unnamed> | n = 1 | x + 2 * y <= 10
@@ -69,7 +66,8 @@
       Real variable 'x[1:1000]'
       
       -- $objective --
-      minimize x[2] 
+      minimize linear function:
+      x[2]
       
       -- $constraints --
        <unnamed> | n = 6 | for (i in 1:2) for (j in 1:3) i + j <= x[i * j]

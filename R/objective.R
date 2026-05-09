@@ -2,12 +2,13 @@
 lp_objective <- function(.problem, objective) {
     quosure <- rlang::enquo(objective)
     objective <- rlang::eval_tidy(quosure, data = data_mask(.problem))
-    expr <- rlang::quo_squash(quosure) |> format()
+    expr <- rlang::as_label(quosure)
 
     if (is.numeric(objective) && length(objective) == 1L && objective == 0) {
         # inform("Setting objective to 0 and finding feasible solution instead.",
         #        call = parent.frame())
 
+        .problem$objective$q_coef <- NULL
         .problem$objective$coef[] <- 0
         .problem$objective$add[] <- 0
         .problem$objective$expr <- ""
@@ -31,6 +32,10 @@ lp_objective <- function(.problem, objective) {
         inform("Summing variables in objective. Write `sum({msg_expr})` to suppress this message.",
                call = parent.frame())
         objective <- sum(objective)
+    }
+
+    if (is_quadratic(objective)) {
+        .problem$objective$q_coef <- objective$q_coef[[1]]
     }
 
     .problem$objective$coef[] <- objective$coef
@@ -87,22 +92,10 @@ lp_max <- lp_maximize
 # Methods ----------------------
 
 #' @export
-print.lp_objective <- function(x, compact = length(x$coef) > 20L, ...) {
-    cat(x$direction, x$expr, "\n")
-
-    if (compact) {
-        cat("\n")
-        return(invisible(x))
-    }
-
-    if (x$add > 0) {
-        glue::glue("         sum(coef*vars) + {x$add}\n") |> cat()
-    } else if (x$add < 0) {
-        glue::glue("         sum(coef*vars) - {-x$add}\n") |> cat()
-    }
-
-    cat("\n")
-    print(x["coef"])
+print.lp_objective <- function(x, ...) {
+    type <- if (is_quadratic(x)) "quadratic" else "linear"
+    cat(x$direction, " ", type, " function:\n",
+        x$expr, "\n\n", sep = "")
     invisible(x)
 }
 

@@ -94,6 +94,9 @@ is_problem <- function(x) {
 is_lp_variable <- function(x) {
     inherits(x, "lp_variable")
 }
+is_lp_objective <- function(x) {
+    inherits(x, "lp_objective")
+}
 is_lp_constraint <- function(x, empty_valid = TRUE) {
     is_con <- inherits(x, "lp_constraint")
     if (empty_valid) {

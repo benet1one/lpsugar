@@ -1,3 +1,4 @@
+
 test_that("objective", {
     a <- letters[1:3]
 
@@ -10,6 +11,11 @@ test_that("objective", {
     expect_snapshot(lp_minimize(p, sum(y)) $ objective)
 
     expect_message(lp_minimize(p, y), "sum\\(y\\)")
+    expect_equal(
+        lp_minimize(p, y) $ objective $ coef,
+        lp_minimize(p, sum(y)) $ objective $ coef
+    )
+
     expect_message(
         p |> lp_minimize({
             k <- 2
@@ -19,10 +25,23 @@ test_that("objective", {
     )
 
     expect_snapshot(
-        p |> lp_minimize({
-            i <- 1:2
-            j <- 1:3
-            z[i, j] * outer(i, j, `^`)
-        }) |> _$objective
+        p |>
+            lp_minimize({
+                i <- 1
+                j <- a[2]
+                z[i, j]
+            }) |>
+            _$objective |>
+            unclass()
     )
+})
+
+test_that("quadratic objective", {
+    p <- lp_problem() |>
+        lp_variable(x[1:2]) |>
+        lp_variable(y[1:2]) |>
+        lp_minimize(sum(x^2) + sum(y))
+
+    expect_snapshot(p$objective)
+    expect_snapshot(unclass(p$objective))
 })

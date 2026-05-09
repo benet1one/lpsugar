@@ -64,3 +64,28 @@ test_that("quadratic arrays", {
 
     expect_snapshot(z^c(0, 1, 2))
 })
+
+test_that("quadratic solver", {
+    withr::local_package("ROI.plugin.highs")
+
+    p <- lp_problem() |>
+        lp_var(x, lower = 0) |>
+        lp_var(y, lower = 0) |>
+        lp_min(
+            (x - 3)^2 + (x + y - 5)^2
+        )
+
+
+    s <- lp_solve(p)
+
+    expect_equal(
+        s$variables,
+        list(x = 3, y = 2),
+        tolerance = 0.0001
+    )
+
+    expect_equal(
+        compute_objective(p, list(x = 3, y = 2)),
+        s$objective
+    )
+})
