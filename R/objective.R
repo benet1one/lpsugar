@@ -102,12 +102,22 @@ print.lp_objective <- function(x, ...) {
 # Utils ------------------------
 
 update_objective <- function(.problem) {
-    total_vars <- ncol(.problem)
-    objective_len <- length(.problem$objective$coef)
+    n_before <- length(.problem$objective$coef)
+    n_after <- ncol(.problem)
+
+    if (is_quadratic(.problem$objective)) {
+        .problem$objective$q_coef <- .problem$objective$q_coef |>
+            cbind(matrix(0, nrow = n_before, ncol = n_after - n_before)) |>
+            rbind(matrix(0, nrow = n_after - n_before, ncol = n_after))
+
+        colnames(.problem$objective$q_coef) <-
+            rownames(.problem$objective$q_coef) <-
+            attr(.problem, "varnames")
+    }
 
     .problem$objective$coef <- c(
         .problem$objective$coef,
-        numeric(total_vars - objective_len)
+        numeric(n_after - n_before)
     )
 
     names(.problem$objective$coef) <- attr(.problem, "varnames")

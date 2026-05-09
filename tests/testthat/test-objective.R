@@ -45,3 +45,13 @@ test_that("quadratic objective", {
     expect_snapshot(p$objective)
     expect_snapshot(unclass(p$objective))
 })
+
+test_that("update objective", {
+    p <- lp_problem() |>
+        lp_variable(x) |>
+        lp_variable(y) |>
+        lp_minimize(x^2 + 5*x*y + 3*y + 1) |>
+        lp_variable(z[1:2])
+
+    expect_snapshot(unclass(p$objective))
+})
