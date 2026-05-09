@@ -303,19 +303,24 @@ test_that("sum", {
     )
 })
 
-test_that("matrix operations", {
+test_that("matrix multiply with vector", {
     r <- 1:2
     c <- 1:3
 
     beta <- c(3, 2, -1)
-    gamma <- matrix(1:12, nrow = 3)
+
+    set.seed(14232)
+    xval <- rpois(length(r) * length(c), 7) |> parameter(r, c)
 
     p <- lp_problem() |>
-        lp_variable(x[r, c])
+        lp_variable(x[r, c]) |>
+        lp_alias(
+            xb = x %*% beta,
+            bx = t(beta) %*% t(x)
+        )
 
-    p |> lp_eval(beta %*% matrix(2))
-    xb <- p |> lp_eval(x %*% beta)
-    bx <- p |> lp_eval(t(beta) %*% t(x))
+    xb <- p$aliases$xb
+    bx <- p$aliases$bx
 
     expect_equal(
         xb$ind,
@@ -326,13 +331,89 @@ test_that("matrix operations", {
         t(bx)$coef
     )
 
+    computed <- compute_aliases(p, list(x = xval))
+
+    expect_equal(
+        computed$xb,
+        xval %*% beta
+    )
+
+    expect_equal(
+        computed$xb,
+        t(computed$bx)
+    )
+
+    expect_equal(
+        p |> lp_eval(beta %*% matrix(2)),
+        beta %*% matrix(2)
+    )
+
     expect_error(
         p |> lp_eval(beta %*% x),
         "non-conformable"
     )
+})
 
-    expect_error(
-        p |> lp_eval(x %*% x),
-        "Cannot matrix multiply `%\\*%` two variables"
+test_that("matrix multiply with matrix", {
+    a <- 1:2
+    b <- 1:3
+
+    gamma <- rpois(length(a) * length(b), 7) |> parameter(a, b)
+    mval <- rpois(length(a) * length(b), 5) |> parameter(a, b)
+    vval <- c(4, -3, 7)
+
+    p <- lp_problem() |>
+        lp_variable(v[b]) |>
+        lp_variable(m[a, b]) |>
+        lp_alias(
+            gv = gamma %*% v,
+            vg = t(v) %*% t(gamma),
+            mg = t(m) %*% gamma,
+            gm = m %*% t(gamma)
+        )
+
+    computed <- compute_aliases(p, list(v = vval, m = mval))
+
+    expect_equal(
+        computed$gv,
+        gamma %*% vval
+    )
+    expect_equal(
+        computed$vg,
+        t(vval) %*% t(gamma)
+    )
+    expect_equal(
+        computed$mg,
+        t(mval) %*% gamma
+    )
+    expect_equal(
+        computed$gm,
+        mval %*% t(gamma)
     )
 })
+
+test_that("quadratic matrix multiply", {
+    a <- 1:2
+    b <- 1:3
+
+    xval <- rpois(length(a) * length(b), 8) |> parameter(a, b)
+
+    p <- lp_problem() |>
+        lp_variable(x[a, b]) |>
+        lp_alias(
+            cprod = t(x) %*% x,
+            tcprod = x %*% t(x)
+        )
+
+    computed <- compute_aliases(p, list(x = xval))
+
+    expect_equal(
+        computed$cprod,
+        crossprod(xval)
+    )
+    expect_equal(
+        computed$tcprod,
+        tcrossprod(xval)
+    )
+})
+

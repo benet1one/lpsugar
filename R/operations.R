@@ -317,10 +317,8 @@ negate_v <- function(x, call) {
     }
 
     if (xv && yv) {
-        abort("Cannot matrix multiply `%*%` two variables.", call = call)
-    }
-
-    if (xv) {
+        matrix_multiply_v_v(x, y, call = call)
+    } else if (xv) {
         matrix_multiply_v_c(x, y, call = call)
     } else {
         t(matrix_multiply_v_c(t(y), t(x), call = call))
@@ -328,12 +326,19 @@ negate_v <- function(x, call) {
 }
 
 # var %*% mat
-matrix_multiply_v_c <- function(x, y, call = parent.frame()) {
+matrix_multiply_v_c <- function(x, y, call) {
+    if (ndim(x) > 2L) {
+        abort("Variable has ({ndim(x)}) dimensions.")
+    } else if (ndim(x) == 1L) {
+        x$ind <- matrix(x$ind, ncol = 1L)
+    }
+
     ptype <- rlang::try_fetch(x$ind %*% y, error = identity)
 
     if (rlang::is_error(ptype)) {
         abort(ptype$message, call = call)
     }
+
 
     if (!is.matrix(y)) {
         y <- matrix(y, ncol = 1L)
@@ -342,6 +347,11 @@ matrix_multiply_v_c <- function(x, y, call = parent.frame()) {
     out <- x
     out$ind <- ptype
     out$ind[] <- 1:length(out$ind)
+
+    if (is_quadratic(x)) {
+        # TODO
+        abort("`%*%` not yet implemented for quadratic variables.", call = call)
+    }
 
     out$coef <- out$coef[integer(), , drop = TRUE]
     out$add <- out$add[integer(), , drop = TRUE]
@@ -358,6 +368,52 @@ matrix_multiply_v_c <- function(x, y, call = parent.frame()) {
     return(out)
 }
 
+# var %*% var
+matrix_multiply_v_v <- function(x, y, call) {
+    x$ind <- drop(x$ind)
+    y$ind <- drop(y$ind)
+
+    ndx <- ndim(x$ind)
+    ndy <- ndim(y$ind)
+
+    if (ndx > 2L) {
+        abort("Left-hand-side has {ndx} dimensions.")
+    } else if (ndx == 1L) {
+        x$ind <- matrix(x$ind, ncol = 1L)
+    }
+
+    if (ndy > 2L) {
+        abort("Right-hand-side has {ndy} dimensions.")
+    } else if (ndy == 1L) {
+        y$ind <- matrix(y$ind, ncol = 1L)
+    }
+
+    ptype <- rlang::try_fetch(x$ind %*% y$ind, error = identity)
+
+    if (rlang::is_error(ptype)) {
+        abort(ptype$message, call = call)
+    }
+
+    out <- x
+    out$ind <- ptype
+    out$ind[] <- 1:length(out$ind)
+
+    out$q_coef <- list()
+    out$coef <- out$coef[integer(), , drop = TRUE]
+    out$add <- out$add[integer(), , drop = TRUE]
+    out$raw <- FALSE
+
+    for (j in 1:ncol(y)) for (i in 1:nrow(x)) {
+        z <- sum(x[i, ] * y[, j])
+        out$q_coef <- c(out$q_coef, z$q_coef)
+        out$coef <- rbind(out$coef, z$coef)
+        out$add <- rbind(out$add, z$add)
+    }
+
+    out$coef <- robust_index(out$coef)
+    out$add <- robust_index(out$add)
+    return(out)
+}
 
 # Methods -----------------------
 
