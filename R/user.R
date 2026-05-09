@@ -280,6 +280,17 @@ compute_aliases <- function(problem, solution) {
         add <- unclass(a$add)
         out <- mat %*% solution + add
 
+        if (is_quadratic(a)) {
+            row_sol <- t(solution)
+            col_sol <- t(row_sol)
+
+            q <- purrr::map_dbl(a$q_coef, function(qi) {
+                0.5 * row_sol %*% qi %*% col_sol
+            })
+
+            out <- out + q
+        }
+
         if (length(out) == 1L) {
             unname(out[1])
         } else {
