@@ -52,21 +52,16 @@ as.L_objective.lp_problem <- function(x) {
 as.L_constraint.lp_problem <- function(x, ...) {
     rlang::check_dots_empty()
 
-    if (length(x$constraints) > 0L) {
-        ROI::L_constraint(
-            L = x$constraints$lhs,
-            dir = c(x$constraints$dir),
-            rhs = c(x$constraints$rhs),
-            names = attr(x, "varnames")
-        )
-    } else {
-        ROI::L_constraint(
-            L = matrix(nrow = 0, ncol = ncol(x)),
-            dir = character(0),
-            rhs = numeric(0),
-            names = attr(x, "varnames")
-        )
+    if (length(x$constraints) == 0L) {
+        return(ROI::NO_constraint(n_obj = ncol(x)))
     }
+
+    ROI::L_constraint(
+        L = x$constraints$lhs,
+        dir = c(x$constraints$dir),
+        rhs = c(x$constraints$rhs),
+        names = attr(x, "varnames")
+    )
 }
 
 #' Make an Optimization Problem
