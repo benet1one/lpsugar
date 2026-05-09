@@ -61,7 +61,7 @@ test_that("parameter", {
 })
 
 test_that("solution summary", {
-    withr::local_package("ROI")
+    withr::local_package("ROI.plugin.highs")
     p <- lp_problem() |>
         lp_var(y, integer = TRUE) |>
         lp_var(x[1:2, 1:3], lower = 1) |>

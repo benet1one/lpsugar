@@ -49,12 +49,12 @@ s2$variables$x
 
 # Problem with Unbounded Solution
 p_unb <- lp_problem() |>
-    lp_variable(y[1:2]) |>
-    lp_min(y[1])
+    lp_variable(y) |>
+    lp_max(y)
 
 s3 <- lp_solve(p_unb)
 s3$status
-s3$variables$y
+s3$objective # Might change depending on solver
 
 # Infeasible Problem
 p_no <- lp_problem() |>

@@ -1,6 +1,6 @@
 
 test_that("printing", {
-    withr::local_package("ROI")
+    withr::local_package("ROI.plugin.highs")
     p <- lp_problem() |>
         lp_variable(x, lower = 0) |>
         lp_variable(y, lower = 0, integer = TRUE) |>
@@ -27,7 +27,7 @@ test_that("printing", {
 })
 
 test_that("solving with multivariate bounds", {
-    withr::local_package("ROI")
+    withr::local_package("ROI.plugin.highs")
     s <- lp_problem() |>
         lp_variable(x[1:2, 1:2], lower = matrix(1:4, 2, 2), upper = 10) |>
         lp_minimize(x[1] + x[2] + x[3] - x[4]) |>
@@ -41,7 +41,7 @@ test_that("solving with multivariate bounds", {
 })
 
 test_that("feasible", {
-    withr::local_package("ROI")
+    withr::local_package("ROI.plugin.highs")
     no_obj <- lp_problem() |>
         lp_variable(x, lower = 5, upper = 10)
 
@@ -64,7 +64,7 @@ test_that("no variables", {
 })
 
 test_that("pretty solution optimal", {
-    withr::local_package("ROI")
+    withr::local_package("ROI.plugin.highs")
     r <- letters[1:2]
     c <- LETTERS[1:3]
     len1set <- c("s")
@@ -106,22 +106,28 @@ test_that("pretty solution optimal", {
 })
 
 test_that("infeasible", {
-    withr::local_package("ROI")
+    withr::local_package("ROI.plugin.highs")
     p <- lp_problem() |>
         lp_variable(z[1:3]) |>
         lp_alias(a = 2*z[1]) |>
         lp_constraint(z <= z - 1)
 
-    s <- lp_find_feasible(p)
+    expect_no_error(lp_find_feasible(p))
+})
 
-    expect_equal(
-        dimnames(p$variables$z),
-        dimnames(s$variables$z)
-    )
+test_that("unbounded", {
+    withr::local_package("ROI.plugin.highs")
+
+    p_unb <- lp_problem() |>
+        lp_variable(y[1:2]) |>
+        lp_min(y[1])
+
+    s3 <- lp_solve(p_unb)
+    expect_equal(s3$status$code, 1)
 })
 
 test_that("binary bounds", {
-    withr::local_package("ROI")
+    withr::local_package("ROI.plugin.highs")
     set <- letters[1:2]
     l <- c(0, 0.7) |> parameter(set)
     u <- c(

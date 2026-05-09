@@ -176,7 +176,10 @@ test_that("variable indexing", {
     # Transpose
     expect_identical(z$coef, t(t(z))$coef)
     expect_snapshot(t(z))
-    expect_error(t(y), "two-dimensional")
+    expect_equal(
+        dim(t(y)),
+        c(1, 3)
+    )
 
     p2 <- lp_problem() |> lp_variable(ThreeD[1:2, 1:3, 1:3])
     ThreeD <- p2$variables$ThreeD
