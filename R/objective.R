@@ -96,11 +96,12 @@ print.lp_objective <- function(x, compact = length(x$coef) > 20L, ...) {
     }
 
     if (x$add > 0) {
-        glue::glue("         sum(coef*vars) + {x$add}\n\n") |> cat()
+        glue::glue("         sum(coef*vars) + {x$add}\n") |> cat()
     } else if (x$add < 0) {
-        glue::glue("         sum(coef*vars) - {-x$add}\n\n") |> cat()
+        glue::glue("         sum(coef*vars) - {-x$add}\n") |> cat()
     }
 
+    cat("\n")
     print(x["coef"])
     invisible(x)
 }

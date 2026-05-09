@@ -16,6 +16,7 @@
       
       -- $objective --
       maximize x + y 
+      
       $coef
       x y 
       1 1 
