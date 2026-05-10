@@ -183,7 +183,7 @@ update_constraints <- function(.problem) {
 
 empty_constraint <- function() {
     list(
-        lhs = matrix(nrow = 0, ncol = 0),
+        lhs = slam::simple_triplet_zero_matrix(nrow = 0, ncol = 0),
         dir = character(0),
         rhs = matrix(nrow = 0, ncol = 1),
         call = character(0),
