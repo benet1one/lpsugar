@@ -186,7 +186,7 @@ subtract_c_v <- function(c, x, call) {
     out <- add_v_c(minus_v(x), c, call)
 
     # If its (1-x) and x is binary, it stays binary
-    if (x$binary && c == 1) {
+    if (x$binary && all(c == 1)) {
         out$binary <- TRUE
     }
 

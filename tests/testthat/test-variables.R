@@ -218,7 +218,10 @@ test_that("operations", {
     expect_identical(x/2, x*0.5)
     expect_identical(1-y, !y)
     expect_identical(1-y[1], !y[1])
-    expect_true( (!y)$binary )
+    expect_true( (!y) $ binary )
+    expect_true( (1 - y) $ binary )
+    expect_true( (rep(1, 3) - y) $ binary )
+    expect_false( (c(1, 2, 1) - y) $ binary )
 
     expect_identical(2*y, y + y)
     expect_identical(-z, z - 2*z)
