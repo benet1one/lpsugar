@@ -93,6 +93,16 @@ lp_max <- lp_maximize
 
 #' @export
 print.lp_objective <- function(x, ...) {
+    if (x$direction == "") {
+        cat("no objective function\n\n")
+        return(invisible(x))
+    }
+
+    if (all(x$coef == 0) && !is_quadratic(x)) {
+        cat("find a feasible solution\n\n")
+        return(invisible(x))
+    }
+
     type <- if (is_quadratic(x)) "quadratic" else "linear"
     cat(x$direction, " ", type, " function:\n",
         x$expr, "\n\n", sep = "")

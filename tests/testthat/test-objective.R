@@ -1,4 +1,23 @@
 
+test_that("printing", {
+    p_empty <- lp_problem() |> lp_var(x)
+    p_max <- p_empty |> lp_maximize(2*x)
+    p_feasible <- p_max |> lp_minimize(0)
+
+    expect_output(
+        print(p_empty$objective),
+        "no objective function"
+    )
+    expect_output(
+        print(p_max$objective),
+        "maximize linear function:"
+    )
+    expect_output(
+        print(p_feasible$objective),
+        "find a feasible solution"
+    )
+})
+
 test_that("objective", {
     a <- letters[1:3]
 
