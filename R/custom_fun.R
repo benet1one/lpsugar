@@ -33,28 +33,16 @@ sum_over <- function(...) {
     if (nams[n] != "") {
         abort("Last element in `...` should be an unnamed expression to sum.")
     }
-    if (any(nams[-n] == "")) {
-        # TODO Fix the grammar in this error message
-        abort("The first elements in `...` should be the named indices to sum across.")
+    if (nams[1L] == "") {
+        abort("First element in `...` must be a name value pair `<ind> = <set>`")
     }
 
     env <- rlang::get_env(dots[[n]])
-    indices <- dots[-n] |> lapply(rlang::eval_tidy)
-    grid <- do.call(expand.grid, indices)
-    s <- 0
+    expr <- rlang::get_expr(dots[[n]])
 
-    if (nrow(grid) > 0) for (i in 1:nrow(grid)) {
-        sub_frame <- grid[i, , drop = FALSE] |>
-            as.list()
-        expr <- dots[[n]] |>
-            rlang::get_expr() |>
-            methods::substituteDirect(sub_frame)
-
-        r <- rlang::eval_tidy(expr = expr, env = env)
-        s <- s + r
-    }
-
-    sum(s)
+    listcomp::gen_list(!!expr, !!!dots[-n], .env = env) |>
+        purrr::map(sum) |>
+        purrr::reduce(`+`)
 }
 
 

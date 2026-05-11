@@ -116,6 +116,14 @@ test_that("sum over", {
         c(1, 0, 0, 0, 2, 0, 0, 0, 3),
         ignore_attr = TRUE
     )
+
+
+    my_list <- list(1:2, 2:9, 3:6)
+
+    expect_equal(
+        sum_over(l = my_list, r = l[1], 2*r),
+        12
+    )
 })
 
 test_that("apply", {
