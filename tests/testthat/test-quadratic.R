@@ -65,6 +65,25 @@ test_that("quadratic arrays", {
     expect_snapshot(z^c(0, 1, 2))
 })
 
+test_that("apply on quadratic", {
+    p <- lp_problem() |>
+        lp_var(x[1:2, 1:3]) |>
+        lp_alias(
+            y = (x - 1)^2,
+            rs_y = rowSums(y)
+        )
+
+    xval <- matrix(rnorm(6), nrow = 2, ncol = 3)
+    yval <- (xval - 1)^2
+    computed <- compute_aliases(p, list(x = xval))
+
+    expect_equal(
+        computed$rs_y,
+        rowSums(yval),
+        ignore_attr = TRUE
+    )
+})
+
 test_that("quadratic solver", {
     withr::local_package("ROI.plugin.highs")
 
