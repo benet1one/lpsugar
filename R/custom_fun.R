@@ -201,6 +201,16 @@ custom_fun <- function() {
         warn_changed_args(na.rm = FALSE, dims = 1L)
         apply_v(x, 2L, mean)
     }
+    e$marginSums <- function(x, margin = NULL) {
+        if (!is_lp_variable(x)) {
+            return(base::marginSums(x, margin = margin))
+        }
+        if (length(margin) == 0) {
+            return(sum.lp_variable(x))
+        }
+
+        apply_v(x, margin, sum)
+    }
 
     return(e)
 }
