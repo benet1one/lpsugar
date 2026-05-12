@@ -222,6 +222,7 @@ diag_v <- function(x) {
 }
 
 apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
+    margin <- parse_margin(margin, variable = x)
     fun <- match.fun(fun)
     simplify <- isTRUE(simplify)
 
@@ -253,6 +254,28 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     }
 
     return(out)
+}
+parse_margin <- function(margin, variable) {
+    if (rlang::is_integerish(margin, finite = TRUE)) {
+        return(margin)
+    }
+    if (rlang::is_character(margin)) {
+        if (!variable$raw) {
+            abort("Character `MARGIN` is only supported for unmodified.")
+        }
+
+        dnn <- names(dimnames(variable))
+        margin_num <- match(margin, dnn)
+
+        if (anyNA(margin_num)) {
+            where_na <- margin[is.na(margin_num)][1]
+            abort('Margin "{where_na}" does not match any dimension in `{variable$name}`.')
+        }
+
+        return(margin_num)
+    }
+
+    abort("Invalid `MARGIN`.")
 }
 
 ifelse_v <- function(test, yes, no) {

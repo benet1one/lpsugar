@@ -182,6 +182,22 @@ test_that("apply", {
         p |> lp_eval(rowSums(y, dims = 3L)),
         "Ignoring argument `dims`"
     )
+
+    p2 <- lp_problem() |>
+        lp_var(x[a = 1:3, b = 1:2]) |>
+        lp_alias(
+            a1 = apply(x, "a", sum),
+            a2 = apply(x, 1, sum),
+        )
+
+    expect_equal(
+        p2$aliases$a1,
+        p2$aliases$a2
+    )
+    expect_error(
+        p2 |> lp_eval(apply(x, "d", sum)),
+        'Margin "d" does not match any dimension in `x`.'
+    )
 })
 
 test_that("ifelse1", {
