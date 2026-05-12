@@ -478,7 +478,3 @@ q_list_multiply <- function(q, c) {
     stopifnot(length(q) == length(c))
     purrr::map2(q, c, `*`)
 }
-
-is_quadratic <- function(x) {
-    (is_lp_variable(x) || is_lp_objective(x)) && (!is.null(x$q_coef))
-}

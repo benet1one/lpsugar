@@ -551,3 +551,39 @@ recycle_const <- function(x, n) {
     abort("Attempt to recycle array of length ({length(x)}) to length ({n}).")
 }
 
+# Quadratic -----------------------
+
+get_q_coef <- function(x) {
+    if (is_quadratic(x)) {
+        return(x$q_coef)
+    }
+
+    qmat <- matrix(
+        0,
+        nrow = ncol(x$coef),
+        ncol = ncol(x$coef),
+        dimnames = list(
+            colnames(x$coef),
+            colnames(x$coef)
+        )
+    )
+
+    list(qmat) |> rep(length(x))
+}
+
+is_quadratic <- function(x) {
+    (is_lp_variable(x) || is_lp_objective(x)) &&
+        (!is.null(x$q_coef))
+}
+
+as_quadratic <- function(x) {
+    if (is_quadratic(x)) {
+        return(x)
+    }
+    if (!is_lp_variable(x) && !is_lp_objective(x)) {
+        abort("`x` must be a variable or an objective function.")
+    }
+
+    x$q_coef <- get_q_coef(x)
+    return(x)
+}
