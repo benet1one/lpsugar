@@ -25,11 +25,13 @@ for_split <- function(quosure, data = NULL) {
         .___indices <- base::list()
         .___add_loop_element <- function(x) {
             ind <- as.list(parent.frame())
+            x # prevents execution when there's a `next`
 
             .___indices <<- base::c(
                 .___indices,
                 base::list(ind)
             )
+
             .___result <<- base::c(
                 .___result,
                 base::list(x)
