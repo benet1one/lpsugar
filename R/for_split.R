@@ -69,7 +69,7 @@ contains_loop <- function(expr) {
     if (is_loop(expr)) {
         return(TRUE)
     }
-    for (e in as.list(expr)) if (contains_loop(e)) {
+    for (e in as.list(expr)) if (!rlang::is_missing(e) && contains_loop(e)) {
         return(TRUE)
     }
 
