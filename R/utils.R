@@ -100,9 +100,6 @@ is_lp_constraint <- function(x, empty_valid = TRUE) {
 is_empty_lp_constraint <- function(x) {
     inherits(x, "empty_lp_constraint")
 }
-is_for_split <- function(x) {
-    inherits(x, "for_split")
-}
 is_lp_solution <- function(x) {
     inherits(x, "lp_solution")
 }
@@ -127,7 +124,7 @@ lp_eval <- function(.problem, expr, split_for = FALSE) {
     data <- data_mask(.problem)
 
     if (split_for) {
-        for_split(quosure, evaluate = TRUE, data = data)
+        for_split(quosure, data = data)
     } else {
         rlang::eval_tidy(quosure, data = data)
     }

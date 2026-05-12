@@ -1,8 +1,6 @@
 
 check_for_split <- function(quosure, call = parent.frame()) {
-    nams <- all.names(quosure)
-
-    if ("return" %in% nams) {
+    if ("return" %in% all.names(quosure)) {
         abort("Cannot use `return` inside a for loop.", call = call)
     }
 }
@@ -101,6 +99,9 @@ include_element_adder <- function(expr) {
     if (is_assignment(e)) {
         return(expr)
     }
+
+    # Happy Checker
+    .___add_loop_element <- NULL
 
     expr[[last]] <- rlang::expr(
         .___add_loop_element(!!e)
