@@ -45,8 +45,7 @@ for_split <- function(quosure, data = NULL) {
     names(result) <- sapply(result_env$.___indices, function(i) {
         i <- i[names(i) %in% ind_names]
         val <- sapply(i, format_ind)
-        ind_str <- paste0(names(i), "=", val, collapse = ", ")
-        paste0("[", ind_str, "]")
+        paste0(names(i), "=", val, collapse = ", ")
     })
 
     result
