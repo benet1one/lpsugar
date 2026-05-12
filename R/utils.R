@@ -31,6 +31,10 @@ warn_changed_args <- function(..., env = parent.frame(), call = env) {
 # Safety ------------------------
 
 format1 <- function(x, ...) {
+    if (!rlang::is_symbolic(x)) {
+        return(rlang::as_label(x))
+    }
+
     y <- format(x, ...)
 
     if (length(y) == 1L) {
