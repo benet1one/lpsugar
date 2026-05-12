@@ -75,3 +75,29 @@
       with class 'robust_index' from package 'lpsugar'
       
 
+# update objective
+
+    Code
+      unclass(p$objective)
+    Output
+      $coef
+         x    y z[1] z[2] 
+         0    3    0    0 
+      
+      $add
+      [1] 1
+      
+      $direction
+      [1] "minimize"
+      
+      $expr
+      [1] "x^2 + 5 * x * y + 3 * y + 1"
+      
+      $q_coef
+           x y z[1] z[2]
+      x    2 5    0    0
+      y    5 0    0    0
+      z[1] 0 0    0    0
+      z[2] 0 0    0    0
+      
+
