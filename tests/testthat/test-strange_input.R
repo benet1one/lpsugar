@@ -71,6 +71,14 @@ test_that("masking", {
         })
 
     expect_snapshot(p2$constraints)
+
+    x <- 5:7
+    p3 <- lp_problem() |>
+        lp_var(x[1:3]) |>
+        lp_var(i) |>
+        lp_alias(s = sum_over(i = 1:3, i * x[i]))
+
+    expect_snapshot(p3$aliases$s)
 })
 
 test_that("misc", {

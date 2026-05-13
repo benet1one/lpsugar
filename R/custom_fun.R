@@ -33,28 +33,16 @@ sum_over <- function(...) {
     if (nams[n] != "") {
         abort("Last element in `...` should be an unnamed expression to sum.")
     }
-    if (any(nams[-n] == "")) {
-        # TODO Fix the grammar in this error message
-        abort("The first elements in `...` should be the named indices to sum across.")
+    if (nams[1L] == "") {
+        abort("First element in `...` must be a name value pair `<ind> = <set>`")
     }
 
     env <- rlang::get_env(dots[[n]])
-    indices <- dots[-n] |> lapply(rlang::eval_tidy)
-    grid <- do.call(expand.grid, indices)
-    s <- 0
+    expr <- rlang::get_expr(dots[[n]])
 
-    if (nrow(grid) > 0) for (i in 1:nrow(grid)) {
-        sub_frame <- grid[i, , drop = FALSE] |>
-            as.list()
-        expr <- dots[[n]] |>
-            rlang::get_expr() |>
-            methods::substituteDirect(sub_frame)
-
-        r <- rlang::eval_tidy(expr = expr, env = env)
-        s <- s + r
-    }
-
-    sum(s)
+    listcomp::gen_list(!!expr, !!!dots[-n], .env = env) |>
+        purrr::map(sum) |>
+        purrr::reduce(`+`)
 }
 
 
@@ -62,6 +50,8 @@ sum_over <- function(...) {
 
 #' @export
 sum.lp_variable <- function(x, ..., na.rm = FALSE) {
+    stopifnot(rlang::is_bool(na.rm))
+
     varnames <- colnames(x$coef)
     x$ind <- x$ind[1]
 
@@ -218,6 +208,16 @@ custom_fun <- function() {
         warn_changed_args(na.rm = FALSE, dims = 1L)
         apply_v(x, 2L, mean)
     }
+    e$marginSums <- function(x, margin = NULL) {
+        if (!is_lp_variable(x)) {
+            return(base::marginSums(x, margin = margin))
+        }
+        if (length(margin) == 0) {
+            return(sum.lp_variable(x))
+        }
+
+        apply_v(x, margin, sum)
+    }
 
     return(e)
 }
@@ -239,6 +239,7 @@ diag_v <- function(x) {
 }
 
 apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
+    margin <- parse_margin(margin, variable = x)
     fun <- match.fun(fun)
     simplify <- isTRUE(simplify)
 
@@ -270,6 +271,28 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     }
 
     return(out)
+}
+parse_margin <- function(margin, variable) {
+    if (rlang::is_integerish(margin, finite = TRUE)) {
+        return(margin)
+    }
+    if (rlang::is_character(margin)) {
+        if (!variable$raw) {
+            abort("Character `MARGIN` is only supported for unmodified.")
+        }
+
+        dnn <- names(dimnames(variable))
+        margin_num <- match(margin, dnn)
+
+        if (anyNA(margin_num)) {
+            where_na <- margin[is.na(margin_num)][1]
+            abort('Margin "{where_na}" does not match any dimension in `{variable$name}`.')
+        }
+
+        return(margin_num)
+    }
+
+    abort("Invalid `MARGIN`.")
 }
 
 ifelse_v <- function(test, yes, no) {
@@ -319,10 +342,14 @@ ifelse_l <- function(test, yes, no) {
     if (is_lp_variable(yes)) {
         yes_v <- recycle_var(yes, len)
         v <- yes_v
+    } else if (!is.numeric(yes)) {
+        abort("`yes` must either be a variable or a numeric vector.")
     }
     if (is_lp_variable(no)) {
         no_v <- recycle_var(no, len)
         v <- no_v
+    } else if (!is.numeric(no)) {
+        abort("`no` must either be a variable or a numeric vector.")
     }
 
     if (!is_lp_variable(yes)) {

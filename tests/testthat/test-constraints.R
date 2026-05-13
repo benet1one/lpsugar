@@ -83,7 +83,8 @@ test_that("deleting constraints", {
 })
 
 test_that("non constraint", {
-    p <- problem_constraints()
+    p <- lp_problem() |>
+        lp_var(x)
 
     expect_error(
         p |> lp_constraint(1 <= 2),
@@ -94,7 +95,15 @@ test_that("non constraint", {
         "did not evaluate to a constraint"
     )
     expect_error(
-        p |> lp_constraint(y[1] != 0),
+        p |> lp_constraint(my_con = 2*x),
+        'Problematic constraint: "my_con"'
+    )
+    expect_error(
+        p |> lp_constraint(my_con = for (i in 0:3) 2*x),
+        'Problematic constraint: "my_con\\[i=0\\]"'
+    )
+    expect_error(
+        p |> lp_constraint(x != 0),
         "Inequality"
     )
 })

@@ -116,6 +116,14 @@ test_that("sum over", {
         c(1, 0, 0, 0, 2, 0, 0, 0, 3),
         ignore_attr = TRUE
     )
+
+
+    my_list <- list(1:2, 2:9, 3:6)
+
+    expect_equal(
+        sum_over(l = my_list, r = l[1], 2*r),
+        12
+    )
 })
 
 test_that("apply", {
@@ -173,6 +181,22 @@ test_that("apply", {
     expect_warning(
         p |> lp_eval(rowSums(y, dims = 3L)),
         "Ignoring argument `dims`"
+    )
+
+    p2 <- lp_problem() |>
+        lp_var(x[a = 1:3, b = 1:2]) |>
+        lp_alias(
+            a1 = apply(x, "a", sum),
+            a2 = apply(x, 1, sum),
+        )
+
+    expect_equal(
+        p2$aliases$a1,
+        p2$aliases$a2
+    )
+    expect_error(
+        p2 |> lp_eval(apply(x, "d", sum)),
+        'Margin "d" does not match any dimension in `x`.'
     )
 })
 

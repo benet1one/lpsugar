@@ -31,6 +31,10 @@ warn_changed_args <- function(..., env = parent.frame(), call = env) {
 # Safety ------------------------
 
 format1 <- function(x, ...) {
+    if (!rlang::is_symbolic(x)) {
+        return(rlang::as_label(x))
+    }
+
     y <- format(x, ...)
 
     if (length(y) == 1L) {
@@ -108,18 +112,24 @@ is_lp_constraint <- function(x, empty_valid = TRUE) {
 is_empty_lp_constraint <- function(x) {
     inherits(x, "empty_lp_constraint")
 }
-is_for_split <- function(x) {
-    inherits(x, "for_split")
-}
 is_lp_solution <- function(x) {
     inherits(x, "lp_solution")
 }
 
-check_problem <- function(x) {
-    if (!is_problem(x)) {
-        abort("`.problem` must be an lp_problem.", call = parent.frame())
+check_problem <- function(problem, field_name = ".problem") {
+    if (!is_problem(problem)) {
+        abort("`{field_name}` must be an `lp_problem`.", call = parent.frame())
     }
 }
+check_roi_solution <- function(solution, field_name = "solution") {
+    expected_fields <- c("solution", "objval", "status", "message")
+
+    if (!is.list(solution) || !all(expected_fields %in% names(solution))) {
+        abort("`{field_name}` must be the output of `solve_model()` or `ROI::ROI_solve()`.",
+              call = parent.frame())
+    }
+}
+
 
 # Evaluation --------------------
 
@@ -135,7 +145,7 @@ lp_eval <- function(.problem, expr, split_for = FALSE) {
     data <- data_mask(.problem)
 
     if (split_for) {
-        for_split(quosure, evaluate = TRUE, data = data)
+        for_split(quosure, data = data)
     } else {
         rlang::eval_tidy(quosure, data = data)
     }
@@ -166,78 +176,4 @@ inside <- function(expr) {
     }
 
     expr
-}
-
-# For split ----------------------
-
-for_split <- function(quosure, evaluate = FALSE, data = NULL, recursive = TRUE) {
-    if (!rlang::quo_is_symbolic(quosure)) {
-        if (evaluate) {
-            return(rlang::eval_tidy(quosure, data = data))
-        } else {
-            return(quosure)
-        }
-    }
-
-    check_for_split(quosure)
-    expr <- rlang::quo_get_expr(quosure)
-    env <- rlang::quo_get_env(quosure)
-
-    expr <- inside(expr)
-
-    if (expr[[1]] != quote(`for`)) {
-        if (evaluate) {
-            return(rlang::eval_tidy(quosure, data = data))
-        } else {
-            return(quosure)
-        }
-    }
-
-    variable <- expr[[2L]] |> format()
-    sequence <- expr[[3L]] |> rlang::eval_tidy(data = data, env = env)
-    interior <- expr[[4L]]
-
-    loop_env <- rlang::new_environment()
-
-    result <- lapply(sequence, function(i) {
-        loop_env[[variable]] <- i
-        interior_i <- methods::substituteDirect(interior, frame = loop_env)
-        quo_i <- rlang::new_quosure(interior_i, env = env)
-
-        if (recursive) {
-            return(for_split(
-                quo_i,
-                evaluate = evaluate,
-                data = data,
-                recursive = recursive
-            ))
-        }
-
-        if (evaluate) {
-            return(rlang::eval_tidy(quo_i, data = data))
-        } else {
-            return(quo_i)
-        }
-    })
-
-    names(result) <- paste0("[", variable, "=", sequence, "]")
-    class(result) <- c("for_split", "list")
-    result
-}
-
-flatten <- function(x, is_leaf = Negate(is_for_split)) {
-    if (is_leaf(x)) {
-        return(x)
-    }
-
-    l <- lapply(x, flatten, is_leaf = is_leaf)
-    purrr::list_flatten(l, name_spec = "{outer}{inner}")
-}
-
-check_for_split <- function(quosure, call = parent.frame()) {
-    nams <- all.names(quosure)
-
-    if ("return" %in% nams || "next" %in% nams) {
-        abort("Cannot use `return` or `next`.", call = call)
-    }
 }

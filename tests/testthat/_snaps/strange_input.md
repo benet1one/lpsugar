@@ -46,3 +46,19 @@
       [i=3] 1 <=  9
       
 
+---
+
+    Code
+      p3$aliases$s
+    Output
+      $coef
+           x[1] x[2] x[3] i
+      [1,]    1    2    3 0
+      with class 'robust_index' from package 'lpsugar'
+      
+      $add
+           [,1]
+      [1,]    0
+      with class 'robust_index' from package 'lpsugar'
+      
+

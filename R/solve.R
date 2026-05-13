@@ -83,7 +83,7 @@ as.L_constraint.lp_problem <- function(x, ...) {
 #' @export
 #' @example inst/examples/example_solve_steps.R
 make_model <- function(problem) {
-    check_problem(problem)
+    check_problem(problem, field_name = "problem")
 
     # No variables
     if (ncol(problem) == 0L) {
@@ -195,7 +195,8 @@ solve_model <- function(model, solver, ...) {
 #'
 #' @example inst/examples/example_solve_steps.R
 pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
-    check_problem(problem)
+    check_problem(problem, field_name = "problem")
+    check_roi_solution(solution)
 
     if (length(solution$solution) == 0) {
         out <- list(

@@ -63,47 +63,40 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
         abort("Constraint does not contain any variables.", call = expr)
     }
 
-    con <- for_split(quosure, evaluate = TRUE, data = data)
-    non_constraint_error <- c(
-        "Expression did not evaluate to a constraint.",
-        ">" = "Did you forget the comparison operator? `<=/==/>=`"
-    )
+    cons <- for_split(quosure, data = data)
+    inds <- rlang::names2(cons)
 
-    if (is.null(con)) {
-        return(empty_constraint())
+    for (i in seq_along(cons)) {
+        con <- cons[[i]]
+        ind_str <- inds[i]
 
-    } else if (is_lp_constraint(con)) {
-        rownames(con$lhs) <- rep(name, nrow(con$lhs))
-        con$name[] <- name
-
-    } else if (is_for_split(con)) {
-        fs <- flatten(con)
-
-        for (k in seq_along(fs)) {
-            c <- fs[[k]]
-            ind <- names(fs)[k]
-
-            if (is.null(c)) {
-                fs[[k]] <- empty_constraint()
-                next
-
-            } else if (!is_lp_constraint(c)) {
-                rlang::abort(non_constraint_error, call = expr)
-            }
-
-            rownames(c$lhs) <- rep(paste0(name, ind), nrow(c$lhs))
-            fs[[k]] <- c
+        if (is.null(con)) {
+            next
         }
 
-        con <- bind_cons(!!!fs)
-        con$name[] <- name
+        name_ind <- if (ind_str == "") {
+            name
+        } else {
+            paste0(name, "[", ind_str, "]")
+        }
 
-    } else {
-        rlang::abort(non_constraint_error, call = expr)
+        if (!is_lp_constraint(con)) {
+            msg <- c(
+                "Expression did not evaluate to a constraint.",
+                if (name != "") glue::glue('Problematic constraint: "{name_ind}".'),
+                ">" = "Did you forget the comparison operator? `<=/==/>=`"
+            )
+
+            rlang::abort(msg, call = quosure)
+        }
+
+        rownames(cons[[i]]$lhs) <- rep_len(name_ind, length(con))
     }
 
-    con$call[] <- format1(expr)
-    return(con)
+    cons <- bind_cons(!!!cons)
+    cons$name[] <- name
+    cons$call[] <- format1(expr)
+    return(cons)
 }
 
 #' Delete constraints
@@ -183,7 +176,7 @@ update_constraints <- function(.problem) {
 
 empty_constraint <- function() {
     list(
-        lhs = matrix(nrow = 0, ncol = 0),
+        lhs = slam::simple_triplet_zero_matrix(nrow = 0, ncol = 0),
         dir = character(0),
         rhs = matrix(nrow = 0, ncol = 1),
         call = character(0),
@@ -206,10 +199,8 @@ bind_cons <- function(...) {
     dots <- dots[lengths(dots) > 0]
     dots <- purrr::keep(dots, function(d) {
         if (!is_lp_constraint(d)) {
-            abort(
-                "`bind_cons()` can only bind `lp_constraint`, not `{class(d)[1]}`",
-                call = call
-            )
+            abort("`bind_cons()` can only bind `lp_constraint`, not `{class(d)[1]}`",
+                  call = call)
         }
 
         !is_empty_lp_constraint(d)
@@ -305,6 +296,8 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 
 #' @export
 print.lp_constraint <- function(x, compact = FALSE, ...) {
+    stopifnot(rlang::is_bool(compact))
+
     pairs <- cbind(x$name, x$call) |>
         unique(MARGIN = 1L)
 

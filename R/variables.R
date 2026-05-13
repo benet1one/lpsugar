@@ -270,7 +270,7 @@ c.lp_variable <- function(..., recursive = TRUE) {
 #' @param ... Problem variables and/or numeric constants, vectors or arrays.
 #' @returns An `lp_variable`.
 #' @export
-#' @examples
+#' @example inst/examples/example_bind_vars.R
 bind_vars <- function(...) {
     dots <- rlang::dots_list(..., .ignore_empty = "all")
     dots_expr <- rlang::enexprs(..., .ignore_empty = "all")
