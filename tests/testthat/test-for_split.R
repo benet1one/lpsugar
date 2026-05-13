@@ -1,74 +1,54 @@
 
 test_that("for_split works", {
-    p <- problem_variables()
+    a <- 1:2
+    b <- letters[1:3]
+
+    p <- lp_problem() |>
+        lp_var(x[a, b])
 
     q1 <- rlang::quo({
-        for (i in 1:5) {
-            y * i^2
-        }
-    })
-
-    q2 <- rlang::quo({
         for (i in 1:3) {
-            for (j in 1:2) {
-                k <- i + j
-                i*x + k
-            }
+            i^2
         }
     })
 
-    q3 <- rlang::quo({
-        for (i in 1:3) for (j in 1:2) {
-            k <- i + j
-            i*x + k
+    for_split(q1) |> expect_snapshot()
+
+    q2 <- rlang::quo(
+        for (i in a) for (j in b) {
+            x[i, j] + i
         }
-    })
-
-    for_split(q1)
-    expect_snapshot(for_split(q1, evaluate = TRUE, data = data_mask(p)))
-
-    expect_identical(for_split(q2), for_split(q3))
-    expect_identical(
-        for_split(q2, evaluate = TRUE, data = data_mask(p)),
-        for_split(q3, evaluate = TRUE, data = data_mask(p))
     )
 
-    expect_equal(
-        for_split(rlang::quo(1 + 1), evaluate = TRUE),
-        2
-    )
-
-    q4 <- rlang::quo({
-        k <- 3
-        k*x - k
-    })
-
-    expect_identical(
-        for_split(q4, evaluate = TRUE, data = data_mask(p)),
-        3 * p$variables$x - 3
-    )
+    for_split(q2, data = data_mask(p)) |> expect_snapshot()
 })
 
-test_that("for split with interruption", {
-    q1 <- rlang::quo(for (i in 1:4) {
-        if (i == 3) {
-            return()
-        }
-        2*i
-    })
-    q2 <- rlang::quo(for (i in 1:4) {
+test_that("for_split with interruption", {
+    q <- rlang::quo(for (i in 1:4) {
         if (i == 3) {
             next
         }
         2*i
     })
 
-    expect_error(
-        for_split(q1),
-        "Cannot use `return` or `next`"
+    expect_equal(
+        for_split(q),
+        list(
+            "i=1" = 2,
+            "i=2" = 4,
+            "i=4" = 8
+        )
     )
-    expect_error(
-        for_split(q2),
-        "Cannot use `return` or `next`"
-    )
+})
+
+test_that("advanced for_split", {
+    q_advanced <- rlang::quo(for (i in 1:4) {
+        k <- i + 1
+
+        for (j in k:(k + 1)) if (k %% 2 == 0) {
+            c(i = i, j = j, k = k)
+        }
+    })
+
+    for_split(q_advanced) |> expect_snapshot()
 })
