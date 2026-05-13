@@ -7,6 +7,8 @@ Code
 - drop R's colSums and export slam::col_sums?
 
 Quadratic
+- cumsum_v
+- ifelse_v could now support all arguments as variables
 - custom_fun?
 
 Docs
