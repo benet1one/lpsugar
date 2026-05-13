@@ -305,6 +305,8 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 
 #' @export
 print.lp_constraint <- function(x, compact = FALSE, ...) {
+    stopifnot(rlang::is_bool(compact))
+
     pairs <- cbind(x$name, x$call) |>
         unique(MARGIN = 1L)
 

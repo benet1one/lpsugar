@@ -287,7 +287,11 @@ matrix_multiply_v_c <- function(x, y, call = parent.frame()) {
 
 #' @export
 diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
-    if (length(lag) != 1L || length(differences) != 1L || lag < 1L || differences < 1L) {
+    stopifnot(
+        rlang::is_integerish(lag, n = 1, finite = TRUE),
+        rlang::is_integerish(differences, n = 1, finite = TRUE)
+    )
+    if (lag < 1L || differences < 1L) {
         abort("`lag` and `differences` must be integers >= 1")
     }
 

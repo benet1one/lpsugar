@@ -50,6 +50,8 @@ sum_over <- function(...) {
 
 #' @export
 sum.lp_variable <- function(x, ..., na.rm = FALSE) {
+    stopifnot(rlang::is_bool(na.rm))
+
     varnames <- colnames(x$coef)
     x$ind <- x$ind[1]
     x$coef <- colSums(x$coef) |>
@@ -335,10 +337,14 @@ ifelse_l <- function(test, yes, no) {
     if (is_lp_variable(yes)) {
         yes_v <- recycle_var(yes, len)
         v <- yes_v
+    } else if (!is.numeric(yes)) {
+        abort("`yes` must either be a variable or a numeric vector.")
     }
     if (is_lp_variable(no)) {
         no_v <- recycle_var(no, len)
         v <- no_v
+    } else if (!is.numeric(no)) {
+        abort("`no` must either be a variable or a numeric vector.")
     }
 
     if (!is_lp_variable(yes)) {

@@ -111,11 +111,20 @@ is_lp_solution <- function(x) {
     inherits(x, "lp_solution")
 }
 
-check_problem <- function(x) {
-    if (!is_problem(x)) {
-        abort("`.problem` must be an lp_problem.", call = parent.frame())
+check_problem <- function(problem, field_name = ".problem") {
+    if (!is_problem(problem)) {
+        abort("`{field_name}` must be an `lp_problem`.", call = parent.frame())
     }
 }
+check_roi_solution <- function(solution, field_name = "solution") {
+    expected_fields <- c("solution", "objval", "status", "message")
+
+    if (!is.list(solution) || !all(expected_fields %in% solution)) {
+        abort("`{field_name}` must be the output of `solve_model()` or `ROI::ROI_solve()`.",
+              call = parent.frame())
+    }
+}
+
 
 # Evaluation --------------------
 
