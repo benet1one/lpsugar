@@ -119,7 +119,7 @@ check_problem <- function(problem, field_name = ".problem") {
 check_roi_solution <- function(solution, field_name = "solution") {
     expected_fields <- c("solution", "objval", "status", "message")
 
-    if (!is.list(solution) || !all(expected_fields %in% solution)) {
+    if (!is.list(solution) || !all(expected_fields %in% names(solution))) {
         abort("`{field_name}` must be the output of `solve_model()` or `ROI::ROI_solve()`.",
               call = parent.frame())
     }
