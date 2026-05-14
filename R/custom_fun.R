@@ -226,7 +226,7 @@ diag_v <- function(x) {
     present_ind[] <- 1:length(present_ind)
 
     if (!is.matrix(present_ind)) {
-        browser()
+        abort("Internal error in diag_v()")
     }
 
     present_ind <- base::diag(present_ind)
@@ -273,7 +273,7 @@ parse_margin <- function(margin, variable) {
     }
     if (rlang::is_character(margin)) {
         if (!variable$raw) {
-            abort("Character `MARGIN` is only supported for unmodified.")
+            abort("Character `MARGIN` is only supported for unmodified variables.")
         }
 
         dnn <- names(dimnames(variable))

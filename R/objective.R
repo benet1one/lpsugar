@@ -15,7 +15,10 @@ lp_objective <- function(.problem, objective) {
     }
 
     if (!is_lp_variable(objective)) {
-        abort("`objective` must either be an expression containing variables.")
+        rlang::abort(c(
+            "`objective` must be an expression containing variables.",
+            "i" = "Alternatively, use `lp_minimize(0)` to set all coeficients to 0."
+        ))
     }
     if (length(objective) == 0L) {
         abort("`objective` evaluated to a variable of length 0.")
