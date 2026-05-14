@@ -84,6 +84,21 @@ test_that("apply on quadratic", {
     )
 })
 
+test_that("cumsum quadratic", {
+    p <- lp_problem() |>
+        lp_var(x[1:3]) |>
+        lp_alias(csx2 = cumsum(x^2))
+
+    xval <- c(2, -3, -7)
+    computed <- compute_aliases(p, list(x = xval))
+
+    expect_equal(
+        computed$csx2,
+        cumsum(xval^2),
+        ignore_attr = TRUE
+    )
+})
+
 test_that("quadratic solver", {
     withr::local_package("ROI.plugin.highs")
 

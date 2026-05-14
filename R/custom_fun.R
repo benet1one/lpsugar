@@ -106,6 +106,9 @@ Math.lp_variable <- function(x, ...) {
 
 cumsum_v <- function(x, call) {
     if (length(x) >= 2L) for (i in 2:length(x)) {
+        if (is_quadratic(x)) {
+            x$q_coef[[i]] <- x$q_coef[[i]] + x$q_coef[[i-1L]]
+        }
         x$coef[i, ] <- x$coef[i, ] + x$coef[i-1L, ]
     }
 
