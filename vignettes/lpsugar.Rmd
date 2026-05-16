@@ -226,3 +226,78 @@ pf$objective
 
 
 ### Constraints
+
+Constraints are equalities or inequalities that restrict the variables. For instance,
+$x \ge y+2$ would be defined with the following code:
+
+```{r}
+p <- lp_problem() |> 
+    lp_variable(x) |> 
+    lp_variable(y) |> 
+    lp_constraint(x >= y + 2)
+```
+
+Often, constraints are defined in groups. In algebra, we use *forall* $(\forall)$.
+Take this constraint:
+
+$$
+k \cdot x_k \le y_{n-k+1} \qquad \forall k \in 1..n
+$$
+
+It can be defined by replacing the *forall* with a `for` loop.
+
+```{r}
+n <- 3
+
+p <- lp_problem() |> 
+    lp_variable(x[1:n]) |> 
+    lp_variable(y[1:n]) |> 
+    lp_constraint(
+        my_constraint = for (k in 1:n) {
+            k * x[k] <= y[n-k+1]
+        }
+    )
+
+p$constraints
+```
+
+Since `lpsugar` supports vectorized operations, it's possible to define the same constraint
+as:
+
+```{r}
+p2 <- p |> 
+    lp_constraint(
+        alt_constraint = {
+            (1:n) * x <= rev(y)
+        }
+    )
+
+p2$constraints["alt_constraint"]
+```
+
+
+Constraints can contain multiple lines of code, which makes it possible to divide
+complex operations more clearly. They can also contain `if` statements, as long as
+the condition does not contain any variables.
+
+```{r}
+n <- 4
+y0 <- 5
+
+p <- lp_problem() |> 
+    lp_var(y[1:n], lower = 0) |> 
+    lp_con(
+        order_con = for (t in 1:n) {
+            if (t == 1) {
+                y_prior <- y0
+            } else {
+                y_prior <- y[t-1]
+            }
+            
+            y[t] >= 2 * (y_prior + 1)
+        }
+    )
+
+p$constraints
+```
+
