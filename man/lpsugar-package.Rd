@@ -12,6 +12,7 @@ Algebraic Modeling Language inspired in R's vectorized syntax. Define Mixed Inte
 Useful links:
 \itemize{
   \item \url{https://github.com/benet1one/lpsugar}
+  \item \url{https://benet1one.github.io/lpsugar/}
   \item Report bugs at \url{https://github.com/benet1one/lpsugar/issues}
 }
 
