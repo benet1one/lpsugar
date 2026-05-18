@@ -1,7 +1,6 @@
 
 First Release
-- Quick Start
-- Check argument types in functions
+- Improve Quick Start
 
 Code
 - drop R's colSums and export slam::col_sums?

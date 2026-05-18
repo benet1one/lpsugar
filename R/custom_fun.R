@@ -234,7 +234,7 @@ diag_v <- function(x) {
     present_ind[] <- 1:length(present_ind)
 
     if (!is.matrix(present_ind)) {
-        browser()
+        abort("Internal error in diag_v()")
     }
 
     present_ind <- base::diag(present_ind)
@@ -281,7 +281,7 @@ parse_margin <- function(margin, variable) {
     }
     if (rlang::is_character(margin)) {
         if (!variable$raw) {
-            abort("Character `MARGIN` is only supported for unmodified.")
+            abort("Character `MARGIN` is only supported for unmodified variables.")
         }
 
         dnn <- names(dimnames(variable))
@@ -311,32 +311,30 @@ ifelse_v <- function(test, yes, no) {
 ifelse_l <- function(test, yes, no) {
     # Default R code from `ifelse`
     if (is.atomic(test)) {
-        if (typeof(test) != "logical") {
+        if (typeof(test) != "logical")
             storage.mode(test) <- "logical"
-        }
-
         if (length(test) == 1 && is.null(attributes(test))) {
-            if (is.na(test)) {
+            if (is.na(test))
                 return(NA)
-            } else if (test && length(yes) == 1) {
-                yat <- attributes(yes)
-                if (is.null(yat) || (is.function(yes) && identical(names(yat), "srcref"))){
-                    return(yes)
-                }
-            } else if (length(no) == 1) {
-                nat <- attributes(no)
-                if (is.null(nat) || (is.function(no) && identical(names(nat), "srcref"))) {
-                    return(no)
+            else if (test) {
+                if (length(yes) == 1) {
+                    yat <- attributes(yes)
+                    if (is.null(yat) || (is.function(yes) && identical(names(yat),
+                                                                       "srcref")))
+                        return(yes)
                 }
             }
-        }
-    } else {
-        test <- if (isS4(test)) {
-            methods::as(test, "logical")
-        } else {
-            as.logical(test)
+            else if (length(no) == 1) {
+                nat <- attributes(no)
+                if (is.null(nat) || (is.function(no) && identical(names(nat),
+                                                                  "srcref")))
+                    return(no)
+            }
         }
     }
+    else test <- if (isS4(test))
+        methods::as(test, "logical")
+    else as.logical(test)
 
     # lpsugar code
     len <- length(test)
