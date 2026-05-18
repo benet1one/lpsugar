@@ -272,10 +272,7 @@ also returns any feasible solution, with the objective value as 0.
 
 pf <- p |> lp_minimize(0)
 pf$objective
-#> minimize  
-#> $coef
-#> x[1,a] x[2,a] x[3,a] x[1,b] x[2,b] x[3,b] 
-#>      0      0      0      0      0      0
+#> find a feasible solution
 ```
 
 ### Constraints

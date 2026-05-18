@@ -35,9 +35,7 @@ p <- lp_problem() |>
   lp_variable(x[1:2, 1:3]) |>
   lp_minimize(sum_over(i = 1:2, j = 1:3, x[i, j] * cost[j]))
 p$objective
-#> minimize sum_over(i = 1:2, j = 1:3, x[i, j] * cost[j]) 
-#> $coef
-#> x[1,1] x[2,1] x[1,2] x[2,2] x[1,3] x[2,3] 
-#>      5      5      2      2      7      7 
+#> minimize linear function:
+#> sum_over(i = 1:2, j = 1:3, x[i, j] * cost[j])
 #> 
 ```

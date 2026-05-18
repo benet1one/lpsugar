@@ -65,11 +65,8 @@ p <- lp_problem() |>
     lp_constraint(sum(made) <= 1500)
 
 p$objective
-#> maximize total_profit - fix_cost 
-#> sum(coef*vars) - 11000
-#> $coef
-#>  made[Phone] made[Tablet]  made[eBook] 
-#>           60           20           10 
+#> maximize linear function:
+#> total_profit - fix_cost
 #> 
 
 library(ROI) |> suppressMessages()
