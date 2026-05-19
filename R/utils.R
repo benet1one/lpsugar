@@ -63,6 +63,11 @@ ndim <- function(x, drop = FALSE) {
 non_conformable <- function(x, y) {
     length(x) > 1L && length(y) > 1L && length(x) != length(y)
 }
+check_conformable <- function(x, y, call = environment()) {
+    if (non_conformable(x, y)) {
+        abort("Non-conformable arrays", call = call)
+    }
+}
 compatible_dimensions <- function(x, y, drop_dim = TRUE) {
     if (is_lp_variable(x)) {
         x <- x$ind
@@ -92,6 +97,9 @@ is_problem <- function(x) {
 }
 is_lp_variable <- function(x) {
     inherits(x, "lp_variable")
+}
+is_lp_objective <- function(x) {
+    inherits(x, "lp_objective")
 }
 is_lp_constraint <- function(x, empty_valid = TRUE) {
     is_con <- inherits(x, "lp_constraint")
@@ -169,4 +177,3 @@ inside <- function(expr) {
 
     expr
 }
-

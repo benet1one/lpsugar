@@ -185,7 +185,13 @@ lp_var <- lp_variable
 #' @export
 print.lp_variable <- function(x, ...) {
     if (!x$raw) {
-        unclass(x)[c("coef", "add")] |> print()
+        fields <- if (is_quadratic(x)) {
+            c(c("q_coef", "coef", "add"))
+        } else {
+            c("coef", "add")
+        }
+
+        unclass(x)[fields] |> print()
         return(invisible(x))
     }
 
@@ -289,6 +295,10 @@ bind_vars <- function(...) {
             e <- dots_expr[[i]] |> format1()
             abort("`{e}` is not numeric or an `lp_variable`.")
         }
+        # if (is_lp_variable(x) && is_quadratic(x)) {
+        #     e <- dots_expr[[i]] |> format1()
+        #     abort("Quadratic variables such as `{e}` are not currently supported in `bind_vars()`")
+        # }
     }
 
     purrr::reduce(dots, function(x, y) {
@@ -308,20 +318,38 @@ bind_vars <- function(...) {
 }
 bind_vv <- function(x, y) {
     z <- x
-    z$ind  <- seq_len(length(x) + length(y)) |> unname() |> robust_index()
+    z$ind  <- seq_len(length(x) + length(y)) |>
+        unname() |>
+        robust_index()
+
+    if (is_quadratic(x) || is_quadratic(y)) {
+        x <- as_quadratic(x)
+        y <- as_quadratic(y)
+        z$q_coef <- c(x$q_coef, y$q_coef)
+    }
+
     z$coef <- rbind(x$coef, y$coef) |> robust_index()
     z$add  <- rbind(x$add,  y$add)  |> robust_index()
     z$raw  <- FALSE
     return(z)
 }
 bind_vc <- function(x, y) {
-    x$ind <- c(x$ind, numeric(length(y))) |> unname() |> robust_index()
+    x$ind <- c(x$ind, numeric(length(y))) |>
+        unname() |>
+        robust_index()
     x$ind[] <- 1:length(x$ind)
+
+    if (is_quadratic(x)) {
+        q <- x$q_coef[[1]]
+        y_q_coef <- q_list_multiply(q, 0)
+        x$q_coef <- c(x$q_coef, y_q_coef)
+    }
 
     x$coef <- rbind(
         x$coef,
         matrix(0, nrow = length(y), ncol = ncol(x$coef))
     ) |> robust_index()
+
     x$add <- rbind(
         x$add,
         matrix(y, ncol = 1L)
@@ -356,6 +384,10 @@ bind_cv <- function(x, y) {
     old_ind <- c(old_ind)
     x$ind <- x$ind[..., drop = drop]
     x$raw <- FALSE
+
+    if (is_quadratic(x)) {
+        x$q_coef <- x$q_coef[old_ind]
+    }
 
     x$coef <- x$coef[old_ind, ]
     x$add <- x$add[old_ind, ]
@@ -518,6 +550,11 @@ recycle_var <- function(x, n) {
     } else if (length(x) == 1L) {
         i <- rep(1L, n)
         x$ind <- x$ind[i]
+
+        if (is_quadratic(x)) {
+            x$q_coef <- x$q_coef[i]
+        }
+
         x$coef <- x$coef[i, ]
         x$add <- x$add[i, ]
         x$raw <- FALSE
@@ -536,3 +573,39 @@ recycle_const <- function(x, n) {
     abort("Attempt to recycle array of length ({length(x)}) to length ({n}).")
 }
 
+# Quadratic -----------------------
+
+get_q_coef <- function(x) {
+    if (is_quadratic(x)) {
+        return(x$q_coef)
+    }
+
+    qmat <- matrix(
+        0,
+        nrow = ncol(x$coef),
+        ncol = ncol(x$coef),
+        dimnames = list(
+            colnames(x$coef),
+            colnames(x$coef)
+        )
+    )
+
+    list(qmat) |> rep(length(x))
+}
+
+is_quadratic <- function(x) {
+    (is_lp_variable(x) || is_lp_objective(x)) &&
+        (!is.null(x$q_coef))
+}
+
+as_quadratic <- function(x) {
+    if (is_quadratic(x)) {
+        return(x)
+    }
+    if (!is_lp_variable(x) && !is_lp_objective(x)) {
+        abort("`x` must be a variable or an objective function.")
+    }
+
+    x$q_coef <- get_q_coef(x)
+    return(x)
+}

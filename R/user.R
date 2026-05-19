@@ -265,8 +265,20 @@ bound_summary <- function(problem, solution, tol = 2e-6) {
 #' @export
 compute_objective <- function(problem, solution) {
     solution <- solution_to_vec(problem, solution)
-    out <- crossprod(problem$objective$coef, solution) +
-        problem$objective$add
+
+    coef <- problem$objective$coef
+    add <- problem$objective$add
+    out <- crossprod(coef, solution) + add
+
+    if (is_quadratic(problem$objective)) {
+        row_sol <- t(solution)
+        col_sol <- t(row_sol)
+        q <- problem$objective$q_coef
+
+        q_out <- 0.5 * row_sol %*% q %*% col_sol
+        out <- out + q_out
+    }
+
     out[1]
 }
 
@@ -279,6 +291,17 @@ compute_aliases <- function(problem, solution) {
         mat <- array(unclass(a$coef), dim = dim(a$coef))
         add <- unclass(a$add)
         out <- mat %*% solution + add
+
+        if (is_quadratic(a)) {
+            row_sol <- t(solution)
+            col_sol <- t(row_sol)
+
+            q_out <- purrr::map_dbl(a$q_coef, function(qi) {
+                0.5 * row_sol %*% qi %*% col_sol
+            })
+
+            out <- out + q_out
+        }
 
         if (length(out) == 1L) {
             unname(out[1])
