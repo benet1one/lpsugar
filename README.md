@@ -26,7 +26,7 @@ You can install the development version of lpsugar from
 pak::pak("benet1one/lpsugar")
 ```
 
-## Quick Example
+## Quick Examples
 
 Start with a simple problem to show the basic syntax.
 
@@ -64,99 +64,60 @@ my_solution$objective
 #> [1] 5
 ```
 
-## Production Problem
-
-Given a set of limited `resources`, we can make `products`. Each product
-takes a certain amount of resources and sells at a `price`. We wish to
-maximize earnings.
-
-``` r
-available <- c(Material = 20, Labour = 10)
-price <- c(A = 150, B = 220, C = 160)
-
-resources <- names(available)
-products <- names(price)
-
-required <- c(
-    # A, B, C
-      6, 3, 4, # Material
-      2, 3, 1  # Labour
-      
-) |> parameter(resources, products)
-
-# parameter() sets the dimensions and names
-required
-#>           products
-#> resources  A B C
-#>   Material 6 3 4
-#>   Labour   2 3 1
-
-production_problem <- lp_problem() |> 
-    lp_var(units[products], integer = TRUE, lower = 0) |> 
-    lp_max(sum(price * units)) |> 
-    lp_con(
-        for (r in resources) {
-            sum_over(p=products, units[p] * required[r,p]) <= available[r]
-        }
-    )
-
-production_solution <- lp_solve(production_problem)
-production_solution$objective
-#> [1] 920
-production_solution$variables
-#> $units
-#> products
-#> A B C 
-#> 0 2 3
-```
-
-## Transportation Problem
+### Transportation Problem
 
 Here’s an example solving the classic transportation problem. We shall
-transport `u[f, w]` units from factory `f` to warehousse `w`, subject to
-a `supply[f]` and a `demand[w]`. We will minimize the total `cost`.
+transport `x[f, m]` units from factory `f` to market `m`, subject to a
+`supply[f]` and a `demand[m]`. We will minimize the total transportation
+`cost`.
 
 ``` r
-factory <- paste0("fct", 1:3)
-warehouse <- c("A", "B", "C", "D")
+supply <- c(BLB = 20, ACO = 25, GRN = 15)
+demand <- c(Madrid = 8, Barcelona = 10, Valencia = 12, Seville = 10)
 
-supply <- c(20, 25, 15) |> parameter(factory)
-demand <- c(8, 10, 12, 10) |> parameter(warehouse)
+factory <- names(supply)
+market <- names(demand)
 
 cost <- c(
-    # A, B, C, D
       2, 7, 3, 1,
       6, 2, 9, 2,
       4, 6, 2, 8
-      
-) |> parameter(factory, warehouse)
+) |> parameter(factory, market)
 
 cost
-#>        warehouse
-#> factory A B C D
-#>    fct1 2 7 3 1
-#>    fct2 6 2 9 2
-#>    fct3 4 6 2 8
+#>        market
+#> factory Madrid Barcelona Valencia Seville
+#>     BLB      2         7        3       1
+#>     ACO      6         2        9       2
+#>     GRN      4         6        2       8
 
 transportation_problem <- lp_problem() |> 
-    lp_variable(u[factory, warehouse], integer = TRUE, lower = 0) |> 
-    lp_minimize(sum(u * cost)) |> 
+    lp_variable(
+        x[factory, market], 
+        integer = TRUE, 
+        lower = 0
+    ) |> 
+    lp_minimize(
+        sum_over(f = factory, m = market, x[f, m] * cost[f, m])
+    ) |> 
     lp_constraint(
-        for (f in factory)   sum(u[f, ]) <= supply[f],
-        for (w in warehouse) sum(u[, w]) >= demand[w]
-        # Alternatively, using vectorization:
-        # rowSums(u) <= supply,
-        # colSums(u) >= demand
+        for (f in factory) sum(x[f, ]) <= supply[f],
+        for (m in market)  sum(x[, m]) >= demand[m]
     )
 
 transportation_solution <- lp_solve(transportation_problem)
+transportation_solution$variables$x
+#>        market
+#> factory Madrid Barcelona Valencia Seville
+#>     BLB      8         0        0      10
+#>     ACO      0        10        0       0
+#>     GRN      0         0       12       0
 transportation_solution$objective
 #> [1] 70
-transportation_solution$variables
-#> $u
-#>        warehouse
-#> factory A  B  C  D
-#>    fct1 8  0  0 10
-#>    fct2 0 10  0  0
-#>    fct3 0  0 12  0
 ```
+
+## Vignettes
+
+For more examples, see the
+[vignettes](https://benet1one.github.io/lpsugar/articles/) in the
+package website.
