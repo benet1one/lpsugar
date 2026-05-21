@@ -6,7 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>lpsugar • lpsugar</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -79,55 +85,54 @@ and how to define them with <code>lpsugar</code>.</p>
 <li>Sets
 <ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
-- <code>factory</code>
+<span class="math inline">\(F\)</span> - <code>factory</code>
 </li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
-- <code>market</code>
+<span class="math inline">\(M\)</span> - <code>market</code>
 </li>
 </ul>
 </li>
 <li>Parameters
 <ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
-- <code>supply</code> produced by each <code>factory</code>.</li>
+<span class="math inline">\(s\)</span> - <code>supply</code>
+produced by each <code>factory</code>.</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>
-- <code>demand</code> on each <code>market</code>.</li>
+<span class="math inline">\(d\)</span> - <code>demand</code> on each
+<code>market</code>.</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
-- <code>cost</code> to transport a unit from each <code>factory</code>
-to each <code>market</code>.</li>
+<span class="math inline">\(c\)</span> - <code>cost</code> to
+transport a unit from each <code>factory</code> to each
+<code>market</code>.</li>
 </ul>
 </li>
 <li>Variable
 <ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-- <code>transport</code> products from each <code>factory</code> to each
+<span class="math inline">\(t\)</span> - <code>transport</code>
+products from each <code>factory</code> to each
 <code>market</code>.</li>
 </ul>
 </li>
 <li>Objective Function
 <ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">min</mi><mo>⁡</mo></mrow><msub><mo>∑</mo><mrow><mi>f</mi><mo>∈</mo><mi>F</mi></mrow></msub><msub><mo>∑</mo><mrow><mi>m</mi><mo>∈</mo><mi>M</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>c</mi><mrow><mi>f</mi><mi>m</mi></mrow></msub><msub><mi>t</mi><mrow><mi>f</mi><mi>m</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\min \sum_{f \in F} \sum_{m \in M} (c_{fm} t_{fm})</annotation></semantics></math>
-- <code>minimize sum(cost * transport)</code>
+<span class="math inline">\(\min \sum_{f \in F} \sum_{m \in M}
+(c_{fm} t_{fm})\)</span> -
+<code>minimize sum(cost * transport)</code>
 </li>
 </ul>
 </li>
 <li>Constraints
 <ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mrow><mi>m</mi><mo>∈</mo><mi>M</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>t</mi><mrow><mi>f</mi><mi>m</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>≤</mo><msub><mi>s</mi><mi>f</mi></msub><mspace width="1.0em"></mspace><mo>∀</mo><mi>f</mi><mo>∈</mo><mi>F</mi></mrow><annotation encoding="application/x-tex">\sum_{m\in M}({t_{fm}}) \le s_f \quad \forall f\in F</annotation></semantics></math>
--
+<span class="math inline">\(\sum_{m\in M}({t_{fm}}) \le s_f \quad
+\forall f\in F\)</span> -
 <code>for (f in factory) sum(transport[f, ]) &lt;= supply[f]</code>
 </li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mrow><mi>f</mi><mo>∈</mo><mi>F</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>t</mi><mrow><mi>f</mi><mi>m</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>≥</mo><msub><mi>d</mi><mi>m</mi></msub><mspace width="1.0em"></mspace><mo>∀</mo><mi>m</mi><mo>∈</mo><mi>M</mi></mrow><annotation encoding="application/x-tex">\sum_{f\in F}({t_{fm}}) \ge d_m \quad \forall m\in M</annotation></semantics></math>
--
+<span class="math inline">\(\sum_{f\in F}({t_{fm}}) \ge d_m \quad
+\forall m\in M\)</span> -
 <code>for (m in market)  sum(transport[, m]) &gt;= demand[m]</code>
 </li>
 </ul>
@@ -188,12 +193,7 @@ the solver automatically.</p>
 <h3 id="sets">Sets<a class="anchor" aria-label="anchor" href="#sets"></a>
 </h3>
 <p>Sets are vectors of indices that a variable or parameter will use.
-For instance, we could define a set
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">S=\{a,b,c\}</annotation></semantics></math>
-to use for a parameter
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>w</mi><mi>i</mi></msub><msub><mo stretchy="false" form="postfix">}</mo><mrow><mi>i</mi><mo>∈</mo><mi>S</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\{w_i\}_{i \in S}</annotation></semantics></math>
-and a variable
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>x</mi><mi>i</mi></msub><msub><mo stretchy="false" form="postfix">}</mo><mrow><mi>i</mi><mo>∈</mo><mi>S</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\{x_i\}_{i \in S}</annotation></semantics></math>.</p>
+For instance, we could define a set <span class="math inline">\(S=\{a,b,c\}\)</span> to use for a parameter <span class="math inline">\(\{w_i\}_{i \in S}\)</span> and a variable <span class="math inline">\(\{x_i\}_{i \in S}\)</span>.</p>
 <p>In <code>lpsugar</code> we define sets and parameters as base R
 objects. Variables are defined inside a problem.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -221,16 +221,15 @@ necessary to name their dimensions, but it’s a good practice, and it
 pays off in the long run.</p>
 <p>For vectors, I recommend using R’s name-value syntax, but it’s also
 possible to use <code>parameter</code>. These are all different
-alternatives for defining
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>w</mi><mi>i</mi></msub><msub><mo stretchy="false" form="postfix">}</mo><mrow><mi>i</mi><mo>∈</mo><mi>S</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\{w_i\}_{i \in S}</annotation></semantics></math>:</p>
+alternatives for defining <span class="math inline">\(\{w_i\}_{i \in
+S}\)</span>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span></span>
 <span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">3</span>, b <span class="op">=</span> <span class="fl">2</span>, c <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">S</span><span class="op">)</span></span>
 <span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">6</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/parameter.html">parameter</a></span><span class="op">(</span><span class="va">S</span><span class="op">)</span></span></code></pre></div>
 <p>For matrices, you can use <code>parameter</code> to define them
-comfortable within the code. Let’s define
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>m</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mo stretchy="false" form="postfix">}</mo><mrow><mi>i</mi><mo>∈</mo><mi>S</mi><mo>,</mo><mspace width="0.222em"></mspace><mi>j</mi><mo>∈</mo><mi>R</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\{m_{ij}\}_{i\in S,\ j\in R}</annotation></semantics></math>.</p>
+comfortable within the code. Let’s define <span class="math inline">\(\{m_{ij}\}_{i\in S,\ j\in R}\)</span>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span></span>
 <span><span class="va">R</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span></span>
@@ -263,8 +262,8 @@ matrix, I recommend setting it’s names using <code>rownames</code> and
 <span><span class="co">#&gt; c 5 6</span></span></code></pre></div>
 <p>For n-dimensional arrays, <code>parameter</code> does not work (by
 design), so the only option is to use <code>dimnames</code>. We will
-define a parameter
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi><mi>k</mi></mrow></msub><msub><mo stretchy="false" form="postfix">}</mo><mrow><mi>i</mi><mo>∈</mo><mi>S</mi><mo>,</mo><mspace width="0.222em"></mspace><mi>j</mi><mo>∈</mo><mi>R</mi><mo>,</mo><mspace width="0.222em"></mspace><mi>k</mi><mo>∈</mo><mi>Q</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\{a_{ijk}\}_{i\in S,\ j\in R,\ k\in Q}</annotation></semantics></math></p>
+define a parameter <span class="math inline">\(\{a_{ijk}\}_{i\in S,\
+j\in R,\ k\in Q}\)</span></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span></span>
 <span><span class="va">R</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span></span>
@@ -296,14 +295,14 @@ define a parameter
 <p>Variables are numbers that the solver will change in order to find
 the optimal solution. In <code>lpsugar</code>, variables can be scalars,
 vectors, or n-dimensional arrays. Their dimensions are defined using
-sets. For instance, a variable
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mo stretchy="false" form="postfix">}</mo><mrow><mi>i</mi><mo>∈</mo><mi>A</mi><mo>,</mo><mspace width="0.222em"></mspace><mi>j</mi><mo>∈</mo><mi>B</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\{x_{ij}\}_{i \in A,\ j \in B}</annotation></semantics></math>
-can be defined as <code>lp_variable(x[A, B])</code>.</p>
+sets. For instance, a variable <span class="math inline">\(\{x_{ij}\}_{i
+\in A,\ j \in B}\)</span> can be defined as
+<code>lp_variable(x[A, B])</code>.</p>
 <p>By default, their <code>lower</code> and <code>upper</code> bounds
 are <code>-Inf</code> to <code>+Inf</code>. It’s possible to set a
 variable to <code>integer</code> or <code>binary</code>. Let us define a
-vector variable
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>x</mi><mi>i</mi></msub><mo>∈</mo><mi>ℕ</mi><msub><mo stretchy="false" form="postfix">}</mo><mrow><mi>i</mi><mo>∈</mo><mn>1</mn><mi>.</mi><mn>.5</mn></mrow></msub></mrow><annotation encoding="application/x-tex">\{x_i \in \mathbb{N}\}_{i \in 1..5}</annotation></semantics></math>.</p>
+vector variable <span class="math inline">\(\{x_i \in \mathbb{N}\}_{i
+\in 1..5}\)</span>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>, lower <span class="op">=</span> <span class="fl">0</span>, integer <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -315,9 +314,9 @@ vector variable
 minimize or maximize. It is set using <code><a href="../reference/lp_objective.html">lp_minimize()</a></code> or
 <code><a href="../reference/lp_objective.html">lp_maximize()</a></code>.</p>
 <p>Let us minimize the following sum:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo>∑</mo><mrow><mi>i</mi><mo>∈</mo><mi>I</mi></mrow></munder><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>J</mi></mrow></munder><mrow><msub><mi>s</mi><mi>j</mi></msub><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">\[
 \sum_{i \in I}\sum_{j \in J}{s_j x_{ij}}
-</annotation></semantics></math></p>
+\]</span></p>
 <p>We’ll use <code><a href="../reference/sum_over.html">sum_over()</a></code> to sum over the indices.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">I</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span>
@@ -349,8 +348,7 @@ objective value as 0.</p>
 <h3 id="constraints">Constraints<a class="anchor" aria-label="anchor" href="#constraints"></a>
 </h3>
 <p>Constraints are equalities or inequalities that restrict the
-variables. For instance,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>≥</mo><mi>y</mi><mo>+</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">x \ge y+2</annotation></semantics></math>
+variables. For instance, <span class="math inline">\(x \ge y+2\)</span>
 would be defined with the following code:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -358,12 +356,11 @@ would be defined with the following code:</p>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_constraint</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;=</span> <span class="va">y</span> <span class="op">+</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p>Often, constraints are defined in groups. In algebra, we use
-<em>forall</em>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mo>∀</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(\forall)</annotation></semantics></math>.
-Take this constraint:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>⋅</mo><msub><mi>x</mi><mi>k</mi></msub><mo>≤</mo><msub><mi>y</mi><mrow><mi>n</mi><mo>−</mo><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mspace width="2.0em"></mspace><mo>∀</mo><mi>k</mi><mo>∈</mo><mn>1</mn><mi>.</mi><mi>.</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">
+<em>forall</em> <span class="math inline">\((\forall)\)</span>. Take
+this constraint:</p>
+<p><span class="math display">\[
 k \cdot x_k \le y_{n-k+1} \qquad \forall k \in 1..n
-</annotation></semantics></math></p>
+\]</span></p>
 <p>It can be defined by replacing the <em>forall</em> with a
 <code>for</code> loop.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">

@@ -13,22 +13,22 @@ library(lpsugar)
 The elements of a transportation problem are these:
 
 - Sets
-  - $`F`$ - `factory`
-  - $`M`$ - `market`
+  - \\F\\ - `factory`
+  - \\M\\ - `market`
 - Parameters
-  - $`s`$ - `supply` produced by each `factory`.
-  - $`d`$ - `demand` on each `market`.
-  - $`c`$ - `cost` to transport a unit from each `factory` to each
+  - \\s\\ - `supply` produced by each `factory`.
+  - \\d\\ - `demand` on each `market`.
+  - \\c\\ - `cost` to transport a unit from each `factory` to each
     `market`.
 - Variable
-  - $`t`$ - `transport` products from each `factory` to each `market`.
+  - \\t\\ - `transport` products from each `factory` to each `market`.
 - Objective Function
-  - $`\min \sum_{f \in F} \sum_{m \in M} (c_{fm} t_{fm})`$ -
+  - \\\min \sum\_{f \in F} \sum\_{m \in M} (c\_{fm} t\_{fm})\\ -
     `minimize sum(cost * transport)`
 - Constraints
-  - $`\sum_{m\in M}({t_{fm}}) \le s_f \quad \forall f\in F`$ -
+  - \\\sum\_{m\in M}({t\_{fm}}) \le s_f \quad \forall f\in F\\ -
     `for (f in factory) sum(transport[f, ]) <= supply[f]`
-  - $`\sum_{f\in F}({t_{fm}}) \ge d_m \quad \forall m\in M`$ -
+  - \\\sum\_{f\in F}({t\_{fm}}) \ge d_m \quad \forall m\in M\\ -
     `for (m in market) sum(transport[, m]) >= demand[m]`
 
 Let’s define the problem in `lpsugar`.
@@ -91,8 +91,8 @@ solution$variables
 ### Sets
 
 Sets are vectors of indices that a variable or parameter will use. For
-instance, we could define a set $`S=\{a,b,c\}`$ to use for a parameter
-$`\{w_i\}_{i \in S}`$ and a variable $`\{x_i\}_{i \in S}`$.
+instance, we could define a set \\S=\\a,b,c\\\\ to use for a parameter
+\\\\w_i\\\_{i \in S}\\ and a variable \\\\x_i\\\_{i \in S}\\.
 
 In `lpsugar` we define sets and parameters as base R objects. Variables
 are defined inside a problem.
@@ -124,7 +124,7 @@ pays off in the long run.
 
 For vectors, I recommend using R’s name-value syntax, but it’s also
 possible to use `parameter`. These are all different alternatives for
-defining $`\{w_i\}_{i \in S}`$:
+defining \\\\w_i\\\_{i \in S}\\:
 
 ``` r
 
@@ -135,7 +135,7 @@ w <- c(3, 2, 6) |> parameter(S)
 ```
 
 For matrices, you can use `parameter` to define them comfortable within
-the code. Let’s define $`\{m_{ij}\}_{i\in S,\ j\in R}`$.
+the code. Let’s define \\\\m\_{ij}\\\_{i\in S,\\ j\in R}\\.
 
 ``` r
 
@@ -175,7 +175,7 @@ m
 
 For n-dimensional arrays, `parameter` does not work (by design), so the
 only option is to use `dimnames`. We will define a parameter
-$`\{a_{ijk}\}_{i\in S,\ j\in R,\ k\in Q}`$
+\\\\a\_{ijk}\\\_{i\in S,\\ j\in R,\\ k\in Q}\\
 
 ``` r
 
@@ -209,12 +209,12 @@ a
 Variables are numbers that the solver will change in order to find the
 optimal solution. In `lpsugar`, variables can be scalars, vectors, or
 n-dimensional arrays. Their dimensions are defined using sets. For
-instance, a variable $`\{x_{ij}\}_{i \in A,\ j \in B}`$ can be defined
-as `lp_variable(x[A, B])`.
+instance, a variable \\\\x\_{ij}\\\_{i \in A,\\ j \in B}\\ can be
+defined as `lp_variable(x[A, B])`.
 
 By default, their `lower` and `upper` bounds are `-Inf` to `+Inf`. It’s
 possible to set a variable to `integer` or `binary`. Let us define a
-vector variable $`\{x_i \in \mathbb{N}\}_{i \in 1..5}`$.
+vector variable \\\\x_i \in \mathbb{N}\\\_{i \in 1..5}\\.
 
 ``` r
 
@@ -232,9 +232,7 @@ or
 
 Let us minimize the following sum:
 
-``` math
-\sum_{i \in I}\sum_{j \in J}{s_j x_{ij}}
-```
+\\ \sum\_{i \in I}\sum\_{j \in J}{s_j x\_{ij}} \\
 
 We’ll use
 [`sum_over()`](https://benet1one.github.io/lpsugar/reference/sum_over.md)
@@ -278,7 +276,7 @@ pf$objective
 ### Constraints
 
 Constraints are equalities or inequalities that restrict the variables.
-For instance, $`x \ge y+2`$ would be defined with the following code:
+For instance, \\x \ge y+2\\ would be defined with the following code:
 
 ``` r
 
@@ -289,11 +287,9 @@ p <- lp_problem() |>
 ```
 
 Often, constraints are defined in groups. In algebra, we use *forall*
-$`(\forall)`$. Take this constraint:
+\\(\forall)\\. Take this constraint:
 
-``` math
-k \cdot x_k \le y_{n-k+1} \qquad \forall k \in 1..n
-```
+\\ k \cdot x_k \le y\_{n-k+1} \qquad \forall k \in 1..n \\
 
 It can be defined by replacing the *forall* with a `for` loop.
 

@@ -71,7 +71,7 @@ cost <- nodes |>
 ```
 
 We will solve it as a flow problem. We choose an arbitrary root node and
-make it send $`n`$ units of flow, where $`n`$ is the number of nodes.
+make it send \\n\\ units of flow, where \\n\\ is the number of nodes.
 Each node demands 1 unit.
 
 Our decision variable `flow[i, j]` indicates how many units flow from
@@ -116,8 +116,8 @@ msp <- msp |>
 ```
 
 Now let’s restrict the flow of the rest of the nodes. Let’s choose the
-1st node as our root. It will have a supply of $`n`$ units. Each other
-node will have a supply of $`0`$ and a demand of $`n`$.
+1st node as our root. It will have a supply of \\n\\ units. Each other
+node will have a supply of \\0\\ and a demand of \\n\\.
 
 ``` r
 
@@ -180,4 +180,8 @@ msp_solution$variables$has_flow
 
 ## Pathfinding
 
+Coming Soon.
+
 ## Traveling Salesman Problem
+
+Coming Soon.

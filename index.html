@@ -6,7 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Algebraic Modeling Language for Linear Problems • lpsugar</title>
-<script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -69,16 +75,16 @@
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"benet1one/lpsugar"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="quick-example">Quick Example<a class="anchor" aria-label="anchor" href="#quick-example"></a>
+<h2 id="quick-examples">Quick Examples<a class="anchor" aria-label="anchor" href="#quick-examples"></a>
 </h2>
 <p>Start with a simple problem to show the basic syntax.</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><mtext mathvariant="normal">max</mtext></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mi>x</mi><mo>+</mo><mi>y</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><mtext mathvariant="normal">st</mtext></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mn>2</mn><mi>x</mi><mo>+</mo><mi>y</mi><mo>≤</mo><mn>8</mn></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mn>2</mn><mi>x</mi><mo>+</mo><mn>3</mn><mi>y</mi><mo>≤</mo><mn>12</mn></mtd></mtr></mtable><annotation encoding="application/x-tex">
+<p><span class="math display">\[
 \begin{array}{rl}
   \text{max} &amp; x+y \\
   \text{st} &amp; 2x + y \le 8 \\
             &amp; 2x + 3y \le 12
 \end{array}
-</annotation></semantics></math></p>
+\]</span></p>
 <p>Let’s write the problem in lpsugar and solve it!</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/benet1one/lpsugar" class="external-link">lpsugar</a></span><span class="op">)</span></span>
@@ -102,97 +108,59 @@
 <span><span class="co">#&gt; [1] 2</span></span>
 <span><span class="va">my_solution</span><span class="op">$</span><span class="va">objective</span></span>
 <span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="production-problem">Production Problem<a class="anchor" aria-label="anchor" href="#production-problem"></a>
-</h2>
-<p>Given a set of limited <code>resources</code>, we can make <code>products</code>. Each product takes a certain amount of resources and sells at a <code>price</code>. We wish to maximize earnings.</p>
+<div class="section level3">
+<h3 id="transportation-problem">Transportation Problem<a class="anchor" aria-label="anchor" href="#transportation-problem"></a>
+</h3>
+<p>Here’s an example solving the classic transportation problem. We shall transport <code>x[f, m]</code> units from factory <code>f</code> to market <code>m</code>, subject to a <code>supply[f]</code> and a <code>demand[m]</code>. We will minimize the total transportation <code>cost</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">available</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Material <span class="op">=</span> <span class="fl">20</span>, Labour <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="va">price</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>A <span class="op">=</span> <span class="fl">150</span>, B <span class="op">=</span> <span class="fl">220</span>, C <span class="op">=</span> <span class="fl">160</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">supply</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>BLB <span class="op">=</span> <span class="fl">20</span>, ACO <span class="op">=</span> <span class="fl">25</span>, GRN <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span>
+<span><span class="va">demand</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Madrid <span class="op">=</span> <span class="fl">8</span>, Barcelona <span class="op">=</span> <span class="fl">10</span>, Valencia <span class="op">=</span> <span class="fl">12</span>, Seville <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">resources</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">available</span><span class="op">)</span></span>
-<span><span class="va">products</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">required</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="co"># A, B, C</span></span>
-<span>      <span class="fl">6</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="co"># Material</span></span>
-<span>      <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">1</span>  <span class="co"># Labour</span></span>
-<span>      </span>
-<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="reference/parameter.html">parameter</a></span><span class="op">(</span><span class="va">resources</span>, <span class="va">products</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># parameter() sets the dimensions and names</span></span>
-<span><span class="va">required</span></span>
-<span><span class="co">#&gt;           products</span></span>
-<span><span class="co">#&gt; resources  A B C</span></span>
-<span><span class="co">#&gt;   Material 6 3 4</span></span>
-<span><span class="co">#&gt;   Labour   2 3 1</span></span>
-<span></span>
-<span><span class="va">production_problem</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">units</span><span class="op">[</span><span class="va">products</span><span class="op">]</span>, integer <span class="op">=</span> <span class="cn">TRUE</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="reference/lp_objective.html">lp_max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">price</span> <span class="op">*</span> <span class="va">units</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="reference/lp_constraint.html">lp_con</a></span><span class="op">(</span></span>
-<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">r</span> <span class="kw">in</span> <span class="va">resources</span><span class="op">)</span> <span class="op">{</span></span>
-<span>            <span class="fu"><a href="reference/sum_over.html">sum_over</a></span><span class="op">(</span>p<span class="op">=</span><span class="va">products</span>, <span class="va">units</span><span class="op">[</span><span class="va">p</span><span class="op">]</span> <span class="op">*</span> <span class="va">required</span><span class="op">[</span><span class="va">r</span>,<span class="va">p</span><span class="op">]</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">available</span><span class="op">[</span><span class="va">r</span><span class="op">]</span></span>
-<span>        <span class="op">}</span></span>
-<span>    <span class="op">)</span></span>
-<span></span>
-<span><span class="va">production_solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="va">production_problem</span><span class="op">)</span></span>
-<span><span class="va">production_solution</span><span class="op">$</span><span class="va">objective</span></span>
-<span><span class="co">#&gt; [1] 920</span></span>
-<span><span class="va">production_solution</span><span class="op">$</span><span class="va">variables</span></span>
-<span><span class="co">#&gt; $units</span></span>
-<span><span class="co">#&gt; products</span></span>
-<span><span class="co">#&gt; A B C </span></span>
-<span><span class="co">#&gt; 0 2 3</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="transportation-problem">Transportation Problem<a class="anchor" aria-label="anchor" href="#transportation-problem"></a>
-</h2>
-<p>Here’s an example solving the classic transportation problem. We shall transport <code>u[f, w]</code> units from factory <code>f</code> to warehousse <code>w</code>, subject to a <code>supply[f]</code> and a <code>demand[w]</code>. We will minimize the total <code>cost</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">factory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"fct"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
-<span><span class="va">warehouse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">supply</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">25</span>, <span class="fl">15</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="reference/parameter.html">parameter</a></span><span class="op">(</span><span class="va">factory</span><span class="op">)</span></span>
-<span><span class="va">demand</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">12</span>, <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="reference/parameter.html">parameter</a></span><span class="op">(</span><span class="va">warehouse</span><span class="op">)</span></span>
+<span><span class="va">factory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">supply</span><span class="op">)</span></span>
+<span><span class="va">market</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">demand</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">cost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="co"># A, B, C, D</span></span>
 <span>      <span class="fl">2</span>, <span class="fl">7</span>, <span class="fl">3</span>, <span class="fl">1</span>,</span>
 <span>      <span class="fl">6</span>, <span class="fl">2</span>, <span class="fl">9</span>, <span class="fl">2</span>,</span>
 <span>      <span class="fl">4</span>, <span class="fl">6</span>, <span class="fl">2</span>, <span class="fl">8</span></span>
-<span>      </span>
-<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="reference/parameter.html">parameter</a></span><span class="op">(</span><span class="va">factory</span>, <span class="va">warehouse</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="reference/parameter.html">parameter</a></span><span class="op">(</span><span class="va">factory</span>, <span class="va">market</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">cost</span></span>
-<span><span class="co">#&gt;        warehouse</span></span>
-<span><span class="co">#&gt; factory A B C D</span></span>
-<span><span class="co">#&gt;    fct1 2 7 3 1</span></span>
-<span><span class="co">#&gt;    fct2 6 2 9 2</span></span>
-<span><span class="co">#&gt;    fct3 4 6 2 8</span></span>
+<span><span class="co">#&gt;        market</span></span>
+<span><span class="co">#&gt; factory Madrid Barcelona Valencia Seville</span></span>
+<span><span class="co">#&gt;     BLB      2         7        3       1</span></span>
+<span><span class="co">#&gt;     ACO      6         2        9       2</span></span>
+<span><span class="co">#&gt;     GRN      4         6        2       8</span></span>
 <span></span>
 <span><span class="va">transportation_problem</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="reference/lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">u</span><span class="op">[</span><span class="va">factory</span>, <span class="va">warehouse</span><span class="op">]</span>, integer <span class="op">=</span> <span class="cn">TRUE</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="reference/lp_objective.html">lp_minimize</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">u</span> <span class="op">*</span> <span class="va">cost</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="reference/lp_variable.html">lp_variable</a></span><span class="op">(</span></span>
+<span>        <span class="va">x</span><span class="op">[</span><span class="va">factory</span>, <span class="va">market</span><span class="op">]</span>, </span>
+<span>        integer <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>        lower <span class="op">=</span> <span class="fl">0</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="reference/lp_objective.html">lp_minimize</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="reference/sum_over.html">sum_over</a></span><span class="op">(</span>f <span class="op">=</span> <span class="va">factory</span>, m <span class="op">=</span> <span class="va">market</span>, <span class="va">x</span><span class="op">[</span><span class="va">f</span>, <span class="va">m</span><span class="op">]</span> <span class="op">*</span> <span class="va">cost</span><span class="op">[</span><span class="va">f</span>, <span class="va">m</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="reference/lp_constraint.html">lp_constraint</a></span><span class="op">(</span></span>
-<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">f</span> <span class="kw">in</span> <span class="va">factory</span><span class="op">)</span>   <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">u</span><span class="op">[</span><span class="va">f</span>, <span class="op">]</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">supply</span><span class="op">[</span><span class="va">f</span><span class="op">]</span>,</span>
-<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">w</span> <span class="kw">in</span> <span class="va">warehouse</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">u</span><span class="op">[</span>, <span class="va">w</span><span class="op">]</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="va">demand</span><span class="op">[</span><span class="va">w</span><span class="op">]</span></span>
-<span>        <span class="co"># Alternatively, using vectorization:</span></span>
-<span>        <span class="co"># rowSums(u) &lt;= supply,</span></span>
-<span>        <span class="co"># colSums(u) &gt;= demand</span></span>
+<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">f</span> <span class="kw">in</span> <span class="va">factory</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">f</span>, <span class="op">]</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">supply</span><span class="op">[</span><span class="va">f</span><span class="op">]</span>,</span>
+<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">m</span> <span class="kw">in</span> <span class="va">market</span><span class="op">)</span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="va">m</span><span class="op">]</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="va">demand</span><span class="op">[</span><span class="va">m</span><span class="op">]</span></span>
 <span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="va">transportation_solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="va">transportation_problem</span><span class="op">)</span></span>
+<span><span class="va">transportation_solution</span><span class="op">$</span><span class="va">variables</span><span class="op">$</span><span class="va">x</span></span>
+<span><span class="co">#&gt;        market</span></span>
+<span><span class="co">#&gt; factory Madrid Barcelona Valencia Seville</span></span>
+<span><span class="co">#&gt;     BLB      8         0        0      10</span></span>
+<span><span class="co">#&gt;     ACO      0        10        0       0</span></span>
+<span><span class="co">#&gt;     GRN      0         0       12       0</span></span>
 <span><span class="va">transportation_solution</span><span class="op">$</span><span class="va">objective</span></span>
-<span><span class="co">#&gt; [1] 70</span></span>
-<span><span class="va">transportation_solution</span><span class="op">$</span><span class="va">variables</span></span>
-<span><span class="co">#&gt; $u</span></span>
-<span><span class="co">#&gt;        warehouse</span></span>
-<span><span class="co">#&gt; factory A  B  C  D</span></span>
-<span><span class="co">#&gt;    fct1 8  0  0 10</span></span>
-<span><span class="co">#&gt;    fct2 0 10  0  0</span></span>
-<span><span class="co">#&gt;    fct3 0  0 12  0</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 70</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="vignettes">Vignettes<a class="anchor" aria-label="anchor" href="#vignettes"></a>
+</h2>
+<p>For more examples, see the <a href="https://benet1one.github.io/lpsugar/articles/">vignettes</a> in the package website.</p>
 </div>
 </div>
 

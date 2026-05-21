@@ -48,15 +48,13 @@ colSums(ratings)
 ```
 
 Nonsense, this would mean Arc is worse than Opera or Safari, and much
-worse than Firefox! Let’s give each feature $`i`$ an optimal weight
-$`w_i`$. Then we maximize the gap between Arc’s score and the second
+worse than Firefox! Let’s give each feature \\i\\ an optimal weight
+\\w_i\\. Then we maximize the gap between Arc’s score and the second
 best score.
 
-``` math
-\max_w {\text{ArcScore}(w) - \text{SecondBestScore}(w)}
-```
+\\ \max_w {\text{ArcScore}(w) - \text{SecondBestScore}(w)} \\
 
-We’ll make sure each feature *matters* by having $`1 < w_i < 5`$, and
+We’ll make sure each feature *matters* by having \\1 \< w_i \< 5\\, and
 make them integers for simplicity.
 
 ``` r
