@@ -218,6 +218,7 @@ bind_cons <- function(...) {
     #     out$name[[i]] <- rep_len(dots_names[i], length(out$name[[i]]))
     # }
 
+    out$q_lhs <- unlist(out$q_lhs, recursive = FALSE)
     out$lhs <- do.call(what = rbind, out$lhs)
     out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()
     out$dir <- unlist(out$dir)

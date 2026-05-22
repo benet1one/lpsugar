@@ -449,9 +449,9 @@ diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
 compare_lp <- function(x, y, op, call) {
     check_conformable(x, y, call)
 
-    if (is_quadratic(x) || is_quadratic(y)) {
-        abort("Quadratic constraints are not yet implemented.", call = call)
-    }
+    # if (is_quadratic(x) || is_quadratic(y)) {
+    #     abort("Quadratic constraints are not yet implemented.", call = call)
+    # }
 
     if (op == "<") {
         op <- "<="
@@ -459,14 +459,22 @@ compare_lp <- function(x, y, op, call) {
         op <- ">="
     }
 
-    lhs <- x - y
-    rhs <- -lhs$add
-    lhs <- slam::as.simple_triplet_matrix(lhs$coef)
+    var <- x - y
+
+    if (is_quadratic(var)) {
+        q_lhs <- lapply(var$q_coef, slam::as.simple_triplet_matrix)
+    } else {
+        q_lhs <- rep(list(NULL), length(var))
+    }
+
+    lhs <- slam::as.simple_triplet_matrix(var$coef)
+    rhs <- -var$add
+
     dir <- rep(op, length(rhs))
     call <- rep(format1(call), length(rhs))
     name <- character(length(rhs))
 
-    list(lhs = lhs, dir = dir, rhs = rhs, name = name, call = call) |>
+    list(q_lhs = q_lhs, lhs = lhs, dir = dir, rhs = rhs, name = name, call = call) |>
         structure(class = "lp_constraint")
 }
 

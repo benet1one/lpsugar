@@ -123,3 +123,23 @@ test_that("quadratic solver", {
         s$objective
     )
 })
+
+test_that("quadratic constraints", {
+    withr::local_package("ROI.plugin.alabama")
+
+    p <- lp_problem() |>
+        lp_var(x[1:3]) |>
+        lp_min(sum(x)) |>
+        lp_con(
+            x^2 < 1,
+            x[3] > 0
+        )
+
+    s <- lp_solve(p, start = c(0.5, -0.2, 0.9))
+
+    expect_equal(
+        round(s$variables$x, 4),
+        c(-1, -1, 0),
+        ignore_attr = TRUE
+    )
+})
