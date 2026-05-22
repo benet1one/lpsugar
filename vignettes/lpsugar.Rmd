@@ -82,7 +82,7 @@ load only the desired solver with `library(ROI.plugin.<solver>)` and another
 is to load all of `ROI` with `library(ROI)` and let it choose the solver automatically.
 
 ```{r}
-library(ROI)
+library(ROI.plugin.highs)
 solution <- lp_solve(transportation_problem)
 solution$objective
 solution$variables
