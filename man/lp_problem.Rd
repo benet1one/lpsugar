@@ -23,7 +23,7 @@ Use \code{\link[=lp_variable]{lp_variable()}} to define the variables,
 }
 \examples{
 # ROI or a ROI plugin needs to be loaded for lp_solve() to work
-library(ROI) |> suppressMessages()
+library(ROI.plugin.highs)
 
 lp_problem() |>
     lp_variable(x[1:2], lower = 0) |>

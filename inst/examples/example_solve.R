@@ -1,4 +1,4 @@
-library(ROI) |> suppressMessages()
+library(ROI.plugin.highs)
 
 r <- letters[1:2]
 c <- LETTERS[1:3]
