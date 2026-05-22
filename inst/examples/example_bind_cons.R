@@ -18,6 +18,6 @@ p <- lp_problem() |>
 
 p$constraints
 
-library(ROI)
+library(ROI.plugin.highs)
 s <- lp_solve(p, binary_as_logical = TRUE)
 s$variables

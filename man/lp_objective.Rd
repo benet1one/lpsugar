@@ -53,7 +53,7 @@ p <- lp_problem() |>
 
 p$objective
 
-library(ROI) |> suppressMessages()
+library(ROI.plugin.highs)
 (s <- lp_solve(p))
 
 s$aliases$total_profit

@@ -19,7 +19,7 @@ a complete graph and an incomplete but connected graph.
 
 ```{r setup}
 library(lpsugar)
-library(ROI)
+library(ROI.plugin.highs)
 library(dplyr, warn.conflicts = FALSE)
 ```
 
