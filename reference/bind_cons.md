@@ -57,10 +57,7 @@ p$constraints
 #> [i=4] 0    0    0    1    0           0           0           4           <=  7
 #> 
 
-library(ROI)
-#> ROI: R Optimization Infrastructure
-#> Registered solver plugins: nlminb, highs.
-#> Default solver: auto.
+library(ROI.plugin.highs)
 s <- lp_solve(p, binary_as_logical = TRUE)
 s$variables
 #> $y

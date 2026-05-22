@@ -34,7 +34,7 @@ solve_model(model, solver, ...)
 ## Examples
 
 ``` r
-library(ROI) |> suppressMessages()
+library(ROI.plugin.highs)
 
 p <- lp_problem() |>
     lp_var(x[a = 1:2, b = 1:2], upper = 10) |>

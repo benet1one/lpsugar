@@ -112,7 +112,7 @@ p1$constraints
 #> 
 
 # The solution is presented differently
-library(ROI) |> suppressMessages()
+library(ROI.plugin.highs)
 lp_solve(p0) [c("variables", "aliases")] # z is a variable
 #> $variables
 #> $variables$x
@@ -296,7 +296,7 @@ p1$aliases
 #> 
 
 # Aliases are computed from the final solution
-library(ROI) |> suppressMessages()
+library(ROI.plugin.highs)
 s <- lp_solve(p1)
 s$variables
 #> $x

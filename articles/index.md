@@ -2,7 +2,8 @@
 
 ### All vignettes
 
-- [browsers](https://benet1one.github.io/lpsugar/articles/browsers.md):
-- [graphs](https://benet1one.github.io/lpsugar/articles/Graphs.md):
-- [lpsugar](https://benet1one.github.io/lpsugar/articles/lpsugar.md):
-- [regression](https://benet1one.github.io/lpsugar/articles/Regression.md):
+- [Browsers](https://benet1one.github.io/lpsugar/articles/browsers.md):
+- [Graphs](https://benet1one.github.io/lpsugar/articles/Graphs.md):
+- [Introduction to
+  lpsugar](https://benet1one.github.io/lpsugar/articles/lpsugar.md):
+- [Regression](https://benet1one.github.io/lpsugar/articles/Regression.md):

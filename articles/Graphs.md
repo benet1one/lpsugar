@@ -1,4 +1,4 @@
-# graphs
+# Graphs
 
 This vignette focuses on all sorts of problems relating to graphs. We
 will create a complete graph and an incomplete but connected graph.
@@ -6,10 +6,7 @@ will create a complete graph and an incomplete but connected graph.
 ``` r
 
 library(lpsugar)
-library(ROI)
-#> ROI: R Optimization Infrastructure
-#> Registered solver plugins: nlminb, highs.
-#> Default solver: auto.
+library(ROI.plugin.highs)
 library(dplyr, warn.conflicts = FALSE)
 ```
 

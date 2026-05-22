@@ -69,7 +69,7 @@ p$objective
 #> total_profit - fix_cost
 #> 
 
-library(ROI) |> suppressMessages()
+library(ROI.plugin.highs)
 (s <- lp_solve(p))
 #> $variables
 #> $variables$made

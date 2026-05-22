@@ -1,4 +1,4 @@
-# lpsugar
+# Introduction to lpsugar
 
 This vignette will teach you the basic elements of a linear problem and
 how to define them with `lpsugar`.
@@ -71,10 +71,7 @@ the solver automatically.
 
 ``` r
 
-library(ROI)
-#> ROI: R Optimization Infrastructure
-#> Registered solver plugins: nlminb, highs.
-#> Default solver: auto.
+library(ROI.plugin.highs)
 solution <- lp_solve(transportation_problem)
 solution$objective
 #> [1] 1590
