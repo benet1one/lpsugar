@@ -194,4 +194,8 @@ edges_complete |>
 
 ## Pathfinding
 
+Coming Soon.
+
 ## Traveling Salesman Problem
+
+Coming Soon.
