@@ -1,8 +1,8 @@
 ---
-title: "regression"
+title: "Regression"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{regression}
+  %\VignetteIndexEntry{Regression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

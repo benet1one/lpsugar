@@ -1,8 +1,8 @@
 ---
-title: "graphs"
+title: "Graphs"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{graphs}
+  %\VignetteIndexEntry{Graphs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

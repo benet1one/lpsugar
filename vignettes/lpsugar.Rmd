@@ -1,8 +1,8 @@
 ---
-title: "lpsugar"
+title: "Introduction to lpsugar"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{lpsugar}
+  %\VignetteIndexEntry{Introduction to lpsugar}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
