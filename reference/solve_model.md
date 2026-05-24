@@ -31,6 +31,16 @@ solve_model(model, solver, ...)
 
   Control arguments to be passed on to the solver.
 
+## See also
+
+[`make_model()`](https://benet1one.github.io/lpsugar/reference/make_model.md)
+to convert an
+[`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
+to a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object,
+[`pretty_solution()`](https://benet1one.github.io/lpsugar/reference/pretty_solution.md)
+to prettify the solution returned by
+[`ROI::ROI_solve()`](https://rdrr.io/pkg/ROI/man/ROI_solve.html).
+
 ## Examples
 
 ``` r

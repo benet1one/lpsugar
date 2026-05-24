@@ -1,17 +1,22 @@
 # Package index
 
-## All functions
+## Define and solve a problem
 
-- [`bind_cons()`](https://benet1one.github.io/lpsugar/reference/bind_cons.md)
-  : Bind constraints
+- [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
+  : Create a Linear Problem
 
-- [`bind_vars()`](https://benet1one.github.io/lpsugar/reference/bind_vars.md)
-  : Concatenate variables and numbers.
+- [`lp_variable()`](https://benet1one.github.io/lpsugar/reference/lp_variable.md)
+  [`lp_var()`](https://benet1one.github.io/lpsugar/reference/lp_variable.md)
+  :
 
-- [`lp_alias()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
-  [`lp_implicit_variable()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
-  [`lp_impvar()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
-  : Define an Alias or Implicit Variable (IMPVAR)
+  Define a variable for an
+  [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
+
+- [`lp_minimize()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
+  [`lp_maximize()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
+  [`lp_min()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
+  [`lp_max()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
+  : Set an objective function
 
 - [`lp_constraint()`](https://benet1one.github.io/lpsugar/reference/lp_constraint.md)
   [`lp_con()`](https://benet1one.github.io/lpsugar/reference/lp_constraint.md)
@@ -24,34 +29,30 @@
 - [`lp_delete_constraint()`](https://benet1one.github.io/lpsugar/reference/lp_delete_constraint.md)
   : Delete constraints
 
-- [`lp_minimize()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
-  [`lp_maximize()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
-  [`lp_min()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
-  [`lp_max()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
-  : Set an objective function
-
-- [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
-  : Create a Linear Problem
+- [`lp_alias()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
+  [`lp_implicit_variable()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
+  [`lp_impvar()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
+  : Define an Alias or Implicit Variable (IMPVAR)
 
 - [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
   [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
   : Solve a Linear Problem
 
-- [`lp_variable()`](https://benet1one.github.io/lpsugar/reference/lp_variable.md)
-  [`lp_var()`](https://benet1one.github.io/lpsugar/reference/lp_variable.md)
-  :
+## Utilities
 
-  Define a variable for an
-  [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
-
-- [`make_model()`](https://benet1one.github.io/lpsugar/reference/make_model.md)
-  : Make an Optimization Problem
-
+- [`sum_over()`](https://benet1one.github.io/lpsugar/reference/sum_over.md)
+  : Index Based Summation
 - [`parameter()`](https://benet1one.github.io/lpsugar/reference/parameter.md)
   : Set Dimensions and Names for Parameters
 
-- [`pretty_solution()`](https://benet1one.github.io/lpsugar/reference/pretty_solution.md)
-  : Prettify the Solution of a Model.
+## Bind variables or constraints
+
+- [`bind_vars()`](https://benet1one.github.io/lpsugar/reference/bind_vars.md)
+  : Concatenate variables and numbers.
+- [`bind_cons()`](https://benet1one.github.io/lpsugar/reference/bind_cons.md)
+  : Bind constraints
+
+## Analyse the solution
 
 - [`solution_summary()`](https://benet1one.github.io/lpsugar/reference/solution_summary.md)
   [`constraint_summary()`](https://benet1one.github.io/lpsugar/reference/solution_summary.md)
@@ -60,8 +61,16 @@
   [`compute_aliases()`](https://benet1one.github.io/lpsugar/reference/solution_summary.md)
   : Compute a Summary of a Solution or Point
 
+## Manually solve a problem
+
+- [`make_model()`](https://benet1one.github.io/lpsugar/reference/make_model.md)
+  [`as.OP()`](https://benet1one.github.io/lpsugar/reference/make_model.md)
+  :
+
+  Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object.
+
 - [`solve_model()`](https://benet1one.github.io/lpsugar/reference/solve_model.md)
   : Solve a Model
 
-- [`sum_over()`](https://benet1one.github.io/lpsugar/reference/sum_over.md)
-  : Index Based Summation
+- [`pretty_solution()`](https://benet1one.github.io/lpsugar/reference/pretty_solution.md)
+  : Prettify the Solution of a Model.

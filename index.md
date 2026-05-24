@@ -1,6 +1,6 @@
-# lpsugar
+# Linear and Quadratic Programming in R
 
-lpsugar is an AML (Algebraic Modeling Language) inspired in R’s
+`lpsugar` is an AML (Algebraic Modeling Language) inspired in R’s
 vectorized syntax, used to define and solve Mixed Integer Linear
 Programs (MILP).
 
@@ -10,7 +10,7 @@ safer choice, I recommend using
 
 ## Installation
 
-You can install the development version of lpsugar from
+You can install the development version of `lpsugar` from
 [GitHub](https://github.com/benet1one/lpsugar) with:
 
 ``` r
@@ -26,7 +26,7 @@ Start with a simple problem to show the basic syntax.
 \\ \begin{array}{rl} \text{max} & x+y \\ \text{st} & 2x + y \le 8 \\ &
 2x + 3y \le 12 \end{array} \\
 
-Let’s write the problem in lpsugar and solve it!
+Let’s write the problem in `lpsugar` and solve it!
 
 ``` r
 

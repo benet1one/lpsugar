@@ -1,6 +1,6 @@
-# Make an Optimization Problem
+# Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object.
 
-Translate an
+Convert an
 [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
 object to a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object.
 Used internally in
@@ -10,6 +10,7 @@ Used internally in
 
 ``` r
 make_model(problem)
+as.OP(problem)
 ```
 
 ## Arguments
@@ -23,6 +24,15 @@ make_model(problem)
 
 An `OP` object as returned from
 [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html).
+
+## See also
+
+[`solve_model()`](https://benet1one.github.io/lpsugar/reference/solve_model.md)
+to solve the `OP` problem by calling
+[`ROI::ROI_solve()`](https://rdrr.io/pkg/ROI/man/ROI_solve.html);
+[`pretty_solution()`](https://benet1one.github.io/lpsugar/reference/pretty_solution.md)
+to prettify the solution returned by
+[`ROI::ROI_solve()`](https://rdrr.io/pkg/ROI/man/ROI_solve.html).
 
 ## Examples
 

@@ -44,7 +44,7 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="define-and-solve-a-problem">Define and solve a problem<a class="anchor" aria-label="anchor" href="#define-and-solve-a-problem"></a></h2>
 
 
 
@@ -55,24 +55,24 @@
 
       <dl><dt>
 
-          <code><a href="bind_cons.html">bind_cons()</a></code>
+          <code><a href="lp_problem.html">lp_problem()</a></code>
 
         </dt>
-        <dd>Bind constraints</dd>
+        <dd>Create a Linear Problem</dd>
 
         <dt>
 
-          <code><a href="bind_vars.html">bind_vars()</a></code>
+          <code><a href="lp_variable.html">lp_variable()</a></code> <code><a href="lp_variable.html">lp_var()</a></code>
 
         </dt>
-        <dd>Concatenate variables and numbers.</dd>
+        <dd>Define a variable for an <code><a href="../reference/lp_problem.html">lp_problem()</a></code></dd>
 
         <dt>
 
-          <code><a href="lp_alias.html">lp_alias()</a></code> <code><a href="lp_alias.html">lp_implicit_variable()</a></code> <code><a href="lp_alias.html">lp_impvar()</a></code>
+          <code><a href="lp_objective.html">lp_minimize()</a></code> <code><a href="lp_objective.html">lp_maximize()</a></code> <code><a href="lp_objective.html">lp_min()</a></code> <code><a href="lp_objective.html">lp_max()</a></code>
 
         </dt>
-        <dd>Define an Alias or Implicit Variable (IMPVAR)</dd>
+        <dd>Set an objective function</dd>
 
         <dt>
 
@@ -90,17 +90,10 @@
 
         <dt>
 
-          <code><a href="lp_objective.html">lp_minimize()</a></code> <code><a href="lp_objective.html">lp_maximize()</a></code> <code><a href="lp_objective.html">lp_min()</a></code> <code><a href="lp_objective.html">lp_max()</a></code>
+          <code><a href="lp_alias.html">lp_alias()</a></code> <code><a href="lp_alias.html">lp_implicit_variable()</a></code> <code><a href="lp_alias.html">lp_impvar()</a></code>
 
         </dt>
-        <dd>Set an objective function</dd>
-
-        <dt>
-
-          <code><a href="lp_problem.html">lp_problem()</a></code>
-
-        </dt>
-        <dd>Create a Linear Problem</dd>
+        <dd>Define an Alias or Implicit Variable (IMPVAR)</dd>
 
         <dt>
 
@@ -108,20 +101,22 @@
 
         </dt>
         <dd>Solve a Linear Problem</dd>
+      </dl></div><div class="section level2">
+      <h2 id="utilities">Utilities<a class="anchor" aria-label="anchor" href="#utilities"></a></h2>
 
-        <dt>
 
-          <code><a href="lp_variable.html">lp_variable()</a></code> <code><a href="lp_variable.html">lp_var()</a></code>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="sum_over.html">sum_over()</a></code>
 
         </dt>
-        <dd>Define a variable for an <code><a href="../reference/lp_problem.html">lp_problem()</a></code></dd>
-
-        <dt>
-
-          <code><a href="make_model.html">make_model()</a></code>
-
-        </dt>
-        <dd>Make an Optimization Problem</dd>
+        <dd>Index Based Summation</dd>
 
         <dt>
 
@@ -129,20 +124,61 @@
 
         </dt>
         <dd>Set Dimensions and Names for Parameters</dd>
+      </dl></div><div class="section level2">
+      <h2 id="bind-variables-or-constraints">Bind variables or constraints<a class="anchor" aria-label="anchor" href="#bind-variables-or-constraints"></a></h2>
 
-        <dt>
 
-          <code><a href="pretty_solution.html">pretty_solution()</a></code>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="bind_vars.html">bind_vars()</a></code>
 
         </dt>
-        <dd>Prettify the Solution of a Model.</dd>
+        <dd>Concatenate variables and numbers.</dd>
 
         <dt>
+
+          <code><a href="bind_cons.html">bind_cons()</a></code>
+
+        </dt>
+        <dd>Bind constraints</dd>
+      </dl></div><div class="section level2">
+      <h2 id="analyse-the-solution">Analyse the solution<a class="anchor" aria-label="anchor" href="#analyse-the-solution"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="solution_summary.html">solution_summary()</a></code> <code><a href="solution_summary.html">constraint_summary()</a></code> <code><a href="solution_summary.html">bound_summary()</a></code> <code><a href="solution_summary.html">compute_objective()</a></code> <code><a href="solution_summary.html">compute_aliases()</a></code>
 
         </dt>
         <dd>Compute a Summary of a Solution or Point</dd>
+      </dl></div><div class="section level2">
+      <h2 id="manually-solve-a-problem">Manually solve a problem<a class="anchor" aria-label="anchor" href="#manually-solve-a-problem"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="make_model.html">make_model()</a></code> <code><a href="make_model.html">as.OP()</a></code>
+
+        </dt>
+        <dd>Create a <code><a href="https://rdrr.io/pkg/ROI/man/OP.html" class="external-link">ROI::OP()</a></code> object.</dd>
 
         <dt>
 
@@ -153,12 +189,13 @@
 
         <dt>
 
-          <code><a href="sum_over.html">sum_over()</a></code>
+          <code><a href="pretty_solution.html">pretty_solution()</a></code>
 
         </dt>
-        <dd>Index Based Summation</dd>
+        <dd>Prettify the Solution of a Model.</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
