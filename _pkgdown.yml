@@ -5,3 +5,29 @@ template:
   params:
     google_site_verification: uYvnyQPldZQ6Hki1ZGPG37NYpOPh78eRMbCuJ54xghs
 
+reference:
+- title: Define and solve a problem
+  contents:
+  - lp_problem
+  - lp_variable
+  - lp_minimize
+  - lp_constraint
+  - lp_delete_constraint
+  - starts_with("lp_")
+  - lp_solve
+- title: Utilities
+  contents:
+  - sum_over
+  - parameter
+- title: Bind variables or constraints
+  contents:
+  - bind_vars
+  - bind_cons
+- title: Analyse the solution
+  contents:
+  - solution_summary
+- title: Manually solve a problem
+  contents:
+  - make_model
+  - solve_model
+  - pretty_solution
