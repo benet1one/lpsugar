@@ -72,14 +72,20 @@ as.L_constraint.lp_problem <- function(x, ...) {
     )
 }
 
-#' Make an Optimization Problem
+#' Create a [ROI::OP()] object.
 #'
-#' Translate an [lp_problem()] object to a [ROI::OP()] object. Used
-#' internally in [lp_solve()].
+#' Convert an [lp_problem()] object to a [ROI::OP()] object.
+#' Used internally in [lp_solve()].
+#'
+#' @usage
+#' make_model(problem)
+#' as.OP(problem)
 #'
 #' @param problem An [lp_problem()].
 #' @returns An `OP` object as returned from [ROI::OP()].
 #'
+#' @seealso [solve_model()] to solve the `OP` problem by calling [ROI::ROI_solve()];
+#' [pretty_solution()] to prettify the solution returned by [ROI::ROI_solve()].
 #' @export
 #' @example inst/examples/example_solve_steps.R
 make_model <- function(problem) {
@@ -156,6 +162,8 @@ as.OP.lp_problem <- function(x) make_model(x)
 #' @param model An `OP` object created with [make_model()] or [ROI::OP()].
 #' @inheritParams lp_solve
 #'
+#' @seealso [make_model()] to convert an [lp_problem()] to a [ROI::OP()] object,
+#' [pretty_solution()] to prettify the solution returned by [ROI::ROI_solve()].
 #' @export
 #' @example inst/examples/example_solve_steps.R
 solve_model <- function(model, solver, ...) {

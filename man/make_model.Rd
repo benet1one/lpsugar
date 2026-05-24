@@ -2,9 +2,10 @@
 % Please edit documentation in R/solve.R
 \name{make_model}
 \alias{make_model}
-\title{Make an Optimization Problem}
+\title{Create a \code{\link[ROI:OP]{ROI::OP()}} object.}
 \usage{
 make_model(problem)
+as.OP(problem)
 }
 \arguments{
 \item{problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
@@ -13,8 +14,8 @@ make_model(problem)
 An \code{OP} object as returned from \code{\link[ROI:OP]{ROI::OP()}}.
 }
 \description{
-Translate an \code{\link[=lp_problem]{lp_problem()}} object to a \code{\link[ROI:OP]{ROI::OP()}} object. Used
-internally in \code{\link[=lp_solve]{lp_solve()}}.
+Convert an \code{\link[=lp_problem]{lp_problem()}} object to a \code{\link[ROI:OP]{ROI::OP()}} object.
+Used internally in \code{\link[=lp_solve]{lp_solve()}}.
 }
 \examples{
 library(ROI.plugin.highs)
@@ -45,4 +46,8 @@ solution_pretty$aliases
 # for finding the optimum, so ROI ignores it.
 solution_raw$objval
 solution_pretty$objective
+}
+\seealso{
+\code{\link[=solve_model]{solve_model()}} to solve the \code{OP} problem by calling \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}};
+\code{\link[=pretty_solution]{pretty_solution()}} to prettify the solution returned by \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}}.
 }

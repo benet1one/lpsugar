@@ -48,3 +48,7 @@ solution_pretty$aliases
 solution_raw$objval
 solution_pretty$objective
 }
+\seealso{
+\code{\link[=make_model]{make_model()}} to convert an \code{\link[=lp_problem]{lp_problem()}} to a \code{\link[ROI:OP]{ROI::OP()}} object,
+\code{\link[=pretty_solution]{pretty_solution()}} to prettify the solution returned by \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}}.
+}
