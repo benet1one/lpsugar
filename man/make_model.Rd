@@ -47,6 +47,6 @@ solution_raw$objval
 solution_pretty$objective
 }
 \seealso{
-\code{\link[=solve_model]{solve_model()}} to solve the \code{OP} problem by calling \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}};
+\code{\link[=solve_model]{solve_model()}} to solve the \code{OP} problem;
 \code{\link[=pretty_solution]{pretty_solution()}} to prettify the solution returned by \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}}.
 }
