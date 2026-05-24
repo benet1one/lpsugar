@@ -184,9 +184,9 @@ empty_constraint <- function() {
     ) |> structure(class = c("empty_lp_constraint", "lp_constraint"))
 }
 
-#' Bind constraints
+#' Define Multiple Constraints at Once
 #'
-#' Define multiple constraints at once.
+#' Concatenate constraints.
 #'
 #' @param ... Constraints. See [lp_constraint()].
 #'
