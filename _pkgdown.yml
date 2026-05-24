@@ -2,4 +2,6 @@ url: https://benet1one.github.io/lpsugar/
 template:
   bootstrap: 5
   math-rendering: mathjax
+  params:
+    google_site_verification: uYvnyQPldZQ6Hki1ZGPG37NYpOPh78eRMbCuJ54xghs
 
