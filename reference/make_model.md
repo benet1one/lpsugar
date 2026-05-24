@@ -10,7 +10,6 @@ Used internally in
 
 ``` r
 make_model(problem)
-as.OP(problem)
 ```
 
 ## Arguments

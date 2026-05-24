@@ -64,7 +64,6 @@
 ## Manually solve a problem
 
 - [`make_model()`](https://benet1one.github.io/lpsugar/reference/make_model.md)
-  [`as.OP()`](https://benet1one.github.io/lpsugar/reference/make_model.md)
   :
 
   Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object.
