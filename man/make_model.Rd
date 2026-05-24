@@ -5,7 +5,6 @@
 \title{Create a \code{\link[ROI:OP]{ROI::OP()}} object.}
 \usage{
 make_model(problem)
-as.OP(problem)
 }
 \arguments{
 \item{problem}{An \code{\link[=lp_problem]{lp_problem()}}.}

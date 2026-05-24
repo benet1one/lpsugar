@@ -77,14 +77,10 @@ as.L_constraint.lp_problem <- function(x, ...) {
 #' Convert an [lp_problem()] object to a [ROI::OP()] object.
 #' Used internally in [lp_solve()].
 #'
-#' @usage
-#' make_model(problem)
-#' as.OP(problem)
-#'
 #' @param problem An [lp_problem()].
 #' @returns An `OP` object as returned from [ROI::OP()].
 #'
-#' @seealso [solve_model()] to solve the `OP` problem by calling [ROI::ROI_solve()];
+#' @seealso [solve_model()] to solve the `OP` problem;
 #' [pretty_solution()] to prettify the solution returned by [ROI::ROI_solve()].
 #' @export
 #' @example inst/examples/example_solve_steps.R
