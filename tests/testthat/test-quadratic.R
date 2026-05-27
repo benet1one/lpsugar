@@ -65,6 +65,31 @@ test_that("quadratic arrays", {
     expect_snapshot(z^c(0, 1, 2))
 })
 
+test_that("quadratic operations", {
+    b <- c(2, 5)
+    xval <- c(-3, 8)
+
+    p <- lp_problem() |>
+        lp_var(x[1:2]) |>
+        lp_alias(
+            a1 = -x^2 * b,
+            a2 = x * b * (-x)
+        )
+
+    computed <- compute_aliases(p, list(x = xval))
+
+    expect_equal(
+        computed$a1,
+        -xval^2 * b,
+        ignore_attr = TRUE
+    )
+    expect_equal(
+        computed$a2,
+        xval * b * (-xval),
+        ignore_attr = TRUE
+    )
+})
+
 test_that("apply on quadratic", {
     p <- lp_problem() |>
         lp_var(x[1:2, 1:3]) |>

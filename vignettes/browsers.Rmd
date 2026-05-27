@@ -1,8 +1,8 @@
 ---
-title: "browsers"
+title: "Browsers"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{browsers}
+  %\VignetteIndexEntry{Browsers}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

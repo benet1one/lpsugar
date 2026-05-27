@@ -2,7 +2,7 @@
 % Please edit documentation in R/constraints.R
 \name{bind_cons}
 \alias{bind_cons}
-\title{Bind constraints}
+\title{Define Multiple Constraints at Once}
 \usage{
 bind_cons(...)
 }
@@ -10,7 +10,7 @@ bind_cons(...)
 \item{...}{Constraints. See \code{\link[=lp_constraint]{lp_constraint()}}.}
 }
 \description{
-Define multiple constraints at once.
+Concatenate constraints.
 }
 \examples{
 n <- 4

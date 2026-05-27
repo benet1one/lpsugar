@@ -20,6 +20,18 @@ are returned as \verb{\{0, 1\}}. If \code{TRUE}, binary variables are returned a
 
 \item{...}{Control arguments to be passed on to the solver.}
 }
+\value{
+A list with the following fields:
+\itemize{
+\item \verb{$objective} : Scalar, value of the objective function at optimum.
+\item \verb{$variables} : List of arrays, values of the variables at optimum.
+\item \verb{$aliases} : List of arrays, values of the aliases at optimum.
+\item \verb{$variables_vec} : Numeric vector, values of the variables at optimum.
+\item \verb{$status} : Status as returned by \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}}.
+\item \verb{$message} : Message as returned by \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}},
+\item \verb{$op} : Optimization Problem \code{OP}, as returned by \code{\link[ROI:OP]{ROI::as.OP()}}.
+}
+}
 \description{
 \code{lp_solve()} computes the optimal solution of an \code{\link[=lp_problem]{lp_problem()}}, whereas
 \code{lp_find_feasible()} returns an arbitrary feasible solution.
@@ -66,4 +78,7 @@ s5 <- lp_find_feasible(p_no)
 s5$status
 s5$variables$z
 s5$objective
+}
+\seealso{
+\code{\link[=as.OP.lp_problem]{as.OP.lp_problem()}}, \code{\link[=pretty_solution]{pretty_solution()}}.
 }

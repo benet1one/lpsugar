@@ -9,10 +9,22 @@ pretty_solution(problem, solution, binary_as_logical = FALSE)
 \arguments{
 \item{problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
 
-\item{solution}{A list created with \code{\link[=solve_model]{solve_model()}} or \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}}.}
+\item{solution}{A list as returned by \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}}.}
 
 \item{binary_as_logical}{Boolean. If \code{FALSE} (the default), binary variables
 are returned as \verb{\{0, 1\}}. If \code{TRUE}, binary variables are returned as logical \verb{\{FALSE, TRUE\}}.}
+}
+\value{
+A list with the following fields:
+\itemize{
+\item \verb{$objective} : Scalar, value of the objective function at optimum.
+\item \verb{$variables} : List of arrays, values of the variables at optimum.
+\item \verb{$aliases} : List of arrays, values of the aliases at optimum.
+\item \verb{$variables_vec} : Numeric vector, values of the variables at optimum.
+\item \verb{$status} : Status as returned by \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}}.
+\item \verb{$message} : Message as returned by \code{\link[ROI:ROI_solve]{ROI::ROI_solve()}},
+\item \verb{$op} : Optimization Problem \code{OP}, as returned by \code{\link[ROI:OP]{ROI::as.OP()}}.
+}
 }
 \description{
 Takes a problem and its solution and prettifies the solution. Used internally
@@ -21,19 +33,19 @@ in \code{\link[=lp_solve]{lp_solve()}}.
 \examples{
 library(ROI.plugin.highs)
 
-p <- lp_problem() |>
+problem <- lp_problem() |>
     lp_var(x[a = 1:2, b = 1:2], upper = 10) |>
     lp_alias(sum_x = sum(x)) |>
     lp_max(sum_x + 5)
 
 # Solve directly with lp_solve()
-direct_solution <- lp_solve(p)
+direct_solution <- lp_solve(problem)
 direct_solution
 
-# Or do each step
-model <- make_model(p)
-solution_raw <- solve_model(model)
-solution_pretty <- pretty_solution(problem = p, solution = solution_raw)
+# Or run each step manually
+op <- as.OP(problem)
+solution_raw <- ROI_solve(op)
+solution_pretty <- pretty_solution(problem, solution = solution_raw)
 
 # pretty_solution() gives each variable its dim and dimnames.
 solution_raw$solution
@@ -47,4 +59,10 @@ solution_pretty$aliases
 # for finding the optimum, so ROI ignores it.
 solution_raw$objval
 solution_pretty$objective
+}
+\seealso{
+\code{\link[=lp_solve]{lp_solve()}} for the standard way to solve a problem.
+
+\code{\link[=as.OP.lp_problem]{as.OP.lp_problem()}} to convert an \code{lp_problem} to an Optimization Problem \code{(OP)} object
+from package \code{ROI}.
 }

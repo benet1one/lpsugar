@@ -6,9 +6,9 @@
 [![R-CMD-check](https://github.com/benet1one/lpsugar/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/benet1one/lpsugar/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-# lpsugar
+# Linear and Quadratic Programming in R
 
-lpsugar is an AML (Algebraic Modeling Language) inspired in R’s
+`lpsugar` is an AML (Algebraic Modeling Language) inspired in R’s
 vectorized syntax, used to define and solve Mixed Integer Linear
 Programs (MILP).
 
@@ -18,7 +18,7 @@ safer choice, I recommend using
 
 ## Installation
 
-You can install the development version of lpsugar from
+You can install the development version of `lpsugar` from
 [GitHub](https://github.com/benet1one/lpsugar) with:
 
 ``` r
@@ -38,7 +38,7 @@ $$
 \end{array}
 $$
 
-Let’s write the problem in lpsugar and solve it!
+Let’s write the problem in `lpsugar` and solve it!
 
 ``` r
 library(lpsugar)

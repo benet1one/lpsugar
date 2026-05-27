@@ -11,19 +11,50 @@
 #' are returned as `{0, 1}`. If `TRUE`, binary variables are returned as logical `{FALSE, TRUE}`.
 #' @param ... Control arguments to be passed on to the solver.
 #'
+#' @returns A list with the following fields:
+#' - `$objective` : Scalar, value of the objective function at optimum.
+#' - `$variables` : List of arrays, values of the variables at optimum.
+#' - `$aliases` : List of arrays, values of the aliases at optimum.
+#' - `$variables_vec` : Numeric vector, values of the variables at optimum.
+#' - `$status` : Status as returned by [ROI::ROI_solve()].
+#' - `$message` : Message as returned by [ROI::ROI_solve()],
+#' - `$op` : Optimization Problem `OP`, as returned by [ROI::as.OP()].
+#'
+#' @seealso [as.OP.lp_problem()], [pretty_solution()].
 #' @export
 #'
 #' @example inst/examples/example_solve.R
 lp_solve <- function(.problem, solver, binary_as_logical = FALSE, ...) {
     check_problem(.problem)
-    model <- make_model(.problem)
-    solution_raw <- solve_model(model, solver, ...)
+    op <- as.OP(.problem)
+    applicable <- ROI::ROI_applicable_solvers(op)
 
-    pretty_solution(
+    if (length(applicable) == 0L) {
+        rlang::abort(c(
+            "No applicable solvers loaded.",
+            ">" = "Use `library(ROI)` to load all installed solvers.",
+            ">" = "Use `library(ROI.plugin.<solver>)` to load a specific solver.",
+            "i" = glue::glue(
+                "See https://roi.r-forge.r-project.org/installation.html#ROI_plug-ins",
+                " for instructions on how to install each solver."
+            )
+        ))
+    }
+
+    roi_sol <- ROI_solve(
+        op,
+        solver = solver,
+        control = rlang::dots_list(...)
+    )
+
+    sol <- pretty_solution(
         .problem,
-        solution = solution_raw,
+        solution = roi_sol,
         binary_as_logical = binary_as_logical
     )
+
+    sol$op <- op
+    return(sol)
 }
 
 #' @rdname lp_solve
@@ -118,27 +149,37 @@ as.Q_constraint.lp_problem <- function(x, ...) {
 
 
 #' Make an Optimization Problem
+#' @importFrom ROI as.OP
+#' @export
+ROI::as.OP
+
+#' @importFrom ROI ROI_solve
+#' @export
+ROI::ROI_solve
+
+#' Create a [ROI::OP()] object.
 #'
-#' Translate an [lp_problem()] object to a [ROI::OP()] object. Used
-#' internally in [lp_solve()].
+#' Convert an [lp_problem()] object to a [ROI::OP()] object.
+#' Used internally in [lp_solve()].
 #'
-#' @param problem An [lp_problem()].
+#' @param x An [lp_problem()].
 #' @returns An `OP` object as returned from [ROI::OP()].
 #'
+#' @seealso [pretty_solution()] to prettify the solution returned by [ROI::ROI_solve()].
 #' @export
 #' @example inst/examples/example_solve_steps.R
-make_model <- function(problem) {
-    check_problem(problem, field_name = "problem")
+as.OP.lp_problem <- function(x) {
+    check_problem(x, field_name = "problem")
 
     # No variables
-    if (ncol(problem) == 0L) {
+    if (ncol(x) == 0L) {
         abort("Problem has no variables. Define them with `lp_variable()`.")
     }
 
     # Direction
-    maximize <- if (problem$objective$direction == "minimize") {
+    maximize <- if (x$objective$direction == "minimize") {
         FALSE
-    } else if (problem$objective$direction == "maximize") {
+    } else if (x$objective$direction == "maximize") {
         TRUE
     } else {
         rlang::abort(c(
@@ -152,17 +193,17 @@ make_model <- function(problem) {
         ))
     }
 
-    objective <- as.Q_objective.lp_problem(problem)
-    constraints <- as.Q_constraint.lp_problem(problem)
+    objective <- as.Q_objective.lp_problem(x)
+    constraints <- as.Q_constraint.lp_problem(x)
 
-    types <- character(ncol(problem))
-    lower <- numeric(ncol(problem))
-    upper <- numeric(ncol(problem))
+    types <- character(ncol(x))
+    lower <- numeric(ncol(x))
+    upper <- numeric(ncol(x))
 
-    for (x in problem$variables) {
-        types[x$ind] <- x$type
-        lower[x$ind] <- x$lower
-        upper[x$ind] <- x$upper
+    for (v in x$variables) {
+        types[v$ind] <- v$type
+        lower[v$ind] <- v$lower
+        upper[v$ind] <- v$upper
     }
 
     # Bound indices and bounds
@@ -174,7 +215,7 @@ make_model <- function(problem) {
     bounds <- ROI::V_bound(
         li = li, ui = ui,
         lb = lb, ub = ub,
-        nobj = ncol(problem)
+        nobj = ncol(x)
     )
 
     ROI::OP(
@@ -186,55 +227,19 @@ make_model <- function(problem) {
     )
 }
 
-#' @importFrom ROI as.OP
-#' @export
-ROI::as.OP
-
-#' @export
-as.OP.lp_problem <- function(x) make_model(x)
-
-#' Solve a Model
-#'
-#' Find the optimum of an Optimization Model created with [make_model()] or [ROI::OP()].
-#' Used internally in [lp_solve()].
-#'
-#' @param model An `OP` object created with [make_model()] or [ROI::OP()].
-#' @inheritParams lp_solve
-#'
-#' @export
-#' @example inst/examples/example_solve_steps.R
-solve_model <- function(model, solver, ...) {
-    if (!inherits(model, "OP")) {
-        abort("Model must be an `OP` object created with `make_model()`.")
-    }
-
-    applicable <- ROI::ROI_applicable_solvers(model)
-
-    if (length(applicable) == 0L) {
-        rlang::abort(c(
-            "No applicable solvers loaded.",
-            ">" = "Use `library(ROI)` to load all installed solvers.",
-            ">" = "Use `library(ROI.plugin.<solver>)` to load a specific solver.",
-            "i" = glue::glue(
-                "See https://roi.r-forge.r-project.org/installation.html#ROI_plug-ins",
-                " for instructions on how to install each solver."
-            )
-        ))
-    }
-
-    dots <- rlang::dots_list(...)
-    out <- ROI::ROI_solve(model, solver = solver, control = dots)
-    out$model <- model
-    return(out)
-}
-
 #' Prettify the Solution of a Model.
 #'
 #' Takes a problem and its solution and prettifies the solution. Used internally
 #' in [lp_solve()].
 #'
 #' @param problem An [lp_problem()].
-#' @param solution A list created with [solve_model()] or [ROI::ROI_solve()].
+#' @param solution A list as returned by [ROI::ROI_solve()].
+#'
+#' @seealso [lp_solve()] for the standard way to solve a problem.
+#'
+#' [as.OP.lp_problem()] to convert an `lp_problem` to an Optimization Problem `(OP)` object
+#' from package `ROI`.
+#'
 #' @inherit lp_solve
 #' @export
 #'
@@ -248,8 +253,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
             objective = NA_real_,
             variables_vec = rep(NA_real_, ncol(problem)),
             status = solution$status,
-            message = solution$message,
-            model = solution$model
+            message = solution$message
         ) |> structure(class = "lp_solution")
 
         return(out)
@@ -282,8 +286,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
         aliases = als,
         variables_vec = solution$solution,
         status = solution$status,
-        message = solution$message,
-        model = solution$model
+        message = solution$message
     ) |> structure(class = "lp_solution")
 }
 
