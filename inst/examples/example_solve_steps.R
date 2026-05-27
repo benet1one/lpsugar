@@ -1,18 +1,18 @@
 library(ROI.plugin.highs)
 
-p <- lp_problem() |>
+problem <- lp_problem() |>
     lp_var(x[a = 1:2, b = 1:2], upper = 10) |>
     lp_alias(sum_x = sum(x)) |>
     lp_max(sum_x + 5)
 
 # Solve directly with lp_solve()
-direct_solution <- lp_solve(p)
+direct_solution <- lp_solve(problem)
 direct_solution
 
-# Or do each step
-model <- make_model(p)
-solution_raw <- solve_model(model)
-solution_pretty <- pretty_solution(problem = p, solution = solution_raw)
+# Or run each step manually
+op <- as.OP(problem)
+solution_raw <- ROI_solve(op)
+solution_pretty <- pretty_solution(problem, solution = solution_raw)
 
 # pretty_solution() gives each variable its dim and dimnames.
 solution_raw$solution

@@ -28,6 +28,5 @@ reference:
   - solution_summary
 - title: Manually solve a problem
   contents:
-  - make_model
-  - solve_model
+  - as.OP.lp_problem
   - pretty_solution
