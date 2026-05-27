@@ -1,6 +1,6 @@
-# Bind constraints
+# Define Multiple Constraints at Once
 
-Define multiple constraints at once.
+Concatenate constraints.
 
 ## Usage
 

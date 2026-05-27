@@ -36,6 +36,32 @@ lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
 
   Control arguments to be passed on to the solver.
 
+## Value
+
+A list with the following fields:
+
+- `$objective` : Scalar, value of the objective function at optimum.
+
+- `$variables` : List of arrays, values of the variables at optimum.
+
+- `$aliases` : List of arrays, values of the aliases at optimum.
+
+- `$variables_vec` : Numeric vector, values of the variables at optimum.
+
+- `$status` : Status as returned by
+  [`ROI::ROI_solve()`](https://rdrr.io/pkg/ROI/man/ROI_solve.html).
+
+- `$message` : Message as returned by
+  [`ROI::ROI_solve()`](https://rdrr.io/pkg/ROI/man/ROI_solve.html),
+
+- `$op` : Optimization Problem `OP`, as returned by
+  [`ROI::as.OP()`](https://rdrr.io/pkg/ROI/man/OP.html).
+
+## See also
+
+[`as.OP.lp_problem()`](https://benet1one.github.io/lpsugar/reference/as.OP.lp_problem.md),
+[`pretty_solution()`](https://benet1one.github.io/lpsugar/reference/pretty_solution.md).
+
 ## Examples
 
 ``` r

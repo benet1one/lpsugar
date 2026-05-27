@@ -95,7 +95,7 @@ library(ROI.plugin.highs)
 #> -- $variables_vec --
 #> -- $status --
 #> -- $message --
-#> -- $model --
+#> -- $op --
 
 s$aliases$total_profit
 #> [1] 43000

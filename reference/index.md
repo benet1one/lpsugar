@@ -50,7 +50,7 @@
 - [`bind_vars()`](https://benet1one.github.io/lpsugar/reference/bind_vars.md)
   : Concatenate variables and numbers.
 - [`bind_cons()`](https://benet1one.github.io/lpsugar/reference/bind_cons.md)
-  : Bind constraints
+  : Define Multiple Constraints at Once
 
 ## Analyse the solution
 
@@ -63,13 +63,10 @@
 
 ## Manually solve a problem
 
-- [`make_model()`](https://benet1one.github.io/lpsugar/reference/make_model.md)
+- [`as.OP(`*`<lp_problem>`*`)`](https://benet1one.github.io/lpsugar/reference/as.OP.lp_problem.md)
   :
 
   Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object.
-
-- [`solve_model()`](https://benet1one.github.io/lpsugar/reference/solve_model.md)
-  : Solve a Model
 
 - [`pretty_solution()`](https://benet1one.github.io/lpsugar/reference/pretty_solution.md)
   : Prettify the Solution of a Model.

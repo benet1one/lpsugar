@@ -15,7 +15,7 @@ lp_find_feasible() returns an arbitrary feasible solution."><meta name="google-s
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.18.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.19.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,6 +81,20 @@ are returned as <code>{0, 1}</code>. If <code>TRUE</code>, binary variables are 
 <dd><p>Control arguments to be passed on to the solver.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A list with the following fields:</p><ul><li><p><code>$objective</code> : Scalar, value of the objective function at optimum.</p></li>
+<li><p><code>$variables</code> : List of arrays, values of the variables at optimum.</p></li>
+<li><p><code>$aliases</code> : List of arrays, values of the aliases at optimum.</p></li>
+<li><p><code>$variables_vec</code> : Numeric vector, values of the variables at optimum.</p></li>
+<li><p><code>$status</code> : Status as returned by <code><a href="https://rdrr.io/pkg/ROI/man/ROI_solve.html" class="external-link">ROI::ROI_solve()</a></code>.</p></li>
+<li><p><code>$message</code> : Message as returned by <code><a href="https://rdrr.io/pkg/ROI/man/ROI_solve.html" class="external-link">ROI::ROI_solve()</a></code>,</p></li>
+<li><p><code>$op</code> : Optimization Problem <code>OP</code>, as returned by <code><a href="https://rdrr.io/pkg/ROI/man/OP.html" class="external-link">ROI::as.OP()</a></code>.</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="as.OP.lp_problem.html">as.OP.lp_problem()</a></code>, <code><a href="pretty_solution.html">pretty_solution()</a></code>.</p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

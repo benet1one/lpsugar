@@ -67,7 +67,7 @@ lp_problem() |>
 #> -- $variables_vec --
 #> -- $status --
 #> -- $message --
-#> -- $model --
+#> -- $op --
 
 # For a Quick Start guide see `vignette("lpsugar", package = "lpsugar")`
 ```

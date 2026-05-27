@@ -1,62 +1,35 @@
-# Prettify the Solution of a Model.
+# Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object.
 
-Takes a problem and its solution and prettifies the solution. Used
-internally in
+Convert an
+[`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
+object to a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object.
+Used internally in
 [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md).
 
 ## Usage
 
 ``` r
-pretty_solution(problem, solution, binary_as_logical = FALSE)
+# S3 method for class 'lp_problem'
+as.OP(x)
 ```
 
 ## Arguments
 
-- problem:
+- x:
 
   An
   [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md).
 
-- solution:
-
-  A list as returned by
-  [`ROI::ROI_solve()`](https://rdrr.io/pkg/ROI/man/ROI_solve.html).
-
-- binary_as_logical:
-
-  Boolean. If `FALSE` (the default), binary variables are returned as
-  `{0, 1}`. If `TRUE`, binary variables are returned as logical
-  `{FALSE, TRUE}`.
-
 ## Value
 
-A list with the following fields:
-
-- `$objective` : Scalar, value of the objective function at optimum.
-
-- `$variables` : List of arrays, values of the variables at optimum.
-
-- `$aliases` : List of arrays, values of the aliases at optimum.
-
-- `$variables_vec` : Numeric vector, values of the variables at optimum.
-
-- `$status` : Status as returned by
-  [`ROI::ROI_solve()`](https://rdrr.io/pkg/ROI/man/ROI_solve.html).
-
-- `$message` : Message as returned by
-  [`ROI::ROI_solve()`](https://rdrr.io/pkg/ROI/man/ROI_solve.html),
-
-- `$op` : Optimization Problem `OP`, as returned by
-  [`ROI::as.OP()`](https://rdrr.io/pkg/ROI/man/OP.html).
+An `OP` object as returned from
+[`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html).
 
 ## See also
 
-[`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
-for the standard way to solve a problem.
-
-[`as.OP.lp_problem()`](https://benet1one.github.io/lpsugar/reference/as.OP.lp_problem.md)
-to convert an `lp_problem` to an Optimization Problem `(OP)` object from
-package `ROI`.
+[`pretty_solution()`](https://benet1one.github.io/lpsugar/reference/pretty_solution.md)
+to prettify the solution returned by
+[`ROI::ROI_solve()`](https://rdrr.io/pkg/ROI/man/ROI_solve.html).
 
 ## Examples
 
