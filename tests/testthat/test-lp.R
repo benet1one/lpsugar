@@ -146,12 +146,10 @@ test_that("binary bounds", {
 })
 
 test_that("no applicable solver", {
-    pkgload::unload("ROI")
-    pkgload::unload("ROI.plugin.highs")
-
+    # No suggested solver for quadratic objective + integer variables
     p <- lp_problem() |>
-        lp_var(x, lower = 0) |>
-        lp_min(x)
+        lp_var(x, integer = TRUE) |>
+        lp_min(x^2)
 
     expect_error(
         lp_solve(p),

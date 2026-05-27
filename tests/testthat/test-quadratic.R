@@ -160,11 +160,11 @@ test_that("quadratic constraints", {
             x[3] > 0
         )
 
-    s <- lp_solve(p, start = c(0.5, -0.2, 0.9))
+    s <- lp_solve(p, solver = "alabama", start = c(0.5, -0.2, 0.9))
 
     expect_equal(
         round(s$variables$x, 4),
-        c(-1, -1, 0),
+        c(-1, -1, +0),
         ignore_attr = TRUE
     )
 })

@@ -147,8 +147,6 @@ as.Q_constraint.lp_problem <- function(x, ...) {
     }
 }
 
-
-#' Make an Optimization Problem
 #' @importFrom ROI as.OP
 #' @export
 ROI::as.OP
