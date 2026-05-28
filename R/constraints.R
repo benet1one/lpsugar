@@ -286,6 +286,7 @@ head.lp_constraint <- function(x, n = 6L, ...) {
         i <- x$name %in% i
     }
 
+    x$q_lhs <- x$q_lhs[i]
     x$lhs <- x$lhs[i, ]
     x$rhs <- x$rhs[i, ]
     x$dir <- x$dir[i]
