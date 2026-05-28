@@ -124,6 +124,22 @@ test_that("cumsum quadratic", {
     )
 })
 
+test_that("ifelse quadratic", {
+    n <- 4
+    a <- (1:n)^2
+    test <- c(TRUE, TRUE, FALSE, TRUE)
+
+    p <- lp_problem() |>
+        lp_var(x[1:n], lower = 0) |>
+        lp_con(
+            ifelse(test, a*x^2, a) <= 10
+        )
+
+    p$constraints$q_lhs |>
+        lapply(as.matrix) |>
+        expect_snapshot()
+})
+
 test_that("quadratic solver", {
     withr::local_package("ROI.plugin.highs")
 

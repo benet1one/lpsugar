@@ -41,3 +41,37 @@
       with class 'robust_index' from package 'lpsugar'
       
 
+# ifelse quadratic
+
+    Code
+      lapply(p$constraints$q_lhs, as.matrix)
+    Output
+      [[1]]
+           x[1] x[2] x[3] x[4]
+      x[1]    2    0    0    0
+      x[2]    0    0    0    0
+      x[3]    0    0    0    0
+      x[4]    0    0    0    0
+      
+      [[2]]
+           x[1] x[2] x[3] x[4]
+      x[1]    0    0    0    0
+      x[2]    0    8    0    0
+      x[3]    0    0    0    0
+      x[4]    0    0    0    0
+      
+      [[3]]
+           x[1] x[2] x[3] x[4]
+      x[1]    0    0    0    0
+      x[2]    0    0    0    0
+      x[3]    0    0    0    0
+      x[4]    0    0    0    0
+      
+      [[4]]
+           x[1] x[2] x[3] x[4]
+      x[1]    0    0    0    0
+      x[2]    0    0    0    0
+      x[3]    0    0    0    0
+      x[4]    0    0    0   32
+      
+
