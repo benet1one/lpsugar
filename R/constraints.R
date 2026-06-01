@@ -165,12 +165,23 @@ update_constraints <- function(.problem) {
         return(.problem)
     }
 
-    lhs <- .problem$constraints$lhs
-    to_bind <- matrix(0, nrow = nrow(lhs), ncol = ncol(.problem) - ncol(lhs))
-    lhs <- cbind(lhs, to_bind)
-    colnames(lhs) <- attr(.problem, "varnames")
+    # lhs <- .problem$constraints$lhs
+    # to_bind <- matrix(0, nrow = nrow(lhs), ncol = ncol(.problem) - ncol(lhs))
+    # lhs <- cbind(lhs, to_bind)
 
-    .problem$constraints$lhs <- lhs
+    q_ind <- which(lengths(.problem$constraints$q_lhs) > 0L)
+
+    for (i in q_ind) {
+        .problem$constraints$q_lhs[[i]]$nrow <- ncol(.problem)
+        .problem$constraints$q_lhs[[i]]$ncol <- ncol(.problem)
+        .problem$constraints$q_lhs[[i]]$dimnames <- list(
+            attr(.problem, "varnames"),
+            attr(.problem, "varnames")
+        )
+    }
+
+    .problem$constraints$lhs$ncol <- ncol(.problem)
+    colnames(.problem$constraints$lhs) <- attr(.problem, "varnames")
     .problem
 }
 
