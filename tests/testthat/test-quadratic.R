@@ -150,7 +150,6 @@ test_that("quadratic solver", {
             (x - 3)^2 + (x + y - 5)^2
         )
 
-
     s <- lp_solve(p)
 
     expect_equal(
@@ -176,6 +175,7 @@ test_that("quadratic constraints", {
             x[3] > 0
         )
 
+    expect_snapshot(p$constraints)
     s <- lp_solve(p, solver = "alabama", start = c(0.5, -0.2, 0.9))
 
     expect_equal(

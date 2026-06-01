@@ -75,3 +75,16 @@
       x[4]    0    0    0   32
       
 
+# quadratic constraints
+
+    Code
+      p$constraints
+    Output
+      
+      <unnamed> | n = 3 | quadratic | x^2 < 1
+      <unnamed> | n = 1 | x[3] > 0
+      
+       x[1] x[2] x[3] dir  
+       0    0    1    >=  0
+      
+

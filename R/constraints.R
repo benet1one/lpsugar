@@ -319,15 +319,26 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
             name
         }
 
+        if (compact) {
+            name_str <- format(name_str, width = 12L)
+        }
+
         ind <- x$name == name & x$call == call
+        quad <- is_quadratic(x[ind])
         n <- sum(ind)
 
-        cat("\n", name_str, "| n =", n, "|", call)
+        cat(
+            "\n",
+            name_str,
+            " | n = ", n,
+            if (quad) " | quadratic",
+            " | ", call,
+            sep = ""
+        )
 
-        if (!compact) {
+        if (!compact && !quad) {
             cat("\n\n")
-
-            mc <- x[ind, ] |> as.matrix.lp_constraint()
+            mc <- x[ind] |> as.matrix.lp_constraint()
             print(mc, quote = FALSE)
             cat("\n")
         }
