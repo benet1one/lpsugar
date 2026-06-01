@@ -108,7 +108,7 @@ as.L_constraint.lp_problem <- function(x, ...) {
         return(ROI::NO_constraint(n_obj = ncol(x)))
     }
 
-    if (any(lengths(x$constraints$q_lhs) > 0)) {
+    if (is_quadratic(x$constraints)) {
         warn("Problem has quadratic constraints, use `as.Q_constraint()` to include quadratic part.")
     }
 
