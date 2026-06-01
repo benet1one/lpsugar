@@ -1,13 +1,4 @@
 
-First Release
-- Quadratic constraints
-
-Code
-- drop R's colSums and export slam::col_sums?
-
-Quadratic
-- printing quadratic constraints
-
 Docs
 - Document SVMs in regression vignette
 - Uppercase titles
