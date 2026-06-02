@@ -257,24 +257,12 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
         return(out)
     }
 
-    vars <- purrr::map(problem$variables, function(x) {
-        out <- array(
-            solution$solution[x$ind],
-            dim = dim(x$ind),
-            dimnames = dimnames(x$ind)
-        )
-
-        if (length(x) == 1L  &&  identical(names(dimnames(x)), "scalar")) {
-            out <- unname(out[1])
-        }
-
-        if (x$binary && binary_as_logical) {
-            out <- out > 0.5
-        }
-
-        out
-    })
-
+    vars <- variables_to_list(
+        solution$solution, 
+        variables = problem$variables, 
+        binary_as_logical = binary_as_logical
+    )
+    
     als <- compute_aliases(problem, solution$solution)
     objective <- solution$objval + problem$objective$add
 

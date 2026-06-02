@@ -90,6 +90,90 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
     }
 }
 
+# Transforming variables -------------------------
+
+variables_to_list <- function(x, variables, binary_as_logical = FALSE) {
+    purrr::map(variables, function(v) {
+        values <- x[v$ind]
+        
+        if (v$binary && binary_as_logical) {
+            values <- values > 0.5
+        }
+        
+        if (length(v) == 1L  &&  identical(names(dimnames(v)), "scalar")) {
+            unname(values)
+        } else {
+            array(values, dim = dim(v), dimnames = dimnames(v))
+        }
+    })
+}
+
+solution_to_vec <- function(problem, solution, call = environment()) {
+    if (is_lp_solution(solution)) {
+        var_vec <- solution_to_vec(problem, solution$variables, call = call)
+        true_vec <- solution$variables_vec
+        
+        if (any(var_vec != true_vec)) {
+            rlang::abort(
+                c("`solution$variables` and `solution$variables_vec` do not match.",
+                  "i" = "You can use either one of them in this function."),
+                call = call
+            )
+        } else {
+            return(true_vec)
+        }
+        
+    } else if (is.atomic(solution)) {
+        if (length(solution) != ncol(problem)) {
+            n <- ncol(problem)
+            m <- length(solution)
+            abort("`problem` has ({n}) variables but `solution` is length ({m}).",
+                  call = call)
+        }
+        
+        num <- as.numeric(solution)
+        names(num) <- attr(problem, "varnames")
+        return(num)
+        
+    } else if (is.list(solution)) {
+        solution_vec <- numeric(ncol(problem))
+        names(solution_vec) <- attr(problem, "varnames")
+        
+        for (x in problem$variables) {
+            xs <- solution[[x$name]]
+            lower <- rep_len(x$lower, length(x))
+            if (x$integer) lower <- ceiling(lower)
+            default <- pmax(0, lower)
+            
+            if (is.null(xs)) {
+                xs <- default
+            } else {
+                xs <- as.numeric(xs)
+                xs[is.na(xs)] <- default[is.na(xs)]
+            }
+            
+            if (length(xs) != length(x)) {
+                n <- length(x)
+                m <- length(xs)
+                abort("Variable '{x$name}' in `solution` is length ({m}) when it should be length ({n}).",
+                      call = call)
+            }
+            
+            if (x$integer && !rlang::is_integerish(xs)) {
+                warn("'{x$name}' should be integer.", call = call)
+            }
+            
+            solution_vec[x$ind] <- xs
+        }
+        
+        return(solution_vec)
+        
+    } else {
+        abort("Unsupported type for `solution`.", call = call)
+    }
+}
+
+
 # Inheritance -------------------
 
 is_problem <- function(x) {
