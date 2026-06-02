@@ -177,3 +177,19 @@ inside <- function(expr) {
 
     expr
 }
+
+# Printing ------------------------
+
+print_field_name <- function(name) {
+    cat(
+        cli::col_grey(cli::symbol$en_dash),
+        cli::style_bold(" $", name),
+        "\n",
+        sep = ""
+    )
+}
+
+print_field <- function(x, field, ...) {
+    print_field_name(field)
+    print(x[[field]], ...)
+}

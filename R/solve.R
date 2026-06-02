@@ -249,23 +249,30 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
 #' @export
 print.lp_solution <- function(x, ...) {
     if (!is.na(x$objective)) {
-        print(x["variables"])
+        print_field(x, "variables")
 
         if (length(x$aliases) > 0L) {
-            print(x["aliases"])
+            print_field(x, "aliases")
         }
 
-        print(x["objective"])
+        print_field_name("objective")
+        cat(x$objective, "\n\n")
     }
-
-    if (x$status$code == 0) {
-        cat("$status$code = 0  (Optimal)\n")
+    
+    print_field_name("status")
+    
+    if (cli::is_utf8_output()) {
+        tick <- cli::symbol$tick
+        cross <- cli::symbol$checkbox_circle_on
     } else {
-        cat("$status$code =", x$status$code, "\n")
-        cat("$status$msg\n")
-        print(x$status$msg)
+        tick <- "[v]"
+        cross <- "[x]"
     }
-
-    cat("\nFields:\n")
-    cat(paste0("-- $", names(x), " --\n"), sep = "")
+    
+    if (x$status$code == 0) {
+        cat("Optimal Solution Found", tick, "\n\n")
+    } else {
+        cat("No Optimal Solution Found", cross, "\n\n")
+        print(x$status)
+    }
 }

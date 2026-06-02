@@ -13,6 +13,7 @@ BugReports: https://github.com/benet1one/lpsugar/issues
 Depends:
     R (>= 4.1.0)
 Imports: 
+    cli,
     glue,
     listcomp,
     methods,

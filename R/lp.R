@@ -37,24 +37,26 @@ lp_problem <- function() {
 
 #' @export
 print.lp_problem <- function(x, compact = TRUE, ...) {
-    cat("<lpsugar Linear Problem>\n\n")
+    cat(
+        cli::col_grey(rep(cli::symbol$en_dash, 2)),
+        cli::style_bold(" <lp_problem> "),
+        cli::col_grey(rep(cli::symbol$en_dash, 2)),
+        "\n\n",
+        sep = ""
+    )
 
     if (length(x$variables) > 0L) {
-        cat("-- $variables --\n")
-        print(x$variables)
+        print_field(x, "variables")
     }
 
     if (x$objective$direction != "") {
-        cat("-- $objective --\n")
-        print(x$objective)
+        print_field(x, "objective")
     }
 
     if (length(x$constraints) > 0L) {
-        cat("-- $constraints --")
-        print(x$constraints, compact = compact, ...)
+        print_field(x, "constraints", compact = compact)
     }
 
-    cat("\n")
     invisible(x)
 }
 

@@ -112,7 +112,8 @@ test_that("infeasible", {
         lp_alias(a = 2*z[1]) |>
         lp_constraint(z <= z - 1)
 
-    expect_no_error(lp_find_feasible(p))
+    s <- lp_find_feasible(p)
+    expect_snapshot(s)
 })
 
 test_that("unbounded", {

@@ -22,13 +22,14 @@
     Code
       print(p_many_rows, compact = FALSE)
     Output
-      <lpsugar Linear Problem>
+      ---- <lp_problem> ----
       
-      -- $variables --
+      -- $variables
       $y
       Real variable 'y[1:3]'
       
-      -- $constraints --
+      -- $constraints
+      
        <unnamed> | n = 20 | for (i in 1:20) y[i%%3 + 1] <= i
       
              y[1] y[2] y[3] dir   
@@ -53,20 +54,20 @@
       [i=19] 0    1    0    <=  19
       [i=20] 0    0    1    <=  20
       
-      
 
 ---
 
     Code
       print(p_many_cols, compact = FALSE)
     Output
-      <lpsugar Linear Problem>
+      ---- <lp_problem> ----
       
-      -- $variables --
+      -- $variables
       $z
       Real variable 'z[1:300]'
       
-      -- $constraints --
+      -- $constraints
+      
     Message
       Problem has over 200 variables, printing with `compact = TRUE`.
     Output
