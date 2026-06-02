@@ -44,7 +44,7 @@ print.lp_problem <- function(x, compact = TRUE, ...) {
         print(x$variables)
     }
 
-    if (any(x$objective$coef != 0L)) {
+    if (x$objective$direction != "") {
         cat("-- $objective --\n")
         print(x$objective)
     }
