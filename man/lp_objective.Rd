@@ -25,6 +25,7 @@ instead of optimizing, just like \code{\link[=lp_find_feasible]{lp_find_feasible
 \value{
 The \code{.problem} with the updated \verb{$objective} function, a list with these fields:
 \itemize{
+\item \verb{$q_coef} : If objective function is quadratic, matrix with the quadratic coefficients.
 \item \verb{$coef} : Vector with the coefficients for each variable.
 \item \verb{$add} : Numeric, addend to the final value. It is not used in the solver.
 \item \verb{$direction} : String, goal of the solver. Can be \code{"minimize"} or \code{"maximize"}.

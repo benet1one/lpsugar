@@ -14,6 +14,9 @@
 #' Constraints can be represented as `lhs * vars <dir> rhs`.
 #'
 #' The `$constraints` field has the following subfields:
+#' - `$q_lhs` : List of quadratic coefficient matrices:
+#'   - `NULL` if constraint is linear.
+#'   - [slam::simple_triplet_matrix()] if constraint is quadratic.
 #' - `$lhs` : [slam::simple_triplet_matrix()] where each row is a constraint,
 #' each column is a variable, and the values represent coefficients.
 #' - `$dir` : Character vector with elements `"<="`, `"=="`, or `">="`,
