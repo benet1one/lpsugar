@@ -23,7 +23,7 @@ Alternatively, set \code{objective = 0} to make the solver find a feasible solut
 instead of optimizing, just like \code{\link[=lp_find_feasible]{lp_find_feasible()}} does.}
 }
 \value{
-The \code{.problem} with the updated \verb{$objective} function, a list with these fields:
+The \code{.problem} with the new \verb{$objective} function, a list with these fields:
 \itemize{
 \item \verb{$q_coef} : If objective function is quadratic, matrix with the quadratic coefficients.
 \item \verb{$coef} : Vector with the coefficients for each variable.

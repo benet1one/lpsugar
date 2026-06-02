@@ -19,8 +19,6 @@ lp_problem <- function() {
         variables = list(),
         constraints = empty_constraint(),
         objective = list(
-            coef = numeric(),
-            add = 0,
             direction = "",
             expr = ""
         ) |> structure(class = "lp_objective"),

@@ -61,7 +61,7 @@ lp_objective <- function(.problem, objective) {
 #' apply `sum(objective)` and display a message. Suppress this message by writing
 #' the `sum` yourself.
 #'
-#' @returns The `.problem` with the updated `$objective` function, a list with these fields:
+#' @returns The `.problem` with the new `$objective` function, a list with these fields:
 #' - `$q_coef` : If objective function is quadratic, matrix with the quadratic coefficients.
 #' - `$coef` : Vector with the coefficients for each variable.
 #' - `$add` : Numeric, addend to the final value. It is not used in the solver.
