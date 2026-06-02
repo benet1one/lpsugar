@@ -48,26 +48,18 @@ lp_problem() |>
         2*x[1] + 3*x[2] <= 12
     ) |>
     lp_solve()
-#> $variables
-#> $variables$x
+#> – $variables
+#> $x
 #> 1:2
 #> 1 2 
 #> 3 2 
 #> 
+#> – $objective
+#> 5 
 #> 
-#> $objective
-#> [1] 5
+#> – $status
+#> Optimal Solution Found ✔ 
 #> 
-#> $status$code = 0  (Optimal)
-#> 
-#> Fields:
-#> -- $objective --
-#> -- $variables --
-#> -- $aliases --
-#> -- $variables_vec --
-#> -- $status --
-#> -- $message --
-#> -- $op --
 
 # For a Quick Start guide see `vignette("lpsugar", package = "lpsugar")`
 ```

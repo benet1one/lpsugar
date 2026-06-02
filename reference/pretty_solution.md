@@ -71,32 +71,23 @@ problem <- lp_problem() |>
 # Solve directly with lp_solve()
 direct_solution <- lp_solve(problem)
 direct_solution
-#> $variables
-#> $variables$x
+#> – $variables
+#> $x
 #>    b
 #> a    1  2
 #>   1 10 10
 #>   2 10 10
 #> 
-#> 
-#> $aliases
-#> $aliases$sum_x
+#> – $aliases
+#> $sum_x
 #> [1] 40
 #> 
+#> – $objective
+#> 45 
 #> 
-#> $objective
-#> [1] 45
+#> – $status
+#> Optimal Solution Found ✔ 
 #> 
-#> $status$code = 0  (Optimal)
-#> 
-#> Fields:
-#> -- $objective --
-#> -- $variables --
-#> -- $aliases --
-#> -- $variables_vec --
-#> -- $status --
-#> -- $message --
-#> -- $op --
 
 # Or run each step manually
 op <- as.OP(problem)

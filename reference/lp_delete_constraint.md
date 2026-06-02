@@ -38,12 +38,13 @@ if (some_condition) {
 }
 
 print(p)
-#> <lpsugar Linear Problem>
+#> –– <lp_problem> ––
 #> 
-#> -- $variables --
+#> – $variables
 #> $x
 #> Real scalar 'x'
 #> 
-#> -- $constraints --
+#> – $constraints
+#> 
 #>  c2 | n = 1 | x < 10
 ```

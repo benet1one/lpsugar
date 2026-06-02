@@ -123,12 +123,11 @@ food <- names(pantry)
 
 lp_problem() |>
     lp_variable(diet[food], lower = 0, upper = pantry)
-#> <lpsugar Linear Problem>
+#> –– <lp_problem> ––
 #> 
-#> -- $variables --
+#> – $variables
 #> $diet
 #> Real variable 'diet[food]'
-#> 
 #> 
 
 
@@ -139,12 +138,11 @@ nodes <- paste("node", 1:10)
 
 lp_problem() |>
     lp_variable(active[nodes, nodes], binary = TRUE)
-#> <lpsugar Linear Problem>
+#> –– <lp_problem> ––
 #> 
-#> -- $variables --
+#> – $variables
 #> $active
 #> Binary variable 'active[nodes, nodes]'
 #> 0 <= active <= 1
-#> 
 #> 
 ```

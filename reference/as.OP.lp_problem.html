@@ -15,7 +15,7 @@ Used internally in lp_solve()."><meta name="google-site-verification" content="u
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.19.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.19.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,32 +87,23 @@ Used internally in <code><a href="lp_solve.html">lp_solve()</a></code>.</p>
 <span class="r-in"><span><span class="co"># Solve directly with lp_solve()</span></span></span>
 <span class="r-in"><span><span class="va">direct_solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="va">problem</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">direct_solution</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $variables</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $variables$x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">–</span><span style="font-weight: bold;"> $variables</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    b</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> a    1  2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1 10 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   2 10 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $aliases</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $aliases$sum_x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">–</span><span style="font-weight: bold;"> $aliases</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $sum_x</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 40</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">–</span><span style="font-weight: bold;"> $objective</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $objective</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 45</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">–</span><span style="font-weight: bold;"> $status</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Optimal Solution Found ✔ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $status$code = 0  (Optimal)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fields:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -- $objective --</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -- $variables --</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -- $aliases --</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -- $variables_vec --</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -- $status --</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -- $message --</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -- $op --</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Or run each step manually</span></span></span>
 <span class="r-in"><span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ROI/man/OP.html" class="external-link">as.OP</a></span><span class="op">(</span><span class="va">problem</span><span class="op">)</span></span></span>

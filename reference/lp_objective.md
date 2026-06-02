@@ -71,31 +71,22 @@ p$objective
 
 library(ROI.plugin.highs)
 (s <- lp_solve(p))
-#> $variables
-#> $variables$made
+#> – $variables
+#> $made
 #> product
 #>  Phone Tablet  eBook 
 #>    500    300    700 
 #> 
-#> 
-#> $aliases
-#> $aliases$total_profit
+#> – $aliases
+#> $total_profit
 #> [1] 43000
 #> 
+#> – $objective
+#> 32000 
 #> 
-#> $objective
-#> [1] 32000
+#> – $status
+#> Optimal Solution Found ✔ 
 #> 
-#> $status$code = 0  (Optimal)
-#> 
-#> Fields:
-#> -- $objective --
-#> -- $variables --
-#> -- $aliases --
-#> -- $variables_vec --
-#> -- $status --
-#> -- $message --
-#> -- $op --
 
 s$aliases$total_profit
 #> [1] 43000
