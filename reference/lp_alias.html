@@ -15,7 +15,7 @@ complexity to the problem."><meta name="google-site-verification" content="uYvny
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.19.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.20.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,7 +108,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-in"><span><span class="co"># But this problem has 3 extra variables and 3 extra constraints:</span></span></span>
 <span class="r-in"><span><span class="va">p0</span><span class="op">$</span><span class="va">constraints</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  some_constraint | n = 3 | (x + y &gt;= 4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> some_constraint | n = 3 | (x + y &gt;= 4)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 x[a] x[b] x[c] y[a] y[b] y[c] z[a] z[b] z[c] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> some_constraint 1    0    0    1    0    0    0    0    0    &gt;=  4</span>
@@ -116,13 +116,13 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> some_constraint 0    0    1    0    0    1    0    0    0    &gt;=  4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  constraint_with_z | n = 1 | (z[1] &lt;= 7)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> constraint_with_z | n = 1 | (z[1] &lt;= 7)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   x[a] x[b] x[c] y[a] y[b] y[c] z[a] z[b] z[c] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constraint_with_z 0    0    0    0    0    0    1    0    0    &lt;=  7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  xyz | n = 3 | for (i in 1:n) z[i] == 2 * x[i] + y[n - i + 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> xyz | n = 3 | for (i in 1:n) z[i] == 2 * x[i] + y[n - i + 1]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          x[a] x[b] x[c] y[a] y[b] y[c] z[a] z[b] z[c] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> xyz[i=1] -2   0    0    0    0    -1   1    0    0    ==  0</span>
@@ -146,7 +146,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-in"><span><span class="co"># This problem no extra variables or constraints!</span></span></span>
 <span class="r-in"><span><span class="va">p1</span><span class="op">$</span><span class="va">constraints</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  some_constraint | n = 3 | x + y &gt;= 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> some_constraint | n = 3 | x + y &gt;= 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 x[a] x[b] x[c] y[a] y[b] y[c] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> some_constraint 1    0    0    1    0    0    &gt;=  4</span>
@@ -154,7 +154,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> some_constraint 0    0    1    0    0    1    &gt;=  4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  constraint_with_z | n = 1 | (z[1] &lt;= 7)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> constraint_with_z | n = 1 | (z[1] &lt;= 7)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   x[a] x[b] x[c] y[a] y[b] y[c] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> constraint_with_z 2    0    0    0    0    1    &lt;=  7</span>
@@ -253,7 +253,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-in"><span><span class="co"># The problems are equivalent</span></span></span>
 <span class="r-in"><span><span class="va">p0</span><span class="op">$</span><span class="va">constraints</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  min | n = 6 | for (j in Cols) for (i in seq_along(Rows)) { ... }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> min | n = 6 | for (j in Cols) for (i in seq_along(Rows)) { ... }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> min[i=1, j="A"] 1      0      0      0      0      0      &gt;=  1</span>
@@ -264,7 +264,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> min[i=3, j="B"] 0      0      0      1      1      1      &gt;=  3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  max | n = 6 | for (j in Cols) for (i in seq_along(Rows)) { ... }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> max | n = 6 | for (j in Cols) for (i in seq_along(Rows)) { ... }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> max[i=1, j="A"] 1      0      0      0      0      0      &lt;=  4</span>
@@ -275,7 +275,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> max[i=3, j="B"] 0      0      0      1      1      1      &lt;=  7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  A_less_than_B | n = 3 | for (i in seq_along(Rows)) { ... }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_less_than_B | n = 3 | for (i in seq_along(Rows)) { ... }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A_less_than_B[i=1] 1      0      0      -1     0      0      &lt;=  0</span>
@@ -284,7 +284,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="va">p1</span><span class="op">$</span><span class="va">constraints</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  min | n = 6 | (col_cumsum &gt;= min_col_cumsum)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> min | n = 6 | (col_cumsum &gt;= min_col_cumsum)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> min 1      0      0      0      0      0      &gt;=  1</span>
@@ -295,7 +295,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> min 0      0      0      1      1      1      &gt;=  3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  max | n = 6 | (col_cumsum &lt;= max_col_cumsum)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> max | n = 6 | (col_cumsum &lt;= max_col_cumsum)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> max 1      0      0      0      0      0      &lt;=  4</span>
@@ -306,7 +306,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> max 0      0      0      1      1      1      &lt;=  7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  A_less_than_B | n = 3 | (col_cumsum[, "A"] &lt;= col_cumsum[, "B"])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_less_than_B | n = 3 | (col_cumsum[, "A"] &lt;= col_cumsum[, "B"])</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A_less_than_B 1      0      0      -1     0      0      &lt;=  0</span>

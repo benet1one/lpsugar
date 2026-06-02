@@ -80,7 +80,7 @@ for (i in 2:n) {
 ## The only difference are the rownames of the constraint matrix
 print(pc$constraints)
 #> 
-#>  alt1 | n = 3 | ordered[2:n] > ordered[1:(n - 1)]
+#> alt1 | n = 3 | ordered[2:n] > ordered[1:(n - 1)]
 #> 
 #>      ordered[1] ordered[2] ordered[3] ordered[4] dir  
 #> alt1 -1         1          0          0          >=  0
@@ -88,7 +88,7 @@ print(pc$constraints)
 #> alt1 0          0          -1         1          >=  0
 #> 
 #> 
-#>  alt2 | n = 3 | for (i in 2:n) ordered[i] > ordered[i - 1]
+#> alt2 | n = 3 | for (i in 2:n) ordered[i] > ordered[i - 1]
 #> 
 #>           ordered[1] ordered[2] ordered[3] ordered[4] dir  
 #> alt2[i=2] -1         1          0          0          >=  0
@@ -96,7 +96,7 @@ print(pc$constraints)
 #> alt2[i=4] 0          0          -1         1          >=  0
 #> 
 #> 
-#>  alt3 | n = 3 | ordered[i] > ordered[i - 1]
+#> alt3 | n = 3 | ordered[i] > ordered[i - 1]
 #> 
 #>      ordered[1] ordered[2] ordered[3] ordered[4] dir  
 #> alt3 -1         1          0          0          >=  0

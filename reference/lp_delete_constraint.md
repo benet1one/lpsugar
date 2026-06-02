@@ -46,5 +46,5 @@ print(p)
 #> 
 #> – $constraints
 #> 
-#>  c2 | n = 1 | x < 10
+#> c2           | n = 1 | x < 10
 ```

@@ -38,13 +38,13 @@ p <- lp_problem() |>
 
 p$constraints
 #> 
-#>  <unnamed> | n = 1 | sum(is_value) == 2
+#> <unnamed> | n = 1 | sum(is_value) == 2
 #> 
 #>  y[1] y[2] y[3] y[4] is_value[1] is_value[2] is_value[3] is_value[4] dir  
 #>  0    0    0    0    1           1           1           1           ==  2
 #> 
 #> 
-#>  <unnamed> | n = 8 | for (i in 1:n) bind_cons(y[i] >= lower + is_value[i] * (value -  ...
+#> <unnamed> | n = 8 | for (i in 1:n) bind_cons(y[i] >= lower + is_value[i] * (value -  ...
 #> 
 #>       y[1] y[2] y[3] y[4] is_value[1] is_value[2] is_value[3] is_value[4] dir  
 #> [i=1] 1    0    0    0    -2          0           0           0           >=  1

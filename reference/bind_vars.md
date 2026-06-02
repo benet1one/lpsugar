@@ -36,7 +36,7 @@ p <- lp_problem() |>
 
 p$constraints
 #> 
-#>  <unnamed> | n = 3 | for (i in 2:length(y_full)) y_full[i] > y_full[i - 1]
+#> <unnamed> | n = 3 | for (i in 2:length(y_full)) y_full[i] > y_full[i - 1]
 #> 
 #>       y[1] y[2] y[3] dir  
 #> [i=2] 1    0    0    >=  4
