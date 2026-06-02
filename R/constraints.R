@@ -165,10 +165,6 @@ update_constraints <- function(.problem) {
         return(.problem)
     }
 
-    # lhs <- .problem$constraints$lhs
-    # to_bind <- matrix(0, nrow = nrow(lhs), ncol = ncol(.problem) - ncol(lhs))
-    # lhs <- cbind(lhs, to_bind)
-
     q_ind <- which(lengths(.problem$constraints$q_lhs) > 0L)
 
     for (i in q_ind) {
