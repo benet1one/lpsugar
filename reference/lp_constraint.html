@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.20.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.20.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +77,10 @@
     <p>The <code>.problem</code> with added <code>$constraints</code>. (Note: previous constraints are not
 overritten).</p>
 <p>Constraints can be represented as <code>lhs * vars &lt;dir&gt; rhs</code>.</p>
-<p>The <code>$constraints</code> field has the following subfields:</p><ul><li><p><code>$lhs</code> : <code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix()</a></code> where each row is a constraint,
+<p>The <code>$constraints</code> field has the following subfields:</p><ul><li><p><code>$q_lhs</code> : List of quadratic coefficient matrices:</p><ul><li><p><code>NULL</code> if constraint is linear.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix()</a></code> if constraint is quadratic.</p></li>
+</ul></li>
+<li><p><code>$lhs</code> : <code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix()</a></code> where each row is a constraint,
 each column is a variable, and the values represent coefficients.</p></li>
 <li><p><code>$dir</code> : Character vector with elements <code>"&lt;="</code>, <code>"=="</code>, or <code>"&gt;="</code>,
 the direction of each constraint.</p></li>

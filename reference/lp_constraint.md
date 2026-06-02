@@ -39,6 +39,13 @@ Constraints can be represented as `lhs * vars <dir> rhs`.
 
 The `$constraints` field has the following subfields:
 
+- `$q_lhs` : List of quadratic coefficient matrices:
+
+  - `NULL` if constraint is linear.
+
+  - [`slam::simple_triplet_matrix()`](https://rdrr.io/pkg/slam/man/matrix.html)
+    if constraint is quadratic.
+
 - `$lhs` :
   [`slam::simple_triplet_matrix()`](https://rdrr.io/pkg/slam/man/matrix.html)
   where each row is a constraint, each column is a variable, and the

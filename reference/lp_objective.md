@@ -34,6 +34,9 @@ lp_max(.problem, objective)
 The `.problem` with the updated `$objective` function, a list with these
 fields:
 
+- `$q_coef` : If objective function is quadratic, matrix with the
+  quadratic coefficients.
+
 - `$coef` : Vector with the coefficients for each variable.
 
 - `$add` : Numeric, addend to the final value. It is not used in the
