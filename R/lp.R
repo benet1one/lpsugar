@@ -61,7 +61,13 @@ print.lp_problem <- function(x, compact = TRUE, ...) {
 #' @export
 dim.lp_problem <- function(x) {
     c(
-        length(x$constraints),
-        attr(x, "n_variables")
+        n_constraints = length(x$constraints),
+        n_variables = attr(x, "n_variables")
     )
+}
+
+#' @importFrom stats variable.names
+#' @export
+variable.names.lp_problem <- function(object, ...) {
+    attr(object, "varnames")
 }
