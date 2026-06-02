@@ -31,7 +31,7 @@ test_that("objective", {
 
     expect_message(lp_minimize(p, y), "sum\\(y\\)")
     expect_equal(
-        lp_minimize(p, y) $ objective $ coef,
+        suppressMessages(lp_minimize(p, y) $ objective $ coef),
         lp_minimize(p, sum(y)) $ objective $ coef
     )
 
