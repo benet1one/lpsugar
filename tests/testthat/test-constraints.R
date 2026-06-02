@@ -33,16 +33,32 @@ test_that("printing", {
 test_that("constraint updates", {
     p <- lp_problem() |>
         lp_var(x[1:3]) |>
-        lp_con(x >= 0)
+        lp_con(x^2 >= 0)
 
     p2 <- p |> lp_variable(z[1:2])
+
     expect_equal(
-        dim(p2$constraints$lhs), c(3, 5)
+        dim(p2$constraints$lhs),
+        c(3, 5)
+    )
+    expect_equal(
+        colnames(p2$constraints$lhs),
+        attr(p2, "varnames")
+    )
+    expect_equal(
+        dim(p2$constraints$q_lhs[[1]]),
+        c(5, 5)
+    )
+    expect_equal(
+        dimnames(p2$constraints$q_lhs[[1]]),
+        list(attr(p2, "varnames"), attr(p2, "varnames"))
     )
 
     p3 <- p2 |> lp_constraint(x[1:2] <= 4*z[1:2])
+
     expect_equal(
-        dim(p3$constraints$lhs), c(5, 5)
+        dim(p3$constraints$lhs),
+        c(5, 5)
     )
 
     p$constraints

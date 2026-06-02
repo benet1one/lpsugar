@@ -594,8 +594,13 @@ get_q_coef <- function(x) {
 }
 
 is_quadratic <- function(x) {
-    (is_lp_variable(x) || is_lp_objective(x)) &&
-        (!is.null(x$q_coef))
+    if (is_lp_variable(x) || is_lp_objective(x)) {
+        return(!is.null(x$q_coef))
+    } else if (is_lp_constraint(x)) {
+        return(any(lengths(x$q_lhs) > 0L))
+    } else {
+        return(FALSE)
+    }
 }
 
 as_quadratic <- function(x) {

@@ -124,6 +124,22 @@ test_that("cumsum quadratic", {
     )
 })
 
+test_that("ifelse quadratic", {
+    n <- 4
+    a <- (1:n)^2
+    test <- c(TRUE, TRUE, FALSE, TRUE)
+
+    p <- lp_problem() |>
+        lp_var(x[1:n], lower = 0) |>
+        lp_con(
+            ifelse(test, a*x^2, a) <= 10
+        )
+
+    p$constraints$q_lhs |>
+        lapply(as.matrix) |>
+        expect_snapshot()
+})
+
 test_that("quadratic solver", {
     withr::local_package("ROI.plugin.highs")
 
@@ -133,7 +149,6 @@ test_that("quadratic solver", {
         lp_min(
             (x - 3)^2 + (x + y - 5)^2
         )
-
 
     s <- lp_solve(p)
 
@@ -146,5 +161,26 @@ test_that("quadratic solver", {
     expect_equal(
         compute_objective(p, list(x = 3, y = 2)),
         s$objective
+    )
+})
+
+test_that("quadratic constraints", {
+    withr::local_package("ROI.plugin.alabama")
+
+    p <- lp_problem() |>
+        lp_var(x[1:3]) |>
+        lp_min(sum(x)) |>
+        lp_con(
+            x^2 < 1,
+            x[3] > 0
+        )
+
+    expect_snapshot(p$constraints)
+    s <- lp_solve(p, solver = "alabama", start = c(0.5, -0.2, 0.9))
+
+    expect_equal(
+        round(s$variables$x, 4),
+        c(-1, -1, +0),
+        ignore_attr = TRUE
     )
 })

@@ -73,6 +73,19 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
 #' @export
 as.L_objective.lp_problem <- function(x) {
     if (is_quadratic(x$objective)) {
+        warn("Problem has a quadratic objective function, use `as.Q_objective()` to include quadratic part.")
+    }
+
+    ROI::L_objective(
+        L = x$objective$coef,
+        names = attr(x, "varnames")
+    )
+}
+
+#' @importFrom ROI as.Q_objective
+#' @export
+as.Q_objective.lp_problem <- function(x) {
+    if (is_quadratic(x$objective)) {
         ROI::Q_objective(
             Q = x$objective$q_coef,
             L = x$objective$coef,
@@ -95,12 +108,43 @@ as.L_constraint.lp_problem <- function(x, ...) {
         return(ROI::NO_constraint(n_obj = ncol(x)))
     }
 
+    if (is_quadratic(x$constraints)) {
+        warn("Problem has quadratic constraints, use `as.Q_constraint()` to include quadratic part.")
+    }
+
     ROI::L_constraint(
         L = x$constraints$lhs,
         dir = c(x$constraints$dir),
         rhs = c(x$constraints$rhs),
         names = attr(x, "varnames")
     )
+}
+
+#' @importFrom ROI as.Q_constraint
+#' @export
+as.Q_constraint.lp_problem <- function(x, ...) {
+    rlang::check_dots_empty()
+
+    if (length(x$constraints) == 0L) {
+        return(ROI::NO_constraint(n_obj = ncol(x)))
+    }
+
+    if (any(lengths(x$constraints$q_lhs) > 0)) {
+        ROI::Q_constraint(
+            Q = x$constraints$q_lhs,
+            L = x$constraints$lhs,
+            dir = c(x$constraints$dir),
+            rhs = c(x$constraints$rhs),
+            names = attr(x, "varnames")
+        )
+    } else {
+        ROI::L_constraint(
+            L = x$constraints$lhs,
+            dir = c(x$constraints$dir),
+            rhs = c(x$constraints$rhs),
+            names = attr(x, "varnames")
+        )
+    }
 }
 
 #' @importFrom ROI as.OP
@@ -147,8 +191,8 @@ as.OP.lp_problem <- function(x) {
         ))
     }
 
-    objective <- as.L_objective.lp_problem(x)
-    constraints <- as.L_constraint.lp_problem(x)
+    objective <- as.Q_objective.lp_problem(x)
+    constraints <- as.Q_constraint.lp_problem(x)
 
     types <- character(ncol(x))
     lower <- numeric(ncol(x))

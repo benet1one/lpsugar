@@ -165,12 +165,19 @@ update_constraints <- function(.problem) {
         return(.problem)
     }
 
-    lhs <- .problem$constraints$lhs
-    to_bind <- matrix(0, nrow = nrow(lhs), ncol = ncol(.problem) - ncol(lhs))
-    lhs <- cbind(lhs, to_bind)
-    colnames(lhs) <- attr(.problem, "varnames")
+    q_ind <- which(lengths(.problem$constraints$q_lhs) > 0L)
 
-    .problem$constraints$lhs <- lhs
+    for (i in q_ind) {
+        .problem$constraints$q_lhs[[i]]$nrow[] <- ncol(.problem)
+        .problem$constraints$q_lhs[[i]]$ncol[] <- ncol(.problem)
+        .problem$constraints$q_lhs[[i]]$dimnames <- list(
+            attr(.problem, "varnames"),
+            attr(.problem, "varnames")
+        )
+    }
+
+    .problem$constraints$lhs$ncol[] <- ncol(.problem)
+    colnames(.problem$constraints$lhs) <- attr(.problem, "varnames")
     .problem
 }
 
@@ -212,12 +219,7 @@ bind_cons <- function(...) {
 
     out <- purrr::list_transpose(dots, simplify = FALSE)
 
-    # dots_names <- rlang::names2(dots)
-    #
-    # for (i in which(dots_names != "")) {
-    #     out$name[[i]] <- rep_len(dots_names[i], length(out$name[[i]]))
-    # }
-
+    out$q_lhs <- unlist(out$q_lhs, recursive = FALSE)
     out$lhs <- do.call(what = rbind, out$lhs)
     out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()
     out$dir <- unlist(out$dir)
@@ -285,6 +287,7 @@ head.lp_constraint <- function(x, n = 6L, ...) {
         i <- x$name %in% i
     }
 
+    x$q_lhs <- x$q_lhs[i]
     x$lhs <- x$lhs[i, ]
     x$rhs <- x$rhs[i, ]
     x$dir <- x$dir[i]
@@ -317,15 +320,26 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
             name
         }
 
+        if (compact) {
+            name_str <- format(name_str, width = 12L)
+        }
+
         ind <- x$name == name & x$call == call
+        quad <- is_quadratic(x[ind])
         n <- sum(ind)
 
-        cat("\n", name_str, "| n =", n, "|", call)
+        cat(
+            "\n",
+            name_str,
+            " | n = ", n,
+            if (quad) " | quadratic",
+            " | ", call,
+            sep = ""
+        )
 
-        if (!compact) {
+        if (!compact && !quad) {
             cat("\n\n")
-
-            mc <- x[ind, ] |> as.matrix.lp_constraint()
+            mc <- x[ind] |> as.matrix.lp_constraint()
             print(mc, quote = FALSE)
             cat("\n")
         }

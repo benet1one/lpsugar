@@ -198,8 +198,19 @@ solution_to_vec <- function(problem, solution, call = environment()) {
 constraint_summary <- function(problem, solution, tol = 2e-6) {
     solution <- solution_to_vec(problem, solution)
     con <- problem$constraints
-    lhs <- con$lhs %*% solution
-    lhs <- lhs[, 1]
+
+    quadratic_part <- numeric(nrow(con))
+    q_ind <- which(lengths(con$q_lhs) > 0L)
+
+    for (i in q_ind) {
+        q <- con$q_lhs[[i]]
+        row_sol <- t(solution)
+        col_sol <- t(row_sol)
+        quadratic_part[i] <- 0.5 * row_sol %*% q %*% col_sol
+    }
+
+    linear_part <- con$lhs %*% solution
+    lhs <- quadratic_part + linear_part
     dir <- con$dir
     rhs <- con$rhs[, 1]
     diff <- rhs - lhs

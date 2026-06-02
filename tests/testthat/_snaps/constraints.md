@@ -4,7 +4,7 @@
       print(plong$constraints, compact = TRUE)
     Output
       
-       <unnamed> | n = 1 | x + x + x + x + x + x + x + x + x + x + x + x + x + x + x + x +  ...
+      <unnamed>    | n = 1 | x + x + x + x + x + x + x + x + x + x + x + x + x + x + x + x +  ...
 
 ---
 
@@ -12,10 +12,10 @@
       print(p$constraints, compact = TRUE)
     Output
       
-       <unnamed> | n = 1 | x[1] == 0
-       my_con | n = 6 | x < t(y)
-       one_line_fs | n = 6 | for (i in 1:3) x[i, ] >= y[, i] - 10
-       my_fs | n = 6 | for (i in 1:3) { ... }
+      <unnamed>    | n = 1 | x[1] == 0
+      my_con       | n = 6 | x < t(y)
+      one_line_fs  | n = 6 | for (i in 1:3) x[i, ] >= y[, i] - 10
+      my_fs        | n = 6 | for (i in 1:3) { ... }
 
 ---
 
@@ -30,7 +30,7 @@
       
       -- $constraints
       
-       <unnamed> | n = 20 | for (i in 1:20) y[i%%3 + 1] <= i
+      <unnamed> | n = 20 | for (i in 1:20) y[i%%3 + 1] <= i
       
              y[1] y[2] y[3] dir   
       [i=1]  0    1    0    <=  1 
@@ -72,8 +72,8 @@
       Problem has over 200 variables, printing with `compact = TRUE`.
     Output
       
-       <unnamed> | n = 300 | z >= 0
-       <unnamed> | n = 300 | z <= 10
+      <unnamed>    | n = 300 | z >= 0
+      <unnamed>    | n = 300 | z <= 10
 
 # bind constraints
 
@@ -81,7 +81,7 @@
       q$constraints
     Output
       
-       name_outer | n = 6 | for (i in 1:n) bind_cons(y[i] >= l + is_two[i] * (2 - l), y[i] <=  ...
+      name_outer | n = 6 | for (i in 1:n) bind_cons(y[i] >= l + is_two[i] * (2 - l), y[i] <=  ...
       
                       y[1] y[2] y[3] is_two[1] is_two[2] is_two[3] dir  
       name_outer[i=1] 1    0    0    -2        0         0         >=  0
@@ -102,7 +102,7 @@
       p_if_for$constraints
     Output
       
-       cc | n = 3 | if (cond[i]) x[i] <= 0
+      cc | n = 3 | if (cond[i]) x[i] <= 0
       
          x[1] x[2] x[3] x[4] x[5] dir  
       cc 0    1    0    0    0    <=  0
@@ -119,7 +119,7 @@
       p_for_if$constraints
     Output
       
-       cc | n = 3 | for (i in seq_along(x)) if (cond[i]) { ... }
+      cc | n = 3 | for (i in seq_along(x)) if (cond[i]) { ... }
       
               x[1] x[2] x[3] x[4] x[5] dir  
       cc[i=2] 0    1    0    0    0    <=  0

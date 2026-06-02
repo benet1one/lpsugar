@@ -337,49 +337,32 @@ ifelse_l <- function(test, yes, no) {
     else as.logical(test)
 
     # lpsugar code
+    if (anyNA(test)) {
+        abort("`test` cannot contain NA values.")
+    }
+
     len <- length(test)
 
-    # One of them is a variable
     if (is_lp_variable(yes)) {
-        yes_v <- recycle_var(yes, len)
-        v <- yes_v
-    } else if (!is.numeric(yes)) {
+        yes <- recycle_var(yes, len)
+    } else if (is.numeric(yes)) {
+        yes <- recycle_const(yes, len)
+    } else {
         abort("`yes` must either be a variable or a numeric vector.")
     }
+
     if (is_lp_variable(no)) {
-        no_v <- recycle_var(no, len)
-        v <- no_v
-    } else if (!is.numeric(no)) {
+        no <- recycle_var(no, len)
+    } else if (is.numeric(no)) {
+        no <- recycle_const(no, len)
+    } else {
         abort("`no` must either be a variable or a numeric vector.")
     }
 
-    if (!is_lp_variable(yes)) {
-        yes_v <- v
-        yes_v$coef[] <- 0
-        yes_v$add[] <- rep_len(yes, len)
-    }
-    if (!is_lp_variable(no)) {
-        no_v <- v
-        no_v$coef[] <- 0
-        no_v$add[] <- rep_len(no, len)
-    }
+    test <- as.numeric(test)
 
-    out <- v
-    out$add <- matrix(NA, nrow = len, ncol = 1L)
-    out$coef <- matrix(NA, nrow = len, ncol = ncol(v$coef))
-    colnames(out$coef) <- colnames(v$coef)
+    yes <- yes * test
+    no <- no * (1 - test)
 
-    ypos <- which(test)
-    npos <- which(!test)
-
-    if (length(ypos) > 0L) {
-        out$coef[ypos, ] <- yes_v$coef[ypos, ]
-        out$add[ypos, ] <- yes_v$add[ypos, ]
-    }
-    if (length(npos) > 0L) {
-        out$coef[npos, ] <- no_v$coef[npos, ]
-        out$add[npos, ] <- no_v$add[npos, ]
-    }
-
-    out
+    yes + no
 }
