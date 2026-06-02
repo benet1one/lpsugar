@@ -1,4 +1,12 @@
 
+Function Objective
+- document that ROI tests rep(0, n) for function sanity
+- gradients and hessians
+- print objective
+- update_objective
+- as.F_objective (ROI:::.check_function_sanity())
+- compute_objective
+
 Docs
 - Document SVMs in regression vignette
 - Uppercase titles
