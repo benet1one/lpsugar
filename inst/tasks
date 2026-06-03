@@ -1,4 +1,7 @@
 
+Code
+- variables_to_vec ensure named variables are passed in correct order
+
 Function Objective
 - gradients and hessians
 - update_objective
