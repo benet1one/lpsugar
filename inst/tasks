@@ -4,8 +4,6 @@ Code
 
 Function Objective
 - gradients and hessians
-- update_objective
-- compute_objective
 
 Docs
 - Document SVMs in regression vignette
