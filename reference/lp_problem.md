@@ -50,13 +50,10 @@ lp_problem() |>
     lp_solve()
 #> – $variables
 #> $x
-#> 1:2
-#> 1 2 
-#> 3 2 
+#> [1] 3 2
 #> 
 #> – $objective
-#> 5 
-#> 
+#> [1] 5
 #> – $status
 #> Optimal Solution Found ✔ 
 #> 

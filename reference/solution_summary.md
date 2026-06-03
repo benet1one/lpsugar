@@ -32,7 +32,9 @@ compute_aliases(problem, solution)
     is missing, it is set to `pmax(0, lower)`.
 
   - An `lp_solution` object as returned by
-    [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md).
+    [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
+    or
+    [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md).
 
   - A vector containing the values of each variable, one after another.
 

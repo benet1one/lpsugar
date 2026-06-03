@@ -148,6 +148,12 @@ package website.
   [`lp_impvar()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
   : Define an Alias or Implicit Variable (IMPVAR)
 
+- [`lp_minimize_function()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
+  [`lp_maximize_function()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
+  [`lp_min_fun()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
+  [`lp_max_fun()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
+  : Set a General Nonlinear Objective Function
+
 - [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
   [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
   : Solve a Linear Problem

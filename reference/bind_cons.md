@@ -61,13 +61,9 @@ library(ROI.plugin.highs)
 s <- lp_solve(p, binary_as_logical = TRUE)
 s$variables
 #> $y
-#> 1:n
-#> 1 2 3 4 
-#> 7 7 3 3 
+#> [1] 7 7 3 3
 #> 
 #> $is_value
-#> 1:n
-#>     1     2     3     4 
-#> FALSE FALSE  TRUE  TRUE 
+#> [1] FALSE FALSE  TRUE  TRUE
 #> 
 ```

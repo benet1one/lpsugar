@@ -73,18 +73,17 @@ direct_solution <- lp_solve(problem)
 direct_solution
 #> – $variables
 #> $x
-#>    b
-#> a    1  2
-#>   1 10 10
-#>   2 10 10
+#>       b
+#> a      [,1] [,2]
+#>   [1,]   10   10
+#>   [2,]   10   10
 #> 
 #> – $aliases
 #> $sum_x
 #> [1] 40
 #> 
 #> – $objective
-#> 45 
-#> 
+#> [1] 45
 #> – $status
 #> Optimal Solution Found ✔ 
 #> 
@@ -100,10 +99,10 @@ solution_raw$solution
 #>     10     10     10     10 
 solution_pretty$variables
 #> $x
-#>    b
-#> a    1  2
-#>   1 10 10
-#>   2 10 10
+#>       b
+#> a      [,1] [,2]
+#>   [1,]   10   10
+#>   [2,]   10   10
 #> 
 
 # It also computes aliases

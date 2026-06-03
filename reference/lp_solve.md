@@ -7,7 +7,7 @@ whereas `lp_find_feasible()` returns an arbitrary feasible solution.
 ## Usage
 
 ``` r
-lp_solve(.problem, solver, binary_as_logical = FALSE, ...)
+lp_solve(.problem, solver, ..., start, binary_as_logical = FALSE)
 
 lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
 ```
@@ -26,15 +26,27 @@ lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
   [`ROI::ROI_options()`](https://rdrr.io/pkg/ROI/man/ROI_options.html)
   is used.
 
+- ...:
+
+  Control arguments to be passed on to the solver.
+
+- start:
+
+  Start value of variables, for nonlinear solvers. One of:
+
+  - Named list of variables with their respective values. If a variable
+    is missing, it is set to `pmax(0, lower)`.
+
+  - An `lp_solution` object as returned by `lp_solve()` or
+    `lp_find_feasible()`.
+
+  - A vector containing the values of each variable, one after another.
+
 - binary_as_logical:
 
   Boolean. If `FALSE` (the default), binary variables are returned as
   `{0, 1}`. If `TRUE`, binary variables are returned as logical
   `{FALSE, TRUE}`.
-
-- ...:
-
-  Control arguments to be passed on to the solver.
 
 ## Value
 

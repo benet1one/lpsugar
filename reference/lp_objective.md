@@ -31,7 +31,7 @@ lp_max(.problem, objective)
 
 ## Value
 
-The `.problem` with the updated `$objective` function, a list with these
+The `.problem` with the new `$objective` function, a list with these
 fields:
 
 - `$q_coef` : If objective function is quadratic, matrix with the
@@ -85,8 +85,7 @@ library(ROI.plugin.highs)
 #> [1] 43000
 #> 
 #> – $objective
-#> 32000 
-#> 
+#> [1] 32000
 #> – $status
 #> Optimal Solution Found ✔ 
 #> 

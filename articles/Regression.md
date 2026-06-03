@@ -97,10 +97,10 @@ cbind(
     true_beta = true_beta,
     lad_beta = lad$variables$beta |> round(2)
 )
-#>   true_beta lad_beta
-#> 1         2     1.83
-#> 2         3     2.98
-#> 3        -5    -4.97
+#>      true_beta lad_beta
+#> [1,]         2     1.83
+#> [2,]         3     2.98
+#> [3,]        -5    -4.97
 ```
 
 And the absolute deviation is:
