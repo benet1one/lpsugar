@@ -84,6 +84,7 @@ direct_solution
 #> 
 #> – $objective
 #> [1] 45
+#> 
 #> – $status
 #> Optimal Solution Found ✔ 
 #> 

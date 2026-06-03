@@ -86,6 +86,7 @@ library(ROI.plugin.highs)
 #> 
 #> – $objective
 #> [1] 32000
+#> 
 #> – $status
 #> Optimal Solution Found ✔ 
 #> 

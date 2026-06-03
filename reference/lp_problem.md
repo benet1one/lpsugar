@@ -54,6 +54,7 @@ lp_problem() |>
 #> 
 #> – $objective
 #> [1] 5
+#> 
 #> – $status
 #> Optimal Solution Found ✔ 
 #> 
