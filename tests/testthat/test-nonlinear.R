@@ -27,7 +27,5 @@ test_that("nonlinear", {
 
 test_that("nonlinear constrained", {
     withr::local_package("ROI.plugin.alabama")
-    
-    p <- lp_problem() |> 
-        lp_var()
+    # TODO
 })

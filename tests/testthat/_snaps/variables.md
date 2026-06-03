@@ -6,6 +6,9 @@
       $name
       [1] "t"
       
+      $scalar
+      [1] FALSE
+      
       $sets
       $sets$a
       [1] "a" "b" "c"
@@ -22,6 +25,9 @@
     Output
       $name
       [1] "t"
+      
+      $scalar
+      [1] FALSE
       
       $sets
       $sets$b

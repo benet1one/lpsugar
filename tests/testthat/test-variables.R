@@ -20,10 +20,12 @@ test_that("variable definitions", {
 
 test_that("variable definition errors", {
     expect_error(
-        lp_problem() |> lp_variable(x[b])
+        lp_problem() |> lp_variable(x[b]),
+        "object 'b' not found"
     )
     expect_error(
-        lp_problem() |> lp_variable()
+        lp_problem() |> lp_variable(),
+        "Argument `definition` is missing, with no default"
     )
     expect_error(
         lp_problem() |> lp_variable(x[, 1:3]),

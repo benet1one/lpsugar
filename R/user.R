@@ -59,7 +59,7 @@ parameter_vector <- function(.x, dots) {
         abort("`.x` is length ({length(.x)}) and `{names(dots)}` is length ({n}).")
     }
 
-    array(.x, dim = length(dots[[1]]), dimnames = dots)
+    array(.x, dim = length(dots[[1]]), dimnames = dimnames_non_numeric(dots))
 }
 
 parameter_matrix <- function(.x, dots, byrow = TRUE) {
@@ -74,7 +74,7 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 
         return(matrix(
             .x, nrow = n, ncol = m,
-            byrow = byrow, dimnames = dots
+            byrow = byrow, dimnames = dimnames_non_numeric(dots)
         ))
 
     } else if (ndim(.x) == 2L) {
@@ -87,7 +87,7 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
         }
 
         warn_changed_args(byrow = TRUE)
-        dimnames(.x) <- dots
+        dimnames(.x) <- dimnames_non_numeric(dots)
         return(.x)
 
     } else {

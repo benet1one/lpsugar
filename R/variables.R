@@ -59,11 +59,15 @@ lp_variable <- function(.problem, definition,
                         lower = -Inf, upper = +Inf) {
 
     check_problem(.problem)
+    if (missing(definition)) {
+        abort("Argument `definition` is missing, with no default.")
+    }
 
     def <- parse_variable_definition({{ definition }})
 
     name <- def$name
     sets <- def$sets
+    dnames <- dimnames_non_numeric(sets)
 
     if (name %in% names(.problem$variables)) {
         abort("Variable `{name}` already exists in this problem.")
@@ -110,10 +114,15 @@ lp_variable <- function(.problem, definition,
 
     # Index array of variable.
     # Indicates which objective coefficients correspond to this variable.
-    ind <- array(dim = lengths(sets), dimnames = sets) |> robust_index()
-    ind[] <- 1:length(ind) + ncol(.problem)
+    if (def$scalar) {
+        ind <- ncol(.problem) + 1L
+        ind <- robust_index(ind)
+    } else {
+        ind <- array(dim = lengths(sets), dimnames = dnames) |> robust_index()
+        ind[] <- 1:length(ind) + ncol(.problem)
+    }
+    
     attr(.problem, "n_variables") <- max(ind)
-
     attr(.problem, "varnames") <- c(
         attr(.problem, "varnames"),
         name_variable(name, sets)
@@ -132,6 +141,7 @@ lp_variable <- function(.problem, definition,
         integer = integer,
         binary = binary,
 
+        scalar = def$scalar,
         ind = ind,
         coef = coef,
         add = add,
@@ -453,12 +463,12 @@ parse_variable_definition <- function(definition) {
 
     if (rlang::is_string(expr)) {
         sets <- list(scalar = "")
-        return(list(name = expr, sets = sets))
+        return(list(name = expr, scalar = TRUE, sets = sets))
 
     } else if (rlang::is_symbol(expr)) {
         name <- expr |> format()
         sets <- list(scalar = "")
-        return(list(name = name, sets = sets))
+        return(list(name = name, scalar = TRUE, sets = sets))
 
     } else if (expr[[1]] == quote(`[`)) {
         name <- expr[[2]]
@@ -490,7 +500,7 @@ parse_variable_definition <- function(definition) {
             )
         }
 
-        return(list(name = name, sets = sets))
+        return(list(name = name, scalar = FALSE, sets = sets))
     }
 
     abort(error_msg, call = parent.frame())

@@ -89,6 +89,16 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
         return(TRUE)
     }
 }
+dimnames_non_numeric <- function(dimnames) {
+    for (i in seq_along(dimnames)) {
+        d <- dimnames[[i]]
+        if (is.numeric(d) && all(d == seq_along(d))) {
+            dimnames[i] <- list(NULL)
+        }
+    }
+    
+    return(dimnames)
+}
 
 # Transforming variables -------------------------
 
@@ -100,7 +110,7 @@ variables_to_list <- function(x, problem, binary_as_logical = FALSE) {
             values <- values > 0.5
         }
         
-        if (length(v) == 1L  &&  identical(names(dimnames(v)), "scalar")) {
+        if (v$scalar) {
             unname(values)
         } else {
             array(values, dim = dim(v), dimnames = dimnames(v))
