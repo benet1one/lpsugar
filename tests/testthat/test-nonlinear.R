@@ -3,14 +3,14 @@ test_that("nonlinear", {
     withr::local_package("ROI.plugin.alabama")
     L <- letters[1:3]
     
-    fn <- function(x, y, z = 0) {
+    my_fun <- function(x, y, z = 0) {
         x^3 / y["a"] + z
     }
     
     p <- lp_problem() |> 
         lp_var(x, lower = 2) |> 
         lp_var(y[L], upper = 10) |> 
-        lp_minimize_function(fn)
+        lp_minimize_function(my_fun)
     
     expect_snapshot(p$objective)
     

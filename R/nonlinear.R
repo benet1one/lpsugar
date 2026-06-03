@@ -1,5 +1,7 @@
 
 lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL) {
+    expr <- rlang::enquo(fun) |> rlang::as_label()
+    
     stopifnot(
         is.function(fun) && !is.primitive(fun),
         is.null(gradient) || is.function(gradient),
@@ -45,7 +47,7 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
         fun = fun_x,
         gradient = gradient_x,
         hessian = hessian_x,
-        expr = rlang::enexpr(fun) |> rlang::as_label()
+        expr = expr
     )
 
     .problem
@@ -124,7 +126,7 @@ new_nonlinear_objective <- function(.problem, direction = NULL,
 lp_minimize_function <- function(.problem, fun, gradient = NULL, hessian = NULL) {
     check_problem(.problem)
     .problem$objective$direction <- "minimize"
-    lp_objective_function(.problem, fun, gradient, hessian)
+    lp_objective_function(.problem, {{fun}}, gradient, hessian)
 }
 
 #' @rdname lp_objective_function
@@ -132,7 +134,7 @@ lp_minimize_function <- function(.problem, fun, gradient = NULL, hessian = NULL)
 lp_maximize_function <- function(.problem, fun, gradient = NULL, hessian = NULL) {
     check_problem(.problem)
     .problem$objective$direction <- "maximize"
-    lp_objective_function(.problem, fun, gradient, hessian)
+    lp_objective_function(.problem, {{fun}}, gradient, hessian)
 }
 
 

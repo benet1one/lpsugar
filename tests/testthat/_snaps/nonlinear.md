@@ -4,6 +4,6 @@
       p$objective
     Output
       minimize nonlinear function:
-      <fn>
+      my_fun
       
 
