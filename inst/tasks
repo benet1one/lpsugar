@@ -5,5 +5,5 @@ Function Objective
 - compute_objective
 
 Docs
-- Document SVMs in regression vignette
+- Document Soft Margin SVMs in regression vignette
 - Nonlinear vignette

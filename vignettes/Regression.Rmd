@@ -1,8 +1,8 @@
 ---
-title: "Regression"
+title: "Regression and Classification"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Regression}
+  %\VignetteIndexEntry{Regression and Classification}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -118,7 +118,38 @@ lad$objective
 
 ## Support Vector Machines
 
+Support Vector Machines (SVM) are a binary classification method, that uses a hyperplane
+to separate the groups.
 
+$$
+x_{ij} \in \mathbb{R} \qquad i \in [1,n],\ j\in [1,k]
+$$
+$$
+y_i \in \{\text{TRUE},\ \text{FALSE}\} \qquad i \in [1,n]
+$$
+
+Usually, $y$ is represented as $y_i \in \{-1, +1\}$, but I believe it's easier to understand
+as a boolean variable.
+
+### Basic Idea
+
+A hard margin SVM finds a vector $\{w_j\}_{j\in[1,k]}$ and scalar $b$ that represents a hyperplane $h$:
+
+$$
+h : \sum_{j=1}^k{(h_{j} w_{j})} + b = 0
+$$
+
+Classifications works like this. When the hyperplane expression is positive, $y_i$ is 
+predicted `TRUE`, when the expression is negative, $y_i$ is predicted false.
+
+$$
+\sum_{j=1}^k{(x_{ij} w_{j})} + b > 0 \Rightarrow y_i=\text{TRUE} \qquad \forall i\in[1,n]
+$$
+$$
+\sum_{j=1}^k{(x_{ij} w_{j})} + b < 0 \Rightarrow y_i=\text{FALSE} \qquad \forall i\in[1,n]
+$$
+
+Let us generate some random data.
 
 ```{r}
 set.seed(101)
@@ -134,13 +165,29 @@ x <- rnorm(n*k, mean = 5, sd = 3) |>
 
 head(x)
 
-y <- (x %*% true_w + true_b) > 0
+y <- x %*% true_w + true_b > 0
 head(y)
 
-plot(x, col = ifelse(y, "red", "blue"))
+plot(x, col = ifelse(y, "orangered", "royalblue"), pch = 16)
 ```
 
 ### Hard Margin
+
+The goal of an SVM is to find the greatest possible margin. This is equivalent to 
+minimizing the quadratic sum of $w$ coefficients.
+
+$$
+\min_w \sum_{j=1}^k{w_j^2}
+$$
+
+Subject to the following constraints:
+
+$$
+\sum_{j=1}^k{(x_{ij} w_{j})} + b > +1 \qquad \forall i : y_i = \text{TRUE}
+$$
+$$
+\sum_{j=1}^k{(x_{ij} w_{j})} + b < -1 \qquad \forall i : y_i = \text{FALSE}
+$$
 
 ```{r}
 svm_hard <- lp_problem() |> 
@@ -150,22 +197,19 @@ svm_hard <- lp_problem() |>
     lp_constraint(
         hard_margin = for (i in 1:n) {
             predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
-            
-            if (y[i]) {
-                predicted >= +1
-            } else {
-                predicted <= -1
-            }
+            if (y[i]) predicted >= +1
+            else      predicted <= -1
         }
     ) |> 
     lp_solve()
 ```
 
-```{r}
-plot(x, col = ifelse(y, "red", "blue"))
+This is the result. The continuous line represent the hyperplane, and the dashed lines
+represent the points where the hyperplane formula is $+1$ and $-1$.
 
-# w[1] * x[1] + w[2] * x[2] + b = 0
-# x[2] = - b / w[2] - x[1] * w[1] / w[2]
+```{r echo=FALSE}
+plot(x, col = ifelse(y, "orangered", "royalblue"), pch = 16)
+
 with(svm_hard$variables, {
      abline(a = - b / w[2], b = - w[1] / w[2])
      abline(a = (+1 - b) / w[2], b = - w[1] / w[2], lty = 2)
@@ -175,10 +219,12 @@ with(svm_hard$variables, {
 
 ### Soft Margin
 
-```{r}
-C <- 0.8 # Regularization hyperparameter
+Explanation coming soon.
 
-svm_soft <-  lp_problem() |> 
+```{r}
+C <- 0.6 # Regularization hyperparameter
+
+svm_soft <- lp_problem() |> 
     lp_var(w[1:k]) |> 
     lp_var(b) |> 
     lp_var(slack[1:n], lower = 0) |> 
@@ -186,22 +232,16 @@ svm_soft <-  lp_problem() |>
     lp_constraint(
         soft_margin = for (i in 1:n) {
             predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
-            
-            if (y[i]) {
-                predicted >= +1 - slack[i]
-            } else {
-                predicted <= -1 + slack[i]
-            }
+            if (y[i]) predicted >= +1 - slack[i]
+            else      predicted <= -1 + slack[i]
         }
     ) |> 
     lp_solve()
 ```
 
-```{r}
-plot(x, col = ifelse(y, "red", "blue"))
+```{r echo=FALSE}
+plot(x, col = ifelse(y, "orangered", "royalblue"), pch = 16)
 
-# w[1] * x[1] + w[2] * x[2] + b = 0
-# x[2] = - b / w[2] - x[1] * w[1] / w[2]
 with(svm_soft$variables, {
      abline(a = - b / w[2], b = - w[1] / w[2])
      abline(a = (+1 - b) / w[2], b = - w[1] / w[2], lty = 2)
