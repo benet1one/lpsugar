@@ -3,11 +3,17 @@
 \name{lp_minimize_function}
 \alias{lp_minimize_function}
 \alias{lp_maximize_function}
+\alias{lp_min_fun}
+\alias{lp_max_fun}
 \title{Set a General Nonlinear Objective Function}
 \usage{
 lp_minimize_function(.problem, fun, gradient = NULL, hessian = NULL)
 
 lp_maximize_function(.problem, fun, gradient = NULL, hessian = NULL)
+
+lp_min_fun(.problem, fun, gradient = NULL, hessian = NULL)
+
+lp_max_fun(.problem, fun, gradient = NULL, hessian = NULL)
 }
 \arguments{
 \item{.problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
