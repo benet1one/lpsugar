@@ -92,8 +92,8 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
 
 # Transforming variables -------------------------
 
-variables_to_list <- function(x, variables, binary_as_logical = FALSE) {
-    purrr::map(variables, function(v) {
+variables_to_list <- function(x, problem, binary_as_logical = FALSE) {
+    purrr::map(problem$variables, function(v) {
         values <- x[v$ind]
         
         if (v$binary && binary_as_logical) {
@@ -108,14 +108,14 @@ variables_to_list <- function(x, variables, binary_as_logical = FALSE) {
     })
 }
 
-solution_to_vec <- function(problem, solution, call = environment()) {
-    if (is_lp_solution(solution)) {
-        var_vec <- solution_to_vec(problem, solution$variables, call = call)
-        true_vec <- solution$variables_vec
+variables_to_vec <- function(x, problem, call = environment()) {
+    if (is_lp_solution(x)) {
+        var_vec <- variables_to_vec(x$variables, problem, call = call)
+        true_vec <- x$variables_vec
         
         if (any(var_vec != true_vec)) {
             rlang::abort(
-                c("`solution$variables` and `solution$variables_vec` do not match.",
+                c("`x$variables` and `x$variables_vec` do not match.",
                   "i" = "You can use either one of them in this function."),
                 call = call
             )
@@ -123,53 +123,53 @@ solution_to_vec <- function(problem, solution, call = environment()) {
             return(true_vec)
         }
         
-    } else if (is.atomic(solution)) {
-        if (length(solution) != ncol(problem)) {
+    } else if (is.atomic(x)) {
+        if (length(x) != ncol(problem)) {
             n <- ncol(problem)
-            m <- length(solution)
-            abort("`problem` has ({n}) variables but `solution` is length ({m}).",
+            m <- length(x)
+            abort("`problem` has ({n}) variables but `x` is length ({m}).",
                   call = call)
         }
         
-        num <- as.numeric(solution)
+        num <- as.numeric(x)
         names(num) <- attr(problem, "varnames")
         return(num)
         
-    } else if (is.list(solution)) {
+    } else if (is.list(x)) {
         solution_vec <- numeric(ncol(problem))
         names(solution_vec) <- attr(problem, "varnames")
         
-        for (x in problem$variables) {
-            xs <- solution[[x$name]]
-            lower <- rep_len(x$lower, length(x))
-            if (x$integer) lower <- ceiling(lower)
+        for (v in problem$variables) {
+            vs <- x[[v$name]]
+            lower <- rep_len(v$lower, length(v))
+            if (v$integer) lower <- ceiling(lower)
             default <- pmax(0, lower)
             
-            if (is.null(xs)) {
-                xs <- default
+            if (is.null(vs)) {
+                vs <- default
             } else {
-                xs <- as.numeric(xs)
-                xs[is.na(xs)] <- default[is.na(xs)]
+                vs <- as.numeric(vs)
+                vs[is.na(vs)] <- default[is.na(vs)]
             }
             
-            if (length(xs) != length(x)) {
-                n <- length(x)
-                m <- length(xs)
-                abort("Variable '{x$name}' in `solution` is length ({m}) when it should be length ({n}).",
+            if (length(vs) != length(v)) {
+                n <- length(v)
+                m <- length(vs)
+                abort("Variable '{v$name}' in `x` is length ({m}) when it should be length ({n}).",
                       call = call)
             }
             
-            if (x$integer && !rlang::is_integerish(xs)) {
-                warn("'{x$name}' should be integer.", call = call)
+            if (v$integer && !rlang::is_integerish(vs)) {
+                warn("'{v$name}' should be integer.", call = call)
             }
             
-            solution_vec[x$ind] <- xs
+            solution_vec[v$ind] <- vs
         }
         
         return(solution_vec)
         
     } else {
-        abort("Unsupported type for `solution`.", call = call)
+        abort("Unsupported type for `x`.", call = call)
     }
 }
 

@@ -25,15 +25,21 @@
         z[i, j]
       })$objective)
     Output
+      $type
+      [1] "linear"
+      
+      $direction
+      [1] "minimize"
+      
+      $q_coef
+      NULL
+      
       $coef
            x   y[a]   y[b]   y[c] z[1,a] z[2,a] z[1,b] z[2,b] z[1,c] z[2,c] 
            0      0      0      0      0      0      1      0      0      0 
       
       $add
       [1] 0
-      
-      $direction
-      [1] "minimize"
       
       $expr
       [1] "{ ... }"
@@ -53,18 +59,11 @@
     Code
       unclass(p$objective)
     Output
-      $coef
-      x[1] x[2] y[1] y[2] 
-         0    0    1    1 
-      
-      $add
-      [1] 0
+      $type
+      [1] "quadratic"
       
       $direction
       [1] "minimize"
-      
-      $expr
-      [1] "sum(x^2) + sum(y)"
       
       $q_coef
            x[1] x[2] y[1] y[2]
@@ -72,7 +71,16 @@
       x[2]    0    2    0    0
       y[1]    0    0    0    0
       y[2]    0    0    0    0
-      with class 'robust_index' from package 'lpsugar'
+      
+      $coef
+      x[1] x[2] y[1] y[2] 
+         0    0    1    1 
+      
+      $add
+      [1] 0
+      
+      $expr
+      [1] "sum(x^2) + sum(y)"
       
 
 # update objective
@@ -80,18 +88,11 @@
     Code
       unclass(p$objective)
     Output
-      $coef
-         x    y z[1] z[2] 
-         0    3    0    0 
-      
-      $add
-      [1] 1
+      $type
+      [1] "quadratic"
       
       $direction
       [1] "minimize"
-      
-      $expr
-      [1] "x^2 + 5 * x * y + 3 * y + 1"
       
       $q_coef
            x y z[1] z[2]
@@ -99,5 +100,15 @@
       y    5 0    0    0
       z[1] 0 0    0    0
       z[2] 0 0    0    0
+      
+      $coef
+         x    y z[1] z[2] 
+         0    3    0    0 
+      
+      $add
+      [1] 1
+      
+      $expr
+      [1] "x^2 + 5 * x * y + 3 * y + 1"
       
 

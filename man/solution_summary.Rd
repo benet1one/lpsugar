@@ -25,7 +25,7 @@ compute_aliases(problem, solution)
 \itemize{
 \item Named list of variables with their respective values.
 If a variable is missing, it is set to \code{pmax(0, lower)}.
-\item An \code{lp_solution} object as returned by \code{\link[=lp_solve]{lp_solve()}}.
+\item An \code{lp_solution} object as returned by \code{\link[=lp_solve]{lp_solve()}} or \code{\link[=lp_find_feasible]{lp_find_feasible()}}.
 \item A vector containing the values of each variable, one after another.
 }}
 

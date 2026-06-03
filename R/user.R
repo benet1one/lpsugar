@@ -105,7 +105,7 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 #' @param solution One of:
 #' - Named list of variables with their respective values.
 #' If a variable is missing, it is set to `pmax(0, lower)`.
-#' - An `lp_solution` object as returned by [lp_solve()].
+#' - An `lp_solution` object as returned by [lp_solve()] or [lp_find_feasible()].
 #' - A vector containing the values of each variable, one after another.
 #' @param tol Tolerance to use for constraint and bound satisfaction.
 #'
@@ -114,7 +114,7 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 #'
 #' @example inst/examples/example_solution_summary.R
 solution_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- solution_to_vec(problem, solution, call = environment())
+    solution <- variables_to_vec(solution, problem, call = environment())
     aliases <- compute_aliases(problem, solution)
     constraints <- constraint_summary(problem, solution, tol = tol)
     bounds <- bound_summary(problem, solution, tol = tol)
@@ -131,7 +131,7 @@ solution_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 constraint_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- solution_to_vec(problem, solution)
+    solution <- variables_to_vec(solution, problem)
     con <- problem$constraints
 
     quadratic_part <- numeric(nrow(con))
@@ -180,7 +180,7 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 bound_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- solution_to_vec(problem, solution)
+    solution <- variables_to_vec(solution, problem)
 
     lower <- numeric(ncol(problem))
     upper <- numeric(ncol(problem))
@@ -210,7 +210,7 @@ bound_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 compute_objective <- function(problem, solution) {
-    solution <- solution_to_vec(problem, solution)
+    solution <- variables_to_vec(solution, problem)
 
     coef <- problem$objective$coef
     add <- problem$objective$add
@@ -231,7 +231,7 @@ compute_objective <- function(problem, solution) {
 #' @rdname solution_summary
 #' @export
 compute_aliases <- function(problem, solution) {
-    solution <- solution_to_vec(problem, solution)
+    solution <- variables_to_vec(solution, problem)
 
     purrr::map(problem$aliases, function(a) {
         mat <- array(unclass(a$coef), dim = dim(a$coef))

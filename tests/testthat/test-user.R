@@ -89,11 +89,11 @@ test_that("solution summary", {
     expected["x[2,3]"] <- -5
 
     expect_equal(
-        solution_to_vec(p, s),
+        variables_to_vec(s, p),
         s$variables_vec
     )
     expect_equal(
-        solution_to_vec(p, slist),
+        variables_to_vec(slist, p),
         expected
     )
 
@@ -101,15 +101,15 @@ test_that("solution summary", {
     s2$variables <- slist
 
     expect_error(
-        solution_to_vec(p, s2),
-        "`solution\\$variables` and `solution\\$variables_vec` do not match"
+        variables_to_vec(s2, p),
+        "`x\\$variables` and `x\\$variables_vec` do not match"
     )
 
     slist2 <- slist
     slist2$y <- 2.5
 
     expect_warning(
-        solution_to_vec(p, slist2),
+        variables_to_vec(slist2, p),
         "'y' should be integer"
     )
 
@@ -117,14 +117,14 @@ test_that("solution summary", {
     slist3$x <- slist$x[1:2, 1:2]
 
     expect_error(
-        solution_to_vec(p, slist3),
-        r"(Variable 'x' in `solution` is length \(4\) when it should be length \(6\))"
+        variables_to_vec(slist3, p),
+        r"(Variable 'x' in `x` is length \(4\) when it should be length \(6\))"
     )
 
     svec <- s$variables_vec |> head(4)
     expect_error(
-        solution_to_vec(p, svec),
-        r"(`problem` has \(7\) variables but `solution` is length \(4\))"
+        variables_to_vec(svec, p),
+        r"(`problem` has \(7\) variables but `x` is length \(4\))"
     )
 
     expect_snapshot(solution_summary(p, slist))

@@ -62,6 +62,8 @@ test_that("quadratic objective", {
         lp_minimize(sum(x^2) + sum(y))
 
     expect_snapshot(p$objective)
+    
+    p$objective$q_coef <- as.matrix(p$objective$q_coef)
     expect_snapshot(unclass(p$objective))
 })
 
@@ -72,5 +74,6 @@ test_that("update objective", {
         lp_minimize(x^2 + 5*x*y + 3*y + 1) |>
         lp_variable(z[1:2])
 
+    p$objective$q_coef <- as.matrix(p$objective$q_coef)
     expect_snapshot(unclass(p$objective))
 })

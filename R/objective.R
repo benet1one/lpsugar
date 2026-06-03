@@ -1,17 +1,18 @@
 
 lp_objective <- function(.problem, objective) {
     quosure <- rlang::enquo(objective)
-    objective <- rlang::eval_tidy(quosure, data = data_mask(.problem))
     expr <- rlang::as_label(quosure)
+    objective <- rlang::eval_tidy(quosure, data = data_mask(.problem))
 
     if (is.numeric(objective) && length(objective) == 1L && objective == 0) {
-        # inform("Setting objective to 0 and finding feasible solution instead.",
-        #        call = parent.frame())
-
-        .problem$objective$q_coef <- NULL
-        .problem$objective$coef[] <- 0
-        .problem$objective$add[] <- 0
-        .problem$objective$expr <- ""
+        .problem$objective <- new_objective(
+            .problem,
+            type = "feasible",
+            coef = NULL,
+            add = 0,
+            expr = ""
+        )
+        
         return(.problem)
     }
 
@@ -24,28 +25,65 @@ lp_objective <- function(.problem, objective) {
     if (length(objective) == 0L) {
         abort("`objective` evaluated to a variable of length 0.")
     }
-
     if (length(objective) > 1L) {
-        msg_expr <- if (length(expr) == 1L) {
-            expr
-        } else {
-            "..."
-        }
-
-        inform("Summing variables in objective. Write `sum({msg_expr})` to suppress this message.",
-               call = parent.frame())
         objective <- sum(objective)
+        inform(
+            "Summing variables in objective. Write `sum({expr})` to suppress this message.",
+            call = parent.frame()
+        )
+        expr <- glue::glue("sum({expr})")
     }
 
-    if (is_quadratic(objective)) {
-        .problem$objective$q_coef <- objective$q_coef[[1]]
-    }
-
-    .problem$objective$coef[] <- objective$coef
-    .problem$objective$add[] <- objective$add
-    .problem$objective$expr <- expr
+    .problem$objective <- new_objective(
+        .problem,
+        type = if (is_quadratic(objective)) "quadratic" else "linear",
+        q_coef = objective$q_coef[[1]],
+        coef = unclass(objective$coef),
+        add = unclass(objective$add),
+        expr = expr
+    )
+    
     return(.problem)
 }
+
+new_objective <- function(.problem, type, direction = NULL, 
+                          q_coef = NULL, coef = NULL, add = NULL, expr = "") {
+    if (is.null(direction)) {
+        direction <- .problem$objective$direction
+    }
+    
+    if (!is.null(q_coef)) {
+        q_coef <- slam::as.simple_triplet_matrix(q_coef)
+        q_coef$dimnames <- list(
+            attr(.problem, "varnames"),
+            attr(.problem, "varnames")
+        )
+    }
+    
+    if (is.null(coef)) {
+        coef <- rep(0, ncol(.problem))
+        names(coef) <- attr(.problem, "varnames")
+    } else {
+        coef <- drop(coef)
+    }
+    
+    if (is.null(add)) {
+        add <- 0
+    } else {
+        add <- drop(add)
+    }
+    
+    list(
+        type = type,
+        direction = direction,
+        q_coef = q_coef,
+        coef = coef,
+        add = add,
+        expr = expr
+    ) |> structure(class = "lp_objective")
+}
+
+# User -------------------------------
 
 #' Set an objective function
 #'
@@ -97,19 +135,21 @@ lp_max <- lp_maximize
 
 #' @export
 print.lp_objective <- function(x, ...) {
-    if (x$direction == "") {
+    if (x$type == "undefined") {
         cat("no objective function\n\n")
         return(invisible(x))
     }
 
-    if (all(x$coef == 0) && !is_quadratic(x)) {
+    if (x$type == "feasible") {
         cat("find a feasible solution\n\n")
         return(invisible(x))
     }
 
-    type <- if (is_quadratic(x)) "quadratic" else "linear"
-    cat(x$direction, " ", type, " function:\n",
-        x$expr, "\n\n", sep = "")
+    cat(
+        x$direction, " ", x$type, " function:\n",
+        x$expr, "\n\n", 
+        sep = ""
+    )
     invisible(x)
 }
 
@@ -120,13 +160,12 @@ update_objective <- function(.problem) {
     n_after <- ncol(.problem)
 
     if (is_quadratic(.problem$objective)) {
-        .problem$objective$q_coef <- .problem$objective$q_coef |>
-            cbind(matrix(0, nrow = n_before, ncol = n_after - n_before)) |>
-            rbind(matrix(0, nrow = n_after - n_before, ncol = n_after))
-
-        colnames(.problem$objective$q_coef) <-
-            rownames(.problem$objective$q_coef) <-
+        .problem$objective$q_coef$nrow <- n_after
+        .problem$objective$q_coef$ncol <- n_after
+        .problem$objective$q_coef$dimnames <- list(
+            attr(.problem, "varnames"),
             attr(.problem, "varnames")
+        )
     }
 
     .problem$objective$coef <- c(

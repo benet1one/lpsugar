@@ -6,13 +6,17 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
         is.null(gradient) || is.function(hessian)
     )
     
-    check_correct_arguments(fun,      .problem$variables, funname = "fun")
-    check_correct_arguments(gradient, .problem$variables, funname = "gradient")
-    check_correct_arguments(hessian,  .problem$variables, funname = "hessian")
+    if (!is.null(gradient) || !is.null(hessian)) {
+        abort("`gradient` and `hessian` are not yet supported")
+    }
     
-    fun_x      <- recode_arguments(fun,      .problem$variables)
-    gradient_x <- recode_arguments(gradient, .problem$variables)
-    hessian_x  <- recode_arguments(hessian,  .problem$variables)
+    check_correct_arguments(fun,      .problem, funname = "fun")
+    check_correct_arguments(gradient, .problem, funname = "gradient")
+    check_correct_arguments(hessian,  .problem, funname = "hessian")
+    
+    fun_x      <- recode_arguments(fun,      .problem)
+    gradient_x <- recode_arguments(gradient, .problem)
+    hessian_x  <- recode_arguments(hessian,  .problem)
     
     n <- ncol(.problem)
     
@@ -24,7 +28,7 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     if (rlang::is_error(fun_sane)) {
         rlang::abort(
             c("Failed to evaluate `fun`.",
-              ">" = "Make sure it works when all variables are 0."), 
+              ">" = "Make sure it works when all variables are 0 (it can return Inf)."), 
             call = parent.frame(),
             parent = fun_sane
         )
@@ -36,21 +40,24 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
         abort("`fun` must return a numeric scalar, not of length `{length(fun_sane)}`")
     }
     
-    .problem$objective$fun <- fun_x
-    .problem$objective$gradient <- gradient_x
-    .problem$objective$hessian <- hessian_x
-    .problem$objective$expr <- rlang::enexpr(fun) |> rlang::as_label()
-    
+    .problem$objective <- new_nonlinear_objective(
+        .problem,
+        fun = fun_x,
+        gradient = gradient_x,
+        hessian = hessian_x,
+        expr = rlang::enexpr(fun) |> rlang::as_label()
+    )
+
     .problem
 }
 
-check_correct_arguments <- function(fun, variables, funname) {
+check_correct_arguments <- function(fun, problem, funname) {
     if (is.null(fun)) {
         return()
     }
     
     args <- rlang::fn_fmls_names(fun)
-    varnames <- names(variables)
+    varnames <- names(problem$variables)
     missing_vars <- varnames[!is.element(varnames, args)]
     
     if (length(missing_vars) > 0L) {
@@ -62,17 +69,37 @@ check_correct_arguments <- function(fun, variables, funname) {
     }
 }
 
-recode_arguments <- function(fun, variables) {
+recode_arguments <- function(fun, problem) {
     if (is.null(fun)) {
         return(NULL)
     }
     
     function(x) {
-        var_list <- variables_to_list(x, variables, binary_as_logical = FALSE)
+        var_list <- variables_to_list(x, problem, binary_as_logical = FALSE)
         do.call(fun, var_list)
     }
 }
 
+is_nonlinear <- function(objective) {
+    !is.null(objective$fun)
+}
+
+new_nonlinear_objective <- function(.problem, direction = NULL, 
+                                    fun = NULL, gradient = NULL, hessian = NULL, expr = "") {
+    if (is.null(direction)) {
+        direction <- .problem$objective$direction
+    }
+    
+    list(
+        type = "nonlinear",
+        direction = direction,
+        fun = fun,
+        gradient = gradient,
+        hessian = hessian,
+        add = 0,
+        expr = expr
+    ) |> structure(class = "lp_objective")
+}
 
 # User -----------------
 
@@ -107,3 +134,15 @@ lp_maximize_function <- function(.problem, fun, gradient = NULL, hessian = NULL)
     .problem$objective$direction <- "maximize"
     lp_objective_function(.problem, fun, gradient, hessian)
 }
+
+
+# Aliases -----------------------
+
+#' @rdname lp_objective_function
+#' @export
+lp_min_fun <- lp_minimize_function
+
+#' @rdname lp_objective_function
+#' @export
+lp_max_fun <- lp_maximize_function
+

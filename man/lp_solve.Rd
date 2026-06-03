@@ -5,7 +5,7 @@
 \alias{lp_find_feasible}
 \title{Solve a Linear Problem}
 \usage{
-lp_solve(.problem, solver, binary_as_logical = FALSE, ...)
+lp_solve(.problem, solver, ..., start, binary_as_logical = FALSE)
 
 lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
 }
@@ -15,10 +15,18 @@ lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
 \item{solver}{String specifying the solver to use.
 If missing, then the default solver returned by \code{\link[ROI:ROI_options]{ROI::ROI_options()}} is used.}
 
+\item{...}{Control arguments to be passed on to the solver.}
+
+\item{start}{Start value of variables, for nonlinear solvers. One of:
+\itemize{
+\item Named list of variables with their respective values.
+If a variable is missing, it is set to \code{pmax(0, lower)}.
+\item An \code{lp_solution} object as returned by \code{\link[=lp_solve]{lp_solve()}} or \code{\link[=lp_find_feasible]{lp_find_feasible()}}.
+\item A vector containing the values of each variable, one after another.
+}}
+
 \item{binary_as_logical}{Boolean. If \code{FALSE} (the default), binary variables
 are returned as \verb{\{0, 1\}}. If \code{TRUE}, binary variables are returned as logical \verb{\{FALSE, TRUE\}}.}
-
-\item{...}{Control arguments to be passed on to the solver.}
 }
 \value{
 A list with the following fields:

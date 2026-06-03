@@ -47,7 +47,7 @@ test_that("feasible", {
 
     expect_error(
         lp_solve(no_obj),
-        "Did you forget to set the objective function"
+        "Must define an objective function"
     )
 
     s <- no_obj |> lp_minimize(0) |> lp_solve()
