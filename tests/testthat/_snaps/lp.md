@@ -41,6 +41,7 @@
       
       -- $objective
       [1] 6.5
+      
       -- $status
       Optimal Solution Found [v] 
       
@@ -79,6 +80,7 @@
       
       -- $objective
       [1] 0
+      
       -- $status
       No Optimal Solution Found [x] 
       

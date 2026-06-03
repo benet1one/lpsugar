@@ -337,6 +337,7 @@ print.lp_solution <- function(x, ...) {
         }
 
         print_field(x, "objective")
+        cat("\n")
     }
     
     print_field_name("status")
