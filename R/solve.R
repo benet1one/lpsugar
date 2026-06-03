@@ -336,8 +336,7 @@ print.lp_solution <- function(x, ...) {
             print_field(x, "aliases")
         }
 
-        print_field_name("objective")
-        cat(x$objective, "\n\n")
+        print_field(x, "objective")
     }
     
     print_field_name("status")
