@@ -156,6 +156,18 @@ print.lp_objective <- function(x, ...) {
 # Utils ------------------------
 
 update_objective <- function(.problem) {
+    if (.problem$objective$type == "undefined") {
+        return(.problem)
+    } else if (.problem$objective$type == "nonlinear") {
+        rlang::abort(c(
+            "Cannot add a variable to a nonlinear problem.",
+            ">" = paste(
+                "Use `lp_variable()` before", 
+                "`lp_minimize_function()` or `lp_maximize_function()`"
+            )
+        ))
+    }
+    
     n_before <- length(.problem$objective$coef)
     n_after <- ncol(.problem)
 
