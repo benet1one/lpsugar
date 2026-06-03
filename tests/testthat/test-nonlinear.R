@@ -16,21 +16,53 @@ test_that("nonlinear", {
     
     s <- lp_solve(
         p, 
+        solver = "alabama",
         start = list(
             y = c(3, 0, 0),
             x = 4
         )
     )
     
-    expect_equal(unname(s$objective), 0.8)
+    expect_equal(
+        s$objective |> round(6) |> unname(), 
+        0.8
+    )
     
     expect_equal(
         compute_objective(p, list(x = 5, y = c(a=1, b=2, c=3))),
-        fn(x = 5, y = c(a=1, b=2, c=3))
+        my_fun(x = 5, y = c(a=1, b=2, c=3))
+    )
+    
+    expect_error(
+        p |> lp_variable(z),
+        "Cannot add a variable to a nonlinear problem."
     )
 })
 
 test_that("nonlinear constrained", {
+    withr::local_package("ROI.plugin.highs")
     withr::local_package("ROI.plugin.alabama")
-    # TODO
+    
+    p <- lp_problem() |> 
+        lp_var(x, lower = 1) |> 
+        lp_var(y, lower = 1) |> 
+        lp_max_fun(\(x, y) sqrt(x) * log(y)) |> 
+        lp_con(x == 10 - y)
+    
+    s <- suppressWarnings(lp_solve(
+        p,
+        solver = "alabama",
+        start = lp_find_feasible(p, solver = "highs")
+    ))
+    
+    expect_equal(
+        s$variables$x,
+        10 - s$variables$y,
+        tolerance = 0.001
+    )
+    
+    expect_equal(
+        s$objective,
+        sqrt(s$variables$x) * log(s$variables$y)
+    )
 })
