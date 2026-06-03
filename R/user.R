@@ -211,7 +211,11 @@ bound_summary <- function(problem, solution, tol = 2e-6) {
 #' @export
 compute_objective <- function(problem, solution) {
     solution <- variables_to_vec(solution, problem)
-
+    
+    if (problem$objective$type == "nonlinear") {
+        return(problem$objective$fun(solution))
+    }
+    
     coef <- problem$objective$coef
     add <- problem$objective$add
     out <- crossprod(coef, solution) + add

@@ -23,6 +23,11 @@ test_that("nonlinear", {
     )
     
     expect_equal(unname(s$objective), 0.8)
+    
+    expect_equal(
+        compute_objective(p, list(x = 5, y = c(a=1, b=2, c=3))),
+        fn(x = 5, y = c(a=1, b=2, c=3))
+    )
 })
 
 test_that("nonlinear constrained", {
