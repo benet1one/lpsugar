@@ -1,8 +1,8 @@
-# Add constraints to an [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
+# Add Constraints to an [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
 
 Restrict the variables in an
 [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
-with linear constraints.
+with linear or quadratic constraints.
 
 ## Usage
 

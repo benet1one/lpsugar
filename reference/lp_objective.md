@@ -1,6 +1,6 @@
-# Set an objective function
+# Set an Objective Function
 
-Minimize of maximize an expression.
+Minimize of maximize a linear or quadratic expression.
 
 ## Usage
 
@@ -52,6 +52,11 @@ fields:
 If `objective` evaluates to a multivariate variable instead of a scalar,
 it will apply `sum(objective)` and display a message. Suppress this
 message by writing the `sum` yourself.
+
+## See also
+
+[`lp_minimize_function()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
+For general nonlinear optimization.
 
 ## Examples
 

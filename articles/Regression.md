@@ -1,4 +1,4 @@
-# Regression
+# Regression and Classification
 
 ``` r
 
@@ -22,26 +22,18 @@ true_beta <- c(2, 3, -5)
 
 x <- matrix(rpois(n*k, 6), nrow = n, ncol = k)
 x[, 1] <- 1
-head(x)
-#>      [,1] [,2] [,3]
-#> [1,]    1    2    6
-#> [2,]    1    5    5
-#> [3,]    1    8    6
-#> [4,]    1    3   10
-#> [5,]    1    6    6
-#> [6,]    1    4    9
 
 e <- rnorm(n)
 y <- (x %*% true_beta) + e
-head(y)
-#>            [,1]
-#> [1,] -20.974429
-#> [2,]  -8.284773
-#> [3,]  -5.220718
-#> [4,] -38.818697
-#> [5,] -10.138891
-#> [6,] -30.994236
 ```
+
+    #>  x1 x2 x3          y
+    #>   1  2  6 -20.974429
+    #>   1  5  5  -8.284773
+    #>   1  8  6  -5.220718
+    #>   1  3 10 -38.818697
+    #>   1  6  6 -10.138891
+    #> ... and 45 more rows
 
 ## Least Absolute Deviation
 
@@ -113,44 +105,53 @@ lad$objective
 
 ## Support Vector Machines
 
-``` r
+Support Vector Machines (SVM) are a binary classification method, that
+uses a hyperplane to separate the groups.
 
-set.seed(101)
-n <- 20
-k <- 2
+\\ x\_{ij} \in \mathbb{R} \qquad i \in \[1,n\],\\ j\in \[1,k\] \\ \\ y_i
+\in \\\text{TRUE},\\ \text{FALSE}\\ \qquad i \in \[1,n\] \\
 
-true_w <- c(3, -4)
-true_b <- 2
+Usually, \\y\\ is represented as \\y_i \in \\-1, +1\\\\, but I believe
+it’s easier to understand as a boolean variable.
 
-x <- rnorm(n*k, mean = 5, sd = 3) |> 
-    round(2) |> 
-    matrix(n, k)
+### Basic Idea
 
-head(x)
-#>      [,1] [,2]
-#> [1,] 4.02 4.51
-#> [2,] 6.66 7.13
-#> [3,] 2.98 4.20
-#> [4,] 5.64 0.61
-#> [5,] 5.93 7.23
-#> [6,] 8.52 0.77
+An SVM finds a vector \\\\w_j\\\_{j\in\[1,k\]}\\ and scalar \\b\\ that
+represents a hyperplane \\h\\:
 
-y <- (x %*% true_w + true_b) > 0
-head(y)
-#>       [,1]
-#> [1,] FALSE
-#> [2,] FALSE
-#> [3,] FALSE
-#> [4,]  TRUE
-#> [5,] FALSE
-#> [6,]  TRUE
+\\ h : \sum\_{j=1}^k{(h\_{j} w\_{j})} + b = 0 \\
 
-plot(x, col = ifelse(y, "red", "blue"))
-```
+Classifications works like this. When the hyperplane expression is
+positive \\y_i\\ is predicted `TRUE`; when the expression is negative
+\\y_i\\ is predicted `FALSE`.
 
-![](Regression_files/figure-html/unnamed-chunk-6-1.png)
+\\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \> 0 \Rightarrow y_i=\text{TRUE}
+\qquad \forall i\in\[1,n\] \\ \\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \<
+0 \Rightarrow y_i=\text{FALSE} \qquad \forall i\in\[1,n\] \\ With this
+randomly generated data, we can find a line (which is an
+\\\mathbb{R}^2\\ hyperplane) that perfectly separates orange from blue.
+
+![](Regression_files/figure-html/unnamed-chunk-7-1.png)
+
+However, this is not the *best* separator. There are two methods of
+finding a better one, a Hard Margin SVM and a Soft Margin SVM.
 
 ### Hard Margin
+
+The goal of an SVM is to find the greatest possible *margin*. The margin
+is the smallest distance from a point to the hyperplane. Minimizing the
+margin is equivalent to minimizing the quadratic sum of \\w\\
+coefficients.
+
+\\ \min_w \sum\_{j=1}^k{w_j^2} \\
+
+And these constraints ensure the prediction is always correct.
+
+\\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \ge +1 \qquad \forall i : y_i =
+\text{TRUE} \\ \\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \le -1 \qquad
+\forall i : y_i = \text{FALSE} \\
+
+The Hard Margin SVM can be written in `lpsugar` with the following code.
 
 ``` r
 
@@ -159,70 +160,72 @@ svm_hard <- lp_problem() |>
     lp_var(b) |> 
     lp_min(sum(w^2)) |> 
     lp_constraint(
-        hard_margin = for (i in 1:n) {
+        true_y = for (i in which(y)) {
             predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
-            
-            if (y[i]) {
-                predicted >= +1
-            } else {
-                predicted <= -1
-            }
+            predicted >= +1
+        },
+        false_y = for (i in which(!y)) {
+            predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
+            predicted <= -1
         }
     ) |> 
     lp_solve()
 ```
 
-``` r
+This is the result. The continuous line represent the hyperplane, and
+the dashed lines represent the points where the hyperplane formula is
+\\+1\\ and \\-1\\.
 
-plot(x, col = ifelse(y, "red", "blue"))
-
-# w[1] * x[1] + w[2] * x[2] + b = 0
-# x[2] = - b / w[2] - x[1] * w[1] / w[2]
-with(svm_hard$variables, {
-     abline(a = - b / w[2], b = - w[1] / w[2])
-     abline(a = (+1 - b) / w[2], b = - w[1] / w[2], lty = 2)
-     abline(a = (-1 - b) / w[2], b = - w[1] / w[2], lty = 2)
-})
-```
-
-![](Regression_files/figure-html/unnamed-chunk-8-1.png)
+![](Regression_files/figure-html/unnamed-chunk-9-1.png)
 
 ### Soft Margin
 
+Soft Margin SVMs allow some prediction errors. This means they support
+data that cannot be linearly separated. A Hard Margin SVM would fail to
+find a feasible solution with this data.
+
+![](Regression_files/figure-html/unnamed-chunk-10-1.png)
+
+We will introduce a slack variable \\\xi_i \ge 0\\ indicating the
+prediction error for observation \\i\\. Naturally, we want to minimize
+the prediction error, so we will update the objective function:
+
+\\ \min_w \sum\_{j=1}^k{w_j^2} + C\sum\_{i=1}^n{\xi_i} \\
+
+Where \\C\\ is known as the Regularization Hyperparameter.
+
+The constraints will now allow some flexibility by adding the slack
+variables \\\xi\\:
+
+\\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \ge +1 - \xi_i \qquad \forall i :
+y_i = \text{TRUE} \\ \\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \le -1 +
+\xi_i \qquad \forall i : y_i = \text{FALSE} \\
+
+In `lpsugar`, the Soft Margin SVM can be coded as follows.
+
 ``` r
 
-C <- 0.8 # Regularization hyperparameter
+C <- 5 # Regularization Hyperparameter
 
-svm_soft <-  lp_problem() |> 
+svm_soft <- lp_problem() |> 
     lp_var(w[1:k]) |> 
     lp_var(b) |> 
     lp_var(slack[1:n], lower = 0) |> 
     lp_min(sum(w^2) + C * sum(slack)) |> 
     lp_constraint(
-        soft_margin = for (i in 1:n) {
+        true_y = for (i in which(y)) {
             predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
-            
-            if (y[i]) {
-                predicted >= +1 - slack[i]
-            } else {
-                predicted <= -1 + slack[i]
-            }
+            predicted >= +1 - slack[i]
+        },
+        false_y = for (i in which(!y)) {
+            predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
+            predicted <= -1 + slack[i]
         }
     ) |> 
     lp_solve()
 ```
 
-``` r
+Notice that all blue values fall on top of the hyperplane, but some
+orange values are incorrectly predicted.
 
-plot(x, col = ifelse(y, "red", "blue"))
-
-# w[1] * x[1] + w[2] * x[2] + b = 0
-# x[2] = - b / w[2] - x[1] * w[1] / w[2]
-with(svm_soft$variables, {
-     abline(a = - b / w[2], b = - w[1] / w[2])
-     abline(a = (+1 - b) / w[2], b = - w[1] / w[2], lty = 2)
-     abline(a = (-1 - b) / w[2], b = - w[1] / w[2], lty = 2)
-})
-```
-
-![](Regression_files/figure-html/unnamed-chunk-10-1.png)
+![](Regression_files/figure-html/unnamed-chunk-12-1.png)

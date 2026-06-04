@@ -1,7 +1,6 @@
-# Define a variable for an [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
+# Add a Variable to an [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
 
-Add a variable to a problem by defining it's name, dimensions, type, and
-bounds.
+Define a variable with it's name, dimensions, type, and bounds.
 
 ## Usage
 

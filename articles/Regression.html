@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Regression • lpsugar</title>
+<title>Regression and Classification • lpsugar</title>
 <!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
   window.MathJax = {
     chtml: {
@@ -16,7 +16,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Regression">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Regression and Classification">
 <meta name="google-site-verification" content="uYvnyQPldZQ6Hki1ZGPG37NYpOPh78eRMbCuJ54xghs">
 </head>
 <body>
@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.21.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.21.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/browsers.html">Browsers</a></li>
     <li><a class="dropdown-item" href="../articles/Graphs.html">Graphs</a></li>
-    <li><a class="dropdown-item" href="../articles/Regression.html">Regression</a></li>
+    <li><a class="dropdown-item" href="../articles/Regression.html">Regression and Classification</a></li>
   </ul>
 </li>
       </ul>
@@ -65,7 +65,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Regression</h1>
+      <h1>Regression and Classification</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/benet1one/lpsugar/blob/master/vignettes/Regression.Rmd" class="external-link"><code>vignettes/Regression.Rmd</code></a></small>
@@ -91,25 +91,16 @@ y_i = \sum_{j=1}^k{\beta_j x_{ij}} + e_i
 <span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">k</span>, <span class="fl">6</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="va">k</span><span class="op">)</span></span>
 <span><span class="va">x</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      [,1] [,2] [,3]</span></span>
-<span><span class="co">#&gt; [1,]    1    2    6</span></span>
-<span><span class="co">#&gt; [2,]    1    5    5</span></span>
-<span><span class="co">#&gt; [3,]    1    8    6</span></span>
-<span><span class="co">#&gt; [4,]    1    3   10</span></span>
-<span><span class="co">#&gt; [5,]    1    6    6</span></span>
-<span><span class="co">#&gt; [6,]    1    4    9</span></span>
 <span></span>
 <span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">true_beta</span><span class="op">)</span> <span class="op">+</span> <span class="va">e</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            [,1]</span></span>
-<span><span class="co">#&gt; [1,] -20.974429</span></span>
-<span><span class="co">#&gt; [2,]  -8.284773</span></span>
-<span><span class="co">#&gt; [3,]  -5.220718</span></span>
-<span><span class="co">#&gt; [4,] -38.818697</span></span>
-<span><span class="co">#&gt; [5,] -10.138891</span></span>
-<span><span class="co">#&gt; [6,] -30.994236</span></span></code></pre></div>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">true_beta</span><span class="op">)</span> <span class="op">+</span> <span class="va">e</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt;  x1 x2 x3          y</span></span>
+<span><span class="co">#&gt;   1  2  6 -20.974429</span></span>
+<span><span class="co">#&gt;   1  5  5  -8.284773</span></span>
+<span><span class="co">#&gt;   1  8  6  -5.220718</span></span>
+<span><span class="co">#&gt;   1  3 10 -38.818697</span></span>
+<span><span class="co">#&gt;   1  6  6 -10.138891</span></span>
+<span><span class="co">#&gt; ... and 45 more rows</span></span></code></pre>
 <div class="section level2">
 <h2 id="least-absolute-deviation">Least Absolute Deviation<a class="anchor" aria-label="anchor" href="#least-absolute-deviation"></a>
 </h2>
@@ -144,7 +135,7 @@ e_i,\ e_i^- = 0\)</span>.</p></li>
 0,\ e_i^- = |e_i|\)</span>.</p></li>
 </ul>
 <p>Let’s write the problem in <code>lpsugar</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -161,7 +152,7 @@ e_i,\ e_i^- = 0\)</span>.</p></li>
 <span>    <span class="fu"><a href="../reference/lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The estimated <span class="math inline">\(\hat{\beta}\)</span> is
 quite similar to the <code>true_beta</code> <span class="math inline">\(\beta\)</span>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
 <span>    true_beta <span class="op">=</span> <span class="va">true_beta</span>,</span>
 <span>    lad_beta <span class="op">=</span> <span class="va">lad</span><span class="op">$</span><span class="va">variables</span><span class="op">$</span><span class="va">beta</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
@@ -171,112 +162,136 @@ quite similar to the <code>true_beta</code> <span class="math inline">\(\beta\)<
 <span><span class="co">#&gt; [2,]         3     2.98</span></span>
 <span><span class="co">#&gt; [3,]        -5    -4.97</span></span></code></pre></div>
 <p>And the absolute deviation is:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lad</span><span class="op">$</span><span class="va">objective</span></span>
 <span><span class="co">#&gt; [1] 32.76798</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="support-vector-machines">Support Vector Machines<a class="anchor" aria-label="anchor" href="#support-vector-machines"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">101</span><span class="op">)</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">20</span></span>
-<span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
-<span></span>
-<span><span class="va">true_w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="op">-</span><span class="fl">4</span><span class="op">)</span></span>
-<span><span class="va">true_b</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
-<span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">k</span>, mean <span class="op">=</span> <span class="fl">5</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">k</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      [,1] [,2]</span></span>
-<span><span class="co">#&gt; [1,] 4.02 4.51</span></span>
-<span><span class="co">#&gt; [2,] 6.66 7.13</span></span>
-<span><span class="co">#&gt; [3,] 2.98 4.20</span></span>
-<span><span class="co">#&gt; [4,] 5.64 0.61</span></span>
-<span><span class="co">#&gt; [5,] 5.93 7.23</span></span>
-<span><span class="co">#&gt; [6,] 8.52 0.77</span></span>
-<span></span>
-<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">true_w</span> <span class="op">+</span> <span class="va">true_b</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       [,1]</span></span>
-<span><span class="co">#&gt; [1,] FALSE</span></span>
-<span><span class="co">#&gt; [2,] FALSE</span></span>
-<span><span class="co">#&gt; [3,] FALSE</span></span>
-<span><span class="co">#&gt; [4,]  TRUE</span></span>
-<span><span class="co">#&gt; [5,] FALSE</span></span>
-<span><span class="co">#&gt; [6,]  TRUE</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">y</span>, <span class="st">"red"</span>, <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Regression_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="700"></p>
+<p>Support Vector Machines (SVM) are a binary classification method,
+that uses a hyperplane to separate the groups.</p>
+<p><span class="math display">\[
+x_{ij} \in \mathbb{R} \qquad i \in [1,n],\ j\in [1,k]
+\]</span> <span class="math display">\[
+y_i \in \{\text{TRUE},\ \text{FALSE}\} \qquad i \in [1,n]
+\]</span></p>
+<p>Usually, <span class="math inline">\(y\)</span> is represented as
+<span class="math inline">\(y_i \in \{-1, +1\}\)</span>, but I believe
+it’s easier to understand as a boolean variable.</p>
+<div class="section level3">
+<h3 id="basic-idea">Basic Idea<a class="anchor" aria-label="anchor" href="#basic-idea"></a>
+</h3>
+<p>An SVM finds a vector <span class="math inline">\(\{w_j\}_{j\in[1,k]}\)</span> and scalar <span class="math inline">\(b\)</span> that represents a hyperplane <span class="math inline">\(h\)</span>:</p>
+<p><span class="math display">\[
+h : \sum_{j=1}^k{(h_{j} w_{j})} + b = 0
+\]</span></p>
+<p>Classifications works like this. When the hyperplane expression is
+positive <span class="math inline">\(y_i\)</span> is predicted
+<code>TRUE</code>; when the expression is negative <span class="math inline">\(y_i\)</span> is predicted <code>FALSE</code>.</p>
+<p><span class="math display">\[
+\sum_{j=1}^k{(x_{ij} w_{j})} + b &gt; 0 \Rightarrow y_i=\text{TRUE}
+\qquad \forall i\in[1,n]
+\]</span> <span class="math display">\[
+\sum_{j=1}^k{(x_{ij} w_{j})} + b &lt; 0 \Rightarrow y_i=\text{FALSE}
+\qquad \forall i\in[1,n]
+\]</span> With this randomly generated data, we can find a line (which
+is an <span class="math inline">\(\mathbb{R}^2\)</span> hyperplane) that
+perfectly separates orange from blue.</p>
+<p><img src="Regression_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
+<p>However, this is not the <em>best</em> separator. There are two
+methods of finding a better one, a Hard Margin SVM and a Soft Margin
+SVM.</p>
+</div>
 <div class="section level3">
 <h3 id="hard-margin">Hard Margin<a class="anchor" aria-label="anchor" href="#hard-margin"></a>
 </h3>
+<p>The goal of an SVM is to find the greatest possible <em>margin</em>.
+The margin is the smallest distance from a point to the hyperplane.
+Minimizing the margin is equivalent to minimizing the quadratic sum of
+<span class="math inline">\(w\)</span> coefficients.</p>
+<p><span class="math display">\[
+\min_w \sum_{j=1}^k{w_j^2}
+\]</span></p>
+<p>And these constraints ensure the prediction is always correct.</p>
+<p><span class="math display">\[
+\sum_{j=1}^k{(x_{ij} w_{j})} + b \ge +1   \qquad \forall i : y_i =
+\text{TRUE}
+\]</span> <span class="math display">\[
+\sum_{j=1}^k{(x_{ij} w_{j})} + b \le -1   \qquad \forall i : y_i =
+\text{FALSE}
+\]</span></p>
+<p>The Hard Margin SVM can be written in <code>lpsugar</code> with the
+following code.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">svm_hard</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">w</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_objective.html">lp_min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">w</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_constraint</a></span><span class="op">(</span></span>
-<span>        hard_margin <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        true_y <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>            <span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span>, <span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
-<span>            </span>
-<span>            <span class="kw">if</span> <span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                <span class="va">predicted</span> <span class="op">&gt;=</span> <span class="op">+</span><span class="fl">1</span></span>
-<span>            <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>                <span class="va">predicted</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">1</span></span>
-<span>            <span class="op">}</span></span>
+<span>            <span class="va">predicted</span> <span class="op">&gt;=</span> <span class="op">+</span><span class="fl">1</span></span>
+<span>        <span class="op">}</span>,</span>
+<span>        false_y <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>            <span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span>, <span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
+<span>            <span class="va">predicted</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">1</span></span>
 <span>        <span class="op">}</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">y</span>, <span class="st">"red"</span>, <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># w[1] * x[1] + w[2] * x[2] + b = 0</span></span>
-<span><span class="co"># x[2] = - b / w[2] - x[1] * w[1] / w[2]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">svm_hard</span><span class="op">$</span><span class="va">variables</span>, <span class="op">{</span></span>
-<span>     <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>a <span class="op">=</span> <span class="op">-</span> <span class="va">b</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, b <span class="op">=</span> <span class="op">-</span> <span class="va">w</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span>     <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>a <span class="op">=</span> <span class="op">(</span><span class="op">+</span><span class="fl">1</span> <span class="op">-</span> <span class="va">b</span><span class="op">)</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, b <span class="op">=</span> <span class="op">-</span> <span class="va">w</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span>     <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>a <span class="op">=</span> <span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">-</span> <span class="va">b</span><span class="op">)</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, b <span class="op">=</span> <span class="op">-</span> <span class="va">w</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Regression_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
+<p>This is the result. The continuous line represent the hyperplane, and
+the dashed lines represent the points where the hyperplane formula is
+<span class="math inline">\(+1\)</span> and <span class="math inline">\(-1\)</span>.</p>
+<p><img src="Regression_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="soft-margin">Soft Margin<a class="anchor" aria-label="anchor" href="#soft-margin"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">C</span> <span class="op">&lt;-</span> <span class="fl">0.8</span> <span class="co"># Regularization hyperparameter</span></span>
+<p>Soft Margin SVMs allow some prediction errors. This means they
+support data that cannot be linearly separated. A Hard Margin SVM would
+fail to find a feasible solution with this data.</p>
+<p><img src="Regression_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
+<p>We will introduce a slack variable <span class="math inline">\(\xi_i
+\ge 0\)</span> indicating the prediction error for observation <span class="math inline">\(i\)</span>. Naturally, we want to minimize the
+prediction error, so we will update the objective function:</p>
+<p><span class="math display">\[
+\min_w \sum_{j=1}^k{w_j^2} + C\sum_{i=1}^n{\xi_i}
+\]</span></p>
+<p>Where <span class="math inline">\(C\)</span> is known as the
+Regularization Hyperparameter.</p>
+<p>The constraints will now allow some flexibility by adding the slack
+variables <span class="math inline">\(\xi\)</span>:</p>
+<p><span class="math display">\[
+\sum_{j=1}^k{(x_{ij} w_{j})} + b \ge +1 - \xi_i   \qquad \forall i : y_i
+= \text{TRUE}
+\]</span> <span class="math display">\[
+\sum_{j=1}^k{(x_{ij} w_{j})} + b \le -1 + \xi_i   \qquad \forall i : y_i
+= \text{FALSE}
+\]</span></p>
+<p>In <code>lpsugar</code>, the Soft Margin SVM can be coded as
+follows.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">C</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="co"># Regularization Hyperparameter</span></span>
 <span></span>
-<span><span class="va">svm_soft</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="va">svm_soft</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">w</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">slack</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_objective.html">lp_min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">w</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">C</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">slack</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_constraint</a></span><span class="op">(</span></span>
-<span>        soft_margin <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        true_y <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>            <span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span>, <span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
-<span>            </span>
-<span>            <span class="kw">if</span> <span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                <span class="va">predicted</span> <span class="op">&gt;=</span> <span class="op">+</span><span class="fl">1</span> <span class="op">-</span> <span class="va">slack</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
-<span>            <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>                <span class="va">predicted</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="va">slack</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
-<span>            <span class="op">}</span></span>
+<span>            <span class="va">predicted</span> <span class="op">&gt;=</span> <span class="op">+</span><span class="fl">1</span> <span class="op">-</span> <span class="va">slack</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
+<span>        <span class="op">}</span>,</span>
+<span>        false_y <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>            <span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span>, <span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
+<span>            <span class="va">predicted</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="va">slack</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
 <span>        <span class="op">}</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">y</span>, <span class="st">"red"</span>, <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># w[1] * x[1] + w[2] * x[2] + b = 0</span></span>
-<span><span class="co"># x[2] = - b / w[2] - x[1] * w[1] / w[2]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">svm_soft</span><span class="op">$</span><span class="va">variables</span>, <span class="op">{</span></span>
-<span>     <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>a <span class="op">=</span> <span class="op">-</span> <span class="va">b</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, b <span class="op">=</span> <span class="op">-</span> <span class="va">w</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span>     <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>a <span class="op">=</span> <span class="op">(</span><span class="op">+</span><span class="fl">1</span> <span class="op">-</span> <span class="va">b</span><span class="op">)</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, b <span class="op">=</span> <span class="op">-</span> <span class="va">w</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span>     <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>a <span class="op">=</span> <span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">-</span> <span class="va">b</span><span class="op">)</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, b <span class="op">=</span> <span class="op">-</span> <span class="va">w</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">/</span> <span class="va">w</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Regression_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
+<p>Notice that all blue values fall on top of the hyperplane, but some
+orange values are incorrectly predicted.</p>
+<p><img src="Regression_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

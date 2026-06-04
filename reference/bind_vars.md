@@ -1,4 +1,4 @@
-# Concatenate variables and numbers.
+# Concatenate Variables and Numbers.
 
 Bind multiple variables and/or constants together.
 

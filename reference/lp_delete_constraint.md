@@ -1,4 +1,4 @@
-# Delete constraints
+# Delete Constraints
 
 Remove named constraints from an
 [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md).

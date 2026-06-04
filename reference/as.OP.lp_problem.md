@@ -1,4 +1,4 @@
-# Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object.
+# Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) Object.
 
 Convert an
 [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)

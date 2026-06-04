@@ -9,25 +9,25 @@
   [`lp_var()`](https://benet1one.github.io/lpsugar/reference/lp_variable.md)
   :
 
-  Define a variable for an
+  Add a Variable to an
   [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
 
 - [`lp_minimize()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
   [`lp_maximize()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
   [`lp_min()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
   [`lp_max()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
-  : Set an objective function
+  : Set an Objective Function
 
 - [`lp_constraint()`](https://benet1one.github.io/lpsugar/reference/lp_constraint.md)
   [`lp_con()`](https://benet1one.github.io/lpsugar/reference/lp_constraint.md)
   [`lp_subject_to()`](https://benet1one.github.io/lpsugar/reference/lp_constraint.md)
   :
 
-  Add constraints to an
+  Add Constraints to an
   [`lp_problem()`](https://benet1one.github.io/lpsugar/reference/lp_problem.md)
 
 - [`lp_delete_constraint()`](https://benet1one.github.io/lpsugar/reference/lp_delete_constraint.md)
-  : Delete constraints
+  : Delete Constraints
 
 - [`lp_alias()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
   [`lp_implicit_variable()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
@@ -54,7 +54,7 @@
 ## Bind variables or constraints
 
 - [`bind_vars()`](https://benet1one.github.io/lpsugar/reference/bind_vars.md)
-  : Concatenate variables and numbers.
+  : Concatenate Variables and Numbers.
 - [`bind_cons()`](https://benet1one.github.io/lpsugar/reference/bind_cons.md)
   : Define Multiple Constraints at Once
 
@@ -69,10 +69,15 @@
 
 ## Manually solve a problem
 
+- [`reexports`](https://benet1one.github.io/lpsugar/reference/reexports.md)
+  [`as.OP`](https://benet1one.github.io/lpsugar/reference/reexports.md)
+  [`ROI_solve`](https://benet1one.github.io/lpsugar/reference/reexports.md)
+  : Objects exported from other packages
+
 - [`as.OP(`*`<lp_problem>`*`)`](https://benet1one.github.io/lpsugar/reference/as.OP.lp_problem.md)
   :
 
-  Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) object.
+  Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) Object.
 
 - [`pretty_solution()`](https://benet1one.github.io/lpsugar/reference/pretty_solution.md)
   : Prettify the Solution of a Model.
