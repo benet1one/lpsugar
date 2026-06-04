@@ -1,6 +1,6 @@
 
 Code
-- variables_to_vec ensure named variables are passed in correct order
+- ensure the call=call in errors are correct
 
 Function Objective
 - gradients and hessians
