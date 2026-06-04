@@ -6,5 +6,5 @@ Function Objective
 - gradients and hessians
 
 Docs
-- Document SVMs in regression vignette
-- Uppercase titles
+- Document Soft Margin SVMs in regression vignette
+- Nonlinear vignette

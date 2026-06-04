@@ -28,5 +28,6 @@ reference:
   - solution_summary
 - title: Manually solve a problem
   contents:
+  - ROI_solve
   - as.OP.lp_problem
   - pretty_solution
