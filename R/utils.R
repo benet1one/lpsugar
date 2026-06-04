@@ -173,6 +173,27 @@ variables_to_vec.list <- function(x, problem, call = environment()) {
             ), call = call)
         }
         
+        dnx <- dimnames(drop(xs))
+        dnv <- dimnames(drop(v$ind))
+        
+        if (!is.null(dnx) && !is.null(dnv)) for (i in seq_along(dnx)) {
+            dnxi <- dnx[[i]]
+            dnvi <- dnv[[i]]
+            
+            if (is.null(dnxi) || is.null(dnvi)) {
+                next
+            }
+            
+            if (any(dnxi != dnvi)) {
+                dn_name <- names(dnv)[i]
+                cli::cli_abort(c(
+                    "Dimension names of variable `{v$name}` do not match.",
+                    "!" = "In dimension '{dn_name}'",
+                    ">" = "Make sure they are the same names in the same order."
+                ))
+            }
+        }
+        
         if (v$integer && !rlang::is_integerish(xs)) {
             warn("`{v$name}` should be integer.", call = call)
         }

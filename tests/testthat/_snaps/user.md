@@ -41,3 +41,21 @@
       [1] 67
       
 
+# variables_to_vec
+
+    Dimensions of variable `a` do not match.
+    x In `x` they are (4, 3)
+    x In `problem` they are (1, 3, 1, 4)
+
+---
+
+    Dimensions of variable `a` do not match.
+    x In `x` they are (12)
+    x In `problem` they are (1, 3, 1, 4)
+
+---
+
+    Dimension names of variable `a` do not match.
+    ! In dimension 'letters[1:4]'
+    > Make sure they are the same names in the same order.
+

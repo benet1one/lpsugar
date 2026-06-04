@@ -123,6 +123,42 @@ test_that("solution summary", {
     expect_snapshot(solution_summary(p, slist4))
 })
 
+test_that("variables_to_vec", {
+    p <- lp_problem() |> 
+        lp_var(a[1, 1:3, 1, letters[1:4]])
+    
+    variables_to_vec(
+        list(a = array(0, dim = c(3, 4))),
+        problem = p
+    )
+    variables_to_vec(
+        list(a = array(0, dim = c(1, 3, 4))),
+        problem = p
+    )
+    
+    expect_snapshot_error(
+        variables_to_vec(
+            list(a = array(0, dim = c(4, 3))),
+            problem = p
+        )
+    )
+    expect_snapshot_error(
+        variables_to_vec(
+            list(a = rep(1, 3*4)),
+            problem = p
+        )
+    )
+    
+    a_unsorted <- array(0, dim = c(3, 4), dimnames = list(NULL, letters[4:1]))
+        
+    expect_snapshot_error(
+        variables_to_vec(
+            list(a = a_unsorted),
+            problem = p
+        )
+    )
+})
+
 test_that("quadratic constraint summary", {
     p <- lp_problem() |> 
         lp_var(x) |> 
