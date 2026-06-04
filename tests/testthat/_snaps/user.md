@@ -1,7 +1,7 @@
 # solution summary
 
     Code
-      solution_summary(p, slist)
+      solution_summary(p, slist4)
     Output
       $aliases
       $aliases$x1

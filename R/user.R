@@ -104,7 +104,6 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 #' @param problem An [lp_problem()].
 #' @param solution One of:
 #' - Named list of variables with their respective values.
-#' If a variable is missing, it is set to `pmax(0, lower)`.
 #' - An `lp_solution` object as returned by [lp_solve()] or [lp_find_feasible()].
 #' - A vector containing the values of each variable, one after another.
 #' @param tol Tolerance to use for constraint and bound satisfaction.

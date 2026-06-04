@@ -76,58 +76,51 @@ test_that("solution summary", {
     s <- lp_solve(p)
     s
 
-    slist <- s$variables
-    slist$y <- NULL
-    slist$x[1, 1] <- 50
-    slist$x[2, 2] <- NA
-    slist$x[2, 3] <- -5
-
-    expected <- s$variables_vec
-    expected["y"] <- 0
-    expected["x[1,1]"] <- 50
-    expected["x[2,2]"] <- 1
-    expected["x[2,3]"] <- -5
-
     expect_equal(
         variables_to_vec(s, p),
         s$variables_vec
     )
     expect_equal(
-        variables_to_vec(slist, p),
-        expected
+        variables_to_vec(s$variables, p),
+        s$variables_vec
     )
 
     s2 <- s
-    s2$variables <- slist
+    s2$variables$x[1] <- 5
 
     expect_error(
         variables_to_vec(s2, p),
         "`x\\$variables` and `x\\$variables_vec` do not match"
     )
 
-    slist2 <- slist
+    slist2 <- s2$variables
     slist2$y <- 2.5
 
     expect_warning(
         variables_to_vec(slist2, p),
-        "'y' should be integer"
+        "`y` should be integer"
     )
 
-    slist3 <- slist
-    slist3$x <- slist$x[1:2, 1:2]
+    slist3 <- s2$variables
+    slist3$x <- slist3$x[1:2, 1:2]
 
     expect_error(
         variables_to_vec(slist3, p),
-        r"(Variable 'x' in `x` is length \(4\) when it should be length \(6\))"
+        "Dimensions of variable `x` do not match"
     )
 
-    svec <- s$variables_vec |> head(4)
     expect_error(
-        variables_to_vec(svec, p),
+        variables_to_vec(s$variables_vec[1:4], p),
         r"(`problem` has \(7\) variables but `x` is length \(4\))"
     )
 
-    expect_snapshot(solution_summary(p, slist))
+    slist4 <- s$variables
+    slist4$y <- 0
+    slist4$x[1, 1] <- 50
+    slist4$x[2, 2] <- 1
+    slist4$x[2, 3] <- -5
+    
+    expect_snapshot(solution_summary(p, slist4))
 })
 
 test_that("quadratic constraint summary", {

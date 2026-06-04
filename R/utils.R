@@ -119,70 +119,85 @@ variables_to_list <- function(x, problem, binary_as_logical = FALSE) {
 }
 
 variables_to_vec <- function(x, problem, call = environment()) {
-    if (is_lp_solution(x)) {
-        var_vec <- variables_to_vec(x$variables, problem, call = call)
-        true_vec <- x$variables_vec
-        
-        if (any(var_vec != true_vec)) {
-            rlang::abort(
-                c("`x$variables` and `x$variables_vec` do not match.",
-                  "i" = "You can use either one of them in this function."),
-                call = call
-            )
-        } else {
-            return(true_vec)
-        }
-        
-    } else if (is.atomic(x)) {
-        if (length(x) != ncol(problem)) {
-            n <- ncol(problem)
-            m <- length(x)
-            abort("`problem` has ({n}) variables but `x` is length ({m}).",
-                  call = call)
-        }
-        
-        num <- as.numeric(x)
-        names(num) <- attr(problem, "varnames")
-        return(num)
-        
-    } else if (is.list(x)) {
-        solution_vec <- numeric(ncol(problem))
-        names(solution_vec) <- attr(problem, "varnames")
-        
-        for (v in problem$variables) {
-            vs <- x[[v$name]]
-            lower <- rep_len(v$lower, length(v))
-            if (v$integer) lower <- ceiling(lower)
-            default <- pmax(0, lower)
-            
-            if (is.null(vs)) {
-                vs <- default
-            } else {
-                vs <- as.numeric(vs)
-                vs[is.na(vs)] <- default[is.na(vs)]
-            }
-            
-            if (length(vs) != length(v)) {
-                n <- length(v)
-                m <- length(vs)
-                abort("Variable '{v$name}' in `x` is length ({m}) when it should be length ({n}).",
-                      call = call)
-            }
-            
-            if (v$integer && !rlang::is_integerish(vs)) {
-                warn("'{v$name}' should be integer.", call = call)
-            }
-            
-            solution_vec[v$ind] <- vs
-        }
-        
-        return(solution_vec)
-        
-    } else {
-        abort("Unsupported type for `x`.", call = call)
-    }
+    UseMethod("variables_to_vec")
 }
 
+#' @export
+variables_to_vec.default <- function(x, problem, call = environment()) {
+    x <- as.numeric(x)
+    
+    if (anyNA(x)) {
+        abort("`x` must not contain NA values.")
+    }
+    
+    if (length(x) != ncol(problem)) {
+        n <- ncol(problem)
+        m <- length(x)
+        abort("`problem` has ({n}) variables but `x` is length ({m}).",
+              call = call)
+    }
+    
+    names(x) <- attr(problem, "varnames")
+    x
+}
+
+#' @export
+variables_to_vec.list <- function(x, problem, call = environment()) {
+    solution_vec <- numeric(ncol(problem))
+    names(solution_vec) <- attr(problem, "varnames")
+    
+    for (v in problem$variables) {
+        xs <- x[[v$name]]
+        
+        if (is.null(xs)) {
+            cli::cli_abort("Variable `{.field {v$name}}` not present in `x`.")
+        }
+        
+        xs <- as.array(xs)
+        xs[] <- as.numeric(xs)
+        
+        if (anyNA(xs)) {
+            abort("`x` must not contain NA values.")
+        }
+
+        dx <- dim(drop(xs))
+        dv <- dim(drop(v$ind))
+        
+        if (any(dx != dv)) {
+            dx_str <- paste(dim(xs), collapse = ", ")
+            dv_str <- paste(dim(v), collapse = ", ")
+            cli::cli_abort(c(
+                "Dimensions of variable `{v$name}` do not match.",
+                "x" = "In `x` they are ({dx_str})",
+                "x" = "In `problem` they are ({dv_str})"
+            ), call = call)
+        }
+        
+        if (v$integer && !rlang::is_integerish(xs)) {
+            warn("`{v$name}` should be integer.", call = call)
+        }
+        
+        solution_vec[v$ind] <- xs
+    }
+    
+    solution_vec
+}
+
+#' @export
+variables_to_vec.lp_solution <- function(x, problem, call = environment()) {
+    var_vec <- variables_to_vec(x$variables, problem, call = call)
+    true_vec <- x$variables_vec
+    
+    if (any(var_vec != true_vec)) {
+        rlang::abort(
+            c("`x$variables` and `x$variables_vec` do not match.",
+              "i" = "You can use either one of them in this function."),
+            call = call
+        )
+    }
+    
+    true_vec
+}
 
 # Inheritance -------------------
 
