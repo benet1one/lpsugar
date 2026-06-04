@@ -28,8 +28,7 @@ compute_aliases(problem, solution)
 
   One of:
 
-  - Named list of variables with their respective values. If a variable
-    is missing, it is set to `pmax(0, lower)`.
+  - Named list of variables with their respective values.
 
   - An `lp_solution` object as returned by
     [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
