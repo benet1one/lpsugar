@@ -4,7 +4,7 @@ test_that("nonlinear", {
     L <- letters[1:3]
     
     my_fun <- function(x, y, z = 0) {
-        x^3 / y["a"] + z
+        x^3 / y["b"] + z
     }
     
     p <- lp_problem() |> 
@@ -18,7 +18,7 @@ test_that("nonlinear", {
         p, 
         solver = "alabama",
         start = list(
-            y = c(3, 0, 0),
+            y = c(3, 3, 3),
             x = 4
         )
     )
