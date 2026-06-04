@@ -5,7 +5,7 @@
 \alias{lp_maximize}
 \alias{lp_min}
 \alias{lp_max}
-\title{Set an objective function}
+\title{Set an Objective Function}
 \usage{
 lp_minimize(.problem, objective)
 
@@ -33,7 +33,7 @@ The \code{.problem} with the new \verb{$objective} function, a list with these f
 }
 }
 \description{
-Minimize of maximize an expression.
+Minimize of maximize a linear or quadratic expression.
 }
 \details{
 If \code{objective} evaluates to a multivariate variable instead of a scalar, it will
@@ -62,4 +62,7 @@ sum(p$objective$coef * s$variables_vec)
 
 s$objective
 sum(p$objective$coef * s$variables_vec) + p$objective$add
+}
+\seealso{
+\code{\link[=lp_minimize_function]{lp_minimize_function()}} For general nonlinear optimization.
 }

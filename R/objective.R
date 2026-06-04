@@ -85,9 +85,9 @@ new_objective <- function(.problem, type, direction = NULL,
 
 # User -------------------------------
 
-#' Set an objective function
+#' Set an Objective Function
 #'
-#' Minimize of maximize an expression.
+#' Minimize of maximize a linear or quadratic expression.
 #'
 #' @param .problem An [lp_problem()].
 #' @param objective Expression to optimize, which must evaluate to an `lp_variable` object.
@@ -106,7 +106,8 @@ new_objective <- function(.problem, type, direction = NULL,
 #' - `$direction` : String, goal of the solver. Can be `"minimize"` or `"maximize"`.
 #' - `$expr` : String, expression that defined the objective function.
 #' @export
-#'
+#' @seealso [lp_minimize_function()] For general nonlinear optimization.
+#' 
 #' @rdname lp_objective
 #' @example inst/examples/example_objective.R
 lp_minimize <- function(.problem, objective) {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/solve.R
 \name{as.OP.lp_problem}
 \alias{as.OP.lp_problem}
-\title{Create a \code{\link[ROI:OP]{ROI::OP()}} object.}
+\title{Create a \code{\link[ROI:OP]{ROI::OP()}} Object.}
 \usage{
 \method{as.OP}{lp_problem}(x)
 }

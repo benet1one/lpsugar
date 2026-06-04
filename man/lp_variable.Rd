@@ -3,7 +3,7 @@
 \name{lp_variable}
 \alias{lp_variable}
 \alias{lp_var}
-\title{Define a variable for an \code{\link[=lp_problem]{lp_problem()}}}
+\title{Add a Variable to an \code{\link[=lp_problem]{lp_problem()}}}
 \usage{
 lp_variable(
   .problem,
@@ -84,7 +84,7 @@ Used for objective, constraints and aliases.
 }
 }
 \description{
-Add a variable to a problem by defining it's name, dimensions, type, and bounds.
+Define a variable with it's name, dimensions, type, and bounds.
 }
 \examples{
 # Diet problem

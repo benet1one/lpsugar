@@ -2,7 +2,7 @@
 % Please edit documentation in R/constraints.R
 \name{lp_delete_constraint}
 \alias{lp_delete_constraint}
-\title{Delete constraints}
+\title{Delete Constraints}
 \usage{
 lp_delete_constraint(.problem, names)
 }

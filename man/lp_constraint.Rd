@@ -4,7 +4,7 @@
 \alias{lp_constraint}
 \alias{lp_con}
 \alias{lp_subject_to}
-\title{Add constraints to an \code{\link[=lp_problem]{lp_problem()}}}
+\title{Add Constraints to an \code{\link[=lp_problem]{lp_problem()}}}
 \usage{
 lp_constraint(.problem, ...)
 
@@ -45,7 +45,7 @@ or \code{""} for unnamed constraints.
 }
 }
 \description{
-Restrict the variables in an \code{\link[=lp_problem]{lp_problem()}} with linear constraints.
+Restrict the variables in an \code{\link[=lp_problem]{lp_problem()}} with linear or quadratic constraints.
 }
 \examples{
 # Ordered variable constraint

@@ -1,7 +1,7 @@
 
-#' Add constraints to an [lp_problem()]
+#' Add Constraints to an [lp_problem()]
 #'
-#' Restrict the variables in an [lp_problem()] with linear constraints.
+#' Restrict the variables in an [lp_problem()] with linear or quadratic constraints.
 #'
 #' @param .problem An [lp_problem()].
 #' @param ... One or more linear constraints. Can be named. They must:
@@ -102,7 +102,7 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
     return(cons)
 }
 
-#' Delete constraints
+#' Delete Constraints
 #'
 #' Remove named constraints from an [lp_problem()].
 #'

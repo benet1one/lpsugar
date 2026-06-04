@@ -199,7 +199,7 @@ ROI::as.OP
 #' @export
 ROI::ROI_solve
 
-#' Create a [ROI::OP()] object.
+#' Create a [ROI::OP()] Object.
 #'
 #' Convert an [lp_problem()] object to a [ROI::OP()] object.
 #' Used internally in [lp_solve()].

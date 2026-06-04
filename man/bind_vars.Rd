@@ -2,7 +2,7 @@
 % Please edit documentation in R/variables.R
 \name{bind_vars}
 \alias{bind_vars}
-\title{Concatenate variables and numbers.}
+\title{Concatenate Variables and Numbers.}
 \usage{
 bind_vars(...)
 }

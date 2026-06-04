@@ -1,7 +1,7 @@
 
-#' Define a variable for an [lp_problem()]
+#' Add a Variable to an [lp_problem()]
 #'
-#' Add a variable to a problem by defining it's name, dimensions, type, and bounds.
+#' Define a variable with it's name, dimensions, type, and bounds.
 #'
 #' @param .problem An [lp_problem()] object.
 #' @param definition Expression.
@@ -273,7 +273,7 @@ c.lp_variable <- function(..., recursive = TRUE) {
     ))
 }
 
-#' Concatenate variables and numbers.
+#' Concatenate Variables and Numbers.
 #'
 #' Bind multiple variables and/or constants together.
 #'
