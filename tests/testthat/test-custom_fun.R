@@ -196,7 +196,7 @@ test_that("apply", {
     )
     expect_error(
         p2 |> lp_eval(apply(x, "d", sum)),
-        'Margin "d" does not match any dimension in `x`.'
+        "Margin 'd' does not match any dimension in `x`."
     )
 })
 

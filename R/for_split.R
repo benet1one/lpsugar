@@ -1,7 +1,11 @@
 
 check_for_split <- function(quosure, call = parent.frame()) {
     if ("return" %in% all.names(quosure)) {
-        abort("Cannot use `return` inside a for loop.", call = call)
+        cli_abort(
+            c("Cannot use `return` inside a for loop.",
+                ">" = "Use `next` to skip the rest of the loop."),
+            call = call
+        )
     }
 }
 

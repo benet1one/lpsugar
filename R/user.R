@@ -38,10 +38,10 @@ parameter <- function(.x, ..., byrow = TRUE) {
         parameter_matrix(.x, dots, byrow = byrow)
 
     } else if (length(dots) == 0L) {
-        abort("`...` cannot be empty.")
+        cli_abort("`...` cannot be empty.")
 
     } else {
-        abort("Only vectors and matrices are supported.")
+        cli_abort("Only vectors and matrices are supported.")
     }
 }
 
@@ -49,14 +49,21 @@ parameter_vector <- function(.x, dots) {
     nd <- sum(dim2(.x) > 1L)
 
     if (nd > 1L) {
-        abort("`.x` has two or more dimensions but only one element in `...`",
-              call = parent.frame())
+        cli_abort(
+            "`.x` has two or more dimensions but only one element in `...`",
+            call = parent.frame()
+        )
     }
 
     n <- length(dots[[1]])
-
+    
     if (length(.x) > 1L && length(.x) != n) {
-        abort("`.x` is length ({length(.x)}) and `{names(dots)}` is length ({n}).")
+        cli_abort(
+            c("Lengths do not match.",
+              "x" = "`.x` is length {length(.x)}",
+              "x" = "`{names(dots)}` is length {n}"),
+            call = parent.frame()
+        )
     }
 
     array(.x, dim = length(dots[[1]]), dimnames = dimnames_non_numeric(dots))
@@ -68,8 +75,12 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 
     if (ndim(.x) == 1L) {
         if (length(.x) != 1L && length(.x) != n*m) {
-            abort("`.x` is length ({length(.x)}) when it should be length ({n*m} = {n} x {m})",
-                  call = parent.frame())
+            cli_abort(
+                c("Lengths do not match.",
+                  "x" = "`.x` is length {length(.x)}",
+                  "x" = "It should be length {n*m} = {n} x {m}"),
+                call = parent.frame()
+            )
         }
 
         return(matrix(
@@ -79,11 +90,12 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 
     } else if (ndim(.x) == 2L) {
         if (any(dim(.x) != lengths(dots))) {
-            msg <- glue::glue(
-                "`.x` has dimensions ({nrow(.x)} x {ncol(.x)}), ",
-                "while `...` have dimensions ({n} x {m})."
+            cli_abort(
+                c("Dimensions do not match.",
+                  "x" = "`.x`  has dimensions ({nrow(.x)}, {ncol(.x)})",
+                  "x" = "`...` has dimensions ({n}, {m})"),
+                call = parent.frame()
             )
-            abort(msg, call = parent.frame())
         }
 
         warn_changed_args(byrow = TRUE)
@@ -91,8 +103,10 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
         return(.x)
 
     } else {
-        abort("`.x` has ({ndim(.x)}) dimensions. Only vectors and matrices are supported.",
-              call = parent.frame())
+        cli_abort(
+            "`.x` has {ndim(.x)} dimensions. Only vectors and matrices are supported.",
+            call = parent.frame()
+        )
     }
 }
 

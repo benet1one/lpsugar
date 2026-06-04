@@ -60,7 +60,7 @@ lp_variable <- function(.problem, definition,
 
     check_problem(.problem)
     if (missing(definition)) {
-        abort("Argument `definition` is missing, with no default.")
+        cli_abort("Argument `definition` is missing, with no default.")
     }
 
     def <- parse_variable_definition({{ definition }})
@@ -70,9 +70,9 @@ lp_variable <- function(.problem, definition,
     dnames <- dimnames_non_numeric(sets)
 
     if (name %in% names(.problem$variables)) {
-        abort("Variable `{name}` already exists in this problem.")
+        cli_abort("Variable `{name}` already exists in this problem.")
     } else if (name %in% names(.problem$aliases)) {
-        abort("Cannot override alias `{name}`.")
+        cli_abort("Cannot override alias `{name}`.")
     }
 
     stopifnot(
@@ -84,19 +84,19 @@ lp_variable <- function(.problem, definition,
     upper <- interpret_bound(upper, "upper", default = +Inf, dim = lengths(sets))
 
     if (any(lower > upper)) {
-        abort("`lower` bound ({lower}) cannot be greater than `upper` bound ({upper}).")
+        cli_abort("`lower` bound ({lower}) cannot be greater than `upper` bound ({upper}).")
     } else if (any(lower == +Inf)) {
-        abort("`lower` bound cannot be +Inf.")
+        cli_abort("`lower` bound cannot be +Inf.")
     } else if (any(upper == -Inf)) {
-        abort("`upper` bound cannot be -Inf.")
+        cli_abort("`upper` bound cannot be -Inf.")
     }
 
     if (binary) {
         if (any(lower > 1)) {
-            abort("`lower` bound cannot be greater than 1 for a binary variable.")
+            cli_abort("`lower` bound cannot be greater than 1 for a binary variable.")
         }
         if (any(upper < 0)) {
-            abort("`upper` bound cannot be less than 0 for a binary variable.")
+            cli_abort("`upper` bound cannot be less than 0 for a binary variable.")
         }
 
         integer <- TRUE
@@ -260,14 +260,14 @@ names.lp_variable <- function(x) {
 }
 #' @export
 as.logical.lp_variable <- function(x, ...) {
-    abort("Variables cannot be coerced to type 'logical'.")
+    cli_abort("Variables cannot be coerced to type 'logical'.")
 }
 
 # Concatenation --------------------
 
 #' @export
 c.lp_variable <- function(..., recursive = TRUE) {
-    rlang::abort(c(
+    cli_abort(c(
         "Cannot use `c()` to concatenate `lp_variable`s.",
         ">" = "Use `bind_vars()` instead."
     ))
@@ -287,7 +287,7 @@ bind_vars <- function(...) {
 
     nams <- rlang::names2(dots)
     if (any(nams != "")) {
-        warn("ignoring named arguments in `bind_vars()`")
+        cli_warn("ignoring named arguments in `bind_vars()`")
     }
 
     len0 <- lengths(dots) == 0
@@ -303,12 +303,8 @@ bind_vars <- function(...) {
 
         if (!is_lp_variable(x) && !is.numeric(x)) {
             e <- dots_expr[[i]] |> format1()
-            abort("`{e}` is not numeric or an `lp_variable`.")
+            cli_abort("`{e}` is not numeric or an `lp_variable`.")
         }
-        # if (is_lp_variable(x) && is_quadratic(x)) {
-        #     e <- dots_expr[[i]] |> format1()
-        #     abort("Quadratic variables such as `{e}` are not currently supported in `bind_vars()`")
-        # }
     }
 
     purrr::reduce(dots, function(x, y) {
@@ -388,7 +384,7 @@ bind_cv <- function(x, y) {
     if (rlang::is_condition(old_ind)) {
         dots <- rlang::enexprs(..., .ignore_empty = "none")
         call <- rlang::expr((!!substitute(x))[!!!dots])
-        abort(old_ind$message, call = call)
+        cli_abort(old_ind$message, call = call)
     }
 
     old_ind <- c(old_ind)
@@ -409,18 +405,18 @@ bind_cv <- function(x, y) {
     `(<-` <- `!<-` <- NULL
     xname <- rlang::sym(x$name)
     call <- rlang::expr((!!xname)[...] <- {{value}})
-    abort("Cannot assign an element of an `lp_variable`.", call = call)
+    cli_abort("Cannot assign an element of an `lp_variable`.", call = call)
 }
 #' @export
 `[[.lp_variable` <- function(x, ...) {
-    rlang::abort(c(
-        glue::glue("Double indexing `{x$name}[[i]]` not supported for `lp_variable`."),
-        ">" = glue::glue("Use `{x$name}[i]` instead.")
+    cli_abort(c(
+        "Double indexing `{x$name}[[i]]` not supported for `lp_variable`.",
+        ">" = "Use `{x$name}[i]` instead."
     ))
 }
 #' @export
 `[[<-.lp_variable` <- function(x, i, value) {
-    abort("Double indexing `{x$name}[[i]]` not supported for `lp_variable`.")
+    cli_abort("Double indexing `{x$name}[[i]]` not supported for `lp_variable`.")
 }
 
 #' @export
@@ -431,9 +427,9 @@ rep.lp_variable <- function(x, ...) {
 #' @export
 t.lp_variable <- function(x) {
     if (ndim(x) > 2L) {
-        abort(glue::glue(
+        cli_abort(c(
             "Variable must be two-dimensional. ",
-            "Index it with `{x$name}[..., drop = TRUE]` to drop unnecessary dimensions."
+            ">" = "Index it with `{x$name}[..., drop = TRUE]` to drop unnecessary dimensions."
         ))
 
     } else if (ndim(x) == 1L) {
@@ -458,8 +454,10 @@ parse_variable_definition <- function(definition) {
     expr <- rlang::get_expr(def)
     env  <- rlang::get_env(def)
 
-    error_msg <- "Failed to parse variable. See ?lp_variable for details on how to define a variable"
-
+    error_msg <- c(
+        "Failed to parse variable.",
+        "i" = "See `?lp_variable` for details on how to define a variable."
+    )
 
     if (rlang::is_string(expr)) {
         sets <- list(scalar = "")
@@ -474,7 +472,7 @@ parse_variable_definition <- function(definition) {
         name <- expr[[2]]
 
         if (!rlang::is_symbol(name) && !rlang::is_string(name)) {
-            abort(error_msg, call = parent.frame())
+            cli_abort(error_msg, call = parent.frame())
         }
 
         name <- format(name)
@@ -485,7 +483,7 @@ parse_variable_definition <- function(definition) {
         sets_names[unnamed] <- sets_exprs[unnamed] |> sapply(format1)
 
         for (s in sets_exprs) if (rlang::is_missing(s)) {
-            abort("Sets in `{name}[...]` cannot be missing.", call = parent.frame())
+            cli_abort("Sets in `{name}[...]` cannot be missing.", call = parent.frame())
         }
 
         sets <- sets_exprs |>
@@ -503,45 +501,56 @@ parse_variable_definition <- function(definition) {
         return(list(name = name, scalar = FALSE, sets = sets))
     }
 
-    abort(error_msg, call = parent.frame())
+    cli_abort(error_msg, call = parent.frame())
 }
 check_variable_set <- function(set, name, call = environment()) {
     if (!rlang::is_atomic(set)) {
-        abort("Set `{name}` is not atomic.", call = call)
+        cli_abort("Set `{name}` is not atomic.", call = call)
     }
 
     nd <- ndim(set, drop = TRUE)
 
     if (nd != 1L) {
-        warn("Set `{name}` is {nd}-dimensional, results may be unexpected.", call = call)
+        cli_warn(
+            "Set `{name}` is {nd}-dimensional, results may be unexpected.", 
+            call = call
+        )
     }
 
     if (is.numeric(set) && any(set != seq_along(set))) {
-        rlang::abort(c(
-            glue::glue("Numeric sets like `{name}` must go from 1 to n."),
-            ">" = "Use character sets for more flexibility."
-        ))
+        cli_abort(
+            c("Numeric sets like `{name}` must go from 1 to n.",
+            ">" = "Use character sets for more flexibility."),
+            call = call
+        )
     }
 }
 interpret_bound <- function(bound, bound_name, default, dim) {
     if (length(bound) == 0L) {
-        warn("`{bound_name}` bound is `NULL` or zero-length, setting to {default}.",
-             call = parent.frame())
+        cli_warn(
+            "`{bound_name}` bound is `NULL` or zero-length, setting to {default}.",
+            call = parent.frame()
+        )
         return(default)
     }
 
     if (length(bound) > 1L && !all(dim2(bound) == dim)) {
-        abort("`dim({bound_name})` different from `dim(variable)`.",
-              call = parent.frame())
+        cli_abort(
+            "`dim({bound_name})` different from `dim(variable)`.",
+            call = parent.frame()
+        )
     }
 
     if (anyNA(bound)) {
-        warn("`{bound_name}` bound containts NA values, setting to {default}.", call = parent.frame())
+        cli_warn(
+            "`{bound_name}` bound containts NA values, setting to {default}.", 
+            call = parent.frame()
+        )
         bound[is.na(bound)] <- default
     }
 
     if (!is.numeric(bound)) {
-        abort("`{bound_name}` bound is not numeric.", call = parent.frame())
+        cli_abort("`{bound_name}` bound is not numeric.", call = parent.frame())
     }
 
     bound
@@ -571,7 +580,7 @@ recycle_var <- function(x, n) {
         return(x)
     }
 
-    abort("Attempt to recycle variable of length ({length(x)}) to length ({n}).")
+    cli_abort("Attempt to recycle variable of length ({length(x)}) to length ({n}).")
 }
 recycle_const <- function(x, n) {
     if (length(x) == n) {
@@ -580,7 +589,7 @@ recycle_const <- function(x, n) {
         return(rep(x, n))
     }
 
-    abort("Attempt to recycle array of length ({length(x)}) to length ({n}).")
+    cli_abort("Attempt to recycle array of length {length(x)} to length {n}.")
 }
 
 # Quadratic -----------------------
@@ -618,7 +627,7 @@ as_quadratic <- function(x) {
         return(x)
     }
     if (!is_lp_variable(x) && !is_lp_objective(x)) {
-        abort("`x` must be a variable or an objective function.")
+        cli_abort("`x` must be a variable or an objective function.")
     }
 
     x$q_coef <- get_q_coef(x)

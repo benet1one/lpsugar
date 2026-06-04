@@ -9,7 +9,7 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     )
     
     if (!is.null(gradient) || !is.null(hessian)) {
-        abort("`gradient` and `hessian` are not yet supported")
+        cli_abort("`gradient` and `hessian` are not yet supported.")
     }
     
     check_correct_arguments(fun,      .problem, funname = "fun")
@@ -28,18 +28,19 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     )
     
     if (rlang::is_error(fun_sane)) {
-        rlang::abort(
+        cli_abort(
             c("Failed to evaluate `fun`.",
-              ">" = "Make sure it works when all variables are 0 (it can return Inf)."), 
+              ">" = "Make sure it works when all variables are 0.",
+              "i" = "It can return -Inf or +Inf."), 
             call = parent.frame(),
             parent = fun_sane
         )
     }
     
     if (!is.numeric(fun_sane)) {
-        abort("`fun` must return a numeric scalar, not `{class(fun_sane)[1]}`")
+        cli_abort("`fun` must return a numeric scalar, not `{class(fun_sane)[1]}`")
     } else if (length(fun_sane) != 1L) {
-        abort("`fun` must return a numeric scalar, not of length `{length(fun_sane)}`")
+        cli_abort("`fun` must return a numeric scalar, not of length `{length(fun_sane)}`")
     }
     
     .problem$objective <- new_nonlinear_objective(
@@ -63,10 +64,9 @@ check_correct_arguments <- function(fun, problem, funname) {
     missing_vars <- varnames[!is.element(varnames, args)]
     
     if (length(missing_vars) > 0L) {
-        missing_vars_str <- paste0("`", missing_vars, "`", collapse = ", ")
-        rlang::abort(c(
-            glue::glue("`{funname}` must have all problem variables as arguments"),
-            "x" = glue::glue("Missing variables: {missing_vars_str}")
+        cli_abort(c(
+            "`{funname}` must have all problem variables as arguments",
+            "x" = "Missing variables: {missing_vars}"
         ))
     }
 }

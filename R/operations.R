@@ -16,7 +16,7 @@ Ops.lp_variable <- function(e1, e2) {
         } else if (op == "!") {
             return(negate_v(e1, call))
         }
-        abort("Unsupported operation `{op}`", call = call)
+        cli_abort("Unsupported operation `{op}`", call = call)
     }
 
     # Checks ----------------------------
@@ -29,7 +29,7 @@ Ops.lp_variable <- function(e1, e2) {
 
     if (!comp) {
         why <- attr(comp, "cnd")
-        rlang::abort(why$message, call = call)
+        cli_abort(why$message, call = call)
     }
 
     # Two element arithmetic
@@ -50,18 +50,18 @@ Ops.lp_variable <- function(e1, e2) {
     if (op %in% comparison_ops) {
         return(compare_lp(e1, e2, op, call))
     } else if (op == "!=") {
-        abort("Inequality `!=` is not supported in constraints.", call = call)
+        cli_abort("Inequality `!=` is not supported in constraints.", call = call)
     }
 
-    abort("Unsupported operation `{op}`", call = call)
+    cli_abort("Unsupported operation `{op}`", call = call)
 }
 
 check_no_na <- function(e1, e2, call) {
     if (!is_lp_variable(e1) && anyNA(e1)) {
-        abort("Left-hand-side object contains NA values.", call = call)
+        cli_abort("Left-hand-side object contains NA values.", call = call)
     }
     if (!is_lp_variable(e2) && anyNA(e2)) {
-        abort("Right-hand-side object contains NA values.", call = call)
+        cli_abort("Right-hand-side object contains NA values.", call = call)
     }
 }
 
@@ -78,7 +78,7 @@ add_lp <- function(x, y, call) {
     } else if (yv) {
         add_v_c(y, x, call)
     } else {
-        abort("None are lp_variables", call = call)
+        cli_abort("None are lp_variables", call = call)
     }
 }
 subtract_lp <- function(x, y, call) {
@@ -92,7 +92,7 @@ subtract_lp <- function(x, y, call) {
     } else if (yv) {
         subtract_c_v(x, y, call)
     } else {
-        abort("None are lp_variables", call = call)
+        cli_abort("None are lp_variables", call = call)
     }
 }
 multiply_lp <- function(x, y, call) {
@@ -106,7 +106,7 @@ multiply_lp <- function(x, y, call) {
     } else if (yv) {
         multiply_v_c(y, x, call)
     } else {
-        abort("None are lp_variables", call = call)
+        cli_abort("None are lp_variables", call = call)
     }
 }
 divide_lp <- function(x, y, call) {
@@ -115,14 +115,14 @@ divide_lp <- function(x, y, call) {
     } else if (is_lp_variable(x)) {
         divide_v_c(x, y, call)
     } else {
-        abort("None are lp_variables", call = call)
+        cli_abort("None are lp_variables", call = call)
     }
 }
 power_lp <- function(x, y, call) {
     if (is_lp_variable(x) && !is_lp_variable(y)) {
         power_v_c(x, y, call)
     } else {
-        abort("Non-quadratic operation.", call = call)
+        cli_abort("Non-quadratic operation.", call = call)
     }
 }
 
@@ -215,7 +215,7 @@ multiply_v_c <- function(x, c, call) {
 # var * var
 multiply_v_v <- function(x, y, call) {
     if (is_quadratic(x) || is_quadratic(y)) {
-        abort("Non-quadratic operation", call = call)
+        cli_abort("Non-quadratic operation", call = call)
     }
 
     check_conformable(x, y, call)
@@ -251,13 +251,13 @@ divide_v_c <- function(x, c, call) {
 }
 # any / var
 divide_a_v <- function(x, y, call) {
-    abort("Cannot divide by a variable in a linear problem.", call = call)
+    cli_abort("Cannot divide by a variable in a linear problem.", call = call)
 }
 
 # var ^ constant
 power_v_c <- function(x, c, call) {
     if (is_quadratic(x)) {
-        abort("Non-quadratic operation", call = call)
+        cli_abort("Non-quadratic operation", call = call)
     }
 
     check_conformable(x, c, call)
@@ -267,7 +267,7 @@ power_v_c <- function(x, c, call) {
     c <- recycle_const(c, max_n)
 
     if (!all(c %in% 0:2)) {
-        abort("Exponent must be 0, 1 or 2", call = call)
+        cli_abort("Exponent must be 0, 1 or 2", call = call)
     }
 
     if (any(c == 2)) {
@@ -292,7 +292,7 @@ power_v_c <- function(x, c, call) {
 
 negate_v <- function(x, call) {
     if (!x$binary) {
-        abort("Negation `!{x$name}` is only supported for binary variables.", call = call)
+        cli_abort("Negation `!{x$name}` is only supported for binary variables.", call = call)
     }
 
     # 1 - x
@@ -313,7 +313,7 @@ negate_v <- function(x, call) {
     yv <- is_lp_variable(y)
 
     if (is_quadratic(x) || is_quadratic(y)) {
-        abort("Non-quadratic operation", call = call)
+        cli_abort("Non-quadratic operation", call = call)
     }
 
     if (xv && yv) {
@@ -328,7 +328,7 @@ negate_v <- function(x, call) {
 # var %*% mat
 matrix_multiply_v_c <- function(x, y, call) {
     if (ndim(x) > 2L) {
-        abort("Variable has ({ndim(x)}) dimensions.")
+        cli_abort("Variable has ({ndim(x)}) dimensions.")
     } else if (ndim(x) == 1L) {
         x$ind <- matrix(x$ind, ncol = 1L)
     }
@@ -336,7 +336,7 @@ matrix_multiply_v_c <- function(x, y, call) {
     ptype <- rlang::try_fetch(x$ind %*% y, error = identity)
 
     if (rlang::is_error(ptype)) {
-        abort(ptype$message, call = call)
+        cli_abort(ptype$message, call = call)
     }
 
 
@@ -350,7 +350,7 @@ matrix_multiply_v_c <- function(x, y, call) {
 
     if (is_quadratic(x)) {
         # TODO
-        abort("`%*%` not yet implemented for quadratic variables.", call = call)
+        cli_abort("`%*%` not yet implemented for quadratic variables.", call = call)
     }
 
     out$coef <- out$coef[integer(), , drop = TRUE]
@@ -377,13 +377,13 @@ matrix_multiply_v_v <- function(x, y, call) {
     ndy <- ndim(y$ind)
 
     if (ndx > 2L) {
-        abort("Left-hand-side has {ndx} dimensions.")
+        cli_abort("Left-hand-side has {ndx} dimensions.")
     } else if (ndx == 1L) {
         x$ind <- matrix(x$ind, ncol = 1L)
     }
 
     if (ndy > 2L) {
-        abort("Right-hand-side has {ndy} dimensions.")
+        cli_abort("Right-hand-side has {ndy} dimensions.")
     } else if (ndy == 1L) {
         y$ind <- matrix(y$ind, ncol = 1L)
     }
@@ -391,7 +391,7 @@ matrix_multiply_v_v <- function(x, y, call) {
     ptype <- rlang::try_fetch(x$ind %*% y$ind, error = identity)
 
     if (rlang::is_error(ptype)) {
-        abort(ptype$message, call = call)
+        cli_abort(ptype$message, call = call)
     }
 
     out <- x
@@ -424,7 +424,7 @@ diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
         rlang::is_integerish(differences, n = 1, finite = TRUE)
     )
     if (lag < 1L || differences < 1L) {
-        abort("`lag` and `differences` must be integers >= 1")
+        cli_abort("`lag` and `differences` must be integers >= 1")
     }
 
     xlen <- length(x)

@@ -112,11 +112,11 @@ test_that("non constraint", {
     )
     expect_error(
         p |> lp_constraint(my_con = 2*x),
-        'Problematic constraint: "my_con"'
+        "Problematic constraint: 'my_con'"
     )
     expect_error(
         p |> lp_constraint(my_con = for (i in 0:3) 2*x),
-        'Problematic constraint: "my_con\\[i=0\\]"'
+        "Problematic constraint: 'my_con\\[i=0\\]'"
     )
     expect_error(
         p |> lp_constraint(x != 0),
@@ -161,11 +161,11 @@ test_that("bind constraints", {
 
     expect_error(
         rbind(x == 1, y),
-        "`bind_cons\\(\\)` can only bind `lp_constraint`, not `lp_variable`"
+        "`bind_cons\\(\\)` can only bind <lp_constraint>, not <lp_variable>"
     )
     expect_error(
         rbind(0, x == 1),
-        "`bind_cons\\(\\)` can only bind `lp_constraint`, not `numeric`"
+        "`bind_cons\\(\\)` can only bind <lp_constraint>, not <numeric>"
     )
 
     n <- 3

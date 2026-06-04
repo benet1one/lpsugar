@@ -35,14 +35,12 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     applicable <- ROI::ROI_applicable_solvers(op)
 
     if (length(applicable) == 0L) {
-        rlang::abort(c(
+        roi_url <- "https://roi.r-forge.r-project.org/installation.html#ROI_plug-ins"
+        cli_abort(c(
             "No applicable solvers loaded.",
             ">" = "Use `library(ROI)` to load all installed solvers.",
             ">" = "Use `library(ROI.plugin.<solver>)` to load a specific solver.",
-            "i" = glue::glue(
-                "See https://roi.r-forge.r-project.org/installation.html#ROI_plug-ins",
-                " for instructions on how to install each solver."
-            )
+            "i" = "See {.url {roi_url}} for instructions on how to install each solver."
         ))
     }
 
@@ -85,12 +83,12 @@ ROI_objective_from_lpsugar <- function(problem) {
     
     switch(
         problem$objective$type,
-        "undefined" = abort("Objective function is undefined."),
+        "undefined" = cli_abort("Objective function is undefined."),
         "feasible"  = ,
         "linear"    = as.L_objective(problem),
         "quadratic" = as.Q_objective(problem),
         "nonlinear" = as.F_objective(problem),
-        abort("Unknown type {problem$objective$type}.")
+        cli_abort("Unknown type {problem$objective$type}.")
     )
 }
 
@@ -110,10 +108,10 @@ ROI_constraint_from_lpsugar <- function(problem) {
 #' @export
 as.L_objective.lp_problem <- function(x) {
     if (x$objective$type == "nonlinear") {
-        abort("Objective is nonlinear, use `as.F_objective()` instead.")
+        cli_abort("Objective is nonlinear, use `as.F_objective()` instead.")
     }
     if (is_quadratic(x$objective)) {
-        warn("Objective function is quadratic, use `as.Q_objective()` to include quadratic part.")
+        cli_abort("Objective function is quadratic, use `as.Q_objective()` instead.")
     }
 
     ROI::L_objective(
@@ -126,7 +124,7 @@ as.L_objective.lp_problem <- function(x) {
 #' @export
 as.Q_objective.lp_problem <- function(x) {
     if (x$objective$type == "nonlinear") {
-        abort("Objective is nonlinear, use `as.F_objective()` instead.")
+        cli_abort("Objective is nonlinear, use `as.F_objective()` instead.")
     }
     
     ROI::Q_objective(
@@ -162,7 +160,7 @@ as.L_constraint.lp_problem <- function(x, ...) {
     }
 
     if (is_quadratic(x$constraints)) {
-        warn("Problem has quadratic constraints, use `as.Q_constraint()` to include quadratic part.")
+        cli_abort("Problem has quadratic constraints, use `as.Q_constraint()` instead.")
     }
 
     ROI::L_constraint(
@@ -215,11 +213,11 @@ as.OP.lp_problem <- function(x) {
 
     # No variables
     if (ncol(x) == 0L) {
-        abort("Problem has no variables. Define them with `lp_variable()`.")
+        cli_abort("Problem has no variables. Define them with `lp_variable()`.")
     }
 
     if (x$objective$type == "undefined") {
-        rlang::abort(c(
+        cli_abort(c(
             paste(
                 "Must define an objective function with `lp_minimize()`, `lp_maximize()`,",
                 "`lp_minimize_function()` or `lp_maximize_function()`."
@@ -237,7 +235,7 @@ as.OP.lp_problem <- function(x) {
     } else if (x$objective$direction == "maximize") {
         maximize <- TRUE
     } else {
-        abort("`$objective$direction` should be either 'minimize' or 'maximize'.")
+        cli_abort("`$objective$direction` should be either 'minimize' or 'maximize'.")
     }
 
     objective <- ROI_objective_from_lpsugar(x)

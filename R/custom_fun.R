@@ -31,10 +31,10 @@ sum_over <- function(...) {
     n <- length(dots)
 
     if (nams[n] != "") {
-        abort("Last element in `...` should be an unnamed expression to sum.")
+        cli_abort("Last element in `...` should be an unnamed expression to sum.")
     }
     if (nams[1L] == "") {
-        abort("First element in `...` must be a name value pair `<ind> = <set>`")
+        cli_abort("First element in `...` must be a name value pair `<ind> = <set>`")
     }
 
     env <- rlang::get_env(dots[[n]])
@@ -93,15 +93,15 @@ Math.lp_variable <- function(x, ...) {
 
     if (fun == "abs") {
         abs_url <- "https://optimization.cbe.cornell.edu/index.php?title=Optimization_with_absolute_values"
-        message <- glue::glue(
-            "Function `abs` is not linear.\n",
-            "See how to implement absolute values in linear programming here:\n",
-            "{abs_url}"
+        message <- paste(
+            "Function `abs()` is not linear.",
+            "See how to implement absolute values in linear programming here:",
+            "{.url {abs_url}}"
         )
-        abort(message, call = call)
+        cli_abort(message, call = call)
     }
 
-    abort("Function `{fun}` is not supported in a linear problem.", call = call)
+    cli_abort("Function `{fun}()` is not supported in a linear problem.", call = call)
 }
 
 cumsum_v <- function(x, call) {
@@ -143,7 +143,7 @@ custom_fun <- function() {
     # and not when w is a variable (which should throw an error because it's not linear)
     e$weighted.mean <- function(x, w, ..., na.rm = FALSE) {
         if (!missing(w) && is_lp_variable(w)) {
-            abort("Weights `w` cannot be a variable")
+            cli_abort("Weights `w` cannot be a variable")
         }
         if (is_lp_variable(x)) {
             rlang::check_dots_empty()
@@ -156,10 +156,12 @@ custom_fun <- function() {
 
     e$ifelse <- function(test, yes, no) {
         if (is_lp_constraint(test)) {
-            abort("The `test` condition must be a binary variable, not an equality or inequality.")
+            cli_abort(
+                "The `test` condition must be a binary variable, not an equality or inequality."
+            )
         }
         if (is_lp_constraint(yes) || is_lp_constraint(no)) {
-            abort("`yes` and `no` cannot be constraints.")
+            cli_abort("`yes` and `no` cannot be constraints.")
         }
         if (is_lp_variable(test)) {
             ifelse_v(test, yes, no)
@@ -227,14 +229,14 @@ custom_fun <- function() {
 
 diag_v <- function(x) {
     if (ndim(x) != 2L) {
-        abort("Variable is not two-dimensional.")
+        cli_abort("Variable is not two-dimensional.")
     }
 
     present_ind <- x$ind
     present_ind[] <- 1:length(present_ind)
 
     if (!is.matrix(present_ind)) {
-        abort("Internal error in diag_v()")
+        cli_abort("Internal error in `diag_v()`. Sorry!")
     }
 
     present_ind <- base::diag(present_ind)
@@ -281,7 +283,7 @@ parse_margin <- function(margin, variable) {
     }
     if (rlang::is_character(margin)) {
         if (!variable$raw) {
-            abort("Character `MARGIN` is only supported for unmodified variables.")
+            cli_abort("Character `MARGIN` is only supported for unmodified variables.")
         }
 
         dnn <- names(dimnames(variable))
@@ -289,21 +291,21 @@ parse_margin <- function(margin, variable) {
 
         if (anyNA(margin_num)) {
             where_na <- margin[is.na(margin_num)][1]
-            abort('Margin "{where_na}" does not match any dimension in `{variable$name}`.')
+            cli_abort("Margin '{where_na}' does not match any dimension in `{variable$name}`.")
         }
 
         return(margin_num)
     }
 
-    abort("Invalid `MARGIN`.")
+    cli_abort("Invalid `MARGIN`.")
 }
 
 ifelse_v <- function(test, yes, no) {
     if (!test$binary) {
-        abort("`test` must be a binary variable.")
+        cli_abort("`test` must be a binary variable.")
     }
     if (is_lp_variable(yes) || is_lp_variable(no)) {
-        abort("If `test` is a variable, `yes` and `no` must be numbers, not variables.")
+        cli_abort("If `test` is a variable, `yes` and `no` must be numbers, not variables.")
     }
 
     no + test * (yes - no)
@@ -338,7 +340,7 @@ ifelse_l <- function(test, yes, no) {
 
     # lpsugar code
     if (anyNA(test)) {
-        abort("`test` cannot contain NA values.")
+        cli_abort("`test` cannot contain NA values.")
     }
 
     len <- length(test)
@@ -348,7 +350,7 @@ ifelse_l <- function(test, yes, no) {
     } else if (is.numeric(yes)) {
         yes <- recycle_const(yes, len)
     } else {
-        abort("`yes` must either be a variable or a numeric vector.")
+        cli_abort("`yes` must either be a variable or a numeric vector.")
     }
 
     if (is_lp_variable(no)) {
@@ -356,7 +358,7 @@ ifelse_l <- function(test, yes, no) {
     } else if (is.numeric(no)) {
         no <- recycle_const(no, len)
     } else {
-        abort("`no` must either be a variable or a numeric vector.")
+        cli_abort("`no` must either be a variable or a numeric vector.")
     }
 
     test <- as.numeric(test)

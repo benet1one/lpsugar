@@ -17,17 +17,17 @@ lp_objective <- function(.problem, objective) {
     }
 
     if (!is_lp_variable(objective)) {
-        rlang::abort(c(
+        cli_abort(c(
             "`objective` must be an expression containing variables.",
             "i" = "Alternatively, use `lp_minimize(0)` to set all coeficients to 0."
         ))
     }
     if (length(objective) == 0L) {
-        abort("`objective` evaluated to a variable of length 0.")
+        cli_abort("`objective` evaluated to a variable of length 0.")
     }
     if (length(objective) > 1L) {
         objective <- sum(objective)
-        inform(
+        cli_inform(
             "Summing variables in objective. Write `sum({expr})` to suppress this message.",
             call = parent.frame()
         )
@@ -160,7 +160,7 @@ update_objective <- function(.problem) {
     if (.problem$objective$type == "undefined") {
         return(.problem)
     } else if (.problem$objective$type == "nonlinear") {
-        rlang::abort(c(
+        cli_abort(c(
             "Cannot add a variable to a nonlinear problem.",
             ">" = paste(
                 "Use `lp_variable()` before", 

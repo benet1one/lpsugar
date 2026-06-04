@@ -63,7 +63,7 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
     vars <- all.vars(expr)
 
     if (!any(vars %in% varnames)) {
-        abort("Constraint does not contain any variables.", call = expr)
+        cli_abort("Constraint does not contain any variables.", call = expr)
     }
 
     cons <- for_split(quosure, data = data)
@@ -86,11 +86,11 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
         if (!is_lp_constraint(con)) {
             msg <- c(
                 "Expression did not evaluate to a constraint.",
-                if (name != "") glue::glue('Problematic constraint: "{name_ind}".'),
+                "x" = "Problematic constraint: '{name_ind}'.",
                 ">" = "Did you forget the comparison operator? `<=/==/>=`"
             )
 
-            rlang::abort(msg, call = quosure)
+            cli_abort(msg, call = quosure)
         }
 
         rownames(cons[[i]]$lhs) <- rep_len(name_ind, length(con))
@@ -131,7 +131,7 @@ lp_delete_constraint <- function(.problem, names) {
     stopifnot(is.character(names))
 
     if (any(names == "") || any(names == "<unnamed>")) {
-        warn("Cannot delete unnamed constraints.")
+        cli_warn("Cannot delete unnamed constraints.")
         names <- names[names != "" & names != "<unnamed>"]
     }
 
@@ -143,7 +143,7 @@ lp_delete_constraint <- function(.problem, names) {
             dQuote(q = FALSE) |>
             paste(collapse = ", ")
 
-        warn("The following constraints are not defined: \n{not_defined}")
+        cli_warn("The following constraints are not defined: \n{not_defined}")
     }
 
     to_delete <- .problem$constraints$name %in% names
@@ -209,8 +209,10 @@ bind_cons <- function(...) {
     dots <- dots[lengths(dots) > 0]
     dots <- purrr::keep(dots, function(d) {
         if (!is_lp_constraint(d)) {
-            abort("`bind_cons()` can only bind `lp_constraint`, not `{class(d)[1]}`",
-                  call = call)
+            cli_abort(
+                "`bind_cons()` can only bind <lp_constraint>, not <{class(d)[1]}>.",
+                call = call
+            )
         }
 
         !is_empty_lp_constraint(d)
@@ -281,7 +283,7 @@ head.lp_constraint <- function(x, n = 6L, ...) {
         (length(dots) == 2L && !rlang::is_missing(dots[[2L]]))
 
     if (wrong_index) {
-        abort("Index constraints with `con[i]` or `con[i, ]`")
+        cli_abort("Index constraints with `con[i]` or `con[i, ]`")
     }
 
     i <- dots[[1L]]
@@ -309,7 +311,7 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
 
     if (!compact && ncol(x$lhs) > 200L) {
         cat("\n")
-        inform("Problem has over 200 variables, printing with `compact = TRUE`.")
+        cli_inform("Problem has over 200 variables, printing with `compact = TRUE`.")
         compact <- TRUE
     }
 

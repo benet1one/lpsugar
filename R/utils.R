@@ -1,29 +1,17 @@
 
 # Messages --------------------------
 
-inform <- function(message, call = parent.frame(), ...) {
-    message <- glue::glue(message, .envir = parent.frame())
-    rlang::inform(message = message, call = call, ...)
-}
-warn <- function(message, call = parent.frame(), ...) {
-    message <- glue::glue(message, .envir = parent.frame())
-    rlang::warn(message = message, call = call, ...)
-}
-abort <- function(message, call = parent.frame(), ...) {
-    message <- glue::glue(message, .envir = parent.frame())
-    rlang::abort(message = message, call = call, ...)
-}
 warn_changed_args <- function(..., env = parent.frame(), call = env) {
     expected <- rlang::enexprs(..., .named = TRUE, .homonyms = "error")
 
     for (arg in names(expected)) {
         if (!exists(arg, envir = env, inherits = FALSE)) {
-            warn("Internal warning: unexistant argument `{arg}`.", call = env)
+            cli_warn("Internal warning: unexistant argument `{arg}`.", call = env)
             next
         }
 
         if (expected[[arg]] != env[[arg]]) {
-            warn("Ignoring argument `{arg}`.", call = call)
+            cli_warn("Ignoring argument `{arg}`.", call = call)
         }
     }
 }
@@ -65,7 +53,7 @@ non_conformable <- function(x, y) {
 }
 check_conformable <- function(x, y, call = environment()) {
     if (non_conformable(x, y)) {
-        abort("Non-conformable arrays", call = call)
+        cli_abort("Non-conformable arrays", call = call)
     }
 }
 compatible_dimensions <- function(x, y, drop_dim = TRUE) {
@@ -127,14 +115,16 @@ variables_to_vec.default <- function(x, problem, call = environment()) {
     x <- as.numeric(x)
     
     if (anyNA(x)) {
-        abort("`x` must not contain NA values.")
+        cli_abort("`x` must not contain NA values.")
     }
     
     if (length(x) != ncol(problem)) {
         n <- ncol(problem)
         m <- length(x)
-        abort("`problem` has ({n}) variables but `x` is length ({m}).",
-              call = call)
+        cli_abort(
+            "`problem` has {n} variables but `x` is length {m}.",
+            call = call
+        )
     }
     
     names(x) <- attr(problem, "varnames")
@@ -150,14 +140,14 @@ variables_to_vec.list <- function(x, problem, call = environment()) {
         xs <- x[[v$name]]
         
         if (is.null(xs)) {
-            cli::cli_abort("Variable `{.field {v$name}}` not present in `x`.")
+            cli_abort("Variable `{.field {v$name}}` not present in `x`.")
         }
         
         xs <- as.array(xs)
         xs[] <- as.numeric(xs)
         
         if (anyNA(xs)) {
-            abort("`x` must not contain NA values.")
+            cli_abort("`x` must not contain NA values.")
         }
 
         dx <- dim(drop(xs))
@@ -166,7 +156,7 @@ variables_to_vec.list <- function(x, problem, call = environment()) {
         if (any(dx != dv)) {
             dx_str <- paste(dim(xs), collapse = ", ")
             dv_str <- paste(dim(v), collapse = ", ")
-            cli::cli_abort(c(
+            cli_abort(c(
                 "Dimensions of variable `{v$name}` do not match.",
                 "x" = "In `x` they are ({dx_str})",
                 "x" = "In `problem` they are ({dv_str})"
@@ -186,7 +176,7 @@ variables_to_vec.list <- function(x, problem, call = environment()) {
             
             if (any(dnxi != dnvi)) {
                 dn_name <- names(dnv)[i]
-                cli::cli_abort(c(
+                cli_abort(c(
                     "Dimension names of variable `{v$name}` do not match.",
                     "!" = "In dimension '{dn_name}'",
                     ">" = "Make sure they are the same names in the same order."
@@ -195,7 +185,7 @@ variables_to_vec.list <- function(x, problem, call = environment()) {
         }
         
         if (v$integer && !rlang::is_integerish(xs)) {
-            warn("`{v$name}` should be integer.", call = call)
+            cli_warn("`{v$name}` should be integer.", call = call)
         }
         
         solution_vec[v$ind] <- xs
@@ -210,7 +200,7 @@ variables_to_vec.lp_solution <- function(x, problem, call = environment()) {
     true_vec <- x$variables_vec
     
     if (any(var_vec != true_vec)) {
-        rlang::abort(
+        cli_abort(
             c("`x$variables` and `x$variables_vec` do not match.",
               "i" = "You can use either one of them in this function."),
             call = call
@@ -248,15 +238,17 @@ is_lp_solution <- function(x) {
 
 check_problem <- function(problem, field_name = ".problem") {
     if (!is_problem(problem)) {
-        abort("`{field_name}` must be an `lp_problem`.", call = parent.frame())
+        cli_abort("`{field_name}` must be an `lp_problem`.", call = parent.frame())
     }
 }
 check_roi_solution <- function(solution, field_name = "solution") {
     expected_fields <- c("solution", "objval", "status", "message")
 
     if (!is.list(solution) || !all(expected_fields %in% names(solution))) {
-        abort("`{field_name}` must be the output of `solve_model()` or `ROI::ROI_solve()`.",
-              call = parent.frame())
+        cli_abort(
+            "`{field_name}` must be the output of `solve_model()` or `ROI::ROI_solve()`.",
+            call = parent.frame()
+        )
     }
 }
 

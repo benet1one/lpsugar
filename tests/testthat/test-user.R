@@ -18,9 +18,18 @@ test_that("parameter", {
         "Ignoring argument `byrow`"
     )
 
-    expect_error(c(3,1) |> parameter(), "cannot be empty")
-    expect_error(c(3,1) |> parameter(a,), "Argument 2 can't be empty")
-    expect_error(c(3,1) |> parameter(b), "`.x` is length \\(2\\) and `b` is length \\(3\\).")
+    expect_error(
+        c(3,1) |> parameter(), 
+        "cannot be empty"
+    )
+    expect_error(
+        c(3,1) |> parameter(a,), 
+        "Argument 2 can't be empty"
+    )
+    expect_error(
+        c(3,1) |> parameter(b), 
+        "Lengths do not match(.+)`.x` is length 2(.+)`b` is length 3"
+    )
 
     cm <- c(
         1, 2, 3,
@@ -32,7 +41,7 @@ test_that("parameter", {
 
     expect_error(
         c(1, 2, 3, 4, 5) |> parameter(a, b),
-        r"(`.x` is length \(5\) when it should be length \(6 = 2 x 3\))"
+        "Lengths do not match(.+)`.x` is length 5(.+)It should be length 6 = 2 x 3"
     )
 
     true_mat <- matrix(cm, 2, 3, byrow = TRUE)
@@ -45,7 +54,7 @@ test_that("parameter", {
 
     expect_error(
         true_mat |> parameter(b, a),
-        r"(`.x` has dimensions \(2 x 3\), while `...` have dimensions \(3 x 2\))"
+        r"(`.x` has dimensions \(2, 3\)(.+)`...` has dimensions \(3, 2\))"
     )
 
     arr <- array(dim = c(2, 3, 1))
@@ -111,7 +120,7 @@ test_that("solution summary", {
 
     expect_error(
         variables_to_vec(s$variables_vec[1:4], p),
-        r"(`problem` has \(7\) variables but `x` is length \(4\))"
+        "`problem` has 7 variables but `x` is length 4"
     )
 
     slist4 <- s$variables
