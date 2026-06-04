@@ -9,12 +9,15 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     )
     
     if (!is.null(gradient) || !is.null(hessian)) {
-        cli_abort("`gradient` and `hessian` are not yet supported.")
+        cli_abort(
+            "`gradient` and `hessian` are not yet supported.", 
+            call = parent.frame()
+        )
     }
     
-    check_correct_arguments(fun,      .problem, funname = "fun")
-    check_correct_arguments(gradient, .problem, funname = "gradient")
-    check_correct_arguments(hessian,  .problem, funname = "hessian")
+    check_correct_arguments(fun,      .problem, funname = "fun", call = parent.frame())
+    check_correct_arguments(gradient, .problem, funname = "gradient", call = parent.frame())
+    check_correct_arguments(hessian,  .problem, funname = "hessian", call = parent.frame())
     
     fun_x      <- recode_arguments(fun,      .problem)
     gradient_x <- recode_arguments(gradient, .problem)
@@ -38,9 +41,15 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     }
     
     if (!is.numeric(fun_sane)) {
-        cli_abort("`fun` must return a numeric scalar, not `{class(fun_sane)[1]}`")
+        cli_abort(
+            "`fun` must return a numeric scalar, not `{class(fun_sane)[1]}`",
+            call = parent.frame()
+        )
     } else if (length(fun_sane) != 1L) {
-        cli_abort("`fun` must return a numeric scalar, not of length `{length(fun_sane)}`")
+        cli_abort(
+            "`fun` must return a numeric scalar, not of length `{length(fun_sane)}`",
+            call = parent.frame()
+        )
     }
     
     .problem$objective <- new_nonlinear_objective(
@@ -54,7 +63,7 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     .problem
 }
 
-check_correct_arguments <- function(fun, problem, funname) {
+check_correct_arguments <- function(fun, problem, funname, call = parent.frame()) {
     if (is.null(fun)) {
         return()
     }
@@ -64,10 +73,11 @@ check_correct_arguments <- function(fun, problem, funname) {
     missing_vars <- varnames[!is.element(varnames, args)]
     
     if (length(missing_vars) > 0L) {
-        cli_abort(c(
-            "`{funname}` must have all problem variables as arguments",
-            "x" = "Missing variables: {missing_vars}"
-        ))
+        cli_abort(
+            c("`{funname}` must have all problem variables as arguments",
+              "x" = "Missing variables: {missing_vars}"),
+            call = call,
+        )
     }
 }
 

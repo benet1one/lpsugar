@@ -47,7 +47,7 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     control <- rlang::dots_list(...)
     
     if (!missing(start)) {
-        control$start <- variables_to_vec(start, .problem)
+        control$start <- variables_to_vec(start, .problem, call = environment())
     }
     
     roi_sol <- ROI_solve(

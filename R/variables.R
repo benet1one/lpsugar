@@ -580,7 +580,7 @@ recycle_var <- function(x, n) {
         return(x)
     }
 
-    cli_abort("Attempt to recycle variable of length ({length(x)}) to length ({n}).")
+    cli_abort("Attempt to recycle variable of length {length(x)} to length {n}.")
 }
 recycle_const <- function(x, n) {
     if (length(x) == n) {

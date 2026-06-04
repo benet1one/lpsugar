@@ -144,7 +144,7 @@ solution_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 constraint_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- variables_to_vec(solution, problem)
+    solution <- variables_to_vec(solution, problem, call = environment())
     con <- problem$constraints
 
     quadratic_part <- numeric(nrow(con))
@@ -193,7 +193,7 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 bound_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- variables_to_vec(solution, problem)
+    solution <- variables_to_vec(solution, problem, call = environment())
 
     lower <- numeric(ncol(problem))
     upper <- numeric(ncol(problem))
@@ -223,7 +223,7 @@ bound_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 compute_objective <- function(problem, solution) {
-    solution <- variables_to_vec(solution, problem)
+    solution <- variables_to_vec(solution, problem, call = environment())
     
     if (problem$objective$type == "nonlinear") {
         return(problem$objective$fun(solution))
@@ -248,7 +248,7 @@ compute_objective <- function(problem, solution) {
 #' @rdname solution_summary
 #' @export
 compute_aliases <- function(problem, solution) {
-    solution <- variables_to_vec(solution, problem)
+    solution <- variables_to_vec(solution, problem, call = environment())
 
     purrr::map(problem$aliases, function(a) {
         mat <- array(unclass(a$coef), dim = dim(a$coef))

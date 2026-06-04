@@ -229,7 +229,7 @@ custom_fun <- function() {
 
 diag_v <- function(x) {
     if (ndim(x) != 2L) {
-        cli_abort("Variable is not two-dimensional.")
+        cli_abort("Variable is not two-dimensional.", call = parent.frame())
     }
 
     present_ind <- x$ind
