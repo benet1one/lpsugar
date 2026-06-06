@@ -190,6 +190,74 @@ update_variables <- function(.problem, field = "variables") {
 #' @export
 lp_var <- lp_variable
 
+
+# Fix Vars -------------------
+
+#' Fix Variables to a Value
+#' 
+#' Set the lower and upper bounds of variables to a fixed value.
+#'
+#' @param .problem An [lp_problem()].
+#' @param ... Name-value pairs, variables with their respective values. 
+#' `NA` values are not fixed, and will remain free within their bounds.
+#'
+#' @returns The `.problem` with modified lower and upper bounds for the variables.
+#' @export
+#'
+#' @examples
+lp_fix_vars <- function(.problem, ...) {
+    vars <- rlang::dots_list(...)
+    nams <- rlang::names2(vars)
+    
+    if (any(nams == "")) {
+        cli_abort("`...` must be named with the names of the variables to fix.")
+    }
+    
+    non_vars <- nams[!is.element(nams, names(.problem$variables))]
+    
+    if (length(non_vars) > 0) {
+        cli_warn(c(
+            "Variables not defined in `.problem`",
+            ">" = "Problematic variables: {non_vars}"
+        ))
+    }
+    
+    fix <- variables_to_list(
+        x = vars, 
+        problem = .problem,
+        miss_error = FALSE,
+        call = environment()
+    )
+    
+    for (v in names(fix)) {
+        pv <- .problem$variables[[v]]
+        fv <- fix[[v]]
+        miss <- is.na(fv)
+        
+        if (all(miss)) {
+            next
+        }
+        
+        pv$lower <- recycle_const(pv$lower, length(pv))
+        pv$upper <- recycle_const(pv$upper, length(pv))
+        
+        if (any(fv[!miss] < pv$lower[!miss])) {
+            cli_warn("Fixed variable `{v}` to a value less than its lower bound.")
+        }
+        if (any(fv[!miss] > pv$upper[!miss])) {
+            cli_warn("Fixed variable `{v}` to a value greater than its upper bound.")
+        }
+        
+        pv$lower[!miss] <- fv[!miss]
+        pv$upper[!miss] <- fv[!miss]
+        
+        .problem$variables[[v]] <- pv
+    }
+    
+    .problem
+}
+
+
 # Methods --------------------
 
 #' @export
