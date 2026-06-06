@@ -34,6 +34,9 @@
   [`lp_impvar()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
   : Define an Alias or Implicit Variable (IMPVAR)
 
+- [`lp_fix_vars()`](https://benet1one.github.io/lpsugar/reference/lp_fix_vars.md)
+  : Fix Variables to a Value
+
 - [`lp_minimize_function()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
   [`lp_maximize_function()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
   [`lp_min_fun()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
