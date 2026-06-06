@@ -1,6 +1,6 @@
 
 Code
-- ensure the call=call in errors are correct
+- Add dots to make functions extensible
 
 Function Objective
 - gradients and hessians
