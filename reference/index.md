@@ -53,6 +53,9 @@
   : Index Based Summation
 - [`parameter()`](https://benet1one.github.io/lpsugar/reference/parameter.md)
   : Set Dimensions and Names for Parameters
+- [`lpsugar_applicable_solvers()`](https://benet1one.github.io/lpsugar/reference/lpsugar_applicable_solvers.md)
+  [`lpsugar_available_solvers()`](https://benet1one.github.io/lpsugar/reference/lpsugar_applicable_solvers.md)
+  : List Applicable and Available Solvers
 
 ## Bind variables or constraints
 
