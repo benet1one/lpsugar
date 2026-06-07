@@ -63,6 +63,7 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     )
 
     sol$op <- op
+    sol$roi_solution <- roi_sol
     return(sol)
 }
 
