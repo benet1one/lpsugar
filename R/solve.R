@@ -307,6 +307,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     vars <- variables_to_list(
         solution$solution, 
         problem = problem, 
+        miss_error = FALSE,
         binary_as_logical = binary_as_logical
     )
     

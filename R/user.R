@@ -248,7 +248,12 @@ compute_objective <- function(problem, solution) {
 #' @rdname solution_summary
 #' @export
 compute_aliases <- function(problem, solution) {
-    solution <- variables_to_vec(solution, problem, call = environment())
+    solution <- variables_to_vec(
+        solution, 
+        problem, 
+        miss_error = FALSE, 
+        call = environment()
+    )
 
     purrr::map(problem$aliases, function(a) {
         mat <- array(unclass(a$coef), dim = dim(a$coef))
