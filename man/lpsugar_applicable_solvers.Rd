@@ -42,7 +42,6 @@ Note since Nonlinear Solvers are also applicable for Linear and Quadratic proble
 they will also be listed.
 }
 \examples{
-
 library(ROI)
 
 quadratic_prob <- lp_problem() |> 

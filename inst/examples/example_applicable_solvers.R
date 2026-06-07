@@ -1,4 +1,3 @@
-
 library(ROI)
 
 quadratic_prob <- lp_problem() |> 
