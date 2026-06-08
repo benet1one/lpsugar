@@ -46,8 +46,8 @@ lpsugar_available_solvers(problem)
 
   - Do not need to be installed.
 
-Note since Nonlinear Solvers are also applicable for Linear and
-Quadratic problems, they will also be listed.
+Note since Nonlinear Solvers are also applicable to Linear and Quadratic
+problems, they will also be listed.
 
 ## See also
 
@@ -59,7 +59,7 @@ Quadratic problems, they will also be listed.
 ``` r
 library(ROI)
 #> ROI: R Optimization Infrastructure
-#> Registered solver plugins: nlminb, highs, alabama.
+#> Registered solver plugins: nlminb, highs, nloptr.bobyqa, nloptr.crs2lm, nloptr.direct, nloptr.directL, nloptr.lbfgs, nloptr.neldermead, nloptr.newuoa, nloptr.sbplx, nloptr.stogo, nloptr.tnewton, nloptr.varmetric, nloptr.cobyla, nloptr.mma, nloptr.auglag, nloptr.isres, nloptr.slsqp, alabama.
 #> Default solver: auto.
 
 quadratic_prob <- lp_problem() |> 
@@ -70,7 +70,8 @@ quadratic_prob <- lp_problem() |>
 
 # Installed and loaded quadratic solvers
 lpsugar_applicable_solvers(quadratic_prob)
-#> [1] "highs"   "alabama"
+#> [1] "highs"         "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag"
+#> [5] "nloptr.isres"  "nloptr.slsqp"  "alabama"      
 # All quadratic solvers
 lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
 #>                Package Version                       Repository

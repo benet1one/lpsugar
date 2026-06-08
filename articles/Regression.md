@@ -20,19 +20,16 @@ k <- 3
 
 true_beta <- c(2, 3, -5)
 
-x <- matrix(rpois(n*k, 6), nrow = n, ncol = k)
-x[, 1] <- 1
-
-e <- rnorm(n)
-y <- (x %*% true_beta) + e
+x <- rpois(n*k, 6) |> matrix(n, k)
+y <- x %*% true_beta + rnorm(n)
 ```
 
     #>  x1 x2 x3          y
-    #>   1  2  6 -20.974429
-    #>   1  5  5  -8.284773
-    #>   1  8  6  -5.220718
-    #>   1  3 10 -38.818697
-    #>   1  6  6 -10.138891
+    #>   5  2  6 -12.974429
+    #>   8  5  5   5.715227
+    #>   5  8  6   2.779282
+    #>   9  3 10 -22.818697
+    #>  10  6  6   7.861109
     #> ... and 45 more rows
 
 ## Least Absolute Deviation
@@ -77,7 +74,7 @@ lad <- lp_problem() |>
         pos = e_pos >= y - yhat,
         neg = e_neg >= yhat - y
     ) |> 
-    lp_solve()
+    lp_solve(solver = "highs")
 ```
 
 The estimated \\\hat{\beta}\\ is quite similar to the `true_beta`
@@ -90,8 +87,8 @@ cbind(
     lad_beta = lad$variables$beta |> round(2)
 )
 #>      true_beta lad_beta
-#> [1,]         2     1.83
-#> [2,]         3     2.98
+#> [1,]         2     1.99
+#> [2,]         3     2.96
 #> [3,]        -5    -4.97
 ```
 
@@ -100,7 +97,7 @@ And the absolute deviation is:
 ``` r
 
 lad$objective
-#> [1] 32.76798
+#> [1] 32.79285
 ```
 
 ## Support Vector Machines
@@ -169,7 +166,7 @@ svm_hard <- lp_problem() |>
             predicted <= -1
         }
     ) |> 
-    lp_solve()
+    lp_solve(solver = "highs")
 ```
 
 This is the result. The continuous line represent the hyperplane, and
@@ -222,7 +219,7 @@ svm_soft <- lp_problem() |>
             predicted <= -1 + slack[i]
         }
     ) |> 
-    lp_solve()
+    lp_solve(solver = "highs")
 ```
 
 Notice that all blue values fall on top of the hyperplane, but some

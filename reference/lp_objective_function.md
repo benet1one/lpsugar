@@ -44,3 +44,39 @@ with the new `$objective` function.
 
 [`lp_minimize()`](https://benet1one.github.io/lpsugar/reference/lp_objective.md)
 to optimize linear or quadratic functions.
+
+## Examples
+
+``` r
+library(ROI.plugin.nloptr)
+
+## Simple Example -----------------------
+# max  sqrt(x) * log(y)
+#  st  x + y <= 10
+
+p1 <- lp_problem() |> 
+    lp_variable(x, lower = 0) |> 
+    lp_variable(y, lower = 0) |> 
+    lp_maximize_function(\(x, y) sqrt(x) * log(y)) |> 
+    lp_constraint(x + y <= 10)
+
+# There are some different solvers within `nloptr`
+lpsugar_applicable_solvers(p1)
+#> [1] "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag" "nloptr.isres" 
+#> [5] "nloptr.slsqp" 
+
+lp_solve(p1, solver = "nloptr.cobyla", start = list(x = 1, y = 1))
+#> – $variables
+#> $x
+#> [1] 4.580018
+#> 
+#> $y
+#> [1] 5.419982
+#> 
+#> – $objective
+#> [1] 3.616963
+#> 
+#> – $status
+#> Optimal Solution Found ✔ 
+#> 
+```
