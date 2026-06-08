@@ -127,7 +127,7 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 #'
 #' @example inst/examples/example_solution_summary.R
 solution_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- variables_to_vec(solution, problem, call = environment())
+    solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
     aliases <- compute_aliases(problem, solution)
     constraints <- constraint_summary(problem, solution, tol = tol)
     bounds <- bound_summary(problem, solution, tol = tol)
@@ -144,7 +144,7 @@ solution_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 constraint_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- variables_to_vec(solution, problem, call = environment())
+    solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
     con <- problem$constraints
 
     quadratic_part <- numeric(nrow(con))
@@ -193,7 +193,7 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 bound_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- variables_to_vec(solution, problem, call = environment())
+    solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
 
     lower <- numeric(ncol(problem))
     upper <- numeric(ncol(problem))
@@ -223,7 +223,7 @@ bound_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 compute_objective <- function(problem, solution) {
-    solution <- variables_to_vec(solution, problem, call = environment())
+    solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
     
     if (problem$objective$type == "nonlinear") {
         return(problem$objective$fun(solution))
@@ -252,7 +252,8 @@ compute_aliases <- function(problem, solution) {
         solution, 
         problem, 
         miss_error = FALSE, 
-        call = environment()
+        call = environment(),
+        field = "solution"
     )
 
     purrr::map(problem$aliases, function(a) {

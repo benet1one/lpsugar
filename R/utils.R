@@ -93,7 +93,8 @@ dimnames_non_numeric <- function(dimnames) {
 variables_to_list <- function(x, problem, 
                               binary_as_logical = FALSE, 
                               miss_error = TRUE, 
-                              call = environment(), ...) {
+                              call = environment(), 
+                              field = "x", ...) {
     UseMethod("variables_to_list")
 }
 
@@ -101,9 +102,10 @@ variables_to_list <- function(x, problem,
 variables_to_list.default <- function(x, problem, 
                                       binary_as_logical = FALSE, 
                                       miss_error = TRUE, 
-                                      call = environment(), ...) {
+                                      call = environment(), 
+                                      field = "x", ...) {
     if (miss_error && anyNA(x)) {
-        cli_abort("`x` must not contain NA values.")
+        cli_abort("`{field}` must not contain NA values.")
     }
     
     purrr::map(problem$variables, function(v) {
@@ -125,14 +127,15 @@ variables_to_list.default <- function(x, problem,
 variables_to_list.list <- function(x, problem, 
                                    binary_as_logical = FALSE, 
                                    miss_error = TRUE, 
-                                   call = environment(), ...) {
+                                   call = environment(), 
+                                   field = "x", ...) {
     
     purrr::map(problem$variables, function(v) {
         xs <- x[[v$name]]
         
         if (is.null(xs)) {
             if (miss_error) {
-                cli_abort("Variable `{v$name}` not present in `x`.", call = call)
+                cli_abort("Variable `{v$name}` not present in `{field}`.", call = call)
             } else {
                 xs <- v$ind
                 xs[] <- NA_real_
@@ -141,7 +144,7 @@ variables_to_list.list <- function(x, problem,
         }
         
         if (miss_error && anyNA(xs)) {
-            cli_abort("`x` must not contain NA values.", call = call)
+            cli_abort("`{field}` must not contain NA values.", call = call)
         }
         
         return(xs)
@@ -149,23 +152,25 @@ variables_to_list.list <- function(x, problem,
 }
 
 
-variables_to_vec <- function(x, problem, miss_error = TRUE, call = environment()) {
+variables_to_vec <- function(x, problem, miss_error = TRUE, 
+                             call = environment(), field = "x") {
     UseMethod("variables_to_vec")
 }
 
 #' @export
-variables_to_vec.default <- function(x, problem, miss_error = TRUE, call = environment()) {
+variables_to_vec.default <- function(x, problem, miss_error = TRUE, 
+                                     call = environment(), field = "x") {
     x <- as.numeric(x)
     
     if (miss_error && anyNA(x)) {
-        cli_abort("`x` must not contain NA values.", call = call)
+        cli_abort("`{field}` must not contain NA values.", call = call)
     }
     
     if (length(x) != ncol(problem)) {
         n <- ncol(problem)
         m <- length(x)
         cli_abort(
-            "`problem` has {n} variables but `x` is length {m}.",
+            "`problem` has {n} variables but `{field}` is length {m}.",
             call = call
         )
     }
@@ -175,7 +180,8 @@ variables_to_vec.default <- function(x, problem, miss_error = TRUE, call = envir
 }
 
 #' @export
-variables_to_vec.list <- function(x, problem, miss_error = TRUE, call = environment()) {
+variables_to_vec.list <- function(x, problem, miss_error = TRUE, 
+                                  call = environment(), field = "x") {
     solution_vec <- numeric(ncol(problem))
     names(solution_vec) <- attr(problem, "varnames")
     
@@ -184,7 +190,7 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE, call = environm
         
         if (is.null(xs)) {
             if (miss_error) {
-                cli_abort("Variable `{v$name}` not present in `x`.", call = call)
+                cli_abort("Variable `{v$name}` not present in `{field}`.", call = call)
             } else {
                 xs <- v$ind
                 xs[] <- NA_real_
@@ -197,7 +203,7 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE, call = environm
         xs[] <- as.numeric(xs)
         
         if (miss_error && anyNA(xs)) {
-            cli_abort("`x` must not contain NA values.", call = call)
+            cli_abort("`{field}` must not contain NA values.", call = call)
         }
 
         dx <- dim(drop(xs))
@@ -208,7 +214,7 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE, call = environm
             dv_str <- paste(dim(v), collapse = ", ")
             cli_abort(
                 c("Dimensions of variable `{v$name}` do not match.",
-                  "x" = "In `x` they are ({dx_str})",
+                  "x" = "In `{field}` they are ({dx_str})",
                   "x" = "In `problem` they are ({dv_str})"), 
                 call = call)
         }
@@ -246,13 +252,21 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE, call = environm
 }
 
 #' @export
-variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE, call = environment()) {
-    var_vec <- variables_to_vec(x$variables, problem, miss_error = miss_error, call = call)
+variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE, 
+                                         call = environment(), field = "x") {
+    var_vec <- variables_to_vec(
+        x$variables, 
+        problem, 
+        miss_error = miss_error, 
+        call = call,
+        field = paste0(field, "$variables")
+    )
+    
     true_vec <- x$variables_vec
     
     if (any(var_vec != true_vec)) {
         cli_abort(
-            c("`x$variables` and `x$variables_vec` do not match.",
+            c("`{field}$variables` and `{field}$variables_vec` do not match.",
               "i" = "You can use either one of them in this function."),
             call = call
         )
