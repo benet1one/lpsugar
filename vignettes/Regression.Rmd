@@ -34,11 +34,8 @@ k <- 3
 
 true_beta <- c(2, 3, -5)
 
-x <- matrix(rpois(n*k, 6), nrow = n, ncol = k)
-x[, 1] <- 1
-
-e <- rnorm(n)
-y <- (x %*% true_beta) + e
+x <- rpois(n*k, 6) |> matrix(n, k)
+y <- x %*% true_beta + rnorm(n)
 ```
 
 
@@ -48,7 +45,6 @@ data.frame(x1 = x[,1], x2 = x[,2], x3 = x[,3], y = y) |>
     print.data.frame(row.names = FALSE)
 cat("... and", n-5, "more rows")
 ```
-
 
 ## Least Absolute Deviation
 
@@ -103,7 +99,7 @@ lad <- lp_problem() |>
         pos = e_pos >= y - yhat,
         neg = e_neg >= yhat - y
     ) |> 
-    lp_solve()
+    lp_solve(solver = "highs")
 ```
 
 The estimated $\hat{\beta}$ is quite similar to the `true_beta` $\beta$.
@@ -217,7 +213,7 @@ svm_hard <- lp_problem() |>
             predicted <= -1
         }
     ) |> 
-    lp_solve()
+    lp_solve(solver = "highs")
 ```
 
 This is the result. The continuous line represent the hyperplane, and the dashed lines
@@ -285,7 +281,7 @@ svm_soft <- lp_problem() |>
             predicted <= -1 + slack[i]
         }
     ) |> 
-    lp_solve()
+    lp_solve(solver = "highs")
 ```
 
 Notice that all blue values fall on top of the hyperplane, but some orange values
