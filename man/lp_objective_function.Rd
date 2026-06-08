@@ -44,7 +44,10 @@ p1 <- lp_problem() |>
     lp_maximize_function(\(x, y) sqrt(x) * log(y)) |> 
     lp_constraint(x + y <= 10)
 
-lp_solve(p1, start = list(x = 1, y = 1))
+# There are some different solvers within `nloptr`
+lpsugar_applicable_solvers(p1)
+
+lp_solve(p1, solver = "nloptr.cobyla", start = list(x = 1, y = 1))
 }
 \seealso{
 \code{\link[=lp_minimize]{lp_minimize()}} to optimize linear or quadratic functions.
