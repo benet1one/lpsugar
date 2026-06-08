@@ -1,0 +1,99 @@
+---
+title: "Nonlinear"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Nonlinear}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(lpsugar)
+library(ROI.plugin.nloptr)
+```
+
+## Constrained Maximum Likelihood
+
+Say we have a list $x$ of vectors $x_i = \{x_{i1}, \dots, x_{im}\}$. Each vector
+is generated from a $\text{Normal}(\mu_i, \sigma)$. The catch is this: each $mu$ is greater
+than the previous:
+
+$$
+\mu_i \ge \mu_{i-1} \qquad \forall i \in [2,n]
+$$
+
+Let's generate the data.
+
+```{r}
+set.seed(101)
+
+n <- 5
+m <- runif(n, 4, 8) |> round()
+
+true_mu <- -0.5 + cumsum(runif(n, 0, 1))
+true_sigma <- 7
+
+x <- list()
+
+for (i in 1:n) {
+    x[[i]] <- rnorm(m[i], mean = true_mu[i], sd = true_sigma) |> round(2)
+}
+
+print(x)
+```
+
+We will find $\mu$ and $\sigma$ by maximum likelihood. Here's the function that returns
+the loglikelihood. It's arguments *must* be the variables of the problem.
+
+```{r}
+loglikelihood <- function(mu, sigma) {
+    ll <- 0
+    
+    for (i in 1:n) {
+        lli <- dnorm(x[[i]], mean = mu[i], sd = sigma, log = TRUE)
+        ll <- ll + sum(lli)
+    }
+    
+    return(ll)
+}
+```
+
+Now we solve the problem.
+
+```{r}
+constrained_mle <- lp_problem() |> 
+    lp_var(mu[1:n]) |> 
+    lp_var(sigma, lower = 0) |> 
+    lp_max_fun(loglikelihood) |> 
+    lp_con(for (i in 2:n) mu[i] >= mu[i-1]) |> 
+    lp_solve(
+        solver = "nloptr.cobyla",
+        start = list(mu = rep(0, n), sigma = 1)
+    )
+
+constrained_mle
+```
+
+```{r echo=FALSE}
+unconstrained_means <- sapply(x, mean)
+cbind(
+    unconstrained_means = unconstrained_means,
+    constrained_mle = constrained_mle$variables$mu,
+    true_mu = true_mu
+) |> round(2)
+```
+
+Constrained optimization gives a better result.
+
+```{r}
+cor(unconstrained_means, true_mu)
+cor(constrained_mle$variables$mu, true_mu)
+```
+
