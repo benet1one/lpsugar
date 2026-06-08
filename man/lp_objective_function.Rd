@@ -32,7 +32,7 @@ An \code{\link[=lp_problem]{lp_problem()}} with the new \verb{$objective} functi
 Optimize an R function.
 }
 \examples{
-library(ROI.plugin.alabama)
+library(ROI.plugin.nloptr)
 
 ## Simple Example -----------------------
 # max  sqrt(x) * log(y)

@@ -165,7 +165,7 @@ test_that("quadratic solver", {
 })
 
 test_that("quadratic constraints", {
-    withr::local_package("ROI.plugin.alabama")
+    withr::local_package("ROI.plugin.nloptr")
 
     p <- lp_problem() |>
         lp_var(x[1:3]) |>
@@ -176,7 +176,7 @@ test_that("quadratic constraints", {
         )
 
     expect_snapshot(p$constraints)
-    s <- lp_solve(p, solver = "alabama", start = c(0.5, -0.2, 0.9))
+    s <- lp_solve(p, solver = "nloptr.cobyla", start = c(0.5, -0.2, 0.9))
 
     expect_equal(
         round(s$variables$x, 4),

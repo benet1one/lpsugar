@@ -1,4 +1,4 @@
-library(ROI.plugin.alabama)
+library(ROI.plugin.nloptr)
 
 ## Simple Example -----------------------
 # max  sqrt(x) * log(y)

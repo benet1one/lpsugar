@@ -28,8 +28,8 @@ Suggests:
     knitr,
     pkgload,
     rmarkdown,
-    ROI.plugin.alabama,
     ROI.plugin.highs,
+    ROI.plugin.nloptr,
     testthat (>= 3.0.0),
     withr
 VignetteBuilder: 
