@@ -351,7 +351,7 @@ ROI_available_solvers.lp_problem <- function(x, method = getOption("download.fil
 #'   - Can solve the `problem`.
 #'   - Do not need to be installed.
 #' 
-#' Note since Nonlinear Solvers are also applicable for Linear and Quadratic problems, 
+#' Note since Nonlinear Solvers are also applicable to Linear and Quadratic problems, 
 #' they will also be listed.
 #' 
 #' @returns 

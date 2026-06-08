@@ -132,7 +132,7 @@ new_nonlinear_objective <- function(.problem, direction = NULL,
 #' @rdname lp_objective_function
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_nonlinear.R
 lp_minimize_function <- function(.problem, fun, gradient = NULL, hessian = NULL) {
     check_problem(.problem)
     .problem$objective$direction <- "minimize"
