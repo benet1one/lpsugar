@@ -19,6 +19,7 @@ reference:
   contents:
   - sum_over
   - parameter
+  - lpsugar_applicable_solvers
 - title: Bind variables or constraints
   contents:
   - bind_vars

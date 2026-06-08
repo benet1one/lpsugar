@@ -47,7 +47,7 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     control <- rlang::dots_list(...)
     
     if (!missing(start)) {
-        control$start <- variables_to_vec(start, .problem)
+        control$start <- variables_to_vec(start, .problem, call = environment())
     }
     
     roi_sol <- ROI_solve(
@@ -63,6 +63,7 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     )
 
     sol$op <- op
+    sol$roi_solution <- roi_sol
     return(sol)
 }
 
@@ -307,6 +308,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     vars <- variables_to_list(
         solution$solution, 
         problem = problem, 
+        miss_error = FALSE,
         binary_as_logical = binary_as_logical
     )
     
@@ -323,7 +325,61 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     ) |> structure(class = "lp_solution")
 }
 
-# Methods --------------------------------------
+# User Utils ----------------------------
+
+#' @importFrom ROI ROI_available_solvers
+#' @export
+ROI_available_solvers.lp_problem <- function(x, method = getOption("download.file.method")) {
+    ROI_available_solvers(as.OP(x), method = method)
+}
+
+#' List Applicable and Available Solvers
+#' 
+#' Show which solvers can solve a problem. Applicable solvers must be installed and loaded,
+#' whereas Available solvers needn't be installed.
+#'
+#' @param problem An [lp_problem()] or a [ROI::OP()].
+#'
+#' @details
+#' - `lpsugar_applicable_solvers` returns a character vector of solver names, which
+#' can be used in `lp_solve(solver = _)`. It lists solvers which:
+#'   - Can solve the `problem`.
+#'   - Are installed and have been loaded with `library(ROI)` or `library(ROI.plugin.<solver>)`.
+#' 
+#' - `lpsugar_available_solvers` returns a `data.frame` with information on the solvers.
+#' It lists solvers which:
+#'   - Can solve the `problem`.
+#'   - Do not need to be installed.
+#' 
+#' Note since Nonlinear Solvers are also applicable to Linear and Quadratic problems, 
+#' they will also be listed.
+#' 
+#' @returns 
+#' - `lpsugar_applicable_solvers` returns a character vector with the solver names.
+#' - `lpsugar_available_solvers` returns a `data.frame` with information on the solvers.
+#' @seealso [ROI::ROI_applicable_solvers()], [ROI::ROI_available_solvers()].
+#' 
+#' @export
+#'
+#' @example inst/examples/example_applicable_solvers.R
+lpsugar_applicable_solvers <- function(problem) {
+    if (inherits(problem, "lp_problem")) {
+        op <- as.OP(problem)
+        ROI::ROI_applicable_solvers(op)
+    } else if (inherits(problem, "OP")) {
+        ROI::ROI_applicable_solvers(problem)
+    } else {
+        cli_abort("`problem` must be an `lp_problem` or an `OP` object.")
+    }
+}
+
+#' @rdname lpsugar_applicable_solvers
+#' @export
+lpsugar_available_solvers <- function(problem) {
+    ROI_available_solvers(problem)
+}
+
+# Methods -------------------------------
 
 #' @export
 print.lp_solution <- function(x, ...) {

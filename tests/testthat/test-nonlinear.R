@@ -1,6 +1,6 @@
 
 test_that("nonlinear", {
-    withr::local_package("ROI.plugin.alabama")
+    withr::local_package("ROI.plugin.nloptr")
     L <- letters[1:3]
     
     my_fun <- function(x, y, z = 0) {
@@ -16,7 +16,7 @@ test_that("nonlinear", {
     
     s <- lp_solve(
         p, 
-        solver = "alabama",
+        solver = "nloptr.cobyla",
         start = list(
             y = c(3, 3, 3),
             x = 4
@@ -41,7 +41,7 @@ test_that("nonlinear", {
 
 test_that("nonlinear constrained", {
     withr::local_package("ROI.plugin.highs")
-    withr::local_package("ROI.plugin.alabama")
+    withr::local_package("ROI.plugin.nloptr")
     
     p <- lp_problem() |> 
         lp_var(x, lower = 1) |> 
@@ -49,11 +49,11 @@ test_that("nonlinear constrained", {
         lp_max_fun(\(x, y) sqrt(x) * log(y)) |> 
         lp_con(x == 10 - y)
     
-    s <- suppressWarnings(lp_solve(
+    s <- lp_solve(
         p,
-        solver = "alabama",
+        solver = "nloptr.isres",
         start = lp_find_feasible(p, solver = "highs")
-    ))
+    )
     
     expect_equal(
         s$variables$x,

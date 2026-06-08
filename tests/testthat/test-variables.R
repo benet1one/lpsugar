@@ -209,6 +209,34 @@ test_that("variable indexing", {
     )
 })
 
+test_that("fix_vars", {
+    p <- lp_problem() |> 
+        lp_var(x[1:3], lower = 1, upper = c(5, 6, 7)) |> 
+        lp_var(y, upper = 6)
+    
+    p1 <- p |> lp_fix_vars(x = c(3, 1, NA))
+    
+    expect_equal(
+        p1$variables$x$lower,
+        c(3, 1, 1)
+    )
+    expect_equal(
+        p1$variables$x$upper,
+        c(3, 1, 7)
+    )
+    expect_equal(p1$variables$y$lower, -Inf)
+    expect_equal(p1$variables$y$upper, 6)
+    
+    expect_warning(
+        p |> lp_fix_vars(y = 8),
+        "Fixed variable `y` to a value greater than its upper bound"
+    )
+    expect_warning(
+        p |> lp_fix_vars(y = 0, z = 6),
+        "Variables not defined in `.problem`(.+)Problematic variables: z"
+    )
+})
+
 test_that("operations", {
     a <- letters[1:3]
     p <- problem_variables()
