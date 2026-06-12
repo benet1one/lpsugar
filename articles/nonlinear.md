@@ -10,7 +10,7 @@ library(ROI.plugin.nloptr)
 
 Say we have a list \\x\\ of vectors \\x_i = \\x\_{i1}, \dots,
 x\_{im}\\\\. Each vector is generated from a \\\text{Normal}(\mu_i,
-\sigma)\\. The catch is this: each \\mu\\ is greater than the previous:
+\sigma)\\. The catch is this: each \\\mu\\ is greater than the previous:
 
 \\ \mu_i \ge \mu\_{i-1} \qquad \forall i \in \[2,n\] \\
 

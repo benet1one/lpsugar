@@ -59,5 +59,6 @@ lp_problem() |>
 #> Optimal Solution Found ✔ 
 #> 
 
-# For a Quick Start guide see `vignette("lpsugar", package = "lpsugar")`
+# See the Quick Start vignette
+# vignette("lpsugar", package = "lpsugar")
 ```

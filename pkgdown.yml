@@ -2,12 +2,12 @@ pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
-  browsers: browsers.html
   Graphs: Graphs.html
   lpsugar: lpsugar.html
+  misc: misc.html
   nonlinear: nonlinear.html
   Regression: Regression.html
-last_built: 2026-06-08T14:44Z
+last_built: 2026-06-12T09:18Z
 urls:
   reference: https://benet1one.github.io/lpsugar/reference
   article: https://benet1one.github.io/lpsugar/articles

@@ -64,7 +64,6 @@ p1 <- lp_problem() |>
 lpsugar_applicable_solvers(p1)
 #> [1] "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag" "nloptr.isres" 
 #> [5] "nloptr.slsqp" 
-
 lp_solve(p1, solver = "nloptr.cobyla", start = list(x = 1, y = 1))
 #> – $variables
 #> $x
@@ -79,4 +78,7 @@ lp_solve(p1, solver = "nloptr.cobyla", start = list(x = 1, y = 1))
 #> – $status
 #> Optimal Solution Found ✔ 
 #> 
+
+# See more examples in the Nonlinear vignette
+# vignette("nonlinear", package = "lpsugar")
 ```
