@@ -1,12 +1,9 @@
 
 Code
 - Add dots to make functions extensible
-- Improve variables_to_vec error handling (pass error to `start`)
 
 Function Objective
 - gradients and hessians
 
 Docs
-- Document Soft Margin SVMs in regression vignette
-- Nonlinear vignette
 - Find another example for nonlinear
