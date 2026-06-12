@@ -92,10 +92,6 @@ recode_arguments <- function(fun, problem) {
     }
 }
 
-is_nonlinear <- function(objective) {
-    !is.null(objective$fun)
-}
-
 new_nonlinear_objective <- function(.problem, direction = NULL, 
                                     fun = NULL, gradient = NULL, hessian = NULL, expr = "") {
     if (is.null(direction)) {
