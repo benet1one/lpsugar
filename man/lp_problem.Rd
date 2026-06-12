@@ -34,5 +34,6 @@ lp_problem() |>
     ) |>
     lp_solve()
 
-# For a Quick Start guide see `vignette("lpsugar", package = "lpsugar")`
+# See the Quick Start vignette
+# vignette("lpsugar", package = "lpsugar")
 }

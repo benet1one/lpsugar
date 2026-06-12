@@ -46,8 +46,10 @@ p1 <- lp_problem() |>
 
 # There are some different solvers within `nloptr`
 lpsugar_applicable_solvers(p1)
-
 lp_solve(p1, solver = "nloptr.cobyla", start = list(x = 1, y = 1))
+
+# See more examples in the Nonlinear vignette
+# vignette("nonlinear", package = "lpsugar")
 }
 \seealso{
 \code{\link[=lp_minimize]{lp_minimize()}} to optimize linear or quadratic functions.
