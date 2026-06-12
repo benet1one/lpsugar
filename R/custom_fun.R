@@ -42,7 +42,7 @@ sum_over <- function(...) {
 
     listcomp::gen_list(!!expr, !!!dots[-n], .env = env) |>
         purrr::map(sum) |>
-        purrr::reduce(`+`)
+        purrr::reduce(`+`, .init = 0)
 }
 
 

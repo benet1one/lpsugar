@@ -124,6 +124,20 @@ test_that("sum over", {
         sum_over(l = my_list, r = l[1], 2*r),
         12
     )
+    
+    expect_equal(
+        sum_over(i = numeric(), j = 1:2, a[i, j]),
+        0
+    )
+    
+    expect_error(
+        sum_over(2+2, 3+3),
+        "First element in `...` must be a name value pair `<ind> = <set>`"
+    )
+    expect_error(
+        sum_over(i = 1:3, j = 1:2),
+        "Last element in `...` should be an unnamed expression to sum."
+    )
 })
 
 test_that("apply", {
