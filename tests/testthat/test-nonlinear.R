@@ -66,3 +66,36 @@ test_that("nonlinear constrained", {
         sqrt(s$variables$x) * log(s$variables$y)
     )
 })
+
+test_that("nonlinear errors", {
+    error_fun <- function(x) {
+        if (x == 0) stop("function does not work for x==0")
+        else x^3
+    }
+    char_fun <- function(x) {
+        paste(x, "00")
+    }
+    non_scalar_fun <- function(x) {
+        matrix(2*x, nrow = 3)
+    }
+    missing_vars_fun <- function(x) {
+        x^3
+    }
+    
+    expect_error(
+        lp_problem() |> lp_var(x) |> lp_min_fun(error_fun),
+        "Failed to evaluate `fun`(.+)Make sure it works when all variables are 0."
+    )
+    expect_error(
+        lp_problem() |> lp_var(x) |> lp_min_fun(char_fun),
+        "`fun` must return a numeric scalar, not <character>"
+    )
+    expect_error(
+        lp_problem() |> lp_var(x) |> lp_min_fun(non_scalar_fun),
+        "`fun` must return a numeric scalar.(.+)Returns <matrix> of length 3"
+    )
+    expect_error(
+        lp_problem() |> lp_var(x) |> lp_var(y) |> lp_var(z) |> lp_min_fun(missing_vars_fun),
+        "`fun` must have all problem variables as arguments.(.+)Missing variables: y and z"
+    )
+})

@@ -42,12 +42,13 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     
     if (!is.numeric(fun_sane)) {
         cli_abort(
-            "`fun` must return a numeric scalar, not `{class(fun_sane)[1]}`",
+            "`fun` must return a numeric scalar, not <{class(fun_sane)[1]}>.",
             call = parent.frame()
         )
     } else if (length(fun_sane) != 1L) {
         cli_abort(
-            "`fun` must return a numeric scalar, not of length `{length(fun_sane)}`",
+            c("`fun` must return a numeric scalar.",
+              "x" = "Returns <{class(fun_sane)[1]}> of length {length(fun_sane)}"),
             call = parent.frame()
         )
     }
@@ -74,7 +75,7 @@ check_correct_arguments <- function(fun, problem, funname, call = parent.frame()
     
     if (length(missing_vars) > 0L) {
         cli_abort(
-            c("`{funname}` must have all problem variables as arguments",
+            c("`{funname}` must have all problem variables as arguments.",
               "x" = "Missing variables: {missing_vars}"),
             call = call,
         )
