@@ -22,7 +22,7 @@ library(ROI.plugin.nloptr)
 ## Constrained Maximum Likelihood
 
 Say we have a list $x$ of vectors $x_i = \{x_{i1}, \dots, x_{im}\}$. Each vector
-is generated from a $\text{Normal}(\mu_i, \sigma)$. The catch is this: each $mu$ is greater
+is generated from a $\text{Normal}(\mu_i, \sigma)$. The catch is this: each $\mu$ is greater
 than the previous:
 
 $$
