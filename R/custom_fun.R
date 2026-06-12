@@ -156,9 +156,11 @@ custom_fun <- function() {
 
     e$ifelse <- function(test, yes, no) {
         if (is_lp_constraint(test)) {
-            cli_abort(
-                "The `test` condition must be a binary variable, not an equality or inequality."
-            )
+            test_expr <- substitute(test) |> rlang::as_label()
+            cli_abort(c(
+                "The `test` condition must be a binary variable, not an equality or inequality.",
+                "x" = "Problematic argument: {test_expr}"
+            ))
         }
         if (is_lp_constraint(yes) || is_lp_constraint(no)) {
             cli_abort("`yes` and `no` cannot be constraints.")

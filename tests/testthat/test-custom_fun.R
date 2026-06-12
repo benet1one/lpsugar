@@ -255,6 +255,10 @@ test_that("ifelse1", {
         p |> lp_con(ifelse(less_than_index, y <= 1:n, y <= upper)),
         "`yes` and `no` cannot be constraints"
     )
+    expect_error(
+        p |> lp_con(y < ifelse(y <= 0, 1, 2)),
+        "The `test` condition must be a binary variable, not an equality or inequality."
+    )
 })
 
 test_that("ifelse2", {
