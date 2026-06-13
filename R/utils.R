@@ -216,7 +216,16 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
                 c("Dimensions of variable `{v$name}` do not match.",
                   "x" = "In `{field}` they are ({dx_str})",
                   "x" = "In `problem` they are ({dv_str})"), 
-                call = call)
+                call = call
+            )
+        }
+        else if (length(xs) != length(v)) {
+            cli_abort(
+                c("Length of variable `{v$name}` does not match.",
+                  "x" = "In `{field}` it's length {length(xs)}",
+                  "x" = "In `problem` it's length {length(v)}"),
+                call = call
+            )
         }
         
         dnx <- dimnames(drop(xs))
@@ -239,7 +248,8 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
                     call = call
                 )
             }
-        }
+        } 
+        
         
         if (v$integer && !rlang::is_integerish(xs[!is.na(xs)])) {
             cli_warn("`{v$name}` should be integer.", call = call)

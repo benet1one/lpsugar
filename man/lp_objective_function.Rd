@@ -19,9 +19,13 @@ lp_max_fun(.problem, fun, gradient = NULL, hessian = NULL)
 \item{.problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
 
 \item{fun}{Function to optimize. The function's arguments must match all
-defined \link[=lp_variable]{variables}.}
+defined \link[=lp_variable]{variables}. It must return a numeric scalar.}
 
-\item{gradient}{Function that returns the gradient vector.}
+\item{gradient}{Function that returns the gradient vector. It can return one of:
+\itemize{
+\item Named list of variables with their respective gradients.
+\item Vector containing the derivative of \code{fun} with respect to each variable.
+}}
 
 \item{hessian}{Function that returns the hessian matrix.}
 }

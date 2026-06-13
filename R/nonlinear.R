@@ -5,12 +5,12 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     stopifnot(
         is.function(fun) && !is.primitive(fun),
         is.null(gradient) || is.function(gradient),
-        is.null(gradient) || is.function(hessian)
+        is.null(hessian)  || is.function(hessian)
     )
     
-    if (!is.null(gradient) || !is.null(hessian)) {
+    if (!is.null(hessian)) {
         cli_abort(
-            "`gradient` and `hessian` are not yet supported.", 
+            "`hessian` is not yet supported.", 
             call = parent.frame()
         )
     }
@@ -19,39 +19,11 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     check_correct_arguments(gradient, .problem, funname = "gradient", call = parent.frame())
     check_correct_arguments(hessian,  .problem, funname = "hessian", call = parent.frame())
     
-    fun_x      <- recode_arguments(fun,      .problem)
-    gradient_x <- recode_arguments(gradient, .problem)
-    hessian_x  <- recode_arguments(hessian,  .problem)
+    fun_x <- nl_recode_fun(fun, .problem, call = parent.frame())
+    gradient_x <- nl_recode_gradient(gradient, .problem, call = parent.frame())
     
-    n <- ncol(.problem)
-    
-    fun_sane <- rlang::try_fetch(
-        fun_x(rep(0, n)),
-        error = identity
-    )
-    
-    if (rlang::is_error(fun_sane)) {
-        cli_abort(
-            c("Failed to evaluate `fun`.",
-              ">" = "Make sure it works when all variables are 0.",
-              "i" = "It can return -Inf or +Inf."), 
-            call = parent.frame(),
-            parent = fun_sane
-        )
-    }
-    
-    if (!is.numeric(fun_sane)) {
-        cli_abort(
-            "`fun` must return a numeric scalar, not <{class(fun_sane)[1]}>.",
-            call = parent.frame()
-        )
-    } else if (length(fun_sane) != 1L) {
-        cli_abort(
-            c("`fun` must return a numeric scalar.",
-              "x" = "Returns <{class(fun_sane)[1]}> of length {length(fun_sane)}"),
-            call = parent.frame()
-        )
-    }
+    # TODO
+    hessian_x <- NULL
     
     .problem$objective <- new_nonlinear_objective(
         .problem,
@@ -82,16 +54,93 @@ check_correct_arguments <- function(fun, problem, funname, call = parent.frame()
     }
 }
 
-recode_arguments <- function(fun, problem) {
-    if (is.null(fun)) {
+nl_recode_fun <- function(fun, problem, call) {
+    fun_x <- recode_arguments(fun, problem)
+    fun_out <- check_function_sanity(
+        fun_x, 
+        n0 = ncol(problem), 
+        funname = "fun", 
+        call = call
+    )
+    
+    if (!is.numeric(fun_out) || length(fun_out) != 1L) {
+        cli_abort(
+            c("`fun` must return a numeric scalar.",
+              "x" = "Returns {.type {fun_out}}."),
+            call = call
+        )
+    }
+    
+    return(fun_x)
+}
+
+nl_recode_gradient <- function(gradient, problem, call) {
+    if (is.null(gradient)) {
         return(NULL)
     }
     
+    gradient_x <- recode_arguments(gradient, problem)
+    gradient_out <- check_function_sanity(
+        gradient_x,
+        n0 = ncol(problem),
+        funname = "gradient",
+        call = call
+    )
+    
+    # Checks for errors, such as missing values, wrong names...
+    gradient_out_vec <- rlang::try_fetch(
+        variables_to_vec(
+            gradient_out,
+            problem = problem,
+            field = "gradient()"
+        ),
+        error = identity
+    )
+    
+    if (rlang::is_error(gradient_out_vec)) {
+        cli_abort(
+            c("Invalid `gradient` output.",
+              ">" = "It should be a numeric vector or a named list."),
+            call = call,
+            parent = gradient_out_vec
+        )
+    }
+    
+    if (is.list(gradient_out)) {
+        return(function(x) {
+            variables_to_vec.list(gradient_x(x), problem)
+        })
+    } else {
+        return(gradient_x)
+    }
+}
+
+recode_arguments <- function(fun, problem) {
     function(x) {
         var_list <- variables_to_list(x, problem, binary_as_logical = FALSE)
         do.call(fun, var_list)
     }
 }
+
+check_function_sanity <- function(fun_x, n0, funname = "fun", call) {
+    fun_out <- rlang::try_fetch(
+        fun_x(rep(0, n0)),
+        error = identity
+    )
+    
+    if (rlang::is_error(fun_out)) {
+        cli_abort(
+            c("Failed to evaluate `{funname}`.",
+              ">" = "Make sure it works when all variables are 0.",
+              "i" = "It can return -Inf or +Inf."), 
+            call = call,
+            parent = fun_out
+        )
+    }
+    
+    return(fun_out)
+}
+
 
 new_nonlinear_objective <- function(.problem, direction = NULL, 
                                     fun = NULL, gradient = NULL, hessian = NULL, expr = "") {
@@ -118,8 +167,10 @@ new_nonlinear_objective <- function(.problem, direction = NULL,
 #'
 #' @param .problem An [lp_problem()].
 #' @param fun Function to optimize. The function's arguments must match all
-#' defined [variables][lp_variable()].
-#' @param gradient Function that returns the gradient vector.
+#' defined [variables][lp_variable()]. It must return a numeric scalar.
+#' @param gradient Function that returns the gradient vector. It can return one of:
+#' - Named list of variables with their respective gradients.
+#' - Vector containing the derivative of `fun` with respect to each variable.
 #' @param hessian Function that returns the hessian matrix.
 #'
 #' @seealso [lp_minimize()] to optimize linear or quadratic functions.

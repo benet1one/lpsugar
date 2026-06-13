@@ -119,7 +119,7 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 #' @param solution One of:
 #' - Named list of variables with their respective values.
 #' - An `lp_solution` object as returned by [lp_solve()] or [lp_find_feasible()].
-#' - A vector containing the values of each variable, one after another.
+#' - Vector containing the values of each variable, one after another.
 #' @param tol Tolerance to use for constraint and bound satisfaction.
 #'
 #' @returns A named list with the computed statistics.

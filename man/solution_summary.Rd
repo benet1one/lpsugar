@@ -25,7 +25,7 @@ compute_aliases(problem, solution)
 \itemize{
 \item Named list of variables with their respective values.
 \item An \code{lp_solution} object as returned by \code{\link[=lp_solve]{lp_solve()}} or \code{\link[=lp_find_feasible]{lp_find_feasible()}}.
-\item A vector containing the values of each variable, one after another.
+\item Vector containing the values of each variable, one after another.
 }}
 
 \item{tol}{Tolerance to use for constraint and bound satisfaction.}
