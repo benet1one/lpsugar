@@ -25,10 +25,16 @@ lp_max_fun(.problem, fun, gradient = NULL, hessian = NULL)
 
   Function to optimize. The function's arguments must match all defined
   [variables](https://benet1one.github.io/lpsugar/reference/lp_variable.md).
+  It must return a numeric scalar.
 
 - gradient:
 
-  Function that returns the gradient vector.
+  Function that returns the gradient vector. It can return one of:
+
+  - Named list of variables with their respective gradients.
+
+  - Vector containing the derivative of `fun` with respect to each
+    variable.
 
 - hessian:
 

@@ -35,7 +35,7 @@ compute_aliases(problem, solution)
     or
     [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md).
 
-  - A vector containing the values of each variable, one after another.
+  - Vector containing the values of each variable, one after another.
 
 - tol:
 
