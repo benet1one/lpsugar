@@ -468,22 +468,72 @@ bind_cv <- function(x, y) {
     x
 }
 #' @export
-`[<-.lp_variable` <- function(x, i, j, ..., value) {
-    `(<-` <- `!<-` <- NULL
-    xname <- rlang::sym(x$name)
-    call <- rlang::expr((!!xname)[...] <- {{value}})
-    cli_abort("Cannot assign an element of an `lp_variable`.", call = call)
+`[<-.lp_variable` <- function(x, ..., value) {
+    ind <- x$ind
+    ind[] <- 1:length(ind)
+    
+    i <- rlang::try_fetch(ind[...], error = identity)
+    
+    if (rlang::is_condition(i)) {
+        dots <- rlang::enexprs(..., .ignore_empty = "none")
+        call <- rlang::expr((!!substitute(x))[!!!dots])
+        cli_abort(i$message, call = call)
+    }
+    
+    i <- c(i)
+    
+    if (is_lp_variable(value)) {
+        y <- recycle_var(value, length(i))
+        
+        if (is_quadratic(x) || is_quadratic(y)) {
+            x <- as_quadratic(x)
+            y <- as_quadratic(y)
+            x$q_coef[i] <- y$q_coef
+        }
+        
+        x$coef[i, ] <- y$coef
+        x$add[i] <- y$add
+        
+        x$binary <- x$binary && y$binary
+        x$raw <- FALSE
+        
+        return(x)
+        
+    } else if (is.numeric(value) || is.logical(value)) {
+        y <- recycle_const(as.numeric(value), length(i))
+        
+        if (is_quadratic(x)) {
+            x$q_coef[i] <- list(x$q_coef[[1]] * 0) |> rep(length(i))
+        }
+        
+        x$coef[i, ] <- 0
+        x$add[i] <- y
+        
+        x$binary <- x$binary && is.logical(value)
+        x$raw <- FALSE
+        
+        return(x)
+        
+    } else {
+        cli_abort(c(
+            "Replacement value must be numeric or an <lp_variable>.",
+            "x" = "Instead is <{class(value)[1]}>"
+        ))
+    }
 }
 #' @export
 `[[.lp_variable` <- function(x, ...) {
     cli_abort(c(
-        "Double indexing `{x$name}[[i]]` not supported for `lp_variable`.",
+        "Double indexing `{x$name}[[i]]` not supported for <lp_variable>.",
         ">" = "Use `{x$name}[i]` instead."
     ))
 }
 #' @export
 `[[<-.lp_variable` <- function(x, i, value) {
-    cli_abort("Double indexing `{x$name}[[i]]` not supported for `lp_variable`.")
+    cli_abort(c(
+        "Double indexing `{x$name}[[i]]` not supported for <lp_variable>.",
+        ">" = "Use `{x$name}[i] <- value}` instead."
+    ))
 }
 
 #' @export

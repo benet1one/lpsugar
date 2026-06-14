@@ -196,19 +196,41 @@ test_that("variable indexing", {
         t(ThreeD[, , 1, drop = TRUE])
     )
 
-    # Other errors
-    expect_error(
-        y[1] <- 2,
-        "Cannot assign an element of an `lp_variable`"
-    )
     expect_error(
         y[[1]],
-        "Double indexing `y\\[\\[i\\]\\]` not supported for `lp_variable`"
+        "Double indexing `y\\[\\[i\\]\\]` not supported for <lp_variable>"
     )
     expect_error(
         y[[1]] <- 2,
-        "Double indexing `y\\[\\[i\\]\\]` not supported for `lp_variable`"
+        "Double indexing `y\\[\\[i\\]\\]` not supported for <lp_variable>"
     )
+})
+
+test_that("variable replacement", {
+    p <- lp_problem() |> 
+        lp_var(x[1:2, 1:2]) |> 
+        lp_var(y[1:2]) |> 
+        lp_alias(
+            z = {
+                x <- x^2
+                x[1, ] <- 3*y
+                x[2, 2] <- 5
+                (x)
+            }
+        )
+    
+    xval <- matrix(runif(4), 2, 2)
+    yval <- runif(2)
+    zval <- {
+        z <- xval^2
+        z[1, ] <- 3*yval
+        z[2, 2] <- 5
+        (z)
+    }
+    
+    computed <- compute_aliases(p, list(x = xval, y = yval))
+    expect_equal(computed$z, zval, ignore_attr = TRUE)
+    expect_equal(dim(computed$z), c(2, 2), ignore_attr = TRUE)
 })
 
 test_that("fix_vars", {
