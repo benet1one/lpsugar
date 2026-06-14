@@ -68,6 +68,87 @@
       with class 'robust_index' from package 'lpsugar'
       
 
+---
+
+    Code
+      bind_vars(1:2, x^2)
+    Output
+      $q_coef
+      $q_coef[[1]]
+             x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
+      x[1]      0    0    0      0      0      0      0
+      x[2]      0    0    0      0      0      0      0
+      x[3]      0    0    0      0      0      0      0
+      y[1,1]    0    0    0      0      0      0      0
+      y[2,1]    0    0    0      0      0      0      0
+      y[1,2]    0    0    0      0      0      0      0
+      y[2,2]    0    0    0      0      0      0      0
+      with class 'robust_index' from package 'lpsugar'
+      
+      $q_coef[[2]]
+             x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
+      x[1]      0    0    0      0      0      0      0
+      x[2]      0    0    0      0      0      0      0
+      x[3]      0    0    0      0      0      0      0
+      y[1,1]    0    0    0      0      0      0      0
+      y[2,1]    0    0    0      0      0      0      0
+      y[1,2]    0    0    0      0      0      0      0
+      y[2,2]    0    0    0      0      0      0      0
+      with class 'robust_index' from package 'lpsugar'
+      
+      $q_coef[[3]]
+             x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
+      x[1]      2    0    0      0      0      0      0
+      x[2]      0    0    0      0      0      0      0
+      x[3]      0    0    0      0      0      0      0
+      y[1,1]    0    0    0      0      0      0      0
+      y[2,1]    0    0    0      0      0      0      0
+      y[1,2]    0    0    0      0      0      0      0
+      y[2,2]    0    0    0      0      0      0      0
+      with class 'robust_index' from package 'lpsugar'
+      
+      $q_coef[[4]]
+             x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
+      x[1]      0    0    0      0      0      0      0
+      x[2]      0    2    0      0      0      0      0
+      x[3]      0    0    0      0      0      0      0
+      y[1,1]    0    0    0      0      0      0      0
+      y[2,1]    0    0    0      0      0      0      0
+      y[1,2]    0    0    0      0      0      0      0
+      y[2,2]    0    0    0      0      0      0      0
+      with class 'robust_index' from package 'lpsugar'
+      
+      $q_coef[[5]]
+             x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
+      x[1]      0    0    0      0      0      0      0
+      x[2]      0    0    0      0      0      0      0
+      x[3]      0    0    2      0      0      0      0
+      y[1,1]    0    0    0      0      0      0      0
+      y[2,1]    0    0    0      0      0      0      0
+      y[1,2]    0    0    0      0      0      0      0
+      y[2,2]    0    0    0      0      0      0      0
+      with class 'robust_index' from package 'lpsugar'
+      
+      
+      $coef
+           x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
+      [1,]    0    0    0      0      0      0      0
+      [2,]    0    0    0      0      0      0      0
+      [3,]    0    0    0      0      0      0      0
+      [4,]    0    0    0      0      0      0      0
+      [5,]    0    0    0      0      0      0      0
+      with class 'robust_index' from package 'lpsugar'
+      
+      $add
+           [,1]
+      [1,]    1
+      [2,]    2
+      [3,]    0
+      [4,]    0
+      [5,]    0
+      with class 'robust_index' from package 'lpsugar'
+      
+
 # variable indexing
 
     Code

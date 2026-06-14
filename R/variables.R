@@ -414,9 +414,8 @@ bind_vc <- function(x, y) {
     x$ind[] <- 1:length(x$ind)
 
     if (is_quadratic(x)) {
-        q <- x$q_coef[[1]]
-        y_q_coef <- q_list_multiply(q, 0)
-        x$q_coef <- c(x$q_coef, y_q_coef)
+        yq <- list(x$q_coef[[1]] * 0) |> rep(length(y))
+        x$q_coef <- c(x$q_coef, yq)
     }
 
     x$coef <- rbind(

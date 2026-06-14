@@ -133,6 +133,8 @@ test_that("variable concatenation", {
         bind_vars(x, y[integer()]),
         x
     )
+    
+    expect_snapshot(bind_vars(1:2, x^2))
 })
 
 test_that("variable indexing", {
