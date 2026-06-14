@@ -39,7 +39,7 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
     value <- rlang::eval_tidy(quosure, data = data)
 
     if (!is_lp_variable(value)) {
-        cli_abort("Did not evaluate to a variable.", call = quosure)
+        cli_abort("Alias `{name}` did not evaluate to a variable.", call = parent.frame())
     }
 
     .problem$aliases[[name]] <- value

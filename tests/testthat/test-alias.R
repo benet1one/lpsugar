@@ -39,6 +39,6 @@ test_that("alias", {
     )
     expect_error(
         p |> lp_alias(y = 1:3),
-        "Did not evaluate to a variable"
+        "Alias `y` did not evaluate to a variable"
     )
 })
