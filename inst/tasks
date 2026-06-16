@@ -1,9 +1,10 @@
 
 Code
+- Check problem should suggest that perhaps user forgot a pipe `|>` in previous statement
 - Add dots to make functions extensible
 
 Function Objective
-- gradients and hessians
+- hessians
 
 Docs
 - Find another example for nonlinear
