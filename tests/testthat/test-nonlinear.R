@@ -51,20 +51,13 @@ test_that("nonlinear constrained", {
     
     s <- lp_solve(
         p,
-        solver = "nloptr.isres",
-        start = lp_find_feasible(p, solver = "highs")
+        solver = "nloptr.slsqp",
+        start = lp_find_feasible(p, solver = "highs"),
+        max_time = 1
     )
     
-    expect_equal(
-        s$variables$x,
-        10 - s$variables$y,
-        tolerance = 0.001
-    )
-    
-    expect_equal(
-        s$objective,
-        sqrt(s$variables$x) * log(s$variables$y)
-    )
+    with(s$variables, expect_equal(x, 10 - y, tolerance = 0.001))
+    with(s$variables, expect_equal(s$objective, sqrt(x) * log(y)))
 })
 
 test_that("nonlinear fun errors", {
