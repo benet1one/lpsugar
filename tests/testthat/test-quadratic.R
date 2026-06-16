@@ -136,7 +136,7 @@ test_that("ifelse quadratic", {
         )
 
     p$constraints$q_lhs |>
-        lapply(as.matrix) |>
+        purrr::map_if(~!is.null(.x), ~as.matrix(.x)) |>
         expect_snapshot()
 })
 

@@ -44,7 +44,7 @@
 # ifelse quadratic
 
     Code
-      lapply(p$constraints$q_lhs, as.matrix)
+      purrr::map_if(p$constraints$q_lhs, ~ !is.null(.x), ~ as.matrix(.x))
     Output
       [[1]]
            x[1] x[2] x[3] x[4]
@@ -61,11 +61,7 @@
       x[4]    0    0    0    0
       
       [[3]]
-           x[1] x[2] x[3] x[4]
-      x[1]    0    0    0    0
-      x[2]    0    0    0    0
-      x[3]    0    0    0    0
-      x[4]    0    0    0    0
+      NULL
       
       [[4]]
            x[1] x[2] x[3] x[4]

@@ -458,7 +458,13 @@ compare_lp <- function(x, y, op, call) {
     var <- x - y
 
     if (is_quadratic(var)) {
-        q_lhs <- lapply(var$q_coef, slam::as.simple_triplet_matrix)
+        q_lhs <- lapply(var$q_coef, function(q) {
+            if (any(q != 0)) {
+                slam::as.simple_triplet_matrix(q)
+            } else {
+                NULL
+            }
+        })
     } else {
         q_lhs <- rep(list(NULL), length(var))
     }
