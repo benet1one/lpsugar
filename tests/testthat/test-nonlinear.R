@@ -51,7 +51,7 @@ test_that("nonlinear constrained", {
     
     s <- lp_solve(
         p,
-        solver = "nloptr.slsqp",
+        solver = "nloptr.isres",
         start = lp_find_feasible(p, solver = "highs"),
         max_time = 1
     )
