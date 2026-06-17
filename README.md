@@ -6,11 +6,12 @@
 [![R-CMD-check](https://github.com/benet1one/lpsugar/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/benet1one/lpsugar/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-# Linear and Quadratic Programming in R
+# Linear, Quadratic and Nonlinear Programming in R
 
 `lpsugar` is an AML (Algebraic Modeling Language) inspired in R’s
 vectorized syntax, used to define and solve Mixed Integer Linear
-Programs (MILP).
+Problems (MILP), Mixed Integer Quadratic Problems (MIQP) and General
+Nonlinear Problems (NLP).
 
 This package is in development, and being made by a solo student. For a
 safer choice, I recommend using
@@ -30,13 +31,11 @@ pak::pak("benet1one/lpsugar")
 
 Start with a simple problem to show the basic syntax.
 
-$$
-\begin{array}{rl}
+$$\begin{array}{rl}
   \text{max} & x+y \\
   \text{st} & 2x + y \le 8 \\
             & 2x + 3y \le 12
-\end{array}
-$$
+\end{array}$$
 
 Let’s write the problem in `lpsugar` and solve it!
 
