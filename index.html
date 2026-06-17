@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.23.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.23.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,9 +64,9 @@
 <div class="row">
   <main id="main" class="col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="linear-and-quadratic-programming-in-r">Linear and Quadratic Programming in R<a class="anchor" aria-label="anchor" href="#linear-and-quadratic-programming-in-r"></a>
+<div class="page-header"><h1 id="linear-quadratic-and-nonlinear-programming-in-r">Linear, Quadratic and Nonlinear Programming in R<a class="anchor" aria-label="anchor" href="#linear-quadratic-and-nonlinear-programming-in-r"></a>
 </h1></div>
-<p><code>lpsugar</code> is an AML (Algebraic Modeling Language) inspired in R’s vectorized syntax, used to define and solve Mixed Integer Linear Programs (MILP).</p>
+<p><code>lpsugar</code> is an AML (Algebraic Modeling Language) inspired in R’s vectorized syntax, used to define and solve Mixed Integer Linear Problems (MILP), Mixed Integer Quadratic Problems (MIQP) and General Nonlinear Problems (NLP).</p>
 <p>This package is in development, and being made by a solo student. For a safer choice, I recommend using <a href="https://dirkschumacher.github.io/ompr/" class="external-link">ompr</a>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -80,13 +80,11 @@
 <h2 id="quick-examples">Quick Examples<a class="anchor" aria-label="anchor" href="#quick-examples"></a>
 </h2>
 <p>Start with a simple problem to show the basic syntax.</p>
-<p><span class="math display">\[
-\begin{array}{rl}
+<p><span class="math display">\[\begin{array}{rl}
   \text{max} &amp; x+y \\
   \text{st} &amp; 2x + y \le 8 \\
             &amp; 2x + 3y \le 12
-\end{array}
-\]</span></p>
+\end{array}\]</span></p>
 <p>Let’s write the problem in <code>lpsugar</code> and solve it!</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/benet1one/lpsugar" class="external-link">lpsugar</a></span><span class="op">)</span></span>
