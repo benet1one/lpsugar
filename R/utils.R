@@ -10,7 +10,7 @@ warn_changed_args <- function(..., env = parent.frame(), call = env) {
             next
         }
 
-        if (expected[[arg]] != env[[arg]]) {
+        if (!identical(expected[[arg]], env[[arg]])) {
             cli_warn("Ignoring argument `{arg}`.", call = call)
         }
     }
