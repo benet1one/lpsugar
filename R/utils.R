@@ -264,17 +264,10 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
 #' @export
 variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE, 
                                          call = environment(), field = "x") {
-    var_vec <- variables_to_vec(
-        x$variables, 
-        problem, 
-        miss_error = miss_error, 
-        call = call,
-        field = paste0(field, "$variables")
-    )
-    
+    var_vec <- unlist(x$variables)
     true_vec <- x$variables_vec
     
-    if (any(var_vec != true_vec)) {
+    if (length(var_vec) != length(true_vec) || any(var_vec != true_vec)) {
         cli_abort(
             c("`{field}$variables` and `{field}$variables_vec` do not match.",
               "i" = "You can use either one of them in this function."),

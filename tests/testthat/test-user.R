@@ -86,7 +86,7 @@ test_that("solution summary", {
     s
 
     expect_equal(
-        variables_to_vec(s, p),
+        variables_to_vec(s),
         s$variables_vec
     )
     expect_equal(
@@ -98,7 +98,7 @@ test_that("solution summary", {
     s2$variables$x[1] <- 5
 
     expect_error(
-        variables_to_vec(s2, p),
+        variables_to_vec(s2),
         "`x\\$variables` and `x\\$variables_vec` do not match"
     )
 
