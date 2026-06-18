@@ -204,7 +204,7 @@ lp_var <- lp_variable
 #' @returns The `.problem` with modified lower and upper bounds for the variables.
 #' @export
 #'
-#' @examples
+#' @example inst/examples/example_fix_vars.R
 lp_fix_vars <- function(.problem, ...) {
     vars <- rlang::dots_list(...)
     nams <- rlang::names2(vars)
