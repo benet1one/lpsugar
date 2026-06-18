@@ -6,7 +6,7 @@
 #' @param .problem An [lp_problem()].
 #' @param ... One or more linear constraints. Can be named. They must:
 #' - Contain one or more variables defined with [lp_variable()]
-#' - Contain a comparison operator ( `< / <= / == / => / >` )
+#' - Contain a comparison operator, such as `<=`,  `==` or `=>`.
 #'
 #' @returns The `.problem` with added `$constraints`. (Note: previous constraints are not
 #' overritten).
