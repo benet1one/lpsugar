@@ -1,6 +1,6 @@
 
 Code
-- Add dots to make functions extensible
+- Warn of use of aliases in nonlinear objective
 
 Function Objective
 - hessians
