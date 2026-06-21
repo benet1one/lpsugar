@@ -4,9 +4,9 @@
 \name{lpsugar-package}
 \alias{lpsugar}
 \alias{lpsugar-package}
-\title{lpsugar: Algebraic Modeling Language for Linear Problems}
+\title{lpsugar: Linear, Quadratic and Nonlinear Programming in R}
 \description{
-Algebraic Modeling Language inspired in R's vectorized syntax. Define Mixed Integer Linear Programming (MILP) problems and solve them with 'ROI'.
+Algebraic Modeling Language for Optimization in R. Supports linear, quadratic, or nonlinear objective functions with linear and quadratic constraints. Problems can be solved with a variety of solvers using 'ROI'.
 }
 \seealso{
 Useful links:
@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: benet \email{benet1one@gmail.com}
+\strong{Maintainer}: Bernat Garcia \email{bernatgarciaquadrat@gmail.com} [copyright holder]
 
 }
 \keyword{internal}
