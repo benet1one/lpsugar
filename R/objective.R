@@ -31,7 +31,7 @@ lp_objective <- function(.problem, objective) {
             "Summing variables in objective. Write `sum({expr})` to suppress this message.",
             call = parent.frame()
         )
-        expr <- glue::glue("sum({expr})")
+        expr <- paste0("sum(", expr, ")")
     }
 
     .problem$objective <- new_objective(
