@@ -42,14 +42,27 @@ check_correct_arguments <- function(fun, problem, funname, call = parent.frame()
     }
     
     args <- rlang::fn_fmls_names(fun)
+    
     varnames <- names(problem$variables)
     missing_vars <- varnames[!is.element(varnames, args)]
+    
+    aliasnames <- names(problem$aliases)
+    present_aliases <- aliasnames[is.element(aliasnames, args)]
     
     if (length(missing_vars) > 0L) {
         cli_abort(
             c("`{funname}` must have all problem variables as arguments.",
               "x" = "Missing variables: {missing_vars}"),
             call = call,
+        )
+    }
+    
+    if (length(present_aliases) > 0L) {
+        cli_abort(
+            c("Aliases can not be passed to `{funname}`.",
+              ">" = "Only variables can be passed to the objective function.",
+              "x" = "Problematic arguments: {present_aliases}"),
+            call = call
         )
     }
 }

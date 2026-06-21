@@ -91,6 +91,10 @@ test_that("nonlinear fun errors", {
         lp_problem() |> lp_var(x) |> lp_var(y) |> lp_var(z) |> lp_min_fun(f_missing_vars),
         "`fun` must have all problem variables as arguments.(.+)Missing variables: y and z"
     )
+    expect_error(
+        lp_problem() |> lp_var(x) |> lp_alias(y = x^2) |> lp_min_fun(\(x, y) x + y),
+        "Aliases can not be passed to `fun`"
+    )
 })
 
 test_that("nonlinear gradient", {
