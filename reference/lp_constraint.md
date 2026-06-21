@@ -28,7 +28,7 @@ lp_subject_to(.problem, ...)
   - Contain one or more variables defined with
     [`lp_variable()`](https://benet1one.github.io/lpsugar/reference/lp_variable.md)
 
-  - Contain a comparison operator ( `< / <= / == / => / >` )
+  - Contain a comparison operator, such as `<=`, `==` or `=>`.
 
 ## Value
 
