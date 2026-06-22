@@ -83,9 +83,9 @@ factory <- names(supply)
 market <- names(demand)
 
 cost <- c(
-      2, 7, 3, 1,
-      6, 2, 9, 2,
-      4, 6, 2, 8
+    2, 7, 3, 1,
+    6, 2, 9, 2,
+    4, 6, 2, 8
 ) |> parameter(factory, market)
 
 cost

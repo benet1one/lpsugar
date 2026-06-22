@@ -25,57 +25,91 @@ library(lpsugar)
 
 The elements of a transportation problem are these:
 
-- Sets
-  - $F$ - `factory`
-  - $M$ - `market`
-  
-- Parameters
-  - $s$ - `supply` produced by each `factory`.
-  - $d$ - `demand` on each `market`.
-  - $c$ - `cost` to transport a unit from each `factory` to each `market`.
-  
-- Variable
-  - $t$ - `transport` products from each `factory` to each `market`.
-  
-- Objective Function
-  - $\min \sum_{f \in F} \sum_{m \in M} (c_{fm} t_{fm})$ - `minimize sum(cost * transport)`
-  
-- Constraints
-  - $\sum_{m\in M}({t_{fm}}) \le s_f \quad \forall f\in F$ - 
-  `for (f in factory) sum(transport[f, ]) <= supply[f]`
-  - $\sum_{f\in F}({t_{fm}}) \ge d_m \quad \forall m\in M$ - 
-  `for (m in market)  sum(transport[, m]) >= demand[m]`
+#### Sets
 
-Let's define the problem in `lpsugar`.
+$F$ —  `factory`
+
+$M$ — `market`
+
+#### Parameters
+
+$s$ — `supply` produced by each `factory`.   
+
+$d$ — `demand` on each `market`.         
+
+$c$ — `cost` to transport a unit from each `factory` to each `market`. 
+
+#### Variable
+
+$x$ — `x` units transported from each `factory` to each `market`.
+
+#### Objective Function
+
+We want to minimize the total cost of transporting the products.
+
+$$
+\min \sum_{f \in F} \sum_{m \in M} {c_{fm} x_{fm}}
+$$
+
+```r
+minimize sum_over(f = factory, m = market, cost[f, m] * x[f, m])
+```
+
+#### Constraints
+
+From each factory, the units transported must be less than or equal to the supply of the factory.
+
+$$
+\sum_{m\in M}{x_{fm}} \le s_f \quad \forall f\in F
+$$
+
+
+```r
+for (f in factory) sum(x[f, ]) <= supply[f]
+```
+
+To each market, the units transported must be greater or equal to the demand of the market.
+
+$$
+\sum_{f\in F}{x_{fm}} \ge d_m \quad \forall m\in M
+$$
+```r
+for (m in market)  sum(x[, m]) >= demand[m]
+```
+
+### Writing the Problem
+
+The problem can be defined in `lpsugar` with the following code.
 
 ```{r}
-# Sets
-factory <- c("A", "B")
-market  <- c("Barcelona", "Paris", "Rome")
+supply <- c(BLB = 20, ACO = 25, GRN = 15)
+demand <- c(Madrid = 8, Barcelona = 10, Valencia = 12, Seville = 10)
 
-# Parameters
-supply <- c(A = 20, B = 50)
-demand <- c(Barcelona = 30, Paris = 15, Rome = 25)
+factory <- names(supply)
+market <- names(demand)
+
 cost <- c(
-    # Bar, Par, Rome
-       30,  12,  32,
-       16,  18,  40
+    2, 7, 3, 1,
+    6, 2, 9, 2,
+    4, 6, 2, 8
 ) |> parameter(factory, market)
 
-# Problem
 transportation_problem <- lp_problem() |> 
     lp_variable(
-        transport[factory, market],
+        x[factory, market], 
+        integer = TRUE, 
         lower = 0
     ) |> 
     lp_minimize(
-        sum(cost * transport)
+        sum_over(f = factory, m = market, x[f, m] * cost[f, m])
     ) |> 
     lp_constraint(
-        for (f in factory) sum(transport[f, ]) <= supply[f],
-        for (m in market)  sum(transport[, m]) >= demand[m]
+        for (f in factory) sum(x[f, ]) <= supply[f],
+        for (m in market)  sum(x[, m]) >= demand[m]
     )
 ```
+
+### Solving the Problem
 
 To solve it, you can use any of `ROI`'s applicable solvers. One option is to
 load only the desired solver with `library(ROI.plugin.<solver>)` and another
@@ -83,13 +117,13 @@ is to load all of `ROI` with `library(ROI)` and let it choose the solver automat
 
 ```{r}
 library(ROI.plugin.highs)
-solution <- lp_solve(transportation_problem)
+solution <- lp_solve(transportation_problem, solver = "highs")
 solution$objective
 solution$variables
 ```
 
 
-## Basic Elements
+## Elements of a Problem
 
 ### Sets
 
