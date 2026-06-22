@@ -22,8 +22,12 @@ library(ROI.plugin.nloptr)
 ## Constrained Maximum Likelihood
 
 Say we have a list $x$ of vectors $x_i = \{x_{i1}, \dots, x_{im}\}$. Each vector
-is generated from a $\text{Normal}(\mu_i, \sigma)$. The catch is this: each $\mu$ is greater
+is generated from a $\text{Normal}(\mu_i, \sigma)$. The catch is that each $\mu$ is greater
 than the previous:
+
+$$
+x_{ij} \sim \text{Normal}(\mu_i, \sigma) \qquad \forall i\in[1,n],\ j\in[1,m_i]
+$$
 
 $$
 \mu_i \ge \mu_{i-1} \qquad \forall i \in [2,n]
@@ -37,7 +41,7 @@ set.seed(101)
 n <- 5
 m <- runif(n, 4, 8) |> round()
 
-true_mu <- -0.5 + cumsum(runif(n, 0, 1))
+true_mu <- 3 + cumsum(runif(n, 0, 1))
 true_sigma <- 7
 
 x <- list()
@@ -53,15 +57,15 @@ We will find $\mu$ and $\sigma$ by maximum likelihood. Here's the function that 
 the loglikelihood. It's arguments *must* be the variables of the problem.
 
 ```{r}
-loglikelihood <- function(mu, sigma) {
-    ll <- 0
+loglikelihood_x <- function(mu, sigma) {
+    LL <- 0
     
     for (i in 1:n) {
-        lli <- dnorm(x[[i]], mean = mu[i], sd = sigma, log = TRUE)
-        ll <- ll + sum(lli)
+        LL_i <- dnorm(x[[i]], mean = mu[i], sd = sigma, log = TRUE)
+        LL <- LL + sum(LL_i)
     }
     
-    return(ll)
+    return(LL)
 }
 ```
 
@@ -71,8 +75,10 @@ Now we solve the problem.
 constrained_mle <- lp_problem() |> 
     lp_var(mu[1:n]) |> 
     lp_var(sigma, lower = 0) |> 
-    lp_max_fun(loglikelihood) |> 
-    lp_con(for (i in 2:n) mu[i] >= mu[i-1]) |> 
+    lp_max_fun(loglikelihood_x) |> 
+    lp_con(
+        for (i in 2:n) mu[i] >= mu[i-1]
+    ) |> 
     lp_solve(
         solver = "nloptr.cobyla",
         start = list(mu = rep(0, n), sigma = 1)
@@ -81,19 +87,43 @@ constrained_mle <- lp_problem() |>
 constrained_mle
 ```
 
+```{r}
+unconstrained_mu <- sapply(x, mean)
+constrained_mu <- constrained_mle$variables$mu
+```
+
 ```{r echo=FALSE}
-unconstrained_means <- sapply(x, mean)
-cbind(
-    unconstrained_means = unconstrained_means,
-    constrained_mle = constrained_mle$variables$mu,
+show_mu <- rbind(
+    unconstrained_mu = unconstrained_mu,
+    constrained_mu = constrained_mu,
     true_mu = true_mu
-) |> round(2)
+)
+
+colnames(show_mu) <- paste0("mu[", seq_along(x), "]")
+round(show_mu, 2)
 ```
 
 Constrained optimization gives a better result.
 
 ```{r}
-cor(unconstrained_means, true_mu)
-cor(constrained_mle$variables$mu, true_mu)
+cor(unconstrained_mu, true_mu)
+cor(constrained_mu, true_mu)
+```
+
+We also get an estimator for $\sigma$.
+
+```{r}
+constrained_sigma <- constrained_mle$variables$sigma
+```
+
+
+```{r echo=FALSE}
+show_sigma <- rbind(
+    constrained_sigma = constrained_sigma,
+    true_sigma = true_sigma
+)
+
+colnames(show_sigma) <- "sigma"
+round(show_sigma, 2)
 ```
 
