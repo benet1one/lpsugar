@@ -190,7 +190,7 @@ test_that("variable indexing", {
 
     expect_error(
         t(ThreeD[, , 1]),
-        "Index it with `ThreeD"
+        "Index it with `x\\[..., drop = TRUE\\]"
     )
     expect_snapshot(
         t(ThreeD[, , 1, drop = TRUE])
@@ -198,11 +198,11 @@ test_that("variable indexing", {
 
     expect_error(
         y[[1]],
-        "Double indexing `y\\[\\[i\\]\\]` not supported for <lp_variable>"
+        "Double indexing `x\\[\\[i\\]\\]` not supported for <lp_variable>"
     )
     expect_error(
         y[[1]] <- 2,
-        "Double indexing `y\\[\\[i\\]\\]` not supported for <lp_variable>"
+        "Double indexing `x\\[\\[i\\]\\]` not supported for <lp_variable>"
     )
 })
 

@@ -72,8 +72,7 @@ sum.lp_variable <- function(x, ..., na.rm = FALSE) {
         x <- x + sum(..., na.rm = na.rm)
     }
 
-    x$raw <- FALSE
-    return(x)
+    transformed_variable(x)
 }
 #' @export
 mean.lp_variable <- function(x, ...) {
@@ -113,9 +112,7 @@ cumsum_v <- function(x, call) {
     }
 
     x$add[] <- cumsum(x$add)
-    x$raw <- FALSE
-
-    return(x)
+    transformed_variable(x)
 }
 
 
@@ -284,8 +281,8 @@ parse_margin <- function(margin, variable) {
         return(margin)
     }
     if (rlang::is_character(margin)) {
-        if (!variable$raw) {
-            cli_abort("Character `MARGIN` is only supported for unmodified variables.")
+        if (is_transformed_lp_variable(variable)) {
+            cli_abort("Character `MARGIN` is only supported for non-transformed variables.")
         }
 
         dnn <- names(dimnames(variable))
