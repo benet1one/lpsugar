@@ -48,9 +48,6 @@
 #' The values represent addends, modified when adding the variable and a constant.
 #' Used for objective, constraints and aliases.
 #'
-#' - `$raw` : Boolean indicating if the variable has been modified in any way
-#' (indexed, multiplied, summed, ...) or remains as defined.
-#'
 #' @export
 #'
 #' @example inst/examples/example_variable.R
@@ -144,8 +141,7 @@ lp_variable <- function(.problem, definition,
         scalar = def$scalar,
         ind = ind,
         coef = coef,
-        add = add,
-        raw = TRUE
+        add = add
 
     ) |> structure(class = "lp_variable")
 
@@ -182,6 +178,20 @@ update_variables <- function(.problem, field = "variables") {
 
     .problem[[field]] <- vars
     .problem
+}
+
+transformed_variable <- function(x) {
+    x$name    <- NULL
+    x$lower   <- NULL
+    x$upper   <- NULL
+    x$type    <- NULL
+    x$integer <- NULL
+    x$scalar  <- NULL
+    # x$binary is not removed, since it's updated from the transformation
+    # fields x$ind, x$coef, x$add are necessary
+    
+    class(x) <- c("transformed_lp_variable", "lp_variable")
+    return(x)
 }
 
 # Alias ----------------------
@@ -262,17 +272,6 @@ lp_fix_vars <- function(.problem, ...) {
 
 #' @export
 print.lp_variable <- function(x, ...) {
-    if (!x$raw) {
-        fields <- if (is_quadratic(x)) {
-            c(c("q_coef", "coef", "add"))
-        } else {
-            c("coef", "add")
-        }
-
-        unclass(x)[fields] |> print()
-        return(invisible(x))
-    }
-
     if (x$binary) {
         cat("Binary ")
     } else if (x$integer) {
@@ -308,6 +307,17 @@ print.lp_variable <- function(x, ...) {
     }
 
     cat("\n")
+    invisible(x)
+}
+#' @export
+print.transformed_lp_variable <- function(x, ...) {
+    fields <- if (is_quadratic(x)) {
+        c(c("q_coef", "coef", "add"))
+    } else {
+        c("coef", "add")
+    }
+    
+    unclass(x)[fields] |> print()
     invisible(x)
 }
 #' @export
@@ -404,8 +414,8 @@ bind_vv <- function(x, y) {
 
     z$coef <- rbind(x$coef, y$coef) |> robust_index()
     z$add  <- rbind(x$add,  y$add)  |> robust_index()
-    z$raw  <- FALSE
-    return(z)
+    
+    transformed_variable(z)
 }
 bind_vc <- function(x, y) {
     x$ind <- c(x$ind, numeric(length(y))) |>
@@ -428,8 +438,7 @@ bind_vc <- function(x, y) {
         matrix(y, ncol = 1L)
     ) |> robust_index()
 
-    x$raw <- FALSE
-    return(x)
+    transformed_variable(x)
 }
 bind_cv <- function(x, y) {
     i <- c(seq_along(x) + length(y), seq_along(y))
@@ -456,7 +465,6 @@ bind_cv <- function(x, y) {
 
     old_ind <- c(old_ind)
     x$ind <- x$ind[..., drop = drop]
-    x$raw <- FALSE
 
     if (is_quadratic(x)) {
         x$q_coef <- x$q_coef[old_ind]
@@ -465,7 +473,7 @@ bind_cv <- function(x, y) {
     x$coef <- x$coef[old_ind, ]
     x$add <- x$add[old_ind, ]
 
-    x
+    transformed_variable(x)
 }
 #' @export
 `[<-.lp_variable` <- function(x, ..., value) {
@@ -495,11 +503,9 @@ bind_cv <- function(x, y) {
         x$add[i] <- y$add
         
         x$binary <- x$binary && y$binary
-        x$raw <- FALSE
-        
-        return(x)
-        
-    } else if (is.numeric(value) || is.logical(value)) {
+        return(transformed_variable(x))
+    } 
+    else if (is.numeric(value) || is.logical(value)) {
         y <- recycle_const(as.numeric(value), length(i))
         
         if (is_quadratic(x)) {
@@ -510,29 +516,26 @@ bind_cv <- function(x, y) {
         x$add[i] <- y
         
         x$binary <- x$binary && is.logical(value)
-        x$raw <- FALSE
-        
-        return(x)
-        
-    } else {
-        cli_abort(c(
-            "Replacement value must be numeric or an <lp_variable>.",
-            "x" = "Instead is <{class(value)[1]}>"
-        ))
+        return(transformed_variable(x))
     }
+    
+    cli_abort(c(
+        "Replacement value must be numeric or an <lp_variable>.",
+        "x" = "Instead is <{class(value)[1]}>"
+    ))
 }
 #' @export
 `[[.lp_variable` <- function(x, ...) {
     cli_abort(c(
-        "Double indexing `{x$name}[[i]]` not supported for <lp_variable>.",
-        ">" = "Use `{x$name}[i]` instead."
+        "Double indexing `x[[i]]` not supported for <lp_variable>.",
+        ">" = "Use `x[i]` instead."
     ))
 }
 #' @export
 `[[<-.lp_variable` <- function(x, i, value) {
     cli_abort(c(
-        "Double indexing `{x$name}[[i]]` not supported for <lp_variable>.",
-        ">" = "Use `{x$name}[i] <- value}` instead."
+        "Double indexing `x[[i]]` not supported for <lp_variable>.",
+        ">" = "Use `x[i] <- value` instead."
     ))
 }
 
@@ -546,7 +549,7 @@ t.lp_variable <- function(x) {
     if (ndim(x) > 2L) {
         cli_abort(c(
             "Variable must be two-dimensional. ",
-            ">" = "Index it with `{x$name}[..., drop = TRUE]` to drop unnecessary dimensions."
+            ">" = "Index it with `x[..., drop = TRUE]` to drop unnecessary dimensions."
         ))
 
     } else if (ndim(x) == 1L) {
@@ -693,8 +696,8 @@ recycle_var <- function(x, n) {
 
         x$coef <- x$coef[i, ]
         x$add <- x$add[i, ]
-        x$raw <- FALSE
-        return(x)
+        
+        return(transformed_variable(x))
     }
 
     cli_abort("Attempt to recycle variable of length {length(x)} to length {n}.")

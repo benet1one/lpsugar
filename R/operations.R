@@ -152,10 +152,9 @@ add_v_v <- function(x, y, call) {
 
     out$coef <- x$coef + y$coef
     out$add <- out$add + y$add
-    out$raw <- FALSE
     out$binary <- FALSE
 
-    return(out)
+    transformed_variable(out)
 }
 # var + constant
 add_v_c <- function(x, c, call) {
@@ -166,10 +165,9 @@ add_v_c <- function(x, c, call) {
     c <- recycle_const(c, max_n)
 
     x$add <- x$add + c
-    x$raw <- FALSE
     x$binary <- FALSE
 
-    return(x)
+    transformed_variable(x)
 }
 
 
@@ -207,10 +205,9 @@ multiply_v_c <- function(x, c, call) {
 
     x$coef <- horizontal_multiply(x$coef, c)
     x$add <- x$add * c
-    x$raw <- FALSE
     x$binary <- FALSE
 
-    return(x)
+    transformed_variable(x)
 }
 # var * var
 multiply_v_v <- function(x, y, call) {
@@ -240,9 +237,7 @@ multiply_v_v <- function(x, y, call) {
         horizontal_multiply(y$coef, x$add)
 
     out$add <- x$add * y$add
-
-    out$raw <- FALSE
-    return(out)
+    transformed_variable(out)
 }
 
 # var / constant
@@ -284,24 +279,22 @@ power_v_c <- function(x, c, call) {
 
     x$coef[c == 0, ] <- 0
     x$add[c == 0, ] <- 1
-    x$raw <- FALSE
-    return(x)
+    
+    transformed_variable(x)
 }
 
 # Logic ------------------------
 
 negate_v <- function(x, call) {
     if (!x$binary) {
-        cli_abort("Negation `!{x$name}` is only supported for binary variables.", call = call)
+        cli_abort("Negation `!x` is only supported for binary variables.", call = call)
     }
 
     # 1 - x
     x$coef <- -x$coef
     x$add <- -x$add + 1
-    x$raw <- FALSE
-    # x$binary <- FALSE
 
-    return(x)
+    transformed_variable(x)
 }
 
 # Matrix Operations -------------
@@ -355,7 +348,6 @@ matrix_multiply_v_c <- function(x, y, call) {
 
     out$coef <- out$coef[integer(), , drop = TRUE]
     out$add <- out$add[integer(), , drop = TRUE]
-    out$raw <- FALSE
 
     for (j in 1:ncol(y)) for (i in 1:nrow(x)) {
         z <- sum(x[i, ] * y[, j])
@@ -365,7 +357,8 @@ matrix_multiply_v_c <- function(x, y, call) {
 
     out$coef <- robust_index(out$coef)
     out$add <- robust_index(out$add)
-    return(out)
+    
+    transformed_variable(out)
 }
 
 # var %*% var
@@ -401,7 +394,6 @@ matrix_multiply_v_v <- function(x, y, call) {
     out$q_coef <- list()
     out$coef <- out$coef[integer(), , drop = TRUE]
     out$add <- out$add[integer(), , drop = TRUE]
-    out$raw <- FALSE
 
     for (j in 1:ncol(y)) for (i in 1:nrow(x)) {
         z <- sum(x[i, ] * y[, j])
@@ -412,7 +404,8 @@ matrix_multiply_v_v <- function(x, y, call) {
 
     out$coef <- robust_index(out$coef)
     out$add <- robust_index(out$add)
-    return(out)
+    
+    transformed_variable(out)
 }
 
 # Methods -----------------------

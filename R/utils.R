@@ -286,6 +286,9 @@ is_problem <- function(x) {
 is_lp_variable <- function(x) {
     inherits(x, "lp_variable")
 }
+is_transformed_lp_variable <- function(x) {
+    inherits(x, "transformed_lp_variable")
+}
 is_lp_objective <- function(x) {
     inherits(x, "lp_objective")
 }

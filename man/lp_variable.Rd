@@ -79,8 +79,6 @@ by a constant. Used for objective, constraints and aliases.
 \item \verb{$add} : Numeric column vector. The number of rows is the length of the variable.
 The values represent addends, modified when adding the variable and a constant.
 Used for objective, constraints and aliases.
-\item \verb{$raw} : Boolean indicating if the variable has been modified in any way
-(indexed, multiplied, summed, ...) or remains as defined.
 }
 }
 \description{
