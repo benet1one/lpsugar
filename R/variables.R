@@ -602,7 +602,7 @@ t.lp_variable <- function(x) {
 # Used in lp_variable()
 # Gets variable name, dim, and dimnames/sets
 parse_variable_definition <- function(definition) {
-    def <- rlang::enquo(definition) |> inside()
+    def <- rlang::enquo(definition)
     expr <- rlang::get_expr(def)
     env  <- rlang::get_env(def)
     

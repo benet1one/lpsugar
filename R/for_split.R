@@ -11,7 +11,7 @@ check_for_split <- function(quosure, call = parent.frame()) {
 
 for_split <- function(quosure, data = NULL) {
     check_for_split(quosure, call = parent.frame())
-    expr <- rlang::get_expr(quosure) |> inside()
+    expr <- rlang::get_expr(quosure)
     env <- rlang::get_env(quosure)
     
     if (!is_loop(expr)) {

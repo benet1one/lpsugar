@@ -400,33 +400,6 @@ lp_eval <- function(.problem, expr, split_for = FALSE) {
     }
 }
 
-inside <- function(expr) {
-    if (!rlang::is_symbolic(expr)) {
-        return(expr)
-    }
-    
-    if (rlang::is_quosure(expr)) {
-        env <- rlang::quo_get_env(expr)
-        expr <- rlang::quo_get_expr(expr)
-        expr <- inside(expr)
-        return(rlang::new_quosure(expr, env))
-    }
-    
-    if (rlang::is_symbol(expr)) {
-        return(expr)
-    }
-    
-    if (expr[[1L]] == quote(`(`)) {
-        return(expr[[2]])
-    }
-    
-    if (expr[[1L]] == quote(`{`) && length(expr) == 2L) {
-        return(expr[[2]])
-    }
-    
-    expr
-}
-
 # Printing ------------------------
 
 print_field_name <- function(name) {

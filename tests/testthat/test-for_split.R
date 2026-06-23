@@ -6,11 +6,11 @@ test_that("for_split works", {
     p <- lp_problem() |>
         lp_var(x[a, b])
 
-    q1 <- rlang::quo({
+    q1 <- rlang::quo(
         for (i in 1:3) {
             i^2
         }
-    })
+    )
 
     for_split(q1) |> expect_snapshot()
 
