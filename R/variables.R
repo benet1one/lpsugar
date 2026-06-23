@@ -54,33 +54,33 @@
 lp_variable <- function(.problem, definition,
                         integer = FALSE, binary = FALSE,
                         lower = -Inf, upper = +Inf) {
-
+    
     check_problem(.problem)
     if (missing(definition)) {
         cli_abort("Argument `definition` is missing, with no default.")
     }
-
+    
     def <- parse_variable_definition({{ definition }})
-
+    
     name <- def$name
     sets <- def$sets
     dnames <- dimnames_non_numeric(sets)
-
+    
     if (name %in% names(.problem$variables)) {
         cli_abort("Variable `{name}` already exists in this problem.")
     } 
     else if (name %in% names(.problem$aliases)) {
         cli_abort("Cannot override alias `{name}`.")
     }
-
+    
     stopifnot(
         rlang::is_bool(integer),
         rlang::is_bool(binary)
     )
-
+    
     lower <- interpret_bound(lower, "lower", default = -Inf, dim = lengths(sets))
     upper <- interpret_bound(upper, "upper", default = +Inf, dim = lengths(sets))
-
+    
     if (any(lower > upper)) {
         cli_abort("`lower` bound ({lower}) cannot be greater than `upper` bound ({upper}).")
     } 
@@ -90,7 +90,7 @@ lp_variable <- function(.problem, definition,
     else if (any(upper == -Inf)) {
         cli_abort("`upper` bound cannot be -Inf.")
     }
-
+    
     if (binary) {
         if (any(lower > 1)) {
             cli_abort("`lower` bound cannot be greater than 1 for a binary variable.")
@@ -98,12 +98,12 @@ lp_variable <- function(.problem, definition,
         if (any(upper < 0)) {
             cli_abort("`upper` bound cannot be less than 0 for a binary variable.")
         }
-
+        
         integer <- TRUE
         lower <- pmax(lower, 0)
         upper <- pmin(upper, 1)
     }
-
+    
     type <- if (binary && all(lower == 0) && all(upper == 1)) {
         "B"
     } 
@@ -113,7 +113,7 @@ lp_variable <- function(.problem, definition,
     else {
         "C"
     }
-
+    
     # Index array of variable.
     # Indicates which objective coefficients correspond to this variable.
     if (def$scalar) {
@@ -130,32 +130,32 @@ lp_variable <- function(.problem, definition,
         attr(.problem, "varnames"),
         name_variable(name, sets)
     )
-
+    
     add <- matrix(0, nrow = length(ind), ncol = 1L) |> robust_index()
     coef <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> robust_index()
     coef[, ind] <- diag(length(ind))
-
+    
     new_variable <- list(
         name = name,
         lower = lower,
         upper = upper,
-
+        
         type = type,
         integer = integer,
         binary = binary,
-
+        
         scalar = def$scalar,
         ind = ind,
         coef = coef,
         add = add
-
+        
     ) |> structure(class = "lp_variable")
-
+    
     .problem$variables <- append(
         .problem$variables,
         list(new_variable) |> rlang::set_names(name)
     )
-
+    
     .problem <- update_variables(.problem, field = "variables")
     .problem <- update_variables(.problem, field = "aliases")
     .problem <- update_objective(.problem)
@@ -167,10 +167,10 @@ update_variables <- function(.problem, field = "variables") {
     total_vars <- ncol(.problem)
     varnames <- variable.names(.problem)
     vars <- .problem[[field]]
-
+    
     for (i in names(vars)) {
         x <- vars[[i]]
-
+        
         x$coef <- cbind(
             x$coef,
             matrix(
@@ -179,13 +179,13 @@ update_variables <- function(.problem, field = "variables") {
                 ncol = total_vars - ncol(x$coef)
             )
         )
-
+        
         x$coef <- robust_index(x$coef)
         colnames(x$coef) <- varnames
-
+        
         vars[[i]] <- x
     }
-
+    
     .problem[[field]] <- vars
     .problem
 }
@@ -291,23 +291,23 @@ print.lp_variable <- function(x, ...) {
     else {
         cat("Real ")
     }
-
+    
     if (length(x) == 1L) {
         cat("scalar ")
     } 
     else {
         cat("variable ")
     }
-
+    
     cat("'")
     cat(x$name)
-
+    
     if (length(x) > 1L) {
         cat("[", paste(names(dimnames(x)), collapse = ", "), "]", sep = "")
     }
-
+    
     cat("'")
-
+    
     if (length(x$lower) == 1L && length(x$upper) == 1L) {
         if (x$lower != -Inf && x$upper != +Inf) {
             cat("\n")
@@ -320,7 +320,7 @@ print.lp_variable <- function(x, ...) {
             cat("\n", x$name, " <= ", x$upper, sep = "")
         }
     }
-
+    
     cat("\n")
     invisible(x)
 }
@@ -378,33 +378,33 @@ c.lp_variable <- function(..., recursive = TRUE) {
 bind_vars <- function(...) {
     dots <- rlang::dots_list(..., .ignore_empty = "all")
     dots_expr <- rlang::enexprs(..., .ignore_empty = "all")
-
+    
     nams <- rlang::names2(dots)
     if (any(nams != "")) {
         cli_warn("ignoring named arguments in `bind_vars()`")
     }
-
+    
     len0 <- lengths(dots) == 0
     dots <- dots[!len0]
     dots_expr <- dots_expr[!len0]
-
+    
     if (length(dots) == 0) {
         return(numeric())
     }
-
+    
     for (i in seq_along(dots)) {
         x <- dots[[i]]
-
+        
         if (!is_lp_variable(x) && !is.numeric(x)) {
             e <- dots_expr[[i]] |> format1()
             cli_abort("`{e}` is not numeric or an `lp_variable`.")
         }
     }
-
+    
     purrr::reduce(dots, function(x, y) {
         xv <- is_lp_variable(x)
         yv <- is_lp_variable(y)
-
+        
         if (xv && yv) {
             bind_vv(x, y)
         } 
@@ -424,13 +424,13 @@ bind_vv <- function(x, y) {
     z$ind  <- seq_len(length(x) + length(y)) |>
         unname() |>
         robust_index()
-
+    
     if (is_quadratic(x) || is_quadratic(y)) {
         x <- as_quadratic(x)
         y <- as_quadratic(y)
         z$q_coef <- c(x$q_coef, y$q_coef)
     }
-
+    
     z$coef <- rbind(x$coef, y$coef) |> robust_index()
     z$add  <- rbind(x$add,  y$add)  |> robust_index()
     
@@ -441,22 +441,22 @@ bind_vc <- function(x, y) {
         unname() |>
         robust_index()
     x$ind[] <- seq_along(x$ind)
-
+    
     if (is_quadratic(x)) {
         yq <- list(x$q_coef[[1]] * 0) |> rep(length(y))
         x$q_coef <- c(x$q_coef, yq)
     }
-
+    
     x$coef <- rbind(
         x$coef,
         matrix(0, nrow = length(y), ncol = ncol(x$coef))
     ) |> robust_index()
-
+    
     x$add <- rbind(
         x$add,
         matrix(y, ncol = 1L)
     ) |> robust_index()
-
+    
     transformed_variable(x)
 }
 bind_cv <- function(x, y) {
@@ -473,28 +473,28 @@ bind_cv <- function(x, y) {
 `[.lp_variable` <- function(x, ..., drop = FALSE) {
     old_ind <- x$ind
     old_ind[] <- seq_along(old_ind)
-
+    
     old_ind <- rlang::try_fetch(
         old_ind[..., drop = drop], 
         error = identity
     )
-
+    
     if (rlang::is_condition(old_ind)) {
         dots <- rlang::enexprs(..., .ignore_empty = "none")
         call <- rlang::expr((!!substitute(x))[!!!dots])
         cli_abort(old_ind$message, call = call)
     }
-
+    
     old_ind <- c(old_ind)
     x$ind <- x$ind[..., drop = drop]
-
+    
     if (is_quadratic(x)) {
         x$q_coef <- x$q_coef[old_ind]
     }
-
+    
     x$coef <- x$coef[old_ind, ]
     x$add <- x$add[old_ind, ]
-
+    
     transformed_variable(x)
 }
 #' @export
@@ -578,15 +578,15 @@ t.lp_variable <- function(x) {
     if (ndim(x) == 1L) {
         x$ind <- matrix(x$ind, ncol = 1L)
     }
-
+    
     present_ind <- x$ind
     present_ind[] <- seq_along(present_ind)
     present_ind <- t(present_ind)
     present_ind <- c(present_ind)
-
+    
     y <- x[present_ind]
     y$ind <- t(x$ind)
-
+    
     return(y)
 }
 
@@ -596,12 +596,12 @@ parse_variable_definition <- function(definition) {
     def <- rlang::enquo(definition) |> inside()
     expr <- rlang::get_expr(def)
     env  <- rlang::get_env(def)
-
+    
     error_msg <- c(
         "Failed to parse variable.",
         "i" = "See `?lp_variable` for details on how to define a variable."
     )
-
+    
     if (rlang::is_string(expr)) {
         sets <- list(scalar = "")
         return(list(name = expr, scalar = TRUE, sets = sets))
@@ -613,26 +613,26 @@ parse_variable_definition <- function(definition) {
     } 
     else if (expr[[1]] == quote(`[`)) {
         name <- expr[[2]]
-
+        
         if (!rlang::is_symbol(name) && !rlang::is_string(name)) {
             cli_abort(error_msg, call = parent.frame())
         }
-
+        
         name <- format(name)
         sets_exprs <- as.list(expr[3:length(expr)])
-
+        
         sets_names <- rlang::names2(sets_exprs)
         unnamed <- sets_names == ""
         sets_names[unnamed] <- sets_exprs[unnamed] |> sapply(format1)
-
+        
         for (s in sets_exprs) if (rlang::is_missing(s)) {
             cli_abort("Sets in `{name}[...]` cannot be missing.", call = parent.frame())
         }
-
+        
         sets <- sets_exprs |>
             lapply(eval, envir = env) |>
             rlang::set_names(sets_names)
-
+        
         for (s in seq_along(sets)) {
             check_variable_set(
                 set = sets[[s]],
@@ -640,30 +640,30 @@ parse_variable_definition <- function(definition) {
                 call = parent.frame()
             )
         }
-
+        
         return(list(name = name, scalar = FALSE, sets = sets))
     }
-
+    
     cli_abort(error_msg, call = parent.frame())
 }
 check_variable_set <- function(set, name, call = environment()) {
     if (!rlang::is_atomic(set)) {
         cli_abort("Set `{name}` is not atomic.", call = call)
     }
-
+    
     nd <- ndim(set, drop = TRUE)
-
+    
     if (nd != 1L) {
         cli_warn(
             "Set `{name}` is {nd}-dimensional, results may be unexpected.", 
             call = call
         )
     }
-
+    
     if (is.numeric(set) && any(set != seq_along(set))) {
         cli_abort(
             c("Numeric sets like `{name}` must go from 1 to n.",
-            ">" = "Use character sets for more flexibility."),
+              ">" = "Use character sets for more flexibility."),
             call = call
         )
     }
@@ -676,14 +676,14 @@ interpret_bound <- function(bound, bound_name, default, dim) {
         )
         return(default)
     }
-
+    
     if (length(bound) > 1L && !all(dim2(bound) == dim)) {
         cli_abort(
             "`dim({bound_name})` different from `dim(variable)`.",
             call = parent.frame()
         )
     }
-
+    
     if (anyNA(bound)) {
         cli_warn(
             "`{bound_name}` bound containts NA values, setting to {default}.", 
@@ -691,11 +691,11 @@ interpret_bound <- function(bound, bound_name, default, dim) {
         )
         bound[is.na(bound)] <- default
     }
-
+    
     if (!is.numeric(bound)) {
         cli_abort("`{bound_name}` bound is not numeric.", call = parent.frame())
     }
-
+    
     bound
 }
 name_variable <- function(name, sets) {
@@ -714,17 +714,17 @@ recycle_var <- function(x, n) {
     else if (length(x) == 1L) {
         i <- rep(1L, n)
         x$ind <- x$ind[i]
-
+        
         if (is_quadratic(x)) {
             x$q_coef <- x$q_coef[i]
         }
-
+        
         x$coef <- x$coef[i, ]
         x$add <- x$add[i, ]
         
         return(transformed_variable(x))
     }
-
+    
     cli_abort("Attempt to recycle variable of length {length(x)} to length {n}.")
 }
 recycle_const <- function(x, n) {
@@ -734,6 +734,6 @@ recycle_const <- function(x, n) {
     else if (length(x) == 1L) {
         return(rep(x, n))
     }
-
+    
     cli_abort("Attempt to recycle array of length {length(x)} to length {n}.")
 }

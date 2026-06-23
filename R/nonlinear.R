@@ -32,7 +32,7 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
         hessian = hessian_x,
         expr = expr
     )
-
+    
     .problem
 }
 

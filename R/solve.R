@@ -33,7 +33,7 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     check_problem(.problem)
     op <- as.OP(.problem)
     applicable <- ROI::ROI_applicable_solvers(op)
-
+    
     if (length(applicable) == 0L) {
         roi_url <- "https://roi.r-forge.r-project.org/installation.html#ROI_plug-ins"
         cli_abort(c(
@@ -43,7 +43,7 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
             "i" = "See {.url {roi_url}} for instructions on how to install each solver."
         ))
     }
-
+    
     control <- rlang::dots_list(...)
     
     if (!missing(start)) {
@@ -60,13 +60,13 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
         solver = solver,
         control = control
     )
-
+    
     sol <- pretty_solution(
         .problem,
         solution = roi_sol,
         binary_as_logical = binary_as_logical
     )
-
+    
     sol$op <- op
     sol$roi_solution <- roi_sol
     return(sol)
@@ -76,7 +76,7 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
 #' @export
 lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
     check_problem(.problem)
-
+    
     .problem |>
         lp_minimize(0) |>
         lp_solve(binary_as_logical = binary_as_logical, ...)
@@ -100,7 +100,7 @@ ROI_objective_from_lpsugar <- function(problem) {
 
 ROI_constraint_from_lpsugar <- function(problem) {
     check_problem(problem, field_name = "problem")
-
+    
     if (length(problem$constraints) == 0L) {
         ROI::NO_constraint(n_obj = ncol(problem))
     } 
@@ -121,7 +121,7 @@ as.L_objective.lp_problem <- function(x) {
     if (is_quadratic(x$objective)) {
         cli_abort("Objective function is quadratic, use `as.Q_objective()` instead.")
     }
-
+    
     ROI::L_objective(
         L = x$objective$coef,
         names = attr(x, "varnames")
@@ -162,15 +162,15 @@ as.F_objective.lp_problem <- function(x) {
 #' @export
 as.L_constraint.lp_problem <- function(x, ...) {
     rlang::check_dots_empty()
-
+    
     if (length(x$constraints) == 0L) {
         return(ROI::NO_constraint(n_obj = ncol(x)))
     }
-
+    
     if (is_quadratic(x$constraints)) {
         cli_abort("Problem has quadratic constraints, use `as.Q_constraint()` instead.")
     }
-
+    
     ROI::L_constraint(
         L = x$constraints$lhs,
         dir = c(x$constraints$dir),
@@ -183,7 +183,7 @@ as.L_constraint.lp_problem <- function(x, ...) {
 #' @export
 as.Q_constraint.lp_problem <- function(x, ...) {
     rlang::check_dots_empty()
-
+    
     if (length(x$constraints) == 0L) {
         return(ROI::NO_constraint(n_obj = ncol(x)))
     }
@@ -218,12 +218,12 @@ ROI::ROI_solve
 #' @example inst/examples/example_solve_steps.R
 as.OP.lp_problem <- function(x) {
     check_problem(x, field_name = "problem")
-
+    
     # No variables
     if (ncol(x) == 0L) {
         cli_abort("Problem has no variables. Define them with `lp_variable()`.")
     }
-
+    
     if (x$objective$type == "undefined") {
         cli_abort(c(
             paste(
@@ -247,32 +247,32 @@ as.OP.lp_problem <- function(x) {
     else {
         cli_abort("`$objective$direction` should be either 'minimize' or 'maximize'.")
     }
-
+    
     objective <- ROI_objective_from_lpsugar(x)
     constraints <- ROI_constraint_from_lpsugar(x)
-
+    
     types <- character(ncol(x))
     lower <- numeric(ncol(x))
     upper <- numeric(ncol(x))
-
+    
     for (v in x$variables) {
         types[v$ind] <- v$type
         lower[v$ind] <- v$lower
         upper[v$ind] <- v$upper
     }
-
+    
     # Bound indices and bounds
     li <- which(lower != 0)
     ui <- which(is.finite(upper))
     lb <- lower[li]
     ub <- upper[ui]
-
+    
     bounds <- ROI::V_bound(
         li = li, ui = ui,
         lb = lb, ub = ub,
         nobj = ncol(x)
     )
-
+    
     ROI::OP(
         objective = objective,
         maximum = maximize,
@@ -302,7 +302,7 @@ as.OP.lp_problem <- function(x) {
 pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     check_problem(problem, field_name = "problem")
     check_roi_solution(solution)
-
+    
     if (length(solution$solution) == 0) {
         out <- list(
             objective = NA_real_,
@@ -310,10 +310,10 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
             status = solution$status,
             message = solution$message
         ) |> structure(class = "lp_solution")
-
+        
         return(out)
     }
-
+    
     vars <- variables_to_list(
         solution$solution, 
         problem = problem, 
@@ -323,7 +323,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     
     als <- compute_aliases(problem, solution$solution)
     objective <- solution$objval + problem$objective$add
-
+    
     list(
         objective = objective,
         variables = vars,
@@ -396,11 +396,11 @@ lpsugar_available_solvers <- function(problem) {
 print.lp_solution <- function(x, ...) {
     if (!is.na(x$objective)) {
         print_field(x, "variables")
-
+        
         if (length(x$aliases) > 0L) {
             print_field(x, "aliases")
         }
-
+        
         print_field(x, "objective")
         cat("\n")
     }

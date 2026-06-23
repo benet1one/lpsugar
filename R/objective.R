@@ -3,7 +3,7 @@ lp_objective <- function(.problem, objective) {
     quosure <- rlang::enquo(objective)
     expr <- rlang::as_label(quosure)
     objective <- rlang::eval_tidy(quosure, data = data_mask(.problem))
-
+    
     if (is.numeric(objective) && length(objective) == 1L && objective == 0) {
         .problem$objective <- new_objective(
             .problem,
@@ -15,7 +15,7 @@ lp_objective <- function(.problem, objective) {
         
         return(.problem)
     }
-
+    
     if (!is_lp_variable(objective)) {
         cli_abort(c(
             "`objective` must be an expression containing variables.",
@@ -33,7 +33,7 @@ lp_objective <- function(.problem, objective) {
         )
         expr <- paste0("sum(", expr, ")")
     }
-
+    
     .problem$objective <- new_objective(
         .problem,
         type = if (is_quadratic(objective)) "quadratic" else "linear",
@@ -142,12 +142,12 @@ print.lp_objective <- function(x, ...) {
         cat("no objective function\n\n")
         return(invisible(x))
     }
-
+    
     if (x$type == "feasible") {
         cat("find a feasible solution\n\n")
         return(invisible(x))
     }
-
+    
     cat(
         x$direction, " ", x$type, " function:\n",
         x$expr, "\n\n", 
@@ -174,7 +174,7 @@ update_objective <- function(.problem) {
     
     n_before <- length(.problem$objective$coef)
     n_after <- ncol(.problem)
-
+    
     if (is_quadratic(.problem$objective)) {
         .problem$objective$q_coef$nrow <- n_after
         .problem$objective$q_coef$ncol <- n_after
@@ -183,12 +183,12 @@ update_objective <- function(.problem) {
             attr(.problem, "varnames")
         )
     }
-
+    
     .problem$objective$coef <- c(
         .problem$objective$coef,
         numeric(n_after - n_before)
     )
-
+    
     names(.problem$objective$coef) <- attr(.problem, "varnames")
     return(.problem)
 }

@@ -29,17 +29,17 @@ sum_over <- function(...) {
     dots <- rlang::enquos(..., .homonyms = "error")
     nams <- rlang::names2(dots)
     n <- length(dots)
-
+    
     if (nams[n] != "") {
         cli_abort("Last element in `...` should be an unnamed expression to sum.")
     }
     if (nams[1L] == "") {
         cli_abort("First element in `...` must be a name value pair `<ind> = <set>`")
     }
-
+    
     env <- rlang::get_env(dots[[n]])
     expr <- rlang::get_expr(dots[[n]])
-
+    
     listcomp::gen_list(!!expr, !!!dots[-n], .env = env) |>
         purrr::map(sum) |>
         purrr::reduce(`+`, .init = 0)
@@ -51,27 +51,27 @@ sum_over <- function(...) {
 #' @export
 sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     stopifnot(rlang::is_bool(na.rm))
-
+    
     varnames <- colnames(x$coef)
     x$ind <- x$ind[1]
-
+    
     if (is_quadratic(x)) {
         x$q_coef <- list(purrr::reduce(x$q_coef, `+`))
     }
-
+    
     x$coef <- colSums(x$coef) |>
         matrix(nrow = 1L) |>
         robust_index()
     x$add <- sum(x$add) |>
         matrix(nrow = 1L, ncol = 1L) |>
         robust_index()
-
+    
     colnames(x$coef) <- varnames
-
+    
     if (...length() > 0L) {
         x <- x + sum(..., na.rm = na.rm)
     }
-
+    
     transformed_variable(x)
 }
 #' @export
@@ -85,11 +85,11 @@ Math.lp_variable <- function(x, ...) {
     fun <- .Generic
     call <- paste0(fun, "(", format(substitute(x)), ")") |>
         str2lang()
-
+    
     if (fun == "cumsum") {
         return(cumsum_v(x, call))
     }
-
+    
     if (fun == "abs") {
         abs_url <- "https://optimization.cbe.cornell.edu/index.php?title=Optimization_with_absolute_values"
         message <- paste(
@@ -99,7 +99,7 @@ Math.lp_variable <- function(x, ...) {
         )
         cli_abort(message, call = call)
     }
-
+    
     cli_abort("Function `{fun}()` is not supported in a linear problem.", call = call)
 }
 
@@ -110,7 +110,7 @@ cumsum_v <- function(x, call) {
         }
         x$coef[i, ] <- x$coef[i, ] + x$coef[i-1L, ]
     }
-
+    
     x$add[] <- cumsum(x$add)
     transformed_variable(x)
 }
@@ -120,22 +120,22 @@ cumsum_v <- function(x, call) {
 
 custom_fun <- function() {
     e <- rlang::env()
-
+    
     e$diag <- function(x = 1, nrow, ncol, names = TRUE) {
         if (!is_lp_variable(x)) {
             return(base::diag(x, nrow, ncol, names))
         }
-
+        
         warn_changed_args(nrow = , ncol = , names = TRUE)
         diag_v(x)
     }
-
+    
     e$sum <- function(..., na.rm = FALSE) {
         rlang::dots_list(...) |>
             purrr::map(base::sum, na.rm = na.rm) |>
             purrr::reduce(`+`)
     }
-
+    
     # If weighted.mean is a method, it only covers the case where x is a variable
     # and not when w is a variable (which should throw an error because it's not linear)
     e$weighted.mean <- function(x, w, ..., na.rm = FALSE) {
@@ -147,10 +147,10 @@ custom_fun <- function() {
             warn_changed_args(na.rm = FALSE)
             na.rm <- FALSE
         }
-
+        
         return(stats::weighted.mean(x, w, ..., na.rm))
     }
-
+    
     e$ifelse <- function(test, yes, no) {
         if (is_lp_constraint(test)) {
             test_expr <- substitute(test) |> rlang::as_label()
@@ -174,21 +174,21 @@ custom_fun <- function() {
             base::ifelse(test, yes, no)
         }
     }
-
+    
     e$apply <- function(X, MARGIN, FUN, ..., simplify = TRUE) {
         if (!is_lp_variable(X)) {
             return(base::apply(X, MARGIN, FUN, ..., simplify = simplify))
         }
-
+        
         warn_changed_args(simplify = TRUE)
         apply_v(X, MARGIN, FUN, ...)
     }
-
+    
     e$rowSums <- function(x, na.rm = FALSE, dims = 1L) {
         if (!is_lp_variable(x)) {
             return(base::rowSums(x, na.rm, dims = dims))
         }
-
+        
         warn_changed_args(na.rm = FALSE, dims = 1L)
         apply_v(x, 1L, sum)
     }
@@ -196,7 +196,7 @@ custom_fun <- function() {
         if (!is_lp_variable(x)) {
             return(base::colSums(x, na.rm, dims = dims))
         }
-
+        
         warn_changed_args(na.rm = FALSE, dims = 1L)
         apply_v(x, 2L, sum)
     }
@@ -204,7 +204,7 @@ custom_fun <- function() {
         if (!is_lp_variable(x)) {
             return(base::rowMeans(x, na.rm, dims = dims))
         }
-
+        
         warn_changed_args(na.rm = FALSE, dims = 1L)
         apply_v(x, 1L, mean)
     }
@@ -212,7 +212,7 @@ custom_fun <- function() {
         if (!is_lp_variable(x)) {
             return(base::colMeans(x, na.rm, dims = dims))
         }
-
+        
         warn_changed_args(na.rm = FALSE, dims = 1L)
         apply_v(x, 2L, mean)
     }
@@ -223,10 +223,10 @@ custom_fun <- function() {
         if (length(margin) == 0) {
             return(sum.lp_variable(x))
         }
-
+        
         apply_v(x, margin, sum)
     }
-
+    
     return(e)
 }
 
@@ -234,14 +234,14 @@ diag_v <- function(x) {
     if (ndim(x) != 2L) {
         cli_abort("Variable is not two-dimensional.", call = parent.frame())
     }
-
+    
     present_ind <- x$ind
     present_ind[] <- seq_along(present_ind)
-
+    
     if (!is.matrix(present_ind)) {
         cli_abort("Internal error in `diag_v()`. Sorry!")
     }
-
+    
     present_ind <- base::diag(present_ind)
     x[present_ind]
 }
@@ -250,27 +250,27 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     margin <- parse_margin(margin, variable = x)
     fun <- match.fun(fun)
     simplify <- isTRUE(simplify)
-
+    
     ind <- x$ind
     ind[] <- seq_along(ind)
     ind_list <- apply(ind, margin, identity, simplify = FALSE)
-
+    
     out_list <- purrr::map(ind_list, \(i) fun(x[i], ...))
-
+    
     if (!simplify) {
         return(out_list)
     }
-
+    
     out_list <- unname(out_list)
     out <- bind_vars(!!!out_list)
-
+    
     if (!is_lp_variable(out)) {
         return(simplify2array(out))
     }
-
+    
     out_ind <- apply(ind, margin, fun, ..., simplify = FALSE) |>
         simplify2array(higher = TRUE, except = 0)
-
+    
     if (is.array(out_ind)) {
         out_ind[] <- seq_along(out_ind)
         out$ind <- out_ind |> robust_index()
@@ -278,7 +278,7 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     else {
         out$ind <- 1:nrow(out$coef)
     }
-
+    
     return(out)
 }
 parse_margin <- function(margin, variable) {
@@ -289,18 +289,18 @@ parse_margin <- function(margin, variable) {
         if (is_transformed_lp_variable(variable)) {
             cli_abort("Character `MARGIN` is only supported for non-transformed variables.")
         }
-
+        
         dnn <- names(dimnames(variable))
         margin_num <- match(margin, dnn)
-
+        
         if (anyNA(margin_num)) {
             where_na <- margin[is.na(margin_num)][1]
             cli_abort("Margin '{where_na}' does not match any dimension in `{variable$name}`.")
         }
-
+        
         return(margin_num)
     }
-
+    
     cli_abort("Invalid `MARGIN`.")
 }
 
@@ -311,7 +311,7 @@ ifelse_v <- function(test, yes, no) {
     if (is_lp_variable(yes) || is_lp_variable(no)) {
         cli_abort("If `test` is a variable, `yes` and `no` must be numbers, not variables.")
     }
-
+    
     no + test * (yes - no)
 }
 ifelse_l <- function(test, yes, no) {
@@ -341,14 +341,14 @@ ifelse_l <- function(test, yes, no) {
     else test <- if (isS4(test))
         methods::as(test, "logical")
     else as.logical(test)
-
+    
     # lpsugar code
     if (anyNA(test)) {
         cli_abort("`test` cannot contain NA values.")
     }
-
+    
     len <- length(test)
-
+    
     if (is_lp_variable(yes)) {
         yes <- recycle_var(yes, len)
     } 
@@ -358,7 +358,7 @@ ifelse_l <- function(test, yes, no) {
     else {
         cli_abort("`yes` must either be a variable or a numeric vector.")
     }
-
+    
     if (is_lp_variable(no)) {
         no <- recycle_var(no, len)
     } 
@@ -368,11 +368,11 @@ ifelse_l <- function(test, yes, no) {
     else {
         cli_abort("`no` must either be a variable or a numeric vector.")
     }
-
+    
     test <- as.numeric(test)
-
+    
     yes <- yes * test
     no <- no * (1 - test)
-
+    
     yes + no
 }

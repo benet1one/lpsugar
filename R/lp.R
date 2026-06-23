@@ -23,10 +23,10 @@ lp_problem <- function() {
             direction = "",
             expr = ""
         ) |> structure(class = "lp_objective"),
-
+        
         # Aka implicit variables (impvar)
         aliases = list()
-
+        
     ) |> structure(
         class = "lp_problem",
         n_variables = 0L, # Must equal length of objective coefficients.
@@ -43,19 +43,19 @@ print.lp_problem <- function(x, compact = TRUE, ...) {
         "\n\n",
         sep = ""
     )
-
+    
     if (length(x$variables) > 0L) {
         print_field(x, "variables")
     }
-
+    
     if (x$objective$direction != "") {
         print_field(x, "objective")
     }
-
+    
     if (length(x$constraints) > 0L) {
         print_field(x, "constraints", compact = compact)
     }
-
+    
     invisible(x)
 }
 

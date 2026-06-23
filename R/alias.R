@@ -16,16 +16,16 @@ lp_alias <- function(.problem, ...) {
     check_problem(.problem)
     dots <- rlang::enquos(...)
     nams <- rlang::names2(dots)
-
+    
     if (any(nams == "")) {
         cli_abort("Aliases must be named.")
     }
-
+    
     for (d in seq_along(dots)) {
         data <- data_mask(.problem)
         .problem <- lp_alias_internal(.problem, dots[[d]], nams[d], data)
     }
-
+    
     return(.problem)
 }
 
@@ -36,13 +36,13 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
     else if (name %in% names(.problem$aliases)) {
         cli_inform("Overriding alias `{name}`.", call = parent.frame())
     }
-
+    
     value <- rlang::eval_tidy(quosure, data = data)
-
+    
     if (!is_lp_variable(value)) {
         cli_abort("Alias `{name}` did not evaluate to a variable.", call = parent.frame())
     }
-
+    
     .problem$aliases[[name]] <- value
     return(.problem)
 }

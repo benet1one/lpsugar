@@ -3,13 +3,13 @@
 
 warn_changed_args <- function(..., env = parent.frame(), call = env) {
     expected <- rlang::enexprs(..., .named = TRUE, .homonyms = "error")
-
+    
     for (arg in names(expected)) {
         if (!exists(arg, envir = env, inherits = FALSE)) {
             cli_warn("Internal warning: unexistant argument `{arg}`.", call = env)
             next
         }
-
+        
         if (!identical(expected[[arg]], env[[arg]])) {
             cli_warn("Ignoring argument `{arg}`.", call = call)
         }
@@ -22,9 +22,9 @@ format1 <- function(x, ...) {
     if (!rlang::is_symbolic(x)) {
         return(rlang::as_label(x))
     }
-
+    
     y <- format(x, ...)
-
+    
     if (length(y) == 1L) {
         y
     } 
@@ -67,14 +67,14 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
     if (is_lp_variable(y)) {
         y <- y$ind
     }
-
+    
     if (drop_dim) {
         x <- drop(x)
         y <- drop(y)
     }
-
+    
     attempt <- rlang::try_fetch(x + y, warning = identity, error = identity)
-
+    
     if (rlang::is_error(attempt)) {
         return(structure(FALSE, cnd = attempt))
     } 
@@ -213,7 +213,7 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
         if (miss_error && anyNA(xs)) {
             cli_abort("`{field}` must not contain NA values.", call = call)
         }
-
+        
         dx <- dim(drop(xs))
         dv <- dim(drop(v$ind))
         
@@ -368,7 +368,7 @@ check_problem <- function(problem, field_name = ".problem") {
 }
 check_roi_solution <- function(solution, field_name = "solution") {
     expected_fields <- c("solution", "objval", "status", "message")
-
+    
     if (!is.list(solution) || !all(expected_fields %in% names(solution))) {
         cli_abort(
             "`{field_name}` must be the output of `solve_model()` or `ROI::ROI_solve()`.",
@@ -384,13 +384,13 @@ data_mask <- function(.problem) {
     fun <- custom_fun()
     var <- rlang::new_environment(.problem$variables, parent = fun)
     als <- rlang::new_environment(.problem$aliases, parent = var)
-
+    
     rlang::new_data_mask(bottom = als, top = fun)
 }
 lp_eval <- function(.problem, expr, split_for = FALSE) {
     quosure <- rlang::enquo(expr)
     data <- data_mask(.problem)
-
+    
     if (split_for) {
         for_split(quosure, data = data)
     } 
@@ -403,26 +403,26 @@ inside <- function(expr) {
     if (!rlang::is_symbolic(expr)) {
         return(expr)
     }
-
+    
     if (rlang::is_quosure(expr)) {
         env <- rlang::quo_get_env(expr)
         expr <- rlang::quo_get_expr(expr)
         expr <- inside(expr)
         return(rlang::new_quosure(expr, env))
     }
-
+    
     if (rlang::is_symbol(expr)) {
         return(expr)
     }
-
+    
     if (expr[[1L]] == quote(`(`)) {
         return(expr[[2]])
     }
-
+    
     if (expr[[1L]] == quote(`{`) && length(expr) == 2L) {
         return(expr[[2]])
     }
-
+    
     expr
 }
 

@@ -5,7 +5,7 @@
 Ops.lp_variable <- function(e1, e2) {
     op <- .Generic
     call <- call(op, substitute(e1), substitute(e2))
-
+    
     # Single Element --------------------
     # +x, -x, !x
     if (rlang::is_missing(e2)) {
@@ -20,20 +20,20 @@ Ops.lp_variable <- function(e1, e2) {
         }
         cli_abort("Unsupported operation `{op}`", call = call)
     }
-
+    
     # Checks ----------------------------
-
+    
     # Error if anyNA
     check_no_na(e1, e2, call)
-
+    
     # Compatible dims
     comp <- compatible_dimensions(e1, e2, drop_dim = TRUE)
-
+    
     if (!comp) {
         why <- attr(comp, "cnd")
         cli_abort(why$message, call = call)
     }
-
+    
     # Two element arithmetic
     if (op == "+") {
         return(add_lp(e1, e2, call))
@@ -50,7 +50,7 @@ Ops.lp_variable <- function(e1, e2) {
     else if (op == "^") {
         return(power_lp(e1, e2, call))
     }
-
+    
     # Comparison -----------------------
     comparison_ops <- c("<", "<=", "==", ">=", ">")
     if (op %in% comparison_ops) {
@@ -59,7 +59,7 @@ Ops.lp_variable <- function(e1, e2) {
     else if (op == "!=") {
         cli_abort("Inequality `!=` is not supported in constraints.", call = call)
     }
-
+    
     cli_abort("Unsupported operation `{op}`", call = call)
 }
 
@@ -77,7 +77,7 @@ check_no_na <- function(e1, e2, call) {
 add_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
-
+    
     if (xv && yv) {
         add_v_v(x, y, call)
     } 
@@ -94,7 +94,7 @@ add_lp <- function(x, y, call) {
 subtract_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
-
+    
     if (xv && yv) {
         subtract_v_v(x, y, call)
     } 
@@ -111,7 +111,7 @@ subtract_lp <- function(x, y, call) {
 multiply_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
-
+    
     if (xv && yv) {
         multiply_v_v(x, y, call)
     } 
@@ -153,40 +153,40 @@ minus_v <- function(x) {
 # var + var
 add_v_v <- function(x, y, call) {
     check_conformable(x, y, call)
-
+    
     max_n <- max(length(x), length(y))
     x <- recycle_var(x, max_n)
     y <- recycle_var(y, max_n)
-
+    
     out <- x
-
+    
     qx <- is_quadratic(x)
     qy <- is_quadratic(y)
-
+    
     if (qx && qy) {
         out$q_coef <- purrr::map2(x$q_coef, y$q_coef, `+`)
     } 
     else if (qx || qy) {
         out$q_coef <- x$q_coef %||% y$q_coef
     }
-
+    
     out$coef <- x$coef + y$coef
     out$add <- out$add + y$add
     out$binary <- FALSE
-
+    
     transformed_variable(out)
 }
 # var + constant
 add_v_c <- function(x, c, call) {
     check_conformable(x, c, call)
-
+    
     max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
     c <- recycle_const(c, max_n)
-
+    
     x$add <- x$add + c
     x$binary <- FALSE
-
+    
     transformed_variable(x)
 }
 
@@ -202,31 +202,31 @@ subtract_v_c <- function(x, c, call) {
 # constant - var
 subtract_c_v <- function(c, x, call) {
     out <- add_v_c(minus_v(x), c, call)
-
+    
     # If its (1-x) and x is binary, it stays binary
     if (x$binary && all(c == 1)) {
         out$binary <- TRUE
     }
-
+    
     return(out)
 }
 
 # var * constant
 multiply_v_c <- function(x, c, call) {
     check_conformable(x, c, call)
-
+    
     max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
     c <- recycle_const(c, max_n)
-
+    
     if (is_quadratic(x)) {
         x$q_coef <- q_list_multiply(x$q_coef, c)
     }
-
+    
     x$coef <- horizontal_multiply(x$coef, c)
     x$add <- x$add * c
     x$binary <- FALSE
-
+    
     transformed_variable(x)
 }
 # var * var
@@ -234,28 +234,28 @@ multiply_v_v <- function(x, y, call) {
     if (is_quadratic(x) || is_quadratic(y)) {
         cli_abort("Non-quadratic operation", call = call)
     }
-
+    
     check_conformable(x, y, call)
-
+    
     max_n <- max(length(x), length(y))
     x <- recycle_var(x, max_n)
     y <- recycle_var(y, max_n)
     m <- ncol(x$coef)
     out <- x
-
+    
     out$q_coef <- lapply(seq_len(max_n), function(i) {
         xi <- x$coef[rep(i, m), ]
         yi <- y$coef[rep(i, m), ]
         qi <- t(xi) * yi + xi * t(yi)
-
+        
         rownames(qi) <- colnames(qi) <- colnames(x$coef)
         qi
     })
-
+    
     out$coef <-
         horizontal_multiply(x$coef, y$add) +
         horizontal_multiply(y$coef, x$add)
-
+    
     out$add <- x$add * y$add
     transformed_variable(out)
 }
@@ -274,29 +274,29 @@ power_v_c <- function(x, c, call) {
     if (is_quadratic(x)) {
         cli_abort("Non-quadratic operation", call = call)
     }
-
+    
     check_conformable(x, c, call)
-
+    
     max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
     c <- recycle_const(c, max_n)
-
+    
     if (!all(c %in% 0:2)) {
         cli_abort("Exponent must be 0, 1 or 2", call = call)
     }
-
+    
     if (any(c == 2)) {
         i2 <- (c == 2)
         xsquared <- multiply_v_v(x, x, call)
-
+        
         x$q_coef <- xsquared$q_coef
         x$q_coef[!i2] <- x$q_coef[!i2] |>
             lapply(\(q) q*0)
-
+        
         x$coef[i2, ] <- xsquared$coef[i2, ]
         x$add[i2, ] <- xsquared$add[i2, ]
     }
-
+    
     x$coef[c == 0, ] <- 0
     x$add[c == 0, ] <- 1
     
@@ -309,11 +309,11 @@ negate_v <- function(x, call) {
     if (!x$binary) {
         cli_abort("Negation `!x` is only supported for binary variables.", call = call)
     }
-
+    
     # 1 - x
     x$coef <- -x$coef
     x$add <- -x$add + 1
-
+    
     transformed_variable(x)
 }
 
@@ -324,11 +324,11 @@ negate_v <- function(x, call) {
     call <- rlang::call2("%*%", substitute(x), substitute(y))
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
-
+    
     if (is_quadratic(x) || is_quadratic(y)) {
         cli_abort("Non-quadratic operation", call = call)
     }
-
+    
     if (xv && yv) {
         matrix_multiply_v_v(x, y, call = call)
     } 
@@ -348,36 +348,36 @@ matrix_multiply_v_c <- function(x, y, call) {
     else if (ndim(x) == 1L) {
         x$ind <- matrix(x$ind, ncol = 1L)
     }
-
+    
     ptype <- rlang::try_fetch(x$ind %*% y, error = identity)
-
+    
     if (rlang::is_error(ptype)) {
         cli_abort(ptype$message, call = call)
     }
-
-
+    
+    
     if (!is.matrix(y)) {
         y <- matrix(y, ncol = 1L)
     }
-
+    
     out <- x
     out$ind <- ptype
     out$ind[] <- seq_along(out$ind)
-
+    
     if (is_quadratic(x)) {
         # TODO
         cli_abort("`%*%` not yet implemented for quadratic variables.", call = call)
     }
-
+    
     out$coef <- out$coef[integer(), , drop = TRUE]
     out$add <- out$add[integer(), , drop = TRUE]
-
+    
     for (j in 1:ncol(y)) for (i in 1:nrow(x)) {
         z <- sum(x[i, ] * y[, j])
         out$coef <- rbind(out$coef, z$coef)
         out$add <- rbind(out$add, z$add)
     }
-
+    
     out$coef <- robust_index(out$coef)
     out$add <- robust_index(out$add)
     
@@ -388,45 +388,45 @@ matrix_multiply_v_c <- function(x, y, call) {
 matrix_multiply_v_v <- function(x, y, call) {
     x$ind <- drop(x$ind)
     y$ind <- drop(y$ind)
-
+    
     ndx <- ndim(x$ind)
     ndy <- ndim(y$ind)
-
+    
     if (ndx > 2L) {
         cli_abort("Left-hand-side has {ndx} dimensions.")
     } 
     else if (ndx == 1L) {
         x$ind <- matrix(x$ind, ncol = 1L)
     }
-
+    
     if (ndy > 2L) {
         cli_abort("Right-hand-side has {ndy} dimensions.")
     } 
     else if (ndy == 1L) {
         y$ind <- matrix(y$ind, ncol = 1L)
     }
-
+    
     ptype <- rlang::try_fetch(x$ind %*% y$ind, error = identity)
-
+    
     if (rlang::is_error(ptype)) {
         cli_abort(ptype$message, call = call)
     }
-
+    
     out <- x
     out$ind <- ptype
     out$ind[] <- seq_along(out$ind)
-
+    
     out$q_coef <- list()
     out$coef <- out$coef[integer(), , drop = TRUE]
     out$add <- out$add[integer(), , drop = TRUE]
-
+    
     for (j in 1:ncol(y)) for (i in 1:nrow(x)) {
         z <- sum(x[i, ] * y[, j])
         out$q_coef <- c(out$q_coef, z$q_coef)
         out$coef <- rbind(out$coef, z$coef)
         out$add <- rbind(out$add, z$add)
     }
-
+    
     out$coef <- robust_index(out$coef)
     out$add <- robust_index(out$add)
     
@@ -444,21 +444,21 @@ diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
     if (lag < 1L || differences < 1L) {
         cli_abort("`lag` and `differences` must be integers >= 1")
     }
-
+    
     xlen <- length(x)
-
+    
     if (lag * differences >= xlen) {
         return(x[integer()])
     }
-
+    
     i1 <- -seq_len(lag)
     y <- x
-
+    
     for (i in seq_len(differences)) {
         ylen <- length(y)
         y <- y[i1] - y[-ylen:-(ylen - lag + 1L)]
     }
-
+    
     y
 }
 
@@ -466,16 +466,16 @@ diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
 
 compare_lp <- function(x, y, op, call) {
     check_conformable(x, y, call)
-
+    
     if (op == "<") {
         op <- "<="
     } 
     else if (op == ">") {
         op <- ">="
     }
-
+    
     var <- x - y
-
+    
     if (is_quadratic(var)) {
         q_lhs <- lapply(var$q_coef, function(q) {
             if (any(q != 0)) {
@@ -489,14 +489,14 @@ compare_lp <- function(x, y, op, call) {
     else {
         q_lhs <- rep(list(NULL), length(var))
     }
-
+    
     lhs <- slam::as.simple_triplet_matrix(var$coef)
     rhs <- -var$add
-
+    
     dir <- rep(op, length(rhs))
     call <- rep(format1(call), length(rhs))
     name <- character(length(rhs))
-
+    
     list(q_lhs = q_lhs, lhs = lhs, dir = dir, rhs = rhs, name = name, call = call) |>
         structure(class = "lp_constraint")
 }

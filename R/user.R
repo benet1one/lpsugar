@@ -29,7 +29,7 @@
 #' mat |> parameter(r = letters[1:3], c = LETTERS[1:2])
 parameter <- function(.x, ..., byrow = TRUE) {
     dots <- rlang::dots_list(..., .named = TRUE, .ignore_empty = "none")
-
+    
     if (length(dots) == 1L) {
         warn_changed_args(byrow = TRUE)
         parameter_vector(.x, dots)
@@ -47,14 +47,14 @@ parameter <- function(.x, ..., byrow = TRUE) {
 
 parameter_vector <- function(.x, dots) {
     nd <- sum(dim2(.x) > 1L)
-
+    
     if (nd > 1L) {
         cli_abort(
             "`.x` has two or more dimensions but only one element in `...`",
             call = parent.frame()
         )
     }
-
+    
     n <- length(dots[[1]])
     
     if (length(.x) > 1L && length(.x) != n) {
@@ -65,14 +65,14 @@ parameter_vector <- function(.x, dots) {
             call = parent.frame()
         )
     }
-
+    
     array(.x, dim = length(dots[[1]]), dimnames = dimnames_non_numeric(dots))
 }
 
 parameter_matrix <- function(.x, dots, byrow = TRUE) {
     n <- lengths(dots)[1]
     m <- lengths(dots)[2]
-
+    
     if (ndim(.x) == 1L) {
         if (length(.x) != 1L && length(.x) != n*m) {
             cli_abort(
@@ -82,7 +82,7 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
                 call = parent.frame()
             )
         }
-
+        
         return(matrix(
             .x, nrow = n, ncol = m,
             byrow = byrow, dimnames = dimnames_non_numeric(dots)
@@ -97,7 +97,7 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
                 call = parent.frame()
             )
         }
-
+        
         warn_changed_args(byrow = TRUE)
         dimnames(.x) <- dimnames_non_numeric(dots)
         return(.x)
@@ -131,7 +131,7 @@ solution_summary <- function(problem, solution, tol = 2e-6) {
     aliases <- compute_aliases(problem, solution)
     constraints <- constraint_summary(problem, solution, tol = tol)
     bounds <- bound_summary(problem, solution, tol = tol)
-
+    
     list(
         aliases = aliases,
         constraints = constraints,
@@ -146,36 +146,36 @@ solution_summary <- function(problem, solution, tol = 2e-6) {
 constraint_summary <- function(problem, solution, tol = 2e-6) {
     solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
     con <- problem$constraints
-
+    
     quadratic_part <- numeric(nrow(con))
     q_ind <- which(lengths(con$q_lhs) > 0L)
-
+    
     for (i in q_ind) {
         q <- con$q_lhs[[i]]
         row_sol <- t(solution)
         col_sol <- t(row_sol)
         quadratic_part[i] <- 0.5 * row_sol %*% q %*% col_sol
     }
-
+    
     linear_part <- con$lhs %*% solution
     lhs <- quadratic_part + linear_part
     dir <- con$dir
     rhs <- con$rhs[, 1]
     diff <- rhs - lhs
-
+    
     less_than <- lhs <= rhs + tol
     greater_than <- lhs >= rhs - tol
     equal_to <- less_than & greater_than
-
+    
     satisfied <- logical(length(dir))
     satisfied[dir == "<="] <- less_than[dir == "<="]
     satisfied[dir == ">="] <- greater_than[dir == ">="]
     satisfied[dir == "=="] <- equal_to[dir == "=="]
-
+    
     feasible <- all(satisfied)
     saturated <- diff > -tol  &  diff < +tol
     saturated[!satisfied] <- NA
-
+    
     df <- data.frame(
         name = con$name,
         fullname = rownames(con),
@@ -185,7 +185,7 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
         satisfied = satisfied,
         saturated = saturated
     )
-
+    
     rownames(df) <- NULL
     df
 }
@@ -194,19 +194,19 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
 #' @export
 bound_summary <- function(problem, solution, tol = 2e-6) {
     solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
-
+    
     lower <- numeric(ncol(problem))
     upper <- numeric(ncol(problem))
-
+    
     for (x in problem$variables) {
         lower[x$ind] <- x$lower
         upper[x$ind] <- x$upper
     }
-
+    
     satisfied <- (solution >= lower - tol) & (solution <= upper + tol)
     saturated <- (solution <= lower + tol) | (solution >= upper - tol)
     saturated[!satisfied] <- NA
-
+    
     df <- data.frame(
         variable = attr(problem, "varnames"),
         lower = lower,
@@ -215,7 +215,7 @@ bound_summary <- function(problem, solution, tol = 2e-6) {
         satisfied = satisfied,
         saturated = saturated
     )
-
+    
     rownames(df) <- NULL
     df
 }
@@ -232,16 +232,16 @@ compute_objective <- function(problem, solution) {
     coef <- problem$objective$coef
     add <- problem$objective$add
     out <- crossprod(coef, solution) + add
-
+    
     if (is_quadratic(problem$objective)) {
         row_sol <- t(solution)
         col_sol <- t(row_sol)
         q <- problem$objective$q_coef
-
+        
         q_out <- 0.5 * row_sol %*% q %*% col_sol
         out <- out + q_out
     }
-
+    
     out[1]
 }
 
@@ -255,23 +255,23 @@ compute_aliases <- function(problem, solution) {
         call = environment(),
         field = "solution"
     )
-
+    
     purrr::map(problem$aliases, function(a) {
         mat <- array(unclass(a$coef), dim = dim(a$coef))
         add <- unclass(a$add)
         out <- mat %*% solution + add
-
+        
         if (is_quadratic(a)) {
             row_sol <- t(solution)
             col_sol <- t(row_sol)
-
+            
             q_out <- purrr::map_dbl(a$q_coef, function(qi) {
                 0.5 * row_sol %*% qi %*% col_sol
             })
-
+            
             out <- out + q_out
         }
-
+        
         if (length(out) == 1L) {
             unname(out[1])
         } 

@@ -22,22 +22,22 @@ print.robust_index <- function(x, ...) {
     } 
     else if (is.array(x)) {
         d <- dim(x)
-
+        
         if (...length() != length(d)) {
             cli_abort("Incorrect number of dimensions.")
         }
-
+        
         dots <- rlang::dots_list(..., .ignore_empty = "none", .preserve_empty = TRUE)
-
+        
         for (margin in 1:length(d)) {
             dm <- dots[[margin]]
-
+            
             if (rlang::is_missing(dm)) {
                 next
             }
-
+            
             im <- eval(dm, envir = parent.frame())
-
+            
             check_index_valid_array(
                 x,
                 margin = margin,
@@ -49,10 +49,10 @@ print.robust_index <- function(x, ...) {
         if (...length() != 1L) {
             cli_abort("Incorrect number of dimensions.")
         }
-
+        
         check_index_valid_vector(x, index = im)
     }
-
+    
     NextMethod(drop = drop) |> robust_index()
 }
 
@@ -67,14 +67,14 @@ check_index_valid_array <- function(x, margin, index, call = parent.frame()) {
     } 
     else if (is.numeric(index)) {
         zero <- match(TRUE, index > -1L & index < 1L)
-
+        
         if (!is.na(zero)) {
             cli_abort("Invalid subscript ({index[zero]}) in dimension {margin}.", call = call)
         }
-
+        
         cap <- dim(x)[margin]
         oob <- match(TRUE, index <= -cap - 1L | index >= cap + 1L)
-
+        
         if (!is.na(oob)) {
             cli_abort("Subscript ({index[oob]}) out of bounds in dimension {margin}.", call = call)
         }
@@ -82,13 +82,13 @@ check_index_valid_array <- function(x, margin, index, call = parent.frame()) {
     else if (is.character(index) || is.factor(index)) {
         index <- as.character(index)
         nams <- dimnames(x)[[margin]]
-
+        
         if (is.null(nams)) {
             cli_abort("Dimension {margin} is unnamed.", call = call)
         }
-
+        
         missing_name <- match(TRUE, !is.element(index, nams))
-
+        
         if (!is.na(missing_name)) {
             cli_abort("Invalid subscript '{index[missing_name]}' in dimension {margin}.", call = call)
         }
@@ -102,21 +102,21 @@ check_index_valid_vector <- function(x, index, call = parent.frame()) {
         if (anyNA(index)) {
             cli_abort("Subscript is NA", call = call)
         }
-
+        
         if (length(index) != length(x)) {
             cli_abort("Subscript length mismatch", call = call)
         }
     }
     else if (is.numeric(index)) {
         zero <- match(TRUE, index > -1L & index < 1L)
-
+        
         if (!is.na(zero)) {
             cli_abort("Invalid subscript ({index[zero]}).", call = call)
         }
-
+        
         cap <- length(x)
         oob <- match(TRUE, index <= -cap - 1L | index >= cap + 1L)
-
+        
         if (!is.na(oob)) {
             cli_abort("Subscript ({index[oob]}) out of bounds.", call = call)
         }
@@ -124,13 +124,13 @@ check_index_valid_vector <- function(x, index, call = parent.frame()) {
     else if (is.character(index) || is.factor(index)) {
         index <- as.character(index)
         nams <- names(x)
-
+        
         if (is.null(nams)) {
             cli_abort("Vector is unnamed.", call = call)
         }
-
+        
         missing_name <- match(TRUE, !is.element(index, nams))
-
+        
         if (!is.na(missing_name)) {
             cli_abort("Invalid subscript '{index[missing_name]}'.", call = call)
         }

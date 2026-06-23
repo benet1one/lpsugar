@@ -35,9 +35,9 @@ lp_constraint <- function(.problem, ...) {
     quos <- rlang::enquos(...)
     nams <- rlang::names2(quos)
     varnames <- c(names(.problem$variables), names(.problem$aliases))
-
+    
     cons <- list()
-
+    
     for (i in seq_along(quos)) {
         cons[[i]] <- lp_constraint_internal(
             quosure = quos[[i]],
@@ -46,58 +46,58 @@ lp_constraint <- function(.problem, ...) {
             varnames = varnames
         )
     }
-
+    
     cons <- bind_cons(!!!cons)
-
+    
     if (length(.problem$constraints) == 0L) {
         .problem$constraints <- cons
     } 
     else {
         .problem$constraints <- bind_cons(.problem$constraints, cons)
     }
-
+    
     return(.problem)
 }
 
 lp_constraint_internal <- function(quosure, name, data, varnames) {
     expr <- rlang::quo_get_expr(quosure)
     vars <- all.vars(expr)
-
+    
     if (!any(vars %in% varnames)) {
         cli_abort("Constraint does not contain any variables.", call = expr)
     }
-
+    
     cons <- for_split(quosure, data = data)
     inds <- rlang::names2(cons)
-
+    
     for (i in seq_along(cons)) {
         con <- cons[[i]]
         ind_str <- inds[i]
-
+        
         if (is.null(con)) {
             next
         }
-
+        
         name_ind <- if (ind_str == "") {
             name
         } 
         else {
             paste0(name, "[", ind_str, "]")
         }
-
+        
         if (!is_lp_constraint(con)) {
             msg <- c(
                 "Expression did not evaluate to a constraint.",
                 "x" = "Problematic constraint: '{name_ind}'.",
                 ">" = "Did you forget the comparison operator? `<=/==/>=`"
             )
-
+            
             cli_abort(msg, call = quosure)
         }
-
+        
         rownames(cons[[i]]$lhs) <- rep_len(name_ind, length(con))
     }
-
+    
     cons <- bind_cons(!!!cons)
     cons$name[] <- name
     cons$call[] <- format1(expr)
@@ -131,23 +131,23 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
 lp_delete_constraint <- function(.problem, names) {
     check_problem(.problem)
     stopifnot(is.character(names))
-
+    
     if (any(names == "") || any(names == "<unnamed>")) {
         cli_warn("Cannot delete unnamed constraints.")
         names <- names[names != "" & names != "<unnamed>"]
     }
-
+    
     not_defined <- which(!(names %in% .problem$constraint$name))
-
+    
     if (length(not_defined) > 0L) {
         not_defined <- names[not_defined] |>
             utils::head(6) |>
             dQuote(q = FALSE) |>
             paste(collapse = ", ")
-
+        
         cli_warn("The following constraints are not defined: \n{not_defined}")
     }
-
+    
     to_delete <- .problem$constraints$name %in% names
     .problem$constraints <- .problem$constraints[!to_delete]
     return(.problem)
@@ -169,9 +169,9 @@ update_constraints <- function(.problem) {
     if (length(.problem$constraints) == 0L) {
         return(.problem)
     }
-
+    
     q_ind <- which(lengths(.problem$constraints$q_lhs) > 0L)
-
+    
     for (i in q_ind) {
         .problem$constraints$q_lhs[[i]]$nrow[] <- ncol(.problem)
         .problem$constraints$q_lhs[[i]]$ncol[] <- ncol(.problem)
@@ -180,7 +180,7 @@ update_constraints <- function(.problem) {
             attr(.problem, "varnames")
         )
     }
-
+    
     .problem$constraints$lhs$ncol[] <- ncol(.problem)
     colnames(.problem$constraints$lhs) <- attr(.problem, "varnames")
     .problem
@@ -206,7 +206,7 @@ empty_constraint <- function() {
 #' @example inst/examples/example_bind_cons.R
 bind_cons <- function(...) {
     call <- environment()
-
+    
     dots <- rlang::dots_list(...)
     dots <- dots[lengths(dots) > 0]
     dots <- purrr::keep(dots, function(d) {
@@ -216,23 +216,23 @@ bind_cons <- function(...) {
                 call = call
             )
         }
-
+        
         !is_empty_lp_constraint(d)
     })
-
+    
     if (length(dots) == 0L) {
         return(empty_constraint())
     }
-
+    
     out <- purrr::list_transpose(dots, simplify = FALSE)
-
+    
     out$q_lhs <- unlist(out$q_lhs, recursive = FALSE)
     out$lhs <- do.call(what = rbind, out$lhs)
     out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()
     out$dir <- unlist(out$dir)
     out$call <- unlist(out$call)
     out$name <- unlist(out$name)
-
+    
     structure(out, class = "lp_constraint")
 }
 
@@ -277,65 +277,65 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 `[.lp_constraint` <- function(x, ..., drop = FALSE) {
     warn_changed_args(drop = FALSE)
     dots <- rlang::dots_list(..., .preserve_empty = TRUE, .ignore_empty = "none")
-
+    
     wrong_index <-
         length(dots) == 0L ||
         rlang::is_missing(dots[[1L]]) ||
         length(dots) > 2L ||
         (length(dots) == 2L && !rlang::is_missing(dots[[2L]]))
-
+    
     if (wrong_index) {
         cli_abort("Index constraints with `con[i]` or `con[i, ]`")
     }
-
+    
     i <- dots[[1L]]
-
+    
     if (is.character(i)) {
         i <- x$name %in% i
     }
-
+    
     x$q_lhs <- x$q_lhs[i]
     x$lhs <- x$lhs[i, ]
     x$rhs <- x$rhs[i, ]
     x$dir <- x$dir[i]
     x$call <- x$call[i]
     x$name <- x$name[i]
-
+    
     return(x)
 }
 
 #' @export
 print.lp_constraint <- function(x, compact = FALSE, ...) {
     stopifnot(rlang::is_bool(compact))
-
+    
     pairs <- cbind(x$name, x$call) |>
         unique(MARGIN = 1L)
-
+    
     if (!compact && ncol(x$lhs) > 200L) {
         cat("\n")
         cli_inform("Problem has over 200 variables, printing with `compact = TRUE`.")
         compact <- TRUE
     }
-
+    
     for (i in seq_len(nrow(pairs))) {
         name <- pairs[i, 1]
         call <- pairs[i, 2]
-
+        
         name_str <- if (name == "") {
-             "<unnamed>"
+            "<unnamed>"
         } 
         else {
             name
         }
-
+        
         if (compact) {
             name_str <- format(name_str, width = 12L)
         }
-
+        
         ind <- x$name == name & x$call == call
         quad <- is_quadratic(x[ind])
         n <- sum(ind)
-
+        
         cat(
             "\n",
             name_str,
@@ -344,7 +344,7 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
             " | ", call,
             sep = ""
         )
-
+        
         if (!compact && !quad) {
             cat("\n\n")
             mc <- x[ind] |> as.matrix.lp_constraint()
@@ -352,6 +352,6 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
             cat("\n")
         }
     }
-
+    
     invisible(x)
 }
