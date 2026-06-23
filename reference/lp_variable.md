@@ -108,9 +108,6 @@ The following fields are meant for internal use only.
   the variable. The values represent addends, modified when adding the
   variable and a constant. Used for objective, constraints and aliases.
 
-- `$raw` : Boolean indicating if the variable has been modified in any
-  way (indexed, multiplied, summed, ...) or remains as defined.
-
 ## Examples
 
 ``` r

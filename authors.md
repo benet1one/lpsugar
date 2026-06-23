@@ -2,21 +2,20 @@
 
 ## Authors
 
-- **benet**. Author, maintainer.
+- **Bernat Garcia**. Author, maintainer, copyright holder.
 
 ## Citation
 
 Source:
 [`DESCRIPTION`](https://github.com/benet1one/lpsugar/blob/master/DESCRIPTION)
 
-benet (2026). *lpsugar: Algebraic Modeling Language for Linear
-Problems*. R package version 0.23.4,
-<https://github.com/benet1one/lpsugar>.
+Garcia B (2026). *lpsugar: Linear, Quadratic and Nonlinear Programming
+in R*. R package version 0.23.5, <https://github.com/benet1one/lpsugar>.
 
     @Manual{,
-      title = {lpsugar: Algebraic Modeling Language for Linear Problems},
-      author = {{benet}},
+      title = {lpsugar: Linear, Quadratic and Nonlinear Programming in R},
+      author = {Bernat Garcia},
       year = {2026},
-      note = {R package version 0.23.4},
+      note = {R package version 0.23.5},
       url = {https://github.com/benet1one/lpsugar},
     }

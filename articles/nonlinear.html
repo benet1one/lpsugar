@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.23.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.23.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@
     <li><a class="dropdown-item" href="../articles/Regression.html">Regression and Classification</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -84,8 +85,12 @@
 <p>Say we have a list <span class="math inline">\(x\)</span> of vectors
 <span class="math inline">\(x_i = \{x_{i1}, \dots, x_{im}\}\)</span>.
 Each vector is generated from a <span class="math inline">\(\text{Normal}(\mu_i, \sigma)\)</span>. The catch
-is this: each <span class="math inline">\(\mu\)</span> is greater than
+is that each <span class="math inline">\(\mu\)</span> is greater than
 the previous:</p>
+<p><span class="math display">\[
+x_{ij} \sim \text{Normal}(\mu_i, \sigma) \qquad \forall i\in[1,n],\
+j\in[1,m_i]
+\]</span></p>
 <p><span class="math display">\[
 \mu_i \ge \mu_{i-1} \qquad \forall i \in [2,n]
 \]</span></p>
@@ -96,7 +101,7 @@ the previous:</p>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">4</span>, <span class="fl">8</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">true_mu</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">true_mu</span> <span class="op">&lt;-</span> <span class="fl">3</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">true_sigma</span> <span class="op">&lt;-</span> <span class="fl">7</span></span>
 <span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -107,40 +112,42 @@ the previous:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [1]  8.02  4.13 -0.99  6.22 -1.76</span></span>
+<span><span class="co">#&gt; [1] 11.52  7.63  2.51  9.72  1.74</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [1]  4.07 -5.18 10.38 -9.88</span></span>
+<span><span class="co">#&gt; [1]  7.57 -1.68 13.88 -6.38</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
-<span><span class="co">#&gt; [1]  -0.94  -0.63  -5.23   1.13  -5.01 -13.63  -0.43</span></span>
+<span><span class="co">#&gt; [1]   2.56   2.87  -1.73   4.63  -1.51 -10.13   3.07</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[4]]</span></span>
-<span><span class="co">#&gt; [1]  6.30 -0.54 -8.91  6.55 -8.53  4.61  0.51</span></span>
+<span><span class="co">#&gt; [1]  9.80  2.96 -5.41 10.05 -5.03  8.11  4.01</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[5]]</span></span>
-<span><span class="co">#&gt; [1] 5.16 5.37 8.15 3.84 8.94</span></span></code></pre></div>
+<span><span class="co">#&gt; [1]  8.66  8.87 11.65  7.34 12.44</span></span></code></pre></div>
 <p>We will find <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> by maximum likelihood. Here’s the
 function that returns the loglikelihood. It’s arguments <em>must</em> be
 the variables of the problem.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">loglikelihood</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mu</span>, <span class="va">sigma</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">ll</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<code class="sourceCode R"><span><span class="va">loglikelihood_x</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mu</span>, <span class="va">sigma</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">LL</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>    </span>
 <span>    <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="va">lli</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">x</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, mean <span class="op">=</span> <span class="va">mu</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, sd <span class="op">=</span> <span class="va">sigma</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>        <span class="va">ll</span> <span class="op">&lt;-</span> <span class="va">ll</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">lli</span><span class="op">)</span></span>
+<span>        <span class="va">LL_i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">x</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, mean <span class="op">=</span> <span class="va">mu</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, sd <span class="op">=</span> <span class="va">sigma</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>        <span class="va">LL</span> <span class="op">&lt;-</span> <span class="va">LL</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">LL_i</span><span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
 <span>    </span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">ll</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">LL</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Now we solve the problem.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">constrained_mle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">mu</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">sigma</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/lp_objective_function.html">lp_max_fun</a></span><span class="op">(</span><span class="va">loglikelihood</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_con</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="va">mu</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="va">mu</span><span class="op">[</span><span class="va">i</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_objective_function.html">lp_max_fun</a></span><span class="op">(</span><span class="va">loglikelihood_x</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_con</a></span><span class="op">(</span></span>
+<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="va">mu</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="va">mu</span><span class="op">[</span><span class="va">i</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_solve.html">lp_solve</a></span><span class="op">(</span></span>
 <span>        solver <span class="op">=</span> <span class="st">"nloptr.cobyla"</span>,</span>
 <span>        start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mu <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -149,28 +156,35 @@ the variables of the problem.</p>
 <span><span class="va">constrained_mle</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">–</span><span style="font-weight: bold;"> $variables</span></span></span>
 <span><span class="co">#&gt; $mu</span></span>
-<span><span class="co">#&gt; [1] -0.5964356 -0.5964356 -0.5964356 -0.0398022  6.2840996</span></span>
+<span><span class="co">#&gt; [1] 2.923783 2.923783 2.923783 3.493470 9.734194</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $sigma</span></span>
-<span><span class="co">#&gt; [1] 5.612405</span></span>
+<span><span class="co">#&gt; [1] 5.612845</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">–</span><span style="font-weight: bold;"> $objective</span></span></span>
-<span><span class="co">#&gt; [1] -88.04789</span></span>
+<span><span class="co">#&gt; [1] -88.04821</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">–</span><span style="font-weight: bold;"> $status</span></span></span>
 <span><span class="co">#&gt; Optimal Solution Found ✔</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;      unconstrained_means constrained_mle true_mu</span></span>
-<span><span class="co">#&gt; [1,]                3.12           -0.60   -0.20</span></span>
-<span><span class="co">#&gt; [2,]               -0.15           -0.60    0.38</span></span>
-<span><span class="co">#&gt; [3,]               -3.53           -0.60    0.72</span></span>
-<span><span class="co">#&gt; [4,]                0.00           -0.04    1.34</span></span>
-<span><span class="co">#&gt; [5,]                6.29            6.28    1.89</span></span></code></pre>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">unconstrained_mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">mean</span><span class="op">)</span></span>
+<span><span class="va">constrained_mu</span> <span class="op">&lt;-</span> <span class="va">constrained_mle</span><span class="op">$</span><span class="va">variables</span><span class="op">$</span><span class="va">mu</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt;                  mu[1] mu[2] mu[3] mu[4] mu[5]</span></span>
+<span><span class="co">#&gt; unconstrained_mu  6.62  3.35 -0.03  3.50  9.79</span></span>
+<span><span class="co">#&gt; constrained_mu    2.92  2.92  2.92  3.49  9.73</span></span>
+<span><span class="co">#&gt; true_mu           3.30  3.88  4.22  4.84  5.39</span></span></code></pre>
 <p>Constrained optimization gives a better result.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">unconstrained_means</span>, <span class="va">true_mu</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">unconstrained_mu</span>, <span class="va">true_mu</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.3233756</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">constrained_mle</span><span class="op">$</span><span class="va">variables</span><span class="op">$</span><span class="va">mu</span>, <span class="va">true_mu</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.7702947</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">constrained_mu</span>, <span class="va">true_mu</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.771652</span></span></code></pre></div>
+<p>We also get an estimator for <span class="math inline">\(\sigma\)</span>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">constrained_sigma</span> <span class="op">&lt;-</span> <span class="va">constrained_mle</span><span class="op">$</span><span class="va">variables</span><span class="op">$</span><span class="va">sigma</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt;                   sigma</span></span>
+<span><span class="co">#&gt; constrained_sigma  5.61</span></span>
+<span><span class="co">#&gt; true_sigma         7.00</span></span></code></pre>
 </div>
   </main>
 </div>
@@ -178,7 +192,7 @@ the variables of the problem.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by benet.</p>
+  <p>Developed by Bernat Garcia.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -1,6 +1,6 @@
 # Linear, Quadratic and Nonlinear Programming in R
 
-`lpsugar` is an AML (Algebraic Modeling Language) inspired in R’s
+`lpsugar` is an Algebraic Modeling Language (AML) inspired in R’s
 vectorized syntax, used to define and solve Mixed Integer Linear
 Problems (MILP), Mixed Integer Quadratic Problems (MIQP) and General
 Nonlinear Problems (NLP).
@@ -70,9 +70,9 @@ factory <- names(supply)
 market <- names(demand)
 
 cost <- c(
-      2, 7, 3, 1,
-      6, 2, 9, 2,
-      4, 6, 2, 8
+    2, 7, 3, 1,
+    6, 2, 9, 2,
+    4, 6, 2, 8
 ) |> parameter(factory, market)
 
 cost

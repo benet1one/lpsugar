@@ -12,56 +12,90 @@ library(lpsugar)
 
 The elements of a transportation problem are these:
 
-- Sets
-  - \\F\\ - `factory`
-  - \\M\\ - `market`
-- Parameters
-  - \\s\\ - `supply` produced by each `factory`.
-  - \\d\\ - `demand` on each `market`.
-  - \\c\\ - `cost` to transport a unit from each `factory` to each
-    `market`.
-- Variable
-  - \\t\\ - `transport` products from each `factory` to each `market`.
-- Objective Function
-  - \\\min \sum\_{f \in F} \sum\_{m \in M} (c\_{fm} t\_{fm})\\ -
-    `minimize sum(cost * transport)`
-- Constraints
-  - \\\sum\_{m\in M}({t\_{fm}}) \le s_f \quad \forall f\in F\\ -
-    `for (f in factory) sum(transport[f, ]) <= supply[f]`
-  - \\\sum\_{f\in F}({t\_{fm}}) \ge d_m \quad \forall m\in M\\ -
-    `for (m in market) sum(transport[, m]) >= demand[m]`
+#### Sets
 
-Let’s define the problem in `lpsugar`.
+\\F\\ — `factory`
+
+\\M\\ — `market`
+
+#### Parameters
+
+\\s\\ — `supply` produced by each `factory`.
+
+\\d\\ — `demand` on each `market`.
+
+\\c\\ — `cost` to transport a unit from each `factory` to each `market`.
+
+#### Variable
+
+\\x\\ — `x` units transported from each `factory` to each `market`.
+
+#### Objective Function
+
+We want to minimize the total cost of transporting the products.
+
+\\ \min \sum\_{f \in F} \sum\_{m \in M} {c\_{fm} x\_{fm}} \\
+
+``` r
+minimize sum_over(f = factory, m = market, cost[f, m] * x[f, m])
+```
+
+#### Constraints
+
+From each factory, the units transported must be less than or equal to
+the supply of the factory.
+
+\\ \sum\_{m\in M}{x\_{fm}} \le s_f \quad \forall f\in F \\
 
 ``` r
 
-# Sets
-factory <- c("A", "B")
-market  <- c("Barcelona", "Paris", "Rome")
+for (f in factory) sum(x[f, ]) <= supply[f]
+```
 
-# Parameters
-supply <- c(A = 20, B = 50)
-demand <- c(Barcelona = 30, Paris = 15, Rome = 25)
+To each market, the units transported must be greater or equal to the
+demand of the market.
+
+\\ \sum\_{f\in F}{x\_{fm}} \ge d_m \quad \forall m\in M \\
+
+``` r
+
+for (m in market)  sum(x[, m]) >= demand[m]
+```
+
+### Writing the Problem
+
+The problem can be defined in `lpsugar` with the following code.
+
+``` r
+
+supply <- c(BLB = 20, ACO = 25, GRN = 15)
+demand <- c(Madrid = 8, Barcelona = 10, Valencia = 12, Seville = 10)
+
+factory <- names(supply)
+market <- names(demand)
+
 cost <- c(
-    # Bar, Par, Rome
-       30,  12,  32,
-       16,  18,  40
+    2, 7, 3, 1,
+    6, 2, 9, 2,
+    4, 6, 2, 8
 ) |> parameter(factory, market)
 
-# Problem
 transportation_problem <- lp_problem() |> 
     lp_variable(
-        transport[factory, market],
+        x[factory, market], 
+        integer = TRUE, 
         lower = 0
     ) |> 
     lp_minimize(
-        sum(cost * transport)
+        sum_over(f = factory, m = market, x[f, m] * cost[f, m])
     ) |> 
     lp_constraint(
-        for (f in factory) sum(transport[f, ]) <= supply[f],
-        for (m in market)  sum(transport[, m]) >= demand[m]
+        for (f in factory) sum(x[f, ]) <= supply[f],
+        for (m in market)  sum(x[, m]) >= demand[m]
     )
 ```
+
+### Solving the Problem
 
 To solve it, you can use any of `ROI`’s applicable solvers. One option
 is to load only the desired solver with `library(ROI.plugin.<solver>)`
@@ -72,18 +106,19 @@ the solver automatically.
 ``` r
 
 library(ROI.plugin.highs)
-solution <- lp_solve(transportation_problem)
+solution <- lp_solve(transportation_problem, solver = "highs")
 solution$objective
-#> [1] 1590
+#> [1] 70
 solution$variables
-#> $transport
+#> $x
 #>        market
-#> factory Barcelona Paris Rome
-#>       A         0     0   20
-#>       B        30    15    5
+#> factory Madrid Barcelona Valencia Seville
+#>     BLB      8         0        0      10
+#>     ACO      0        10        0       0
+#>     GRN      0         0       12       0
 ```
 
-## Basic Elements
+## Elements of a Problem
 
 ### Sets
 
@@ -350,7 +385,8 @@ p <- lp_problem() |>
         order_con = for (t in 1:n) {
             if (t == 1) {
                 y_prior <- y0
-            } else {
+            } 
+            else {
                 y_prior <- y[t-1]
             }
             

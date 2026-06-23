@@ -5,5 +5,5 @@ to see their documentation.
 
 - ROI:
 
-  [`as.OP`](https://rdrr.io/pkg/ROI/man/OP.html),
-  [`ROI_solve`](https://rdrr.io/pkg/ROI/man/ROI_solve.html)
+  [`ROI_solve`](https://rdrr.io/pkg/ROI/man/ROI_solve.html),
+  [`as.OP`](https://rdrr.io/pkg/ROI/man/OP.html)
