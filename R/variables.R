@@ -163,6 +163,8 @@ lp_variable <- function(.problem, definition,
     .problem
 }
 
+# Whenever a new variable is added to a problem
+# Update $coef of other variables/aliases
 update_variables <- function(.problem, field = "variables") {
     total_vars <- ncol(.problem)
     varnames <- variable.names(.problem)
@@ -190,6 +192,8 @@ update_variables <- function(.problem, field = "variables") {
     .problem
 }
 
+# Used when any transformation is applied to a variable
+# indexing, operations, etc.
 transformed_variable <- function(x) {
     x$name    <- NULL
     x$lower   <- NULL
@@ -419,6 +423,7 @@ bind_vars <- function(...) {
         }
     })
 }
+# bind_vars(var, var)
 bind_vv <- function(x, y) {
     z <- x
     z$ind  <- seq_len(length(x) + length(y)) |>
@@ -436,6 +441,7 @@ bind_vv <- function(x, y) {
     
     transformed_variable(z)
 }
+# bind_vars(var, const)
 bind_vc <- function(x, y) {
     x$ind <- c(x$ind, numeric(length(y))) |>
         unname() |>
@@ -459,6 +465,7 @@ bind_vc <- function(x, y) {
     
     transformed_variable(x)
 }
+# bind_vars(const, var)
 bind_cv <- function(x, y) {
     i <- c(seq_along(x) + length(y), seq_along(y))
     z <- bind_vc(y, x)[i]
@@ -592,6 +599,8 @@ t.lp_variable <- function(x) {
 
 # Utils ----------------------
 
+# Used in lp_variable()
+# Gets variable name, dim, and dimnames/sets
 parse_variable_definition <- function(definition) {
     def <- rlang::enquo(definition) |> inside()
     expr <- rlang::get_expr(def)
@@ -646,6 +655,8 @@ parse_variable_definition <- function(definition) {
     
     cli_abort(error_msg, call = parent.frame())
 }
+
+# Checks that sets are correctly defined
 check_variable_set <- function(set, name, call = environment()) {
     if (!rlang::is_atomic(set)) {
         cli_abort("Set `{name}` is not atomic.", call = call)
@@ -668,6 +679,9 @@ check_variable_set <- function(set, name, call = environment()) {
         )
     }
 }
+
+# Used in lp_variable()
+# Checks that bounds are correctly defined
 interpret_bound <- function(bound, bound_name, default, dim) {
     if (length(bound) == 0L) {
         cli_warn(
@@ -698,6 +712,9 @@ interpret_bound <- function(bound, bound_name, default, dim) {
     
     bound
 }
+
+# Gives the colnames of $coef
+# For instance c("x[1,1]", "x[2,1]", ...)
 name_variable <- function(name, sets) {
     if (length(sets) == 1L && lengths(sets) == 1L) {
         return(name)
@@ -707,6 +724,9 @@ name_variable <- function(name, sets) {
     paste0(name, "[", index, "]")
 }
 
+# Recycles a variable to length n
+# Only when it's length 1 or n
+# Faster and safer than rep.lp_variable(x, length.out = n)
 recycle_var <- function(x, n) {
     if (length(x) == n) {
         return(x)
@@ -727,6 +747,10 @@ recycle_var <- function(x, n) {
     
     cli_abort("Attempt to recycle variable of length {length(x)} to length {n}.")
 }
+
+# Recycles a constant to length n
+# Only when it's length 1 or n
+# Safer than rep(x, length.out = n)
 recycle_const <- function(x, n) {
     if (length(x) == n) {
         return(c(x))
