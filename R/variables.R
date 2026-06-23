@@ -122,7 +122,7 @@ lp_variable <- function(.problem, definition,
     } 
     else {
         ind <- array(dim = lengths(sets), dimnames = dnames) |> robust_index()
-        ind[] <- 1:length(ind) + ncol(.problem)
+        ind[] <- seq_along(ind) + ncol(.problem)
     }
     
     attr(.problem, "n_variables") <- max(ind)
@@ -165,7 +165,7 @@ lp_variable <- function(.problem, definition,
 
 update_variables <- function(.problem, field = "variables") {
     total_vars <- ncol(.problem)
-    varnames <- attr(.problem, "varnames")
+    varnames <- variable.names(.problem)
     vars <- .problem[[field]]
 
     for (i in names(vars)) {
@@ -173,7 +173,11 @@ update_variables <- function(.problem, field = "variables") {
 
         x$coef <- cbind(
             x$coef,
-            matrix(0, nrow = nrow(x$coef), ncol = total_vars - ncol(x$coef))
+            matrix(
+                data = 0, 
+                nrow = nrow(x$coef), 
+                ncol = total_vars - ncol(x$coef)
+            )
         )
 
         x$coef <- robust_index(x$coef)
@@ -436,7 +440,7 @@ bind_vc <- function(x, y) {
     x$ind <- c(x$ind, numeric(length(y))) |>
         unname() |>
         robust_index()
-    x$ind[] <- 1:length(x$ind)
+    x$ind[] <- seq_along(x$ind)
 
     if (is_quadratic(x)) {
         yq <- list(x$q_coef[[1]] * 0) |> rep(length(y))
@@ -468,9 +472,12 @@ bind_cv <- function(x, y) {
 #' @export
 `[.lp_variable` <- function(x, ..., drop = FALSE) {
     old_ind <- x$ind
-    old_ind[] <- 1:length(old_ind)
+    old_ind[] <- seq_along(old_ind)
 
-    old_ind <- rlang::try_fetch(old_ind[..., drop = drop], error = identity)
+    old_ind <- rlang::try_fetch(
+        old_ind[..., drop = drop], 
+        error = identity
+    )
 
     if (rlang::is_condition(old_ind)) {
         dots <- rlang::enexprs(..., .ignore_empty = "none")
@@ -493,7 +500,7 @@ bind_cv <- function(x, y) {
 #' @export
 `[<-.lp_variable` <- function(x, ..., value) {
     ind <- x$ind
-    ind[] <- 1:length(ind)
+    ind[] <- seq_along(ind)
     
     i <- rlang::try_fetch(ind[...], error = identity)
     
@@ -556,7 +563,7 @@ bind_cv <- function(x, y) {
 
 #' @export
 rep.lp_variable <- function(x, ...) {
-    ind <- rep(1:length(x), ...)
+    ind <- rep(seq_along(x), ...)
     x[ind]
 }
 #' @export
@@ -573,7 +580,7 @@ t.lp_variable <- function(x) {
     }
 
     present_ind <- x$ind
-    present_ind[] <- 1:length(present_ind)
+    present_ind[] <- seq_along(present_ind)
     present_ind <- t(present_ind)
     present_ind <- c(present_ind)
 

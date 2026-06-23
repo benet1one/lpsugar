@@ -236,7 +236,7 @@ diag_v <- function(x) {
     }
 
     present_ind <- x$ind
-    present_ind[] <- 1:length(present_ind)
+    present_ind[] <- seq_along(present_ind)
 
     if (!is.matrix(present_ind)) {
         cli_abort("Internal error in `diag_v()`. Sorry!")
@@ -252,7 +252,7 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     simplify <- isTRUE(simplify)
 
     ind <- x$ind
-    ind[] <- 1:length(ind)
+    ind[] <- seq_along(ind)
     ind_list <- apply(ind, margin, identity, simplify = FALSE)
 
     out_list <- purrr::map(ind_list, \(i) fun(x[i], ...))
@@ -272,7 +272,7 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
         simplify2array(higher = TRUE, except = 0)
 
     if (is.array(out_ind)) {
-        out_ind[] <- 1:length(out_ind)
+        out_ind[] <- seq_along(out_ind)
         out$ind <- out_ind |> robust_index()
     } 
     else {

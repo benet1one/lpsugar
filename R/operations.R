@@ -362,7 +362,7 @@ matrix_multiply_v_c <- function(x, y, call) {
 
     out <- x
     out$ind <- ptype
-    out$ind[] <- 1:length(out$ind)
+    out$ind[] <- seq_along(out$ind)
 
     if (is_quadratic(x)) {
         # TODO
@@ -414,7 +414,7 @@ matrix_multiply_v_v <- function(x, y, call) {
 
     out <- x
     out$ind <- ptype
-    out$ind[] <- 1:length(out$ind)
+    out$ind[] <- seq_along(out$ind)
 
     out$q_coef <- list()
     out$coef <- out$coef[integer(), , drop = TRUE]
