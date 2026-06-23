@@ -27,16 +27,19 @@ format1 <- function(x, ...) {
 
     if (length(y) == 1L) {
         y
-    } else if (endsWith(y[1], "{")) {
+    } 
+    else if (endsWith(y[1], "{")) {
         paste(y[1], "... }")
-    } else {
+    } 
+    else {
         paste(y[1], "...")
     }
 }
 dim2 <- function(x) {
     if (is.null(dim(x))) {
         length(x)
-    } else {
+    } 
+    else {
         dim(x)
     }
 }
@@ -44,7 +47,8 @@ ndim <- function(x, drop = FALSE) {
     if (drop) {
         # Without max(1), scalars would return 0 dimensions
         sum(dim2(x) > 1L) |> max(1)
-    } else {
+    } 
+    else {
         length(dim2(x))
     }
 }
@@ -73,7 +77,8 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
 
     if (rlang::is_error(attempt)) {
         return(structure(FALSE, cnd = attempt))
-    } else {
+    } 
+    else {
         return(TRUE)
     }
 }
@@ -117,7 +122,8 @@ variables_to_list.default <- function(x, problem,
         
         if (v$scalar) {
             unname(values)
-        } else {
+        } 
+        else {
             array(values, dim = dim(v), dimnames = dimnames(v))
         }
     })
@@ -136,7 +142,8 @@ variables_to_list.list <- function(x, problem,
         if (is.null(xs)) {
             if (miss_error) {
                 cli_abort("Variable `{v$name}` not present in `{field}`.", call = call)
-            } else {
+            } 
+            else {
                 xs <- v$ind
                 xs[] <- NA_real_
                 return(xs)
@@ -191,7 +198,8 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
         if (is.null(xs)) {
             if (miss_error) {
                 cli_abort("Variable `{v$name}` not present in `{field}`.", call = call)
-            } else {
+            } 
+            else {
                 xs <- v$ind
                 xs[] <- NA_real_
                 solution_vec[v$ind] <- xs
@@ -296,7 +304,8 @@ is_lp_constraint <- function(x, empty_valid = TRUE) {
     is_con <- inherits(x, "lp_constraint")
     if (empty_valid) {
         is_con
-    } else {
+    } 
+    else {
         is_con && !is_empty_lp_constraint(x)
     }
 }
@@ -339,7 +348,8 @@ lp_eval <- function(.problem, expr, split_for = FALSE) {
 
     if (split_for) {
         for_split(quosure, data = data)
-    } else {
+    } 
+    else {
         rlang::eval_tidy(quosure, data = data)
     }
 }

@@ -159,14 +159,18 @@ custom_fun <- function() {
                 "x" = "Problematic argument: {test_expr}"
             ))
         }
+        
         if (is_lp_constraint(yes) || is_lp_constraint(no)) {
             cli_abort("`yes` and `no` cannot be constraints.")
         }
+        
         if (is_lp_variable(test)) {
             ifelse_v(test, yes, no)
-        } else if (is_lp_variable(yes) || is_lp_variable(no)) {
+        } 
+        else if (is_lp_variable(yes) || is_lp_variable(no)) {
             ifelse_l(test, yes, no)
-        } else {
+        } 
+        else {
             base::ifelse(test, yes, no)
         }
     }
@@ -270,7 +274,8 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     if (is.array(out_ind)) {
         out_ind[] <- 1:length(out_ind)
         out$ind <- out_ind |> robust_index()
-    } else {
+    } 
+    else {
         out$ind <- 1:nrow(out$coef)
     }
 
@@ -346,17 +351,21 @@ ifelse_l <- function(test, yes, no) {
 
     if (is_lp_variable(yes)) {
         yes <- recycle_var(yes, len)
-    } else if (is.numeric(yes)) {
+    } 
+    else if (is.numeric(yes)) {
         yes <- recycle_const(yes, len)
-    } else {
+    } 
+    else {
         cli_abort("`yes` must either be a variable or a numeric vector.")
     }
 
     if (is_lp_variable(no)) {
         no <- recycle_var(no, len)
-    } else if (is.numeric(no)) {
+    } 
+    else if (is.numeric(no)) {
         no <- recycle_const(no, len)
-    } else {
+    } 
+    else {
         cli_abort("`no` must either be a variable or a numeric vector.")
     }
 

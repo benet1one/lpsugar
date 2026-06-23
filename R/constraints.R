@@ -51,7 +51,8 @@ lp_constraint <- function(.problem, ...) {
 
     if (length(.problem$constraints) == 0L) {
         .problem$constraints <- cons
-    } else {
+    } 
+    else {
         .problem$constraints <- bind_cons(.problem$constraints, cons)
     }
 
@@ -79,7 +80,8 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
 
         name_ind <- if (ind_str == "") {
             name
-        } else {
+        } 
+        else {
             paste0(name, "[", ind_str, "]")
         }
 
@@ -321,7 +323,8 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
 
         name_str <- if (name == "") {
              "<unnamed>"
-        } else {
+        } 
+        else {
             name
         }
 

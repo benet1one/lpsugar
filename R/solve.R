@@ -103,9 +103,11 @@ ROI_constraint_from_lpsugar <- function(problem) {
 
     if (length(problem$constraints) == 0L) {
         ROI::NO_constraint(n_obj = ncol(problem))
-    } else if (is_quadratic(problem$constraint)) {
+    } 
+    else if (is_quadratic(problem$constraint)) {
         as.Q_constraint(problem)
-    } else {
+    } 
+    else {
         as.L_constraint(problem)
     }
 }
@@ -238,9 +240,11 @@ as.OP.lp_problem <- function(x) {
     
     if (x$objective$direction == "minimize") {
         maximize <- FALSE
-    } else if (x$objective$direction == "maximize") {
+    } 
+    else if (x$objective$direction == "maximize") {
         maximize <- TRUE
-    } else {
+    } 
+    else {
         cli_abort("`$objective$direction` should be either 'minimize' or 'maximize'.")
     }
 
@@ -371,9 +375,11 @@ lpsugar_applicable_solvers <- function(problem) {
     if (inherits(problem, "lp_problem")) {
         op <- as.OP(problem)
         ROI::ROI_applicable_solvers(op)
-    } else if (inherits(problem, "OP")) {
+    } 
+    else if (inherits(problem, "OP")) {
         ROI::ROI_applicable_solvers(problem)
-    } else {
+    } 
+    else {
         cli_abort("`problem` must be an `lp_problem` or an `OP` object.")
     }
 }
@@ -404,14 +410,16 @@ print.lp_solution <- function(x, ...) {
     if (cli::is_utf8_output()) {
         tick <- cli::symbol$tick
         cross <- cli::symbol$checkbox_circle_on
-    } else {
+    } 
+    else {
         tick <- "[v]"
         cross <- "[x]"
     }
     
     if (x$status$code == 0) {
         cat("Optimal Solution Found", tick, "\n\n")
-    } else {
+    } 
+    else {
         cat("No Optimal Solution Found", cross, "\n\n")
         print(x$status)
     }

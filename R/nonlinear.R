@@ -123,7 +123,8 @@ nl_recode_gradient <- function(gradient, problem, call) {
         return(function(x) {
             variables_to_vec.list(gradient_x(x), problem)
         })
-    } else {
+    } 
+    else {
         return(gradient_x)
     }
 }

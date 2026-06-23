@@ -121,7 +121,8 @@ get_loop_indices <- function(expr) {
 
     if (is_loop(expr)) {
         here_index <- c(expr[[2]] |> format())
-    } else {
+    } 
+    else {
         here_index <- character(0)
     }
 
@@ -135,7 +136,8 @@ get_loop_indices <- function(expr) {
 format_ind <- function(i) {
     if (rlang::is_integer(i, n = 1)) {
         as.character(i)
-    } else {
+    } 
+    else {
         rlang::as_label(i)
     }
 }

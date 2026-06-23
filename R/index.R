@@ -19,8 +19,8 @@ print.robust_index <- function(x, ...) {
 `[.robust_index` <- function(x, ..., drop = FALSE) {
     if (...length() == 1L) {
         check_index_valid_vector(x, index = c(...))
-
-    } else if (is.array(x)) {
+    } 
+    else if (is.array(x)) {
         d <- dim(x)
 
         if (...length() != length(d)) {
@@ -44,8 +44,8 @@ print.robust_index <- function(x, ...) {
                 index = im
             )
         }
-
-    } else if (is.vector(x)) {
+    } 
+    else if (is.vector(x)) {
         if (...length() != 1L) {
             cli_abort("Incorrect number of dimensions.")
         }
@@ -61,12 +61,11 @@ check_index_valid_array <- function(x, margin, index, call = parent.frame()) {
         if (anyNA(index)) {
             cli_abort("Subscript is NA", call = call)
         }
-
         if (length(index) != dim(x)[margin]) {
             cli_abort("Subscript length mismatch in dimension {margin}", call = call)
         }
-
-    } else if (is.numeric(index)) {
+    } 
+    else if (is.numeric(index)) {
         zero <- match(TRUE, index > -1L & index < 1L)
 
         if (!is.na(zero)) {
@@ -79,8 +78,8 @@ check_index_valid_array <- function(x, margin, index, call = parent.frame()) {
         if (!is.na(oob)) {
             cli_abort("Subscript ({index[oob]}) out of bounds in dimension {margin}.", call = call)
         }
-
-    } else if (is.character(index) || is.factor(index)) {
+    } 
+    else if (is.character(index) || is.factor(index)) {
         index <- as.character(index)
         nams <- dimnames(x)[[margin]]
 
@@ -93,8 +92,8 @@ check_index_valid_array <- function(x, margin, index, call = parent.frame()) {
         if (!is.na(missing_name)) {
             cli_abort("Invalid subscript '{index[missing_name]}' in dimension {margin}.", call = call)
         }
-
-    } else {
+    } 
+    else {
         cli_abort("Invalid subscript of class `{class(index)}`.", call = call)
     }
 }
@@ -107,8 +106,8 @@ check_index_valid_vector <- function(x, index, call = parent.frame()) {
         if (length(index) != length(x)) {
             cli_abort("Subscript length mismatch", call = call)
         }
-
-    } else if (is.numeric(index)) {
+    }
+    else if (is.numeric(index)) {
         zero <- match(TRUE, index > -1L & index < 1L)
 
         if (!is.na(zero)) {
@@ -121,8 +120,8 @@ check_index_valid_vector <- function(x, index, call = parent.frame()) {
         if (!is.na(oob)) {
             cli_abort("Subscript ({index[oob]}) out of bounds.", call = call)
         }
-
-    } else if (is.character(index) || is.factor(index)) {
+    } 
+    else if (is.character(index) || is.factor(index)) {
         index <- as.character(index)
         nams <- names(x)
 
@@ -135,8 +134,8 @@ check_index_valid_vector <- function(x, index, call = parent.frame()) {
         if (!is.na(missing_name)) {
             cli_abort("Invalid subscript '{index[missing_name]}'.", call = call)
         }
-
-    } else {
+    } 
+    else {
         cli_abort("Invalid subscript of class `{class(index)}`.", call = call)
     }
 }

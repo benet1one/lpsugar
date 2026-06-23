@@ -63,13 +63,15 @@ new_objective <- function(.problem, type, direction = NULL,
     if (is.null(coef)) {
         coef <- rep(0, ncol(.problem))
         names(coef) <- attr(.problem, "varnames")
-    } else {
+    } 
+    else {
         coef <- drop(coef)
     }
     
     if (is.null(add)) {
         add <- 0
-    } else {
+    } 
+    else {
         add <- drop(add)
     }
     
@@ -159,7 +161,8 @@ print.lp_objective <- function(x, ...) {
 update_objective <- function(.problem) {
     if (.problem$objective$type == "undefined") {
         return(.problem)
-    } else if (.problem$objective$type == "nonlinear") {
+    } 
+    else if (.problem$objective$type == "nonlinear") {
         cli_abort(c(
             "Cannot add a variable to a nonlinear problem.",
             ">" = paste(

@@ -11,9 +11,11 @@ Ops.lp_variable <- function(e1, e2) {
     if (rlang::is_missing(e2)) {
         if (op == "+") {
             return(e1)
-        } else if (op == "-") {
+        } 
+        else if (op == "-") {
             return(minus_v(e1))
-        } else if (op == "!") {
+        } 
+        else if (op == "!") {
             return(negate_v(e1, call))
         }
         cli_abort("Unsupported operation `{op}`", call = call)
@@ -35,13 +37,17 @@ Ops.lp_variable <- function(e1, e2) {
     # Two element arithmetic
     if (op == "+") {
         return(add_lp(e1, e2, call))
-    } else if (op == "-") {
+    } 
+    else if (op == "-") {
         return(subtract_lp(e1, e2, call))
-    } else if (op == "*") {
+    } 
+    else if (op == "*") {
         return(multiply_lp(e1, e2, call))
-    } else if (op == "/") {
+    } 
+    else if (op == "/") {
         return(divide_lp(e1, e2, call))
-    } else if (op == "^") {
+    } 
+    else if (op == "^") {
         return(power_lp(e1, e2, call))
     }
 
@@ -49,7 +55,8 @@ Ops.lp_variable <- function(e1, e2) {
     comparison_ops <- c("<", "<=", "==", ">=", ">")
     if (op %in% comparison_ops) {
         return(compare_lp(e1, e2, op, call))
-    } else if (op == "!=") {
+    } 
+    else if (op == "!=") {
         cli_abort("Inequality `!=` is not supported in constraints.", call = call)
     }
 
@@ -73,11 +80,14 @@ add_lp <- function(x, y, call) {
 
     if (xv && yv) {
         add_v_v(x, y, call)
-    } else if (xv) {
+    } 
+    else if (xv) {
         add_v_c(x, y, call)
-    } else if (yv) {
+    } 
+    else if (yv) {
         add_v_c(y, x, call)
-    } else {
+    } 
+    else {
         cli_abort("None are lp_variables", call = call)
     }
 }
@@ -87,11 +97,14 @@ subtract_lp <- function(x, y, call) {
 
     if (xv && yv) {
         subtract_v_v(x, y, call)
-    } else if (xv) {
+    } 
+    else if (xv) {
         subtract_v_c(x, y, call)
-    } else if (yv) {
+    } 
+    else if (yv) {
         subtract_c_v(x, y, call)
-    } else {
+    } 
+    else {
         cli_abort("None are lp_variables", call = call)
     }
 }
@@ -101,27 +114,33 @@ multiply_lp <- function(x, y, call) {
 
     if (xv && yv) {
         multiply_v_v(x, y, call)
-    } else if (xv) {
+    } 
+    else if (xv) {
         multiply_v_c(x, y, call)
-    } else if (yv) {
+    } 
+    else if (yv) {
         multiply_v_c(y, x, call)
-    } else {
+    } 
+    else {
         cli_abort("None are lp_variables", call = call)
     }
 }
 divide_lp <- function(x, y, call) {
     if (is_lp_variable(y)) {
         divide_a_v(x, y, call)
-    } else if (is_lp_variable(x)) {
+    } 
+    else if (is_lp_variable(x)) {
         divide_v_c(x, y, call)
-    } else {
+    } 
+    else {
         cli_abort("None are lp_variables", call = call)
     }
 }
 power_lp <- function(x, y, call) {
     if (is_lp_variable(x) && !is_lp_variable(y)) {
         power_v_c(x, y, call)
-    } else {
+    } 
+    else {
         cli_abort("Non-quadratic operation.", call = call)
     }
 }
@@ -146,7 +165,8 @@ add_v_v <- function(x, y, call) {
 
     if (qx && qy) {
         out$q_coef <- purrr::map2(x$q_coef, y$q_coef, `+`)
-    } else if (qx || qy) {
+    } 
+    else if (qx || qy) {
         out$q_coef <- x$q_coef %||% y$q_coef
     }
 
@@ -311,9 +331,11 @@ negate_v <- function(x, call) {
 
     if (xv && yv) {
         matrix_multiply_v_v(x, y, call = call)
-    } else if (xv) {
+    } 
+    else if (xv) {
         matrix_multiply_v_c(x, y, call = call)
-    } else {
+    } 
+    else {
         t(matrix_multiply_v_c(t(y), t(x), call = call))
     }
 }
@@ -322,7 +344,8 @@ negate_v <- function(x, call) {
 matrix_multiply_v_c <- function(x, y, call) {
     if (ndim(x) > 2L) {
         cli_abort("Variable has ({ndim(x)}) dimensions.")
-    } else if (ndim(x) == 1L) {
+    } 
+    else if (ndim(x) == 1L) {
         x$ind <- matrix(x$ind, ncol = 1L)
     }
 
@@ -371,13 +394,15 @@ matrix_multiply_v_v <- function(x, y, call) {
 
     if (ndx > 2L) {
         cli_abort("Left-hand-side has {ndx} dimensions.")
-    } else if (ndx == 1L) {
+    } 
+    else if (ndx == 1L) {
         x$ind <- matrix(x$ind, ncol = 1L)
     }
 
     if (ndy > 2L) {
         cli_abort("Right-hand-side has {ndy} dimensions.")
-    } else if (ndy == 1L) {
+    } 
+    else if (ndy == 1L) {
         y$ind <- matrix(y$ind, ncol = 1L)
     }
 
@@ -444,7 +469,8 @@ compare_lp <- function(x, y, op, call) {
 
     if (op == "<") {
         op <- "<="
-    } else if (op == ">") {
+    } 
+    else if (op == ">") {
         op <- ">="
     }
 
@@ -454,11 +480,13 @@ compare_lp <- function(x, y, op, call) {
         q_lhs <- lapply(var$q_coef, function(q) {
             if (any(q != 0)) {
                 slam::as.simple_triplet_matrix(q)
-            } else {
+            } 
+            else {
                 NULL
             }
         })
-    } else {
+    } 
+    else {
         q_lhs <- rep(list(NULL), length(var))
     }
 

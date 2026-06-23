@@ -33,14 +33,14 @@ parameter <- function(.x, ..., byrow = TRUE) {
     if (length(dots) == 1L) {
         warn_changed_args(byrow = TRUE)
         parameter_vector(.x, dots)
-
-    } else if (length(dots) == 2L) {
+    } 
+    else if (length(dots) == 2L) {
         parameter_matrix(.x, dots, byrow = byrow)
-
-    } else if (length(dots) == 0L) {
+    } 
+    else if (length(dots) == 0L) {
         cli_abort("`...` cannot be empty.")
-
-    } else {
+    } 
+    else {
         cli_abort("Only vectors and matrices are supported.")
     }
 }
@@ -87,8 +87,8 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
             .x, nrow = n, ncol = m,
             byrow = byrow, dimnames = dimnames_non_numeric(dots)
         ))
-
-    } else if (ndim(.x) == 2L) {
+    } 
+    else if (ndim(.x) == 2L) {
         if (any(dim(.x) != lengths(dots))) {
             cli_abort(
                 c("Dimensions do not match.",
@@ -101,8 +101,8 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
         warn_changed_args(byrow = TRUE)
         dimnames(.x) <- dimnames_non_numeric(dots)
         return(.x)
-
-    } else {
+    } 
+    else {
         cli_abort(
             "`.x` has {ndim(.x)} dimensions. Only vectors and matrices are supported.",
             call = parent.frame()
@@ -274,7 +274,8 @@ compute_aliases <- function(problem, solution) {
 
         if (length(out) == 1L) {
             unname(out[1])
-        } else {
+        } 
+        else {
             array(out, dim = dim2(a), dimnames = dimnames(a))
         }
     })

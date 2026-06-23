@@ -68,7 +68,8 @@ lp_variable <- function(.problem, definition,
 
     if (name %in% names(.problem$variables)) {
         cli_abort("Variable `{name}` already exists in this problem.")
-    } else if (name %in% names(.problem$aliases)) {
+    } 
+    else if (name %in% names(.problem$aliases)) {
         cli_abort("Cannot override alias `{name}`.")
     }
 
@@ -82,9 +83,11 @@ lp_variable <- function(.problem, definition,
 
     if (any(lower > upper)) {
         cli_abort("`lower` bound ({lower}) cannot be greater than `upper` bound ({upper}).")
-    } else if (any(lower == +Inf)) {
+    } 
+    else if (any(lower == +Inf)) {
         cli_abort("`lower` bound cannot be +Inf.")
-    } else if (any(upper == -Inf)) {
+    } 
+    else if (any(upper == -Inf)) {
         cli_abort("`upper` bound cannot be -Inf.")
     }
 
@@ -103,9 +106,11 @@ lp_variable <- function(.problem, definition,
 
     type <- if (binary && all(lower == 0) && all(upper == 1)) {
         "B"
-    } else if (binary || integer) {
+    } 
+    else if (binary || integer) {
         "I"
-    } else {
+    } 
+    else {
         "C"
     }
 
@@ -114,7 +119,8 @@ lp_variable <- function(.problem, definition,
     if (def$scalar) {
         ind <- ncol(.problem) + 1L
         ind <- robust_index(ind)
-    } else {
+    } 
+    else {
         ind <- array(dim = lengths(sets), dimnames = dnames) |> robust_index()
         ind[] <- 1:length(ind) + ncol(.problem)
     }
@@ -274,15 +280,18 @@ lp_fix_vars <- function(.problem, ...) {
 print.lp_variable <- function(x, ...) {
     if (x$binary) {
         cat("Binary ")
-    } else if (x$integer) {
+    } 
+    else if (x$integer) {
         cat("Integer ")
-    } else {
+    } 
+    else {
         cat("Real ")
     }
 
     if (length(x) == 1L) {
         cat("scalar ")
-    } else {
+    } 
+    else {
         cat("variable ")
     }
 
@@ -299,9 +308,11 @@ print.lp_variable <- function(x, ...) {
         if (x$lower != -Inf && x$upper != +Inf) {
             cat("\n")
             cat(x$lower, "<=", x$name, "<=", x$upper)
-        } else if (x$lower != -Inf) {
+        } 
+        else if (x$lower != -Inf) {
             cat("\n", x$name, " >= ", x$lower, sep = "")
-        } else if (x$upper != +Inf) {
+        } 
+        else if (x$upper != +Inf) {
             cat("\n", x$name, " <= ", x$upper, sep = "")
         }
     }
@@ -313,7 +324,8 @@ print.lp_variable <- function(x, ...) {
 print.transformed_lp_variable <- function(x, ...) {
     fields <- if (is_quadratic(x)) {
         c(c("q_coef", "coef", "add"))
-    } else {
+    } 
+    else {
         c("coef", "add")
     }
     
@@ -391,11 +403,14 @@ bind_vars <- function(...) {
 
         if (xv && yv) {
             bind_vv(x, y)
-        } else if (xv && !yv) {
+        } 
+        else if (xv && !yv) {
             bind_vc(x, y)
-        } else if (!xv && yv) {
+        } 
+        else if (!xv && yv) {
             bind_cv(x, y)
-        } else {
+        } 
+        else {
             c(x, y)
         }
     })
@@ -551,8 +566,9 @@ t.lp_variable <- function(x) {
             "Variable must be two-dimensional. ",
             ">" = "Index it with `x[..., drop = TRUE]` to drop unnecessary dimensions."
         ))
-
-    } else if (ndim(x) == 1L) {
+    } 
+    
+    if (ndim(x) == 1L) {
         x$ind <- matrix(x$ind, ncol = 1L)
     }
 
@@ -582,13 +598,13 @@ parse_variable_definition <- function(definition) {
     if (rlang::is_string(expr)) {
         sets <- list(scalar = "")
         return(list(name = expr, scalar = TRUE, sets = sets))
-
-    } else if (rlang::is_symbol(expr)) {
+    } 
+    else if (rlang::is_symbol(expr)) {
         name <- expr |> format()
         sets <- list(scalar = "")
         return(list(name = name, scalar = TRUE, sets = sets))
-
-    } else if (expr[[1]] == quote(`[`)) {
+    } 
+    else if (expr[[1]] == quote(`[`)) {
         name <- expr[[2]]
 
         if (!rlang::is_symbol(name) && !rlang::is_string(name)) {
@@ -686,7 +702,8 @@ name_variable <- function(name, sets) {
 recycle_var <- function(x, n) {
     if (length(x) == n) {
         return(x)
-    } else if (length(x) == 1L) {
+    } 
+    else if (length(x) == 1L) {
         i <- rep(1L, n)
         x$ind <- x$ind[i]
 
@@ -705,7 +722,8 @@ recycle_var <- function(x, n) {
 recycle_const <- function(x, n) {
     if (length(x) == n) {
         return(c(x))
-    } else if (length(x) == 1L) {
+    } 
+    else if (length(x) == 1L) {
         return(rep(x, n))
     }
 
@@ -735,9 +753,11 @@ get_q_coef <- function(x) {
 is_quadratic <- function(x) {
     if (is_lp_variable(x) || is_lp_objective(x)) {
         return(!is.null(x$q_coef))
-    } else if (is_lp_constraint(x)) {
+    } 
+    else if (is_lp_constraint(x)) {
         return(any(lengths(x$q_lhs) > 0L))
-    } else {
+    } 
+    else {
         return(FALSE)
     }
 }

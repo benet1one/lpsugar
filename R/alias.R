@@ -32,7 +32,8 @@ lp_alias <- function(.problem, ...) {
 lp_alias_internal <- function(.problem, quosure, name, data) {
     if (name %in% names(.problem$variables)) {
         cli_abort("Cannot override variable `{name}`.", call = parent.frame())
-    } else if (name %in% names(.problem$aliases)) {
+    } 
+    else if (name %in% names(.problem$aliases)) {
         cli_inform("Overriding alias `{name}`.", call = parent.frame())
     }
 
