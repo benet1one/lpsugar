@@ -27,17 +27,17 @@ The elements of a transportation problem are these:
 
 #### Sets
 
-$F$ —  `factory`
+$F$ — `factory`
 
 $M$ — `market`
 
 #### Parameters
 
-$s$ — `supply` produced by each `factory`.   
+$s$ — `supply` produced by each `factory`.
 
-$d$ — `demand` on each `market`.         
+$d$ — `demand` on each `market`.
 
-$c$ — `cost` to transport a unit from each `factory` to each `market`. 
+$c$ — `cost` to transport a unit from each `factory` to each `market`.
 
 #### Variable
 
