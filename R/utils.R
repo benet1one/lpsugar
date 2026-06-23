@@ -1,6 +1,8 @@
 
 # Messages --------------------------
 
+# Gives a warning if a function argument is not the default
+# Useful for arguments that are ignored
 warn_changed_args <- function(..., env = parent.frame(), call = env) {
     expected <- rlang::enexprs(..., .named = TRUE, .homonyms = "error")
     
@@ -18,6 +20,7 @@ warn_changed_args <- function(..., env = parent.frame(), call = env) {
 
 # Safety ------------------------
 
+# Formats an object to a string (length 1)
 format1 <- function(x, ...) {
     if (!rlang::is_symbolic(x)) {
         return(rlang::as_label(x))
@@ -35,6 +38,7 @@ format1 <- function(x, ...) {
         paste(y[1], "...")
     }
 }
+
 dim2 <- function(x) {
     if (is.null(dim(x))) {
         length(x)
@@ -43,6 +47,7 @@ dim2 <- function(x) {
         dim(x)
     }
 }
+# Number of dimensions
 ndim <- function(x, drop = FALSE) {
     if (drop) {
         # Without max(1), scalars would return 0 dimensions
@@ -52,6 +57,9 @@ ndim <- function(x, drop = FALSE) {
         length(dim2(x))
     }
 }
+
+# Returns FALSE if dimensions are incompatible
+# and a condition
 compatible_dimensions <- function(x, y, drop_dim = TRUE) {
     if (is_lp_variable(x)) {
         x <- x$ind
@@ -83,6 +91,7 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
         return(TRUE)
     }
 }
+
 dimnames_non_numeric <- function(dimnames) {
     for (i in seq_along(dimnames)) {
         d <- dimnames[[i]]
@@ -96,6 +105,8 @@ dimnames_non_numeric <- function(dimnames) {
 
 # Transforming variables -------------------------
 
+# Returns a named list with the variable's values
+# in their proper dimensions
 variables_to_list <- function(x, problem, 
                               binary_as_logical = FALSE, 
                               miss_error = TRUE, 
@@ -159,7 +170,8 @@ variables_to_list.list <- function(x, problem,
     })
 }
 
-
+# Returns a named vector with the values of the variables
+# Named with variable.names(problem)
 variables_to_vec <- function(x, problem, miss_error = TRUE, 
                              call = environment(), field = "x") {
     UseMethod("variables_to_vec")
@@ -289,6 +301,7 @@ variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE,
 
 # Quadratic ---------------------
 
+# Returns or builds quadratic part of a variable or objective function
 get_q_coef <- function(x) {
     if (is_quadratic(x)) {
         return(x$q_coef)
@@ -307,6 +320,7 @@ get_q_coef <- function(x) {
     list(qmat) |> rep(length(x))
 }
 
+# Is a variable, constraint, or objective function quadratic?
 is_quadratic <- function(x) {
     if (is_lp_variable(x) || is_lp_objective(x)) {
         return(!is.null(x$q_coef))
@@ -319,6 +333,7 @@ is_quadratic <- function(x) {
     }
 }
 
+# Turn a variable or objective function into quadratic
 as_quadratic <- function(x) {
     if (is_quadratic(x)) {
         return(x)
@@ -381,6 +396,7 @@ check_roi_solution <- function(solution, field_name = "solution") {
 
 # Evaluation --------------------
 
+# Where lp_eval() is evaluated
 data_mask <- function(.problem) {
     fun <- custom_fun()
     var <- rlang::new_environment(.problem$variables, parent = fun)
@@ -388,6 +404,8 @@ data_mask <- function(.problem) {
     
     rlang::new_data_mask(bottom = als, top = fun)
 }
+
+# Eval an expression inside lp_min(), lp_con(), lp_alias(), ...
 lp_eval <- function(.problem, expr, split_for = FALSE) {
     quosure <- rlang::enquo(expr)
     data <- data_mask(.problem)
