@@ -52,14 +52,6 @@ ndim <- function(x, drop = FALSE) {
         length(dim2(x))
     }
 }
-non_conformable <- function(x, y) {
-    length(x) > 1L && length(y) > 1L && length(x) != length(y)
-}
-check_conformable <- function(x, y, call = environment()) {
-    if (non_conformable(x, y)) {
-        cli_abort("Non-conformable arrays", call = call)
-    }
-}
 compatible_dimensions <- function(x, y, drop_dim = TRUE) {
     if (is_lp_variable(x)) {
         x <- x$ind
@@ -73,9 +65,18 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
         y <- drop(y)
     }
     
+    if (length(x) > 1L && length(y) > 1L && length(x) != length(y)) {
+        cnd <- rlang::error_cnd(
+            class = "lpsugar_error_non_conformable",
+            message = "non-conformable arrays"
+        )
+        return(structure(FALSE, cnd = cnd))
+    }
+    
     attempt <- rlang::try_fetch(x + y, warning = identity, error = identity)
     
     if (rlang::is_error(attempt)) {
+        attempt$class <- "lpsugar_error_non_conformable"
         return(structure(FALSE, cnd = attempt))
     } 
     else {
