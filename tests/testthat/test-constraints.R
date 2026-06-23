@@ -1,33 +1,29 @@
 
 test_that("printing", {
+    p <- problem_constraints()
+    
     plong <- lp_problem() |>
         lp_var(x) |>
         lp_con(x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x > 1)
-
-    print(plong$constraints)
-    print(plong$constraints, compact = TRUE) |> expect_snapshot()
-
-    p <- problem_constraints()
-    print(p$constraints)
-    print(p$constraints, compact = TRUE) |> expect_snapshot()
 
     p_many_rows <- lp_problem() |>
         lp_var(y[1:3]) |>
         lp_con(
             for (i in 1:20) y[i %% 3 + 1] <= i
         )
-
-    expect_snapshot(
-        print(p_many_rows, compact = FALSE)
-    )
-
+    
     p_many_cols <- lp_problem() |>
         lp_var(z[1:300]) |>
         lp_con(z >= 0, z <= 10)
-
-    expect_snapshot(
-        print(p_many_cols, compact = FALSE)
-    )
+    
+    print(p$constraints, compact = TRUE) |> expect_snapshot()
+    print(p$constraints) |> expect_snapshot()
+    
+    print(plong$constraints, compact = TRUE) |> expect_snapshot()
+    print(plong$constraints) |> expect_snapshot()
+    
+    print(p_many_rows, compact = FALSE) |> expect_snapshot()
+    print(p_many_cols, compact = FALSE) |> expect_snapshot()
 })
 
 test_that("constraint updates", {

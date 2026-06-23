@@ -1,6 +1,85 @@
 # printing
 
     Code
+      print(p$constraints, compact = TRUE)
+    Output
+      
+      <unnamed>    | n = 1 | x[1] == 0
+      my_con       | n = 6 | x < t(y)
+      one_line_fs  | n = 6 | for (i in 1:3) x[i, ] >= y[, i] - 10
+      my_fs        | n = 6 | for (i in 1:3) { ... }
+
+---
+
+    Code
+      print(p$constraints)
+    Output
+      
+      <unnamed> | n = 1 | x[1] == 0
+      
+       x[1,1] x[2,1] x[3,1] x[1,2] x[2,2] x[3,2] y[1,1] y[2,1] y[1,2] y[2,2] y[1,3]
+       1      0      0      0      0      0      0      0      0      0      0     
+       y[2,3] dir  
+       0      ==  0
+      
+      
+      my_con | n = 6 | x < t(y)
+      
+             x[1,1] x[2,1] x[3,1] x[1,2] x[2,2] x[3,2] y[1,1] y[2,1] y[1,2] y[2,2]
+      my_con 1      0      0      0      0      0      -1     0      0      0     
+      my_con 0      1      0      0      0      0      0      0      -1     0     
+      my_con 0      0      1      0      0      0      0      0      0      0     
+      my_con 0      0      0      1      0      0      0      -1     0      0     
+      my_con 0      0      0      0      1      0      0      0      0      -1    
+      my_con 0      0      0      0      0      1      0      0      0      0     
+             y[1,3] y[2,3] dir  
+      my_con 0      0      <=  0
+      my_con 0      0      <=  0
+      my_con -1     0      <=  0
+      my_con 0      0      <=  0
+      my_con 0      0      <=  0
+      my_con 0      -1     <=  0
+      
+      
+      one_line_fs | n = 6 | for (i in 1:3) x[i, ] >= y[, i] - 10
+      
+                       x[1,1] x[2,1] x[3,1] x[1,2] x[2,2] x[3,2] y[1,1] y[2,1] y[1,2]
+      one_line_fs[i=1] 1      0      0      0      0      0      -1     0      0     
+      one_line_fs[i=1] 0      0      0      1      0      0      0      -1     0     
+      one_line_fs[i=2] 0      1      0      0      0      0      0      0      -1    
+      one_line_fs[i=2] 0      0      0      0      1      0      0      0      0     
+      one_line_fs[i=3] 0      0      1      0      0      0      0      0      0     
+      one_line_fs[i=3] 0      0      0      0      0      1      0      0      0     
+                       y[2,2] y[1,3] y[2,3] dir    
+      one_line_fs[i=1] 0      0      0      >=  -10
+      one_line_fs[i=1] 0      0      0      >=  -10
+      one_line_fs[i=2] 0      0      0      >=  -10
+      one_line_fs[i=2] -1     0      0      >=  -10
+      one_line_fs[i=3] 0      -1     0      >=  -10
+      one_line_fs[i=3] 0      0      -1     >=  -10
+      
+      
+      my_fs | n = 6 | for (i in 1:3) { ... }
+      
+                 x[1,1] x[2,1] x[3,1] x[1,2] x[2,2] x[3,2] y[1,1] y[2,1] y[1,2]
+      my_fs[i=1] 1      0      0      0      0      0      -1     0      0     
+      my_fs[i=1] 0      0      0      1      0      0      0      -1     0     
+      my_fs[i=2] 0      1      0      0      0      0      0      0      -1    
+      my_fs[i=2] 0      0      0      0      1      0      0      0      0     
+      my_fs[i=3] 0      0      1      0      0      0      0      0      0     
+      my_fs[i=3] 0      0      0      0      0      1      0      0      0     
+                 y[2,2] y[1,3] y[2,3] dir  
+      my_fs[i=1] 0      0      0      <=  0
+      my_fs[i=1] 0      0      0      <=  0
+      my_fs[i=2] 0      0      0      <=  0
+      my_fs[i=2] -1     0      0      <=  0
+      my_fs[i=3] 0      -1     0      <=  0
+      my_fs[i=3] 0      0      -1     <=  0
+      
+
+---
+
+    Code
       print(plong$constraints, compact = TRUE)
     Output
       
@@ -9,13 +88,14 @@
 ---
 
     Code
-      print(p$constraints, compact = TRUE)
+      print(plong$constraints)
     Output
       
-      <unnamed>    | n = 1 | x[1] == 0
-      my_con       | n = 6 | x < t(y)
-      one_line_fs  | n = 6 | for (i in 1:3) x[i, ] >= y[, i] - 10
-      my_fs        | n = 6 | for (i in 1:3) { ... }
+      <unnamed> | n = 1 | x + x + x + x + x + x + x + x + x + x + x + x + x + x + x + x +  ...
+      
+       x  dir  
+       28 >=  1
+      
 
 ---
 
