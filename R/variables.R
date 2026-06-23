@@ -699,8 +699,9 @@ interpret_bound <- function(bound, bound_name, default, dim) {
     bound
 }
 name_variable <- function(name, sets) {
-    if (length(sets) == 1L && lengths(sets) == 1L)
+    if (length(sets) == 1L && lengths(sets) == 1L) {
         return(name)
+    }
     grid <- do.call(expand.grid, sets)
     index <- .mapply(dots = grid, FUN = paste, MoreArgs = list(sep = ","))
     paste0(name, "[", index, "]")
