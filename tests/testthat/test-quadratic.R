@@ -135,7 +135,7 @@ test_that("ifelse quadratic", {
             ifelse(test, a*x^2, a) <= 10
         )
 
-    p$constraints$q_lhs |>
+    p$constraints$Q |>
         purrr::map_if(~!is.null(.x), ~as.matrix(.x)) |>
         expect_snapshot()
 })

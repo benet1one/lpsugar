@@ -34,26 +34,26 @@ test_that("constraint updates", {
     p2 <- p |> lp_variable(z[1:2])
 
     expect_equal(
-        dim(p2$constraints$lhs),
+        dim(p2$constraints$L),
         c(3, 5)
     )
     expect_equal(
-        colnames(p2$constraints$lhs),
+        colnames(p2$constraints$L),
         attr(p2, "varnames")
     )
     expect_equal(
-        dim(p2$constraints$q_lhs[[1]]),
+        dim(p2$constraints$Q[[1]]),
         c(5, 5)
     )
     expect_equal(
-        dimnames(p2$constraints$q_lhs[[1]]),
+        dimnames(p2$constraints$Q[[1]]),
         list(attr(p2, "varnames"), attr(p2, "varnames"))
     )
 
     p3 <- p2 |> lp_constraint(x[1:2] <= 4*z[1:2])
 
     expect_equal(
-        dim(p3$constraints$lhs),
+        dim(p3$constraints$L),
         c(5, 5)
     )
 

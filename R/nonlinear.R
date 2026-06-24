@@ -168,8 +168,8 @@ new_nonlinear_objective <- function(.problem, direction = NULL,
         fun = fun,
         gradient = gradient,
         hessian = hessian,
-        add = 0,
-        expr = expr
+        expr = expr,
+        A = 0 # compute_objective() always adds this offset
     ) |> structure(class = "lp_objective")
 }
 

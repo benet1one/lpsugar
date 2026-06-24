@@ -148,16 +148,16 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
     con <- problem$constraints
     
     quadratic_part <- numeric(nrow(con))
-    q_ind <- which(lengths(con$q_lhs) > 0L)
+    q_ind <- which(lengths(con$Q) > 0L)
     
     for (i in q_ind) {
-        q <- con$q_lhs[[i]]
+        q <- con$Q[[i]]
         row_sol <- t(solution)
         col_sol <- t(row_sol)
         quadratic_part[i] <- 0.5 * row_sol %*% q %*% col_sol
     }
     
-    linear_part <- con$lhs %*% solution
+    linear_part <- con$L %*% solution
     lhs <- quadratic_part + linear_part
     dir <- con$dir
     rhs <- con$rhs[, 1]
@@ -229,14 +229,14 @@ compute_objective <- function(problem, solution) {
         return(problem$objective$fun(solution))
     }
     
-    coef <- problem$objective$coef
-    add <- problem$objective$add
-    out <- crossprod(coef, solution) + add
+    L <- problem$objective$L
+    A <- problem$objective$A
+    out <- crossprod(L, solution) + A
     
     if (is_quadratic(problem$objective)) {
         row_sol <- t(solution)
         col_sol <- t(row_sol)
-        q <- problem$objective$q_coef
+        q <- problem$objective$Q
         
         q_out <- 0.5 * row_sol %*% q %*% col_sol
         out <- out + q_out
@@ -257,15 +257,15 @@ compute_aliases <- function(problem, solution) {
     )
     
     purrr::map(problem$aliases, function(a) {
-        mat <- array(unclass(a$coef), dim = dim(a$coef))
-        add <- unclass(a$add)
+        mat <- array(unclass(a$L), dim = dim(a$L))
+        add <- unclass(a$A)
         out <- mat %*% solution + add
         
         if (is_quadratic(a)) {
             row_sol <- t(solution)
             col_sol <- t(row_sol)
             
-            q_out <- purrr::map_dbl(a$q_coef, function(qi) {
+            q_out <- purrr::map_dbl(a$Q, function(qi) {
                 0.5 * row_sol %*% qi %*% col_sol
             })
             

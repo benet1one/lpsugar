@@ -43,7 +43,7 @@
     Code
       bind_vars(1:2, y, x[1], 3)
     Output
-      $coef
+      $L
            x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
       [1,]    0    0    0      0      0      0      0
       [2,]    0    0    0      0      0      0      0
@@ -55,7 +55,7 @@
       [8,]    0    0    0      0      0      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    1
       [2,]    2
@@ -73,8 +73,8 @@
     Code
       bind_vars(1:2, x^2)
     Output
-      $q_coef
-      $q_coef[[1]]
+      $Q
+      $Q[[1]]
              x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
       x[1]      0    0    0      0      0      0      0
       x[2]      0    0    0      0      0      0      0
@@ -85,7 +85,7 @@
       y[2,2]    0    0    0      0      0      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $q_coef[[2]]
+      $Q[[2]]
              x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
       x[1]      0    0    0      0      0      0      0
       x[2]      0    0    0      0      0      0      0
@@ -96,7 +96,7 @@
       y[2,2]    0    0    0      0      0      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $q_coef[[3]]
+      $Q[[3]]
              x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
       x[1]      2    0    0      0      0      0      0
       x[2]      0    0    0      0      0      0      0
@@ -107,7 +107,7 @@
       y[2,2]    0    0    0      0      0      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $q_coef[[4]]
+      $Q[[4]]
              x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
       x[1]      0    0    0      0      0      0      0
       x[2]      0    2    0      0      0      0      0
@@ -118,7 +118,7 @@
       y[2,2]    0    0    0      0      0      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $q_coef[[5]]
+      $Q[[5]]
              x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
       x[1]      0    0    0      0      0      0      0
       x[2]      0    0    0      0      0      0      0
@@ -130,7 +130,7 @@
       with class 'robust_index' from package 'lpsugar'
       
       
-      $coef
+      $L
            x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
       [1,]    0    0    0      0      0      0      0
       [2,]    0    0    0      0      0      0      0
@@ -139,7 +139,7 @@
       [5,]    0    0    0      0      0      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    1
       [2,]    2
@@ -154,7 +154,7 @@
     Code
       t(z)
     Output
-      $coef
+      $L
            x y[a] y[b] y[c] z[1,a] z[2,a] z[1,b] z[2,b] z[1,c] z[2,c]
       [1,] 0    0    0    0      1      0      0      0      0      0
       [2,] 0    0    0    0      0      0      1      0      0      0
@@ -164,7 +164,7 @@
       [6,] 0    0    0    0      0      0      0      0      0      1
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    0
       [2,]    0
@@ -180,7 +180,7 @@
     Code
       t(ThreeD[, , 1, drop = TRUE])
     Output
-      $coef
+      $L
            ThreeD[1,1,1] ThreeD[2,1,1] ThreeD[1,2,1] ThreeD[2,2,1] ThreeD[1,3,1]
       [1,]             1             0             0             0             0
       [2,]             0             0             1             0             0
@@ -211,7 +211,7 @@
       [6,]             0             0             0
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    0
       [2,]    0
@@ -225,7 +225,7 @@
 # operations
 
     Code
-      diff(y)$coef
+      diff(y)$L
     Output
            x y[a] y[b] y[c] z[1,a] z[2,a] z[1,b] z[2,b] z[1,c] z[2,c]
       [1,] 0   -1    1    0      0      0      0      0      0      0
@@ -235,7 +235,7 @@
 ---
 
     Code
-      diff(y, lag = 2)$coef
+      diff(y, lag = 2)$L
     Output
            x y[a] y[b] y[c] z[1,a] z[2,a] z[1,b] z[2,b] z[1,c] z[2,c]
       [1,] 0   -1    0    1      0      0      0      0      0      0

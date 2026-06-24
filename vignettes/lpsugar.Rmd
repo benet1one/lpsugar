@@ -245,7 +245,7 @@ p <- lp_problem() |>
         sum_over(i=I, j=J, s[j] * x[i, j])
     )
 
-p$objective$coef
+p$objective$L
 ```
 
 Sometimes the goal is to find any feasible solution. This can be done by

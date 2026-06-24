@@ -25,17 +25,18 @@ lp_subject_to(.problem, ...)
 The \code{.problem} with added \verb{$constraints}. (Note: previous constraints are not
 overritten).
 
-Constraints can be represented as \verb{lhs * vars <dir> rhs}.
+A constraint with \code{dir[i] = "<="} is represented as
+\eqn{\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i}}.
 
 The \verb{$constraints} field has the following subfields:
 \itemize{
-\item \verb{$q_lhs} : List of quadratic coefficient matrices:
+\item \verb{$Q} : List of quadratic coefficient matrices:
 \itemize{
-\item \code{NULL} if constraint is linear.
+\item \code{NULL} if the constraint is linear.
 \item \code{\link[slam:matrix]{slam::simple_triplet_matrix()}} if constraint is quadratic.
 }
-\item \verb{$lhs} : \code{\link[slam:matrix]{slam::simple_triplet_matrix()}} where each row is a constraint,
-each column is a variable, and the values represent coefficients.
+\item \verb{$L} : \code{\link[slam:matrix]{slam::simple_triplet_matrix()}} of linear coefficients,
+where each row is a constraint and each is a variable.
 \item \verb{$dir} : Character vector with elements \code{"<="}, \code{"=="}, or \code{">="},
 the direction of each constraint.
 \item \verb{$rhs} : Numeric column vector representing the right hand side of each constraint.

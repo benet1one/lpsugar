@@ -123,7 +123,7 @@ as.L_objective.lp_problem <- function(x) {
     }
     
     ROI::L_objective(
-        L = x$objective$coef,
+        L = x$objective$L,
         names = attr(x, "varnames")
     )
 }
@@ -136,8 +136,8 @@ as.Q_objective.lp_problem <- function(x) {
     }
     
     ROI::Q_objective(
-        Q = x$objective$q_coef,
-        L = x$objective$coef,
+        Q = x$objective$Q,
+        L = x$objective$L,
         names = attr(x, "varnames")
     )
 }
@@ -172,7 +172,7 @@ as.L_constraint.lp_problem <- function(x, ...) {
     }
     
     ROI::L_constraint(
-        L = x$constraints$lhs,
+        L = x$constraints$L,
         dir = c(x$constraints$dir),
         rhs = c(x$constraints$rhs),
         names = attr(x, "varnames")
@@ -189,8 +189,8 @@ as.Q_constraint.lp_problem <- function(x, ...) {
     }
     
     ROI::Q_constraint(
-        Q = x$constraints$q_lhs,
-        L = x$constraints$lhs,
+        Q = x$constraints$Q,
+        L = x$constraints$L,
         dir = c(x$constraints$dir),
         rhs = c(x$constraints$rhs),
         names = attr(x, "varnames")
@@ -322,7 +322,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     )
     
     als <- compute_aliases(problem, solution$solution)
-    objective <- solution$objval + problem$objective$add
+    objective <- solution$objval + problem$objective$A
     
     list(
         objective = objective,

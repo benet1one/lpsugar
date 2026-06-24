@@ -8,8 +8,8 @@ lp_objective <- function(.problem, objective) {
         .problem$objective <- new_objective(
             .problem,
             type = "feasible",
-            coef = NULL,
-            add = 0,
+            L = NULL,
+            A = 0,
             expr = ""
         )
         
@@ -37,9 +37,9 @@ lp_objective <- function(.problem, objective) {
     .problem$objective <- new_objective(
         .problem,
         type = if (is_quadratic(objective)) "quadratic" else "linear",
-        q_coef = objective$q_coef[[1]],
-        coef = unclass(objective$coef),
-        add = unclass(objective$add),
+        Q = objective$Q[[1]],
+        L = unclass(objective$L),
+        A = unclass(objective$A),
         expr = expr
     )
     
@@ -47,40 +47,40 @@ lp_objective <- function(.problem, objective) {
 }
 
 new_objective <- function(.problem, type, direction = NULL, 
-                          q_coef = NULL, coef = NULL, add = NULL, expr = "") {
+                          Q = NULL, L = NULL, A = NULL, expr = "") {
     if (is.null(direction)) {
         direction <- .problem$objective$direction
     }
     
-    if (!is.null(q_coef)) {
-        q_coef <- slam::as.simple_triplet_matrix(q_coef)
-        q_coef$dimnames <- list(
+    if (!is.null(Q)) {
+        Q <- slam::as.simple_triplet_matrix(Q)
+        Q$dimnames <- list(
             attr(.problem, "varnames"),
             attr(.problem, "varnames")
         )
     }
     
-    if (is.null(coef)) {
-        coef <- rep(0, ncol(.problem))
-        names(coef) <- attr(.problem, "varnames")
+    if (is.null(L)) {
+        L <- rep(0, ncol(.problem))
+        names(L) <- attr(.problem, "varnames")
     } 
     else {
-        coef <- drop(coef)
+        L <- drop(L)
     }
     
-    if (is.null(add)) {
-        add <- 0
+    if (is.null(A)) {
+        A <- 0
     } 
     else {
-        add <- drop(add)
+        A <- drop(A)
     }
     
     list(
         type = type,
         direction = direction,
-        q_coef = q_coef,
-        coef = coef,
-        add = add,
+        Q = Q,
+        L = L,
+        A = A,
         expr = expr
     ) |> structure(class = "lp_objective")
 }
@@ -102,9 +102,9 @@ new_objective <- function(.problem, type, direction = NULL,
 #' the `sum` yourself.
 #'
 #' @returns The `.problem` with the new `$objective` function, a list with these fields:
-#' - `$q_coef` : If objective function is quadratic, matrix with the quadratic coefficients.
-#' - `$coef` : Vector with the coefficients for each variable.
-#' - `$add` : Numeric, addend to the final value. It is not used in the solver.
+#' - `$Q` : If objective function is quadratic, matrix with the quadratic coefficients.
+#' - `$L` : Vector with the coefficients for each variable.
+#' - `$A` : Numeric, addend to the final value. It is not used in the solver.
 #' - `$direction` : String, goal of the solver. Can be `"minimize"` or `"maximize"`.
 #' - `$expr` : String, expression that defined the objective function.
 #' @export
@@ -172,23 +172,23 @@ update_objective <- function(.problem) {
         ))
     }
     
-    n_before <- length(.problem$objective$coef)
+    n_before <- length(.problem$objective$L)
     n_after <- ncol(.problem)
     
     if (is_quadratic(.problem$objective)) {
-        .problem$objective$q_coef$nrow <- n_after
-        .problem$objective$q_coef$ncol <- n_after
-        .problem$objective$q_coef$dimnames <- list(
+        .problem$objective$Q$nrow <- n_after
+        .problem$objective$Q$ncol <- n_after
+        .problem$objective$Q$dimnames <- list(
             attr(.problem, "varnames"),
             attr(.problem, "varnames")
         )
     }
     
-    .problem$objective$coef <- c(
-        .problem$objective$coef,
+    .problem$objective$L <- c(
+        .problem$objective$L,
         numeric(n_after - n_before)
     )
     
-    names(.problem$objective$coef) <- attr(.problem, "varnames")
+    names(.problem$objective$L) <- attr(.problem, "varnames")
     return(.problem)
 }

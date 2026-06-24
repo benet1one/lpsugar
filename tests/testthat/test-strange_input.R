@@ -26,11 +26,11 @@ test_that("splice", {
         lp_alias(!!!a) |>
         lp_constraint(!!!c)
 
-    expect_true(p$aliases$a$coef == 2)
-    expect_true(p$aliases$a$add == 0)
+    expect_true(p$aliases$a$L == 2)
+    expect_true(p$aliases$a$A == 0)
 
-    expect_true(p$aliases$b$coef == 2)
-    expect_true(p$aliases$b$add == 1)
+    expect_true(p$aliases$b$L == 2)
+    expect_true(p$aliases$b$A == 1)
 
     expect_snapshot(p$constraints)
 })
@@ -50,7 +50,7 @@ test_that("for with no slpit", {
             }
         )
 
-    expect_true(p$constraints$lhs$v == 24)
+    expect_true(p$constraints$L$v == 24)
     expect_true(p$constraints$rhs == 9)
 })
 

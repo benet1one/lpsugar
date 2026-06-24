@@ -25,9 +25,9 @@ instead of optimizing, just like \code{\link[=lp_find_feasible]{lp_find_feasible
 \value{
 The \code{.problem} with the new \verb{$objective} function, a list with these fields:
 \itemize{
-\item \verb{$q_coef} : If objective function is quadratic, matrix with the quadratic coefficients.
-\item \verb{$coef} : Vector with the coefficients for each variable.
-\item \verb{$add} : Numeric, addend to the final value. It is not used in the solver.
+\item \verb{$Q} : If objective function is quadratic, matrix with the quadratic coefficients.
+\item \verb{$L} : Vector with the coefficients for each variable.
+\item \verb{$A} : Numeric, addend to the final value. It is not used in the solver.
 \item \verb{$direction} : String, goal of the solver. Can be \code{"minimize"} or \code{"maximize"}.
 \item \verb{$expr} : String, expression that defined the objective function.
 }
@@ -58,10 +58,10 @@ library(ROI.plugin.highs)
 (s <- lp_solve(p))
 
 s$aliases$total_profit
-sum(p$objective$coef * s$variables_vec)
+sum(p$objective$L * s$variables_vec)
 
 s$objective
-sum(p$objective$coef * s$variables_vec) + p$objective$add
+sum(p$objective$L * s$variables_vec) + p$objective$A
 }
 \seealso{
 \code{\link[=lp_minimize_function]{lp_minimize_function()}} For general nonlinear optimization.

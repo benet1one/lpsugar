@@ -72,11 +72,12 @@ The following fields are meant for internal use only.
 \itemize{
 \item \verb{$ind} : Integer array. Indicates which indices correspond to this variable.
 Meant for internal use only.
-\item \verb{$coef} : Numeric matrix. The number of rows is the length of the variable, the number
+\item \verb{$L} : Numeric matrix of linear coefficients.
+The number of rows is the length of the variable, the number
 of columns is the total amount of variables in the problem.
 The values represent coefficients that are modified when adding variables or multiplying
 by a constant. Used for objective, constraints and aliases.
-\item \verb{$add} : Numeric column vector. The number of rows is the length of the variable.
+\item \verb{$A} : Numeric column vector. The number of rows is the length of the variable.
 The values represent addends, modified when adding the variable and a constant.
 Used for objective, constraints and aliases.
 }

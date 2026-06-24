@@ -31,14 +31,14 @@
       $direction
       [1] "minimize"
       
-      $q_coef
+      $Q
       NULL
       
-      $coef
+      $L
            x   y[a]   y[b]   y[c] z[1,a] z[2,a] z[1,b] z[2,b] z[1,c] z[2,c] 
            0      0      0      0      0      0      1      0      0      0 
       
-      $add
+      $A
       [1] 0
       
       $expr
@@ -65,18 +65,18 @@
       $direction
       [1] "minimize"
       
-      $q_coef
+      $Q
            x[1] x[2] y[1] y[2]
       x[1]    2    0    0    0
       x[2]    0    2    0    0
       y[1]    0    0    0    0
       y[2]    0    0    0    0
       
-      $coef
+      $L
       x[1] x[2] y[1] y[2] 
          0    0    1    1 
       
-      $add
+      $A
       [1] 0
       
       $expr
@@ -94,18 +94,18 @@
       $direction
       [1] "minimize"
       
-      $q_coef
+      $Q
            x y z[1] z[2]
       x    2 5    0    0
       y    5 0    0    0
       z[1] 0 0    0    0
       z[2] 0 0    0    0
       
-      $coef
+      $L
          x    y z[1] z[2] 
          0    3    0    0 
       
-      $add
+      $A
       [1] 1
       
       $expr

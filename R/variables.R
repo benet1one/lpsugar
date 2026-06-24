@@ -39,12 +39,13 @@
 #' - `$ind` : Integer array. Indicates which indices correspond to this variable.
 #' Meant for internal use only.
 #'
-#' - `$coef` : Numeric matrix. The number of rows is the length of the variable, the number
+#' - `$L` : Numeric matrix of linear coefficients. 
+#' The number of rows is the length of the variable, the number
 #' of columns is the total amount of variables in the problem.
 #' The values represent coefficients that are modified when adding variables or multiplying
 #' by a constant. Used for objective, constraints and aliases.
 #'
-#' - `$add` : Numeric column vector. The number of rows is the length of the variable.
+#' - `$A` : Numeric column vector. The number of rows is the length of the variable.
 #' The values represent addends, modified when adding the variable and a constant.
 #' Used for objective, constraints and aliases.
 #'
@@ -131,9 +132,9 @@ lp_variable <- function(.problem, definition,
         name_variable(name, sets)
     )
     
-    add <- matrix(0, nrow = length(ind), ncol = 1L) |> robust_index()
-    coef <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> robust_index()
-    coef[, ind] <- diag(length(ind))
+    A <- matrix(0, nrow = length(ind), ncol = 1L) |> robust_index()
+    L <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> robust_index()
+    L[, ind] <- diag(length(ind))
     
     new_variable <- list(
         name = name,
@@ -146,8 +147,8 @@ lp_variable <- function(.problem, definition,
         
         scalar = def$scalar,
         ind = ind,
-        coef = coef,
-        add = add
+        L = L,
+        A = A
         
     ) |> structure(class = "lp_variable")
     
@@ -164,7 +165,7 @@ lp_variable <- function(.problem, definition,
 }
 
 # Whenever a new variable is added to a problem
-# Update $coef of other variables/aliases
+# Update $L of other variables/aliases
 update_variables <- function(.problem, field = "variables") {
     total_vars <- ncol(.problem)
     varnames <- variable.names(.problem)
@@ -173,17 +174,17 @@ update_variables <- function(.problem, field = "variables") {
     for (i in names(vars)) {
         x <- vars[[i]]
         
-        x$coef <- cbind(
-            x$coef,
+        x$L <- cbind(
+            x$L,
             matrix(
                 data = 0, 
-                nrow = nrow(x$coef), 
-                ncol = total_vars - ncol(x$coef)
+                nrow = nrow(x$L), 
+                ncol = total_vars - ncol(x$L)
             )
         )
         
-        x$coef <- robust_index(x$coef)
-        colnames(x$coef) <- varnames
+        x$L <- robust_index(x$L)
+        colnames(x$L) <- varnames
         
         vars[[i]] <- x
     }
@@ -202,7 +203,7 @@ transformed_variable <- function(x) {
     x$integer <- NULL
     x$scalar  <- NULL
     # x$binary is not removed, since it's updated from the transformation
-    # fields x$ind, x$coef, x$add are necessary
+    # fields x$ind, x$L, x$A are necessary
     
     class(x) <- c("transformed_lp_variable", "lp_variable")
     return(x)
@@ -331,10 +332,10 @@ print.lp_variable <- function(x, ...) {
 #' @export
 print.transformed_lp_variable <- function(x, ...) {
     fields <- if (is_quadratic(x)) {
-        c(c("q_coef", "coef", "add"))
+        c(c("Q", "L", "A"))
     } 
     else {
-        c("coef", "add")
+        c("L", "A")
     }
     
     unclass(x)[fields] |> print()
@@ -433,11 +434,11 @@ bind_vv <- function(x, y) {
     if (is_quadratic(x) || is_quadratic(y)) {
         x <- as_quadratic(x)
         y <- as_quadratic(y)
-        z$q_coef <- c(x$q_coef, y$q_coef)
+        z$Q <- c(x$Q, y$Q)
     }
     
-    z$coef <- rbind(x$coef, y$coef) |> robust_index()
-    z$add  <- rbind(x$add,  y$add)  |> robust_index()
+    z$L <- rbind(x$L, y$L) |> robust_index()
+    z$A  <- rbind(x$A,  y$A)  |> robust_index()
     
     transformed_variable(z)
 }
@@ -449,17 +450,17 @@ bind_vc <- function(x, y) {
     x$ind[] <- seq_along(x$ind)
     
     if (is_quadratic(x)) {
-        yq <- list(x$q_coef[[1]] * 0) |> rep(length(y))
-        x$q_coef <- c(x$q_coef, yq)
+        yq <- list(x$Q[[1]] * 0) |> rep(length(y))
+        x$Q <- c(x$Q, yq)
     }
     
-    x$coef <- rbind(
-        x$coef,
-        matrix(0, nrow = length(y), ncol = ncol(x$coef))
+    x$L <- rbind(
+        x$L,
+        matrix(0, nrow = length(y), ncol = ncol(x$L))
     ) |> robust_index()
     
-    x$add <- rbind(
-        x$add,
+    x$A <- rbind(
+        x$A,
         matrix(y, ncol = 1L)
     ) |> robust_index()
     
@@ -496,11 +497,11 @@ bind_cv <- function(x, y) {
     x$ind <- x$ind[..., drop = drop]
     
     if (is_quadratic(x)) {
-        x$q_coef <- x$q_coef[old_ind]
+        x$Q <- x$Q[old_ind]
     }
     
-    x$coef <- x$coef[old_ind, ]
-    x$add <- x$add[old_ind, ]
+    x$L <- x$L[old_ind, ]
+    x$A <- x$A[old_ind, ]
     
     transformed_variable(x)
 }
@@ -525,11 +526,11 @@ bind_cv <- function(x, y) {
         if (is_quadratic(x) || is_quadratic(y)) {
             x <- as_quadratic(x)
             y <- as_quadratic(y)
-            x$q_coef[i] <- y$q_coef
+            x$Q[i] <- y$Q
         }
         
-        x$coef[i, ] <- y$coef
-        x$add[i] <- y$add
+        x$L[i, ] <- y$L
+        x$A[i] <- y$A
         
         x$binary <- x$binary && y$binary
         return(transformed_variable(x))
@@ -538,11 +539,11 @@ bind_cv <- function(x, y) {
         y <- recycle_const(as.numeric(value), length(i))
         
         if (is_quadratic(x)) {
-            x$q_coef[i] <- list(x$q_coef[[1]] * 0) |> rep(length(i))
+            x$Q[i] <- list(x$Q[[1]] * 0) |> rep(length(i))
         }
         
-        x$coef[i, ] <- 0
-        x$add[i] <- y
+        x$L[i, ] <- 0
+        x$A[i] <- y
         
         x$binary <- x$binary && is.logical(value)
         return(transformed_variable(x))
@@ -713,7 +714,7 @@ interpret_bound <- function(bound, bound_name, default, dim) {
     bound
 }
 
-# Gives the colnames of $coef
+# Gives the colnames of $L
 # For instance c("x[1,1]", "x[2,1]", ...)
 name_variable <- function(name, sets) {
     if (length(sets) == 1L && lengths(sets) == 1L) {
@@ -736,11 +737,11 @@ recycle_var <- function(x, n) {
         x$ind <- x$ind[i]
         
         if (is_quadratic(x)) {
-            x$q_coef <- x$q_coef[i]
+            x$Q <- x$Q[i]
         }
         
-        x$coef <- x$coef[i, ]
-        x$add <- x$add[i, ]
+        x$L <- x$L[i, ]
+        x$A <- x$A[i, ]
         
         return(transformed_variable(x))
     }

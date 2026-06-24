@@ -30,7 +30,7 @@ test_that("alias", {
         "Overriding alias `s`"
     )
     expect_true(
-        all(p2$aliases$s$coef == c(0, "x[2,1]" = 1, 0, 0, 0, 0))
+        all(p2$aliases$s$L == c(0, "x[2,1]" = 1, 0, 0, 0, 0))
     )
 
     expect_error(

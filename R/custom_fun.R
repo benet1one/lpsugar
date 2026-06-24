@@ -52,21 +52,21 @@ sum_over <- function(...) {
 sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     stopifnot(rlang::is_bool(na.rm))
     
-    varnames <- colnames(x$coef)
+    varnames <- colnames(x$L)
     x$ind <- x$ind[1]
     
     if (is_quadratic(x)) {
-        x$q_coef <- list(purrr::reduce(x$q_coef, `+`))
+        x$Q <- list(purrr::reduce(x$Q, `+`))
     }
     
-    x$coef <- colSums(x$coef) |>
+    x$L <- colSums(x$L) |>
         matrix(nrow = 1L) |>
         robust_index()
-    x$add <- sum(x$add) |>
+    x$A <- sum(x$A) |>
         matrix(nrow = 1L, ncol = 1L) |>
         robust_index()
     
-    colnames(x$coef) <- varnames
+    colnames(x$L) <- varnames
     
     if (...length() > 0L) {
         x <- x + sum(..., na.rm = na.rm)
@@ -106,12 +106,12 @@ Math.lp_variable <- function(x, ...) {
 cumsum_v <- function(x, call) {
     if (length(x) >= 2L) for (i in 2:length(x)) {
         if (is_quadratic(x)) {
-            x$q_coef[[i]] <- x$q_coef[[i]] + x$q_coef[[i-1L]]
+            x$Q[[i]] <- x$Q[[i]] + x$Q[[i-1L]]
         }
-        x$coef[i, ] <- x$coef[i, ] + x$coef[i-1L, ]
+        x$L[i, ] <- x$L[i, ] + x$L[i-1L, ]
     }
     
-    x$add[] <- cumsum(x$add)
+    x$A[] <- cumsum(x$A)
     transformed_variable(x)
 }
 
@@ -276,7 +276,7 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
         out$ind <- out_ind |> robust_index()
     } 
     else {
-        out$ind <- 1:nrow(out$coef)
+        out$ind <- 1:nrow(out$L)
     }
     
     return(out)

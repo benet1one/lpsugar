@@ -302,18 +302,18 @@ variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE,
 # Quadratic ---------------------
 
 # Returns or builds quadratic part of a variable or objective function
-get_q_coef <- function(x) {
+get_Q <- function(x) {
     if (is_quadratic(x)) {
-        return(x$q_coef)
+        return(x$Q)
     }
     
     qmat <- matrix(
         0,
-        nrow = ncol(x$coef),
-        ncol = ncol(x$coef),
+        nrow = ncol(x$L),
+        ncol = ncol(x$L),
         dimnames = list(
-            colnames(x$coef),
-            colnames(x$coef)
+            colnames(x$L),
+            colnames(x$L)
         )
     )
     
@@ -323,10 +323,10 @@ get_q_coef <- function(x) {
 # Is a variable, constraint, or objective function quadratic?
 is_quadratic <- function(x) {
     if (is_lp_variable(x) || is_lp_objective(x)) {
-        return(!is.null(x$q_coef))
+        return(!is.null(x$Q))
     } 
     else if (is_lp_constraint(x)) {
-        return(any(lengths(x$q_lhs) > 0L))
+        return(any(lengths(x$Q) > 0L))
     } 
     else {
         return(FALSE)
@@ -342,7 +342,7 @@ as_quadratic <- function(x) {
         cli_abort("`x` must be a variable or an objective function.")
     }
     
-    x$q_coef <- get_q_coef(x)
+    x$Q <- get_Q(x)
     return(x)
 }
 

@@ -178,7 +178,7 @@ test_that("variable indexing", {
     expect_error(y[1,1], "Incorrect number of dimensions")
 
     # Transpose
-    expect_identical(z$coef, t(t(z))$coef)
+    expect_identical(z$L, t(t(z))$L)
     expect_snapshot(t(z))
     expect_equal(
         dim(t(y)),
@@ -328,8 +328,8 @@ test_that("operations", {
     expect_error(u[1,,] + t[1,,], "non-conformable")
     expect_error(t + b, "non-conformable")
 
-    expect_snapshot(diff(y) $ coef)
-    expect_snapshot(diff(y, lag = 2) $ coef)
+    expect_snapshot(diff(y) $ L)
+    expect_snapshot(diff(y, lag = 2) $ L)
     expect_equal(
         diff(z, differences = 2),
         diff(diff(z))
@@ -351,8 +351,8 @@ test_that("sum", {
         x + y[1] + y[2] + y[3] + 2*sum(z) + sum(1:4)
     )
     expect_identical(
-        sum(z[1:5]) $ coef,
-        cumsum(z)[5] $ coef
+        sum(z[1:5]) $ L,
+        cumsum(z)[5] $ L
     )
 
     expect_no_error(
@@ -387,8 +387,8 @@ test_that("matrix multiply with vector", {
         t(bx)$ind
     )
     expect_equal(
-        xb$coef,
-        t(bx)$coef
+        xb$L,
+        t(bx)$L
     )
 
     computed <- compute_aliases(p, list(x = xval))

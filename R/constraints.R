@@ -11,14 +11,15 @@
 #' @returns The `.problem` with added `$constraints`. (Note: previous constraints are not
 #' overritten).
 #'
-#' Constraints can be represented as `lhs * vars <dir> rhs`.
+#' A constraint with `dir[i] = "<="` is represented as 
+#' \eqn{\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i}}.
 #'
 #' The `$constraints` field has the following subfields:
-#' - `$q_lhs` : List of quadratic coefficient matrices:
-#'   - `NULL` if constraint is linear.
+#' - `$Q` : List of quadratic coefficient matrices:
+#'   - `NULL` if the constraint is linear.
 #'   - [slam::simple_triplet_matrix()] if constraint is quadratic.
-#' - `$lhs` : [slam::simple_triplet_matrix()] where each row is a constraint,
-#' each column is a variable, and the values represent coefficients.
+#' - `$L` : [slam::simple_triplet_matrix()] of linear coefficients, 
+#' where each row is a constraint and each is a variable.
 #' - `$dir` : Character vector with elements `"<="`, `"=="`, or `">="`,
 #' the direction of each constraint.
 #' - `$rhs` : Numeric column vector representing the right hand side of each constraint.
@@ -95,7 +96,7 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
             cli_abort(msg, call = quosure)
         }
         
-        rownames(cons[[i]]$lhs) <- rep_len(name_ind, length(con))
+        rownames(cons[[i]]$L) <- rep_len(name_ind, length(con))
     }
     
     cons <- bind_cons(!!!cons)
@@ -170,25 +171,25 @@ update_constraints <- function(.problem) {
         return(.problem)
     }
     
-    q_ind <- which(lengths(.problem$constraints$q_lhs) > 0L)
+    q_ind <- which(lengths(.problem$constraints$Q) > 0L)
     
     for (i in q_ind) {
-        .problem$constraints$q_lhs[[i]]$nrow[] <- ncol(.problem)
-        .problem$constraints$q_lhs[[i]]$ncol[] <- ncol(.problem)
-        .problem$constraints$q_lhs[[i]]$dimnames <- list(
+        .problem$constraints$Q[[i]]$nrow[] <- ncol(.problem)
+        .problem$constraints$Q[[i]]$ncol[] <- ncol(.problem)
+        .problem$constraints$Q[[i]]$dimnames <- list(
             attr(.problem, "varnames"),
             attr(.problem, "varnames")
         )
     }
     
-    .problem$constraints$lhs$ncol[] <- ncol(.problem)
-    colnames(.problem$constraints$lhs) <- attr(.problem, "varnames")
+    .problem$constraints$L$ncol[] <- ncol(.problem)
+    colnames(.problem$constraints$L) <- attr(.problem, "varnames")
     .problem
 }
 
 empty_constraint <- function() {
     list(
-        lhs = slam::simple_triplet_zero_matrix(nrow = 0, ncol = 0),
+        L = slam::simple_triplet_zero_matrix(nrow = 0, ncol = 0),
         dir = character(0),
         rhs = matrix(nrow = 0, ncol = 1),
         call = character(0),
@@ -226,8 +227,8 @@ bind_cons <- function(...) {
     
     out <- purrr::list_transpose(dots, simplify = FALSE)
     
-    out$q_lhs <- unlist(out$q_lhs, recursive = FALSE)
-    out$lhs <- do.call(what = rbind, out$lhs)
+    out$Q <- unlist(out$Q, recursive = FALSE)
+    out$L <- do.call(what = rbind, out$L)
     out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()
     out$dir <- unlist(out$dir)
     out$call <- unlist(out$call)
@@ -246,7 +247,7 @@ rbind.lp_constraint <- function(..., deparse.level = 1) {
 
 #' @export
 as.matrix.lp_constraint <- function(x, ...) {
-    cbind(as.matrix(x$lhs), dir = x$dir, rhs = x$rhs)
+    cbind(as.matrix(x$L), dir = x$dir, rhs = x$rhs)
 }
 #' @export
 as.array.lp_constraint <- function(x, ...) {
@@ -263,7 +264,7 @@ dim.lp_constraint <- function(x) {
 }
 #' @export
 dimnames.lp_constraint <- function(x) {
-    list(rownames(x$lhs), NA)
+    list(rownames(x$L), NA)
 }
 
 #' @export
@@ -294,8 +295,8 @@ head.lp_constraint <- function(x, n = 6L, ...) {
         i <- x$name %in% i
     }
     
-    x$q_lhs <- x$q_lhs[i]
-    x$lhs <- x$lhs[i, ]
+    x$Q <- x$Q[i]
+    x$L <- x$L[i, ]
     x$rhs <- x$rhs[i, ]
     x$dir <- x$dir[i]
     x$call <- x$call[i]
@@ -311,7 +312,7 @@ print.lp_constraint <- function(x, compact = FALSE, ...) {
     pairs <- cbind(x$name, x$call) |>
         unique(MARGIN = 1L)
     
-    if (!compact && ncol(x$lhs) > 200L) {
+    if (!compact && ncol(x$L) > 200L) {
         cat("\n")
         cli_inform("Problem has over 200 variables, printing with `compact = TRUE`.")
         compact <- TRUE

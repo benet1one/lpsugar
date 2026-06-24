@@ -63,20 +63,20 @@ test_that("sum", {
     )
     expect_true({
         x2 <- p |> lp_eval(sum(c(1, NA, 1), x, na.rm = TRUE))
-        x2$add == 2
+        x2$A == 2
     })
 
     expect_true({
         mean_x <- p |> lp_eval(mean(x))
-        all(mean_x$coef == c(1/2, 1/2, 0))
+        all(mean_x$L == c(1/2, 1/2, 0))
     })
     expect_true({
         w_mean_x <- p |> lp_eval(weighted.mean(x, w = c(1, 3)))
-        all(w_mean_x$coef == c(1/4, 3/4, 0))
+        all(w_mean_x$L == c(1/4, 3/4, 0))
     })
     expect_true({
         w_mean_x <- p |> lp_eval(weighted.mean(x, w = c(0, 5)))
-        all(w_mean_x$coef == c(0, 1, 0))
+        all(w_mean_x$L == c(0, 1, 0))
     })
     expect_no_error(
         p |> lp_eval(weighted.mean(1:2, 2:3))
@@ -103,8 +103,8 @@ test_that("sum over", {
     s1 <- p |> lp_eval(sum_over(j = 1:2, x * a[, j]))
     s2 <- p |> lp_eval(sum_over(i = 1:3, j = 1:2, x[i] * a[i, j]))
 
-    expect_equal(s1$coef, c(5, 7, 9), ignore_attr = TRUE)
-    expect_equal(s2$coef, c(5, 7, 9), ignore_attr = TRUE)
+    expect_equal(s1$L, c(5, 7, 9), ignore_attr = TRUE)
+    expect_equal(s2$L, c(5, 7, 9), ignore_attr = TRUE)
 
     q <- lp_problem() |>
         lp_var(y[1:3, 1:3])
@@ -112,7 +112,7 @@ test_that("sum over", {
     s3 <-  q |> lp_eval(sum_over(i = 1:3, diag(y)[i] * i))
 
     expect_equal(
-        s3$coef,
+        s3$L,
         c(1, 0, 0, 0, 2, 0, 0, 0, 3),
         ignore_attr = TRUE
     )
@@ -160,7 +160,7 @@ test_that("apply", {
         (y[2,1] + y[2,2]) / 2
     ))
 
-    expect_equal(rowmeans_y_1$coef, rowmeans_y_2$coef)
+    expect_equal(rowmeans_y_1$L, rowmeans_y_2$L)
 
     p |> lp_eval(apply(y, 2, mean))
 
@@ -238,12 +238,12 @@ test_that("ifelse1", {
         }
     )
 
-    expect_equal(p1$constraints$lhs, p2$constraints$lhs)
+    expect_equal(p1$constraints$L, p2$constraints$L)
     expect_equal(p1$constraints$rhs, p2$constraints$rhs)
 
     expect_equal(
-        as.matrix(p1$constraints$lhs),
-        as.matrix(p3$constraints$lhs),
+        as.matrix(p1$constraints$L),
+        as.matrix(p3$constraints$L),
         ignore_attr = TRUE
     )
     expect_equal(p1$constraints$rhs, p3$constraints$rhs)

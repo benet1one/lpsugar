@@ -31,8 +31,8 @@ test_that("objective", {
 
     expect_message(lp_minimize(p, y), "sum\\(y\\)")
     expect_equal(
-        suppressMessages(lp_minimize(p, y) $ objective $ coef),
-        lp_minimize(p, sum(y)) $ objective $ coef
+        suppressMessages(lp_minimize(p, y) $ objective $ L),
+        lp_minimize(p, sum(y)) $ objective $ L
     )
 
     expect_message(
@@ -63,7 +63,7 @@ test_that("quadratic objective", {
 
     expect_snapshot(p$objective)
     
-    p$objective$q_coef <- as.matrix(p$objective$q_coef)
+    p$objective$Q <- as.matrix(p$objective$Q)
     expect_snapshot(unclass(p$objective))
 })
 
@@ -74,6 +74,6 @@ test_that("update objective", {
         lp_minimize(x^2 + 5*x*y + 3*y + 1) |>
         lp_variable(z[1:2])
 
-    p$objective$q_coef <- as.matrix(p$objective$q_coef)
+    p$objective$Q <- as.matrix(p$objective$Q)
     expect_snapshot(unclass(p$objective))
 })

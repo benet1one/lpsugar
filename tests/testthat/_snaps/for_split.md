@@ -19,72 +19,72 @@
       for_split(q2, data = data_mask(p))
     Output
       $`i=1, j="a"`
-      $coef
+      $L
            x[1,a] x[2,a] x[1,b] x[2,b] x[1,c] x[2,c]
       [1,]      1      0      0      0      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    1
       with class 'robust_index' from package 'lpsugar'
       
       
       $`i=1, j="b"`
-      $coef
+      $L
            x[1,a] x[2,a] x[1,b] x[2,b] x[1,c] x[2,c]
       [1,]      0      0      1      0      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    1
       with class 'robust_index' from package 'lpsugar'
       
       
       $`i=1, j="c"`
-      $coef
+      $L
            x[1,a] x[2,a] x[1,b] x[2,b] x[1,c] x[2,c]
       [1,]      0      0      0      0      1      0
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    1
       with class 'robust_index' from package 'lpsugar'
       
       
       $`i=2, j="a"`
-      $coef
+      $L
            x[1,a] x[2,a] x[1,b] x[2,b] x[1,c] x[2,c]
       [1,]      0      1      0      0      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    2
       with class 'robust_index' from package 'lpsugar'
       
       
       $`i=2, j="b"`
-      $coef
+      $L
            x[1,a] x[2,a] x[1,b] x[2,b] x[1,c] x[2,c]
       [1,]      0      0      0      1      0      0
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    2
       with class 'robust_index' from package 'lpsugar'
       
       
       $`i=2, j="c"`
-      $coef
+      $L
            x[1,a] x[2,a] x[1,b] x[2,b] x[1,c] x[2,c]
       [1,]      0      0      0      0      0      1
       with class 'robust_index' from package 'lpsugar'
       
-      $add
+      $A
            [,1]
       [1,]    2
       with class 'robust_index' from package 'lpsugar'

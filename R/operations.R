@@ -162,14 +162,14 @@ add_v_v <- function(x, y, call) {
     qy <- is_quadratic(y)
     
     if (qx && qy) {
-        out$q_coef <- purrr::map2(x$q_coef, y$q_coef, `+`)
+        out$Q <- purrr::map2(x$Q, y$Q, `+`)
     } 
     else if (qx || qy) {
-        out$q_coef <- x$q_coef %||% y$q_coef
+        out$Q <- x$Q %||% y$Q
     }
     
-    out$coef <- x$coef + y$coef
-    out$add <- out$add + y$add
+    out$L <- x$L + y$L
+    out$A <- out$A + y$A
     out$binary <- FALSE
     
     transformed_variable(out)
@@ -180,7 +180,7 @@ add_v_c <- function(x, c, call) {
     x <- recycle_var(x, max_n)
     c <- recycle_const(c, max_n)
     
-    x$add <- x$add + c
+    x$A <- x$A + c
     x$binary <- FALSE
     
     transformed_variable(x)
@@ -214,11 +214,11 @@ multiply_v_c <- function(x, c, call) {
     c <- recycle_const(c, max_n)
     
     if (is_quadratic(x)) {
-        x$q_coef <- q_list_multiply(x$q_coef, c)
+        x$Q <- q_list_multiply(x$Q, c)
     }
     
-    x$coef <- horizontal_multiply(x$coef, c)
-    x$add <- x$add * c
+    x$L <- horizontal_multiply(x$L, c)
+    x$A <- x$A * c
     x$binary <- FALSE
     
     transformed_variable(x)
@@ -232,23 +232,23 @@ multiply_v_v <- function(x, y, call) {
     max_n <- max(length(x), length(y))
     x <- recycle_var(x, max_n)
     y <- recycle_var(y, max_n)
-    m <- ncol(x$coef)
+    m <- ncol(x$L)
     out <- x
     
-    out$q_coef <- lapply(seq_len(max_n), function(i) {
-        xi <- x$coef[rep(i, m), ]
-        yi <- y$coef[rep(i, m), ]
+    out$Q <- lapply(seq_len(max_n), function(i) {
+        xi <- x$L[rep(i, m), ]
+        yi <- y$L[rep(i, m), ]
         qi <- t(xi) * yi + xi * t(yi)
         
-        rownames(qi) <- colnames(qi) <- colnames(x$coef)
+        rownames(qi) <- colnames(qi) <- colnames(x$L)
         qi
     })
     
-    out$coef <-
-        horizontal_multiply(x$coef, y$add) +
-        horizontal_multiply(y$coef, x$add)
+    out$L <-
+        horizontal_multiply(x$L, y$A) +
+        horizontal_multiply(y$L, x$A)
     
-    out$add <- x$add * y$add
+    out$A <- x$A * y$A
     transformed_variable(out)
 }
 
@@ -279,16 +279,16 @@ power_v_c <- function(x, c, call) {
         i2 <- (c == 2)
         xsquared <- multiply_v_v(x, x, call)
         
-        x$q_coef <- xsquared$q_coef
-        x$q_coef[!i2] <- x$q_coef[!i2] |>
+        x$Q <- xsquared$Q
+        x$Q[!i2] <- x$Q[!i2] |>
             lapply(\(q) q*0)
         
-        x$coef[i2, ] <- xsquared$coef[i2, ]
-        x$add[i2, ] <- xsquared$add[i2, ]
+        x$L[i2, ] <- xsquared$L[i2, ]
+        x$A[i2, ] <- xsquared$A[i2, ]
     }
     
-    x$coef[c == 0, ] <- 0
-    x$add[c == 0, ] <- 1
+    x$L[c == 0, ] <- 0
+    x$A[c == 0, ] <- 1
     
     transformed_variable(x)
 }
@@ -301,8 +301,8 @@ negate_v <- function(x, call) {
     }
     
     # 1 - x
-    x$coef <- -x$coef
-    x$add <- -x$add + 1
+    x$L <- -x$L
+    x$A <- -x$A + 1
     
     transformed_variable(x)
 }
@@ -359,17 +359,17 @@ matrix_multiply_v_c <- function(x, y, call) {
         cli_abort("`%*%` not yet implemented for quadratic variables.", call = call)
     }
     
-    out$coef <- out$coef[integer(), , drop = TRUE]
-    out$add <- out$add[integer(), , drop = TRUE]
+    out$L <- out$L[integer(), , drop = TRUE]
+    out$A <- out$A[integer(), , drop = TRUE]
     
     for (j in 1:ncol(y)) for (i in 1:nrow(x)) {
         z <- sum(x[i, ] * y[, j])
-        out$coef <- rbind(out$coef, z$coef)
-        out$add <- rbind(out$add, z$add)
+        out$L <- rbind(out$L, z$L)
+        out$A <- rbind(out$A, z$A)
     }
     
-    out$coef <- robust_index(out$coef)
-    out$add <- robust_index(out$add)
+    out$L <- robust_index(out$L)
+    out$A <- robust_index(out$A)
     
     transformed_variable(out)
 }
@@ -406,19 +406,19 @@ matrix_multiply_v_v <- function(x, y, call) {
     out$ind <- ptype
     out$ind[] <- seq_along(out$ind)
     
-    out$q_coef <- list()
-    out$coef <- out$coef[integer(), , drop = TRUE]
-    out$add <- out$add[integer(), , drop = TRUE]
+    out$Q <- list()
+    out$L <- out$L[integer(), , drop = TRUE]
+    out$A <- out$A[integer(), , drop = TRUE]
     
     for (j in 1:ncol(y)) for (i in 1:nrow(x)) {
         z <- sum(x[i, ] * y[, j])
-        out$q_coef <- c(out$q_coef, z$q_coef)
-        out$coef <- rbind(out$coef, z$coef)
-        out$add <- rbind(out$add, z$add)
+        out$Q <- c(out$Q, z$Q)
+        out$L <- rbind(out$L, z$L)
+        out$A <- rbind(out$A, z$A)
     }
     
-    out$coef <- robust_index(out$coef)
-    out$add <- robust_index(out$add)
+    out$L <- robust_index(out$L)
+    out$A <- robust_index(out$A)
     
     transformed_variable(out)
 }
@@ -465,7 +465,7 @@ compare_lp <- function(x, y, op, call) {
     var <- x - y
     
     if (is_quadratic(var)) {
-        q_lhs <- lapply(var$q_coef, function(q) {
+        Q <- lapply(var$Q, function(q) {
             if (any(q != 0)) {
                 slam::as.simple_triplet_matrix(q)
             } 
@@ -475,17 +475,17 @@ compare_lp <- function(x, y, op, call) {
         })
     } 
     else {
-        q_lhs <- rep(list(NULL), length(var))
+        Q <- rep(list(NULL), length(var))
     }
     
-    lhs <- slam::as.simple_triplet_matrix(var$coef)
-    rhs <- -var$add
+    L <- slam::as.simple_triplet_matrix(var$L)
+    rhs <- -var$A
     
     dir <- rep(op, length(rhs))
     call <- rep(format1(call), length(rhs))
     name <- character(length(rhs))
     
-    list(q_lhs = q_lhs, lhs = lhs, dir = dir, rhs = rhs, name = name, call = call) |>
+    list(Q = Q, L = L, dir = dir, rhs = rhs, name = name, call = call) |>
         structure(class = "lp_constraint")
 }
 
