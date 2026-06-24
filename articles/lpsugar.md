@@ -283,7 +283,7 @@ p <- lp_problem() |>
         sum_over(i=I, j=J, s[j] * x[i, j])
     )
 
-p$objective$coef
+p$objective$L
 #> x[1,a] x[2,a] x[3,a] x[1,b] x[2,b] x[3,b] 
 #>      2      2      2      5      5      5
 ```

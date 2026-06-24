@@ -78,12 +78,13 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>The <code>.problem</code> with added <code>$constraints</code>. (Note: previous constraints are not
 overritten).</p>
-<p>Constraints can be represented as <code>lhs * vars &lt;dir&gt; rhs</code>.</p>
-<p>The <code>$constraints</code> field has the following subfields:</p><ul><li><p><code>$q_lhs</code> : List of quadratic coefficient matrices:</p><ul><li><p><code>NULL</code> if constraint is linear.</p></li>
+<p>A constraint with <code>dir[i] = "&lt;="</code> is represented as
+\(\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i}\).</p>
+<p>The <code>$constraints</code> field has the following subfields:</p><ul><li><p><code>$Q</code> : List of quadratic coefficient matrices:</p><ul><li><p><code>NULL</code> if the constraint is linear.</p></li>
 <li><p><code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix()</a></code> if constraint is quadratic.</p></li>
 </ul></li>
-<li><p><code>$lhs</code> : <code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix()</a></code> where each row is a constraint,
-each column is a variable, and the values represent coefficients.</p></li>
+<li><p><code>$L</code> : <code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix()</a></code> of linear coefficients,
+where each row is a constraint and each is a variable.</p></li>
 <li><p><code>$dir</code> : Character vector with elements <code>"&lt;="</code>, <code>"=="</code>, or <code>"&gt;="</code>,
 the direction of each constraint.</p></li>
 <li><p><code>$rhs</code> : Numeric column vector representing the right hand side of each constraint.</p></li>

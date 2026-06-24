@@ -35,21 +35,22 @@ lp_subject_to(.problem, ...)
 The `.problem` with added `$constraints`. (Note: previous constraints
 are not overritten).
 
-Constraints can be represented as `lhs * vars <dir> rhs`.
+A constraint with `dir[i] = "<="` is represented as \\\frac{1}{2}
+x'Q\_{i}x + L\_{i}x \le \text{rhs}\_{i}\\.
 
 The `$constraints` field has the following subfields:
 
-- `$q_lhs` : List of quadratic coefficient matrices:
+- `$Q` : List of quadratic coefficient matrices:
 
-  - `NULL` if constraint is linear.
+  - `NULL` if the constraint is linear.
 
   - [`slam::simple_triplet_matrix()`](https://rdrr.io/pkg/slam/man/matrix.html)
     if constraint is quadratic.
 
-- `$lhs` :
+- `$L` :
   [`slam::simple_triplet_matrix()`](https://rdrr.io/pkg/slam/man/matrix.html)
-  where each row is a constraint, each column is a variable, and the
-  values represent coefficients.
+  of linear coefficients, where each row is a constraint and each is a
+  variable.
 
 - `$dir` : Character vector with elements `"<="`, `"=="`, or `">="`, the
   direction of each constraint.

@@ -34,12 +34,12 @@ lp_max(.problem, objective)
 The `.problem` with the new `$objective` function, a list with these
 fields:
 
-- `$q_coef` : If objective function is quadratic, matrix with the
-  quadratic coefficients.
+- `$Q` : If objective function is quadratic, matrix with the quadratic
+  coefficients.
 
-- `$coef` : Vector with the coefficients for each variable.
+- `$L` : Vector with the coefficients for each variable.
 
-- `$add` : Numeric, addend to the final value. It is not used in the
+- `$A` : Numeric, addend to the final value. It is not used in the
   solver.
 
 - `$direction` : String, goal of the solver. Can be `"minimize"` or
@@ -98,11 +98,11 @@ library(ROI.plugin.highs)
 
 s$aliases$total_profit
 #> [1] 43000
-sum(p$objective$coef * s$variables_vec)
+sum(p$objective$L * s$variables_vec)
 #> [1] 43000
 
 s$objective
 #> [1] 32000
-sum(p$objective$coef * s$variables_vec) + p$objective$add
+sum(p$objective$L * s$variables_vec) + p$objective$A
 #> [1] 32000
 ```

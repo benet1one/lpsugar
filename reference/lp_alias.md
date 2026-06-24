@@ -273,7 +273,7 @@ p1$variables
 # Instead you can find it in $aliases
 p1$aliases
 #> $col_cumsum
-#> $coef
+#> $L
 #>      x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B]
 #> [1,]      1      0      0      0      0      0
 #> [2,]      1      1      0      0      0      0
@@ -283,7 +283,7 @@ p1$aliases
 #> [6,]      0      0      0      1      1      1
 #> with class 'robust_index' from package 'lpsugar'
 #> 
-#> $add
+#> $A
 #>      [,1]
 #> [1,]    0
 #> [2,]    0

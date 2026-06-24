@@ -98,14 +98,14 @@ The following fields are meant for internal use only.
 - `$ind` : Integer array. Indicates which indices correspond to this
   variable. Meant for internal use only.
 
-- `$coef` : Numeric matrix. The number of rows is the length of the
-  variable, the number of columns is the total amount of variables in
-  the problem. The values represent coefficients that are modified when
-  adding variables or multiplying by a constant. Used for objective,
-  constraints and aliases.
+- `$L` : Numeric matrix of linear coefficients. The number of rows is
+  the length of the variable, the number of columns is the total amount
+  of variables in the problem. The values represent coefficients that
+  are modified when adding variables or multiplying by a constant. Used
+  for objective, constraints and aliases.
 
-- `$add` : Numeric column vector. The number of rows is the length of
-  the variable. The values represent addends, modified when adding the
+- `$A` : Numeric column vector. The number of rows is the length of the
+  variable. The values represent addends, modified when adding the
   variable and a constant. Used for objective, constraints and aliases.
 
 ## Examples
