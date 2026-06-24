@@ -18,7 +18,7 @@ lp_alias <- function(.problem, ...) {
     nams <- rlang::names2(dots)
     
     if (any(nams == "")) {
-        cli_abort("Aliases must be named.")
+        cli_abort("Aliases must be named.", class = "lpsugar_error_unnamed_alias")
     }
     
     for (d in seq_along(dots)) {
@@ -31,7 +31,11 @@ lp_alias <- function(.problem, ...) {
 
 lp_alias_internal <- function(.problem, quosure, name, data) {
     if (name %in% names(.problem$variables)) {
-        cli_abort("Cannot override variable `{name}`.", call = parent.frame())
+        cli_abort(
+            "Cannot override variable `{name}`.", 
+            class = "lpsugar_error_alias_override_variable",
+            call = parent.frame()
+        )
     } 
     else if (name %in% names(.problem$aliases)) {
         cli_inform("Overriding alias `{name}`.", call = parent.frame())
@@ -40,7 +44,11 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
     value <- rlang::eval_tidy(quosure, data = data)
     
     if (!is_lp_variable(value)) {
-        cli_abort("Alias `{name}` did not evaluate to a variable.", call = parent.frame())
+        cli_abort(
+            "Alias `{name}` did not evaluate to a variable.", 
+            class = "lpsugar_error_alias_not_a_variable",
+            call = parent.frame()
+        )
     }
     
     .problem$aliases[[name]] <- value

@@ -65,7 +65,11 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
     vars <- all.vars(expr)
     
     if (!any(vars %in% varnames)) {
-        cli_abort("Constraint does not contain any variables.", call = expr)
+        cli_abort(
+            "Constraint does not contain any variables.", 
+            class = "lpsugar_error_no_constraint",
+            call = expr
+        )
     }
     
     cons <- for_split(quosure, data = data)
@@ -93,7 +97,7 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
                 ">" = "Did you forget the comparison operator? `<=/==/>=`"
             )
             
-            cli_abort(msg, call = quosure)
+            cli_abort(msg, call = quosure, class = "lpsugar_error_no_constraint")
         }
         
         rownames(cons[[i]]$L) <- rep_len(name_ind, length(con))
@@ -214,6 +218,7 @@ bind_cons <- function(...) {
         if (!is_lp_constraint(d)) {
             cli_abort(
                 "`bind_cons()` can only bind <lp_constraint>, not <{class(d)[1]}>.",
+                class = "lpsugar_error_bind_non_constraint",
                 call = call
             )
         }
@@ -286,7 +291,10 @@ head.lp_constraint <- function(x, n = 6L, ...) {
         (length(dots) == 2L && !rlang::is_missing(dots[[2L]]))
     
     if (wrong_index) {
-        cli_abort("Index constraints with `con[i]` or `con[i, ]`")
+        cli_abort(
+            "Index constraints with `con[i]` or `con[i, ]`",
+            class = "lpsugar_error_bad_constraint_index"
+        )
     }
     
     i <- dots[[1L]]
