@@ -170,9 +170,14 @@ update_objective <- function(.problem) {
         cli_abort(
             c("Cannot add a variable to a nonlinear problem.",
               ">" = paste(
-                  "Use `lp_variable()` before", 
+                  "Add the variable before using", 
                   "`lp_minimize_function()` or `lp_maximize_function()`"
-              )),
+              ),
+              ">" = paste(
+                  "Or reset the objective function with `lp_minimize(0)`",
+                  "before adding the variable"
+              )
+            ),
             class = "lpsugar_error_nonlinear_add_variable"
         )
     }
