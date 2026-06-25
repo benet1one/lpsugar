@@ -116,7 +116,7 @@ test_that("non constraint", {
     )
     expect_error(
         p |> lp_constraint(x != 0),
-        "Inequality"
+        "Not equal"
     )
 })
 

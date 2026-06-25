@@ -221,7 +221,10 @@ as.OP.lp_problem <- function(x) {
     
     # No variables
     if (ncol(x) == 0L) {
-        cli_abort("Problem has no variables. Define them with `lp_variable()`.")
+        cli_abort(
+            "Problem has no variables. Define them with `lp_variable()`.",
+            class = "lpsugar_error_no_variables_defined"
+        )
     }
     
     if (x$objective$type == "undefined") {
@@ -235,7 +238,7 @@ as.OP.lp_problem <- function(x) {
                 "or set the objective function to 0 with `lp_minimize(0)`",
                 sep = "\n"
             )
-        ))
+        ), class = "lpsugar_error_no_objective")
     }
     
     if (x$objective$direction == "minimize") {
@@ -245,7 +248,10 @@ as.OP.lp_problem <- function(x) {
         maximize <- TRUE
     } 
     else {
-        cli_abort("`$objective$direction` should be either 'minimize' or 'maximize'.")
+        cli_abort(
+            "`$objective$direction` should be either 'minimize' or 'maximize'.",
+            class = "lpsugar_error_bad_objective_direction"
+        )
     }
     
     objective <- ROI_objective_from_lpsugar(x)

@@ -17,13 +17,17 @@ lp_objective <- function(.problem, objective) {
     }
     
     if (!is_lp_variable(objective)) {
-        cli_abort(c(
-            "`objective` must be an expression containing variables.",
-            "i" = "Alternatively, use `lp_minimize(0)` to set all coeficients to 0."
-        ))
+        cli_abort(
+            c("`objective` must be an expression containing variables.",
+              "i" = "Alternatively, use `lp_minimize(0)` to set all coeficients to 0."),
+            class = "lpsugar_error_bad_objective"
+        )
     }
     if (length(objective) == 0L) {
-        cli_abort("`objective` evaluated to a variable of length 0.")
+        cli_abort(
+            "`objective` evaluated to a variable of length 0.",
+            class = "lpsugar_error_bad_objective"
+        )
     }
     if (length(objective) > 1L) {
         objective <- sum(objective)
@@ -163,13 +167,14 @@ update_objective <- function(.problem) {
         return(.problem)
     } 
     else if (.problem$objective$type == "nonlinear") {
-        cli_abort(c(
-            "Cannot add a variable to a nonlinear problem.",
-            ">" = paste(
-                "Use `lp_variable()` before", 
-                "`lp_minimize_function()` or `lp_maximize_function()`"
-            )
-        ))
+        cli_abort(
+            c("Cannot add a variable to a nonlinear problem.",
+              ">" = paste(
+                  "Use `lp_variable()` before", 
+                  "`lp_minimize_function()` or `lp_maximize_function()`"
+              )),
+            class = "lpsugar_error_nonlinear_add_variable"
+        )
     }
     
     n_before <- length(.problem$objective$L)

@@ -4,6 +4,7 @@ check_for_split <- function(quosure, call = parent.frame()) {
         cli_abort(
             c("Cannot use `return` inside a for loop.",
               ">" = "Use `next` to skip the rest of the loop."),
+            class = "lpsugar_error_return_in_for_loop",
             call = call
         )
     }

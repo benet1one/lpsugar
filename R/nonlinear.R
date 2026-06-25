@@ -53,7 +53,8 @@ check_correct_arguments <- function(fun, problem, funname, call = parent.frame()
         cli_abort(
             c("`{funname}` must have all problem variables as arguments.",
               "x" = "Missing variables: {missing_vars}"),
-            call = call,
+            class = "lpsugar_error_missing_variables_in_fun",
+            call = call
         )
     }
     
@@ -62,6 +63,7 @@ check_correct_arguments <- function(fun, problem, funname, call = parent.frame()
             c("Aliases can not be passed to `{funname}`.",
               ">" = "Only variables can be passed to the objective function.",
               "x" = "Problematic arguments: {present_aliases}"),
+            class = "lpsugar_error_alias_passed_to_fun",
             call = call
         )
     }
@@ -80,6 +82,7 @@ nl_recode_fun <- function(fun, problem, call) {
         cli_abort(
             c("`fun` must return a numeric scalar.",
               "x" = "Returns {.type {fun_out}}."),
+            class = "lpsugar_error_fun_not_scalar",
             call = call
         )
     }
@@ -114,6 +117,7 @@ nl_recode_gradient <- function(gradient, problem, call) {
         cli_abort(
             c("Invalid `gradient` output.",
               ">" = "It should be a numeric vector or a named list."),
+            class = "lpsugar_error_bad_gradient_output",
             call = call,
             parent = gradient_out_vec
         )
@@ -146,7 +150,8 @@ check_function_sanity <- function(fun_x, n0, funname = "fun", call) {
         cli_abort(
             c("Failed to evaluate `{funname}`.",
               ">" = "Make sure it works when all variables are 0.",
-              "i" = "It can return -Inf or +Inf."), 
+              "i" = "It can return -Inf or +Inf."),
+            class = "lpsugar_error_fun_throws_error",
             call = call,
             parent = fun_out
         )
