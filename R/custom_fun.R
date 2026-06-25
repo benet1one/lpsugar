@@ -128,6 +128,8 @@ cumsum_v <- function(x, call) {
 
 # Custom Function Data Mask ---------------------
 
+# Overwrites base functions to make the applicable
+# to lp_variables
 custom_fun <- function() {
     e <- rlang::env()
     
@@ -140,6 +142,8 @@ custom_fun <- function() {
         diag_v(x)
     }
     
+    # sum.lp_variable() only works if first element in `...` is an lp_variable
+    # this allows the first element to be anything
     e$sum <- function(..., na.rm = FALSE) {
         rlang::dots_list(...) |>
             purrr::map(base::sum, na.rm = na.rm) |>
@@ -247,6 +251,7 @@ custom_fun <- function() {
     return(e)
 }
 
+# diag() of an lp_variable
 diag_v <- function(x) {
     if (ndim(x) != 2L) {
         cli_abort(
@@ -270,6 +275,7 @@ diag_v <- function(x) {
     x[present_ind]
 }
 
+# apply() on an lp_variable
 apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     margin <- parse_margin(margin, variable = x)
     fun <- match.fun(fun)
@@ -331,6 +337,7 @@ parse_margin <- function(margin, variable) {
     cli_abort("Invalid `MARGIN`.", class = "lpsugar_error_bad_margin")
 }
 
+# `test` is lp_variable
 ifelse_v <- function(test, yes, no) {
     if (!test$binary) {
         cli_abort(
@@ -347,6 +354,8 @@ ifelse_v <- function(test, yes, no) {
     
     no + test * (yes - no)
 }
+
+# `test` is logical vector, `yes` or `no` are lp_variables
 ifelse_l <- function(test, yes, no) {
     # Default R code from `ifelse`
     if (is.atomic(test)) {
