@@ -1,4 +1,5 @@
 
+# Main function, called by lp_minimize() and lp_maximize()
 lp_objective <- function(.problem, objective) {
     quosure <- rlang::enquo(objective)
     expr <- rlang::as_label(quosure)
@@ -50,6 +51,7 @@ lp_objective <- function(.problem, objective) {
     return(.problem)
 }
 
+# lp_objective object constructor for quadratic and linear objectives
 new_objective <- function(.problem, type, direction = NULL, 
                           Q = NULL, L = NULL, A = NULL, expr = "") {
     if (is.null(direction)) {
@@ -162,6 +164,7 @@ print.lp_objective <- function(x, ...) {
 
 # Utils ------------------------
 
+# Adds zeros to Q and L coefficients when a variable is added to the problem
 update_objective <- function(.problem) {
     if (.problem$objective$type == "undefined") {
         return(.problem)
