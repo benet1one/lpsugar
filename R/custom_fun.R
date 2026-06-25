@@ -388,7 +388,7 @@ ifelse_l <- function(test, yes, no) {
     if (anyNA(test)) {
         cli_abort(
             "`test` cannot contain NA values.",
-            class = "lpsugar_error_ifelse_test_na"
+            class = "lpsugar_error_na_values"
         )
     }
     
