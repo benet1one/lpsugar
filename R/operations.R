@@ -1,6 +1,10 @@
 
 # Wrappers -------------------
 
+# Wrapping all operations in Ops.lp_variable
+# allows better error handling
+# even if the code is uglier
+
 #' @export
 Ops.lp_variable <- function(e1, e2) {
     op <- .Generic
@@ -547,12 +551,19 @@ compare_lp <- function(x, y, op, call) {
 
 # Utils ----------------------
 
+# Functions to apply vectorized operations on lp_variables
+
+# Multiplies each row for a constant
+# x[i, ] <- x[i, ] * c[i]
 horizontal_multiply <- function(x, c) {
     stopifnot(length(c) == nrow(x) || length(c) == 1L)
     c <- array(c, dim = dim(x))
     x*c
 }
 
+# Multiplies each element of a list for a constant
+# q[[i]] <- q[[i]] * c[i]
+# meant for updating the quadratic `Q` field
 q_list_multiply <- function(q, c) {
     stopifnot(length(q) == length(c))
     purrr::map2(q, c, `*`)
