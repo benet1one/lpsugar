@@ -397,7 +397,7 @@ ifelse_l <- function(test, yes, no) {
     if (is_lp_variable(yes)) {
         yes <- recycle_var(yes, len)
     } 
-    else if (is.numeric(yes)) {
+    else if (is.numeric(yes) || is.logical(yes)) {
         yes <- recycle_const(yes, len)
     } 
     else {
@@ -410,7 +410,7 @@ ifelse_l <- function(test, yes, no) {
     if (is_lp_variable(no)) {
         no <- recycle_var(no, len)
     } 
-    else if (is.numeric(no)) {
+    else if (is.numeric(no) || is.logical(no)) {
         no <- recycle_const(no, len)
     } 
     else {
