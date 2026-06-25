@@ -1,4 +1,5 @@
 
+# Main function, called by lp_minimize_function() and lp_maximize_function()
 lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL) {
     expr <- rlang::enquo(fun) |> rlang::as_label()
     
@@ -36,6 +37,9 @@ lp_objective_function <- function(.problem, fun, gradient = NULL, hessian = NULL
     .problem
 }
 
+# Ensures the arguments of `fun` contain
+# - all problem variables
+# - no aliases
 check_correct_arguments <- function(fun, problem, funname, call = parent.frame()) {
     if (is.null(fun)) {
         return()
@@ -69,6 +73,7 @@ check_correct_arguments <- function(fun, problem, funname, call = parent.frame()
     }
 }
 
+# Applied to the objective `fun`
 nl_recode_fun <- function(fun, problem, call) {
     fun_x <- recode_arguments(fun, problem)
     fun_out <- check_function_sanity(
@@ -90,6 +95,7 @@ nl_recode_fun <- function(fun, problem, call) {
     return(fun_x)
 }
 
+# Applied to the `gradient`
 nl_recode_gradient <- function(gradient, problem, call) {
     if (is.null(gradient)) {
         return(NULL)
@@ -133,6 +139,8 @@ nl_recode_gradient <- function(gradient, problem, call) {
     }
 }
 
+# fun(var1, var2, ...) -> fun(x)
+# where `x` is `c(var1, var2, ...)`
 recode_arguments <- function(fun, problem) {
     function(x) {
         var_list <- variables_to_list(x, problem, binary_as_logical = FALSE)
@@ -140,6 +148,7 @@ recode_arguments <- function(fun, problem) {
     }
 }
 
+# Ensures fun_x(rep(0, n)) works without error
 check_function_sanity <- function(fun_x, n0, funname = "fun", call) {
     fun_out <- rlang::try_fetch(
         fun_x(rep(0, n0)),
@@ -160,7 +169,7 @@ check_function_sanity <- function(fun_x, n0, funname = "fun", call) {
     return(fun_out)
 }
 
-
+# lp_objective constructor for nonlinear objectives
 new_nonlinear_objective <- function(.problem, direction = NULL, 
                                     fun = NULL, gradient = NULL, hessian = NULL, expr = "") {
     if (is.null(direction)) {
