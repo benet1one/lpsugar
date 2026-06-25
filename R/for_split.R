@@ -1,15 +1,6 @@
 
-check_for_split <- function(quosure, call = parent.frame()) {
-    if ("return" %in% all.names(quosure)) {
-        cli_abort(
-            c("Cannot use `return` inside a for loop.",
-              ">" = "Use `next` to skip the rest of the loop."),
-            class = "lpsugar_error_return_in_for_loop",
-            call = call
-        )
-    }
-}
-
+# Takes a loop or nested loops and returns a list
+# of results. Inspired in comprehenr::to_list().
 for_split <- function(quosure, data = NULL) {
     check_for_split(quosure, call = parent.frame())
     expr <- rlang::get_expr(quosure)
@@ -54,6 +45,18 @@ for_split <- function(quosure, data = NULL) {
     result
 }
 
+# At the moment only checks that there is no `return` statement
+check_for_split <- function(quosure, call = parent.frame()) {
+    if ("return" %in% all.names(quosure)) {
+        cli_abort(
+            c("Cannot use `return` inside a for loop.",
+              ">" = "Use `next` to skip the rest of the loop."),
+            class = "lpsugar_error_return_in_for_loop",
+            call = call
+        )
+    }
+}
+
 is_assignment <- function(expr) {
     rlang::is_call(expr) && 
         (expr[[1]] == quote(`<-`) || expr[[1]] == quote(`=`))
@@ -77,6 +80,7 @@ contains_loop <- function(expr) {
     FALSE
 }
 
+# Runs `include_element_adder()` on all nested for loops
 include_all_element_adders <- function(expr) {
     if (!contains_loop(expr)) {
         return(expr)
@@ -95,15 +99,20 @@ include_all_element_adders <- function(expr) {
     return(expr)
 }
 
+# Replaces 
+# `for (i in seq) {expr}`
+# with
+# `for (i in seq) .___add_loop_element({expr})`
 include_element_adder <- function(expr) {
     last <- length(expr)
     e <- expr[[last]]
     
+    # Does not add element if it's an assigment (<-)
     if (is_assignment(e)) {
         return(expr)
     }
     
-    # Happy Checker
+    # This line keeps R CMD Check happy
     .___add_loop_element <- NULL
     
     expr[[last]] <- rlang::expr(
