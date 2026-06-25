@@ -1,4 +1,4 @@
-# lpsugar (development)
+# lpsugar 0.24.0
 
 ## Breaking Changes
 
