@@ -55,10 +55,8 @@ for_split <- function(quosure, data = NULL) {
 }
 
 is_assignment <- function(expr) {
-    rlang::is_call(expr) && (
-        expr[[1]] == quote(`<-`) ||
-            expr[[1]] == quote(`=`)
-    )
+    rlang::is_call(expr) && 
+        (expr[[1]] == quote(`<-`) || expr[[1]] == quote(`=`))
 }
 
 is_loop <- function(expr) {
@@ -121,7 +119,7 @@ get_loop_indices <- function(expr) {
     }
     
     if (is_loop(expr)) {
-        here_index <- c(expr[[2]] |> format())
+        here_index <- format(expr[[2]])
     } 
     else {
         here_index <- character(0)

@@ -421,9 +421,5 @@ ifelse_l <- function(test, yes, no) {
     }
     
     test <- as.numeric(test)
-    
-    yes <- yes * test
-    no <- no * (1 - test)
-    
-    yes + no
+    yes * test + no * (1 - test)
 }
