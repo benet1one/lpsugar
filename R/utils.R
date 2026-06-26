@@ -153,7 +153,12 @@ variables_to_list.list <- function(x, problem,
         
         if (is.null(xs)) {
             if (miss_error) {
-                cli_abort("Variable `{v$name}` not present in `{field}`.", call = call)
+                cli_abort(
+                    c("`{field}` should include all variables",
+                      "x" = "Missing variable: `{v$name}`."),
+                    class = "lpsugar_error_missing_variable",
+                    call = call
+                )
             } 
             else {
                 xs <- v$ind
@@ -163,7 +168,11 @@ variables_to_list.list <- function(x, problem,
         }
         
         if (miss_error && anyNA(xs)) {
-            cli_abort("`{field}` must not contain NA values.", call = call)
+            cli_abort(
+                "`{field}` must not contain NA values.", 
+                class = "lpsugar_error_na_values",
+                call = call
+            )
         }
         
         return(xs)
@@ -183,7 +192,11 @@ variables_to_vec.default <- function(x, problem, miss_error = TRUE,
     x <- as.numeric(x)
     
     if (miss_error && anyNA(x)) {
-        cli_abort("`{field}` must not contain NA values.", call = call)
+        cli_abort(
+            "`{field}` must not contain NA values.", 
+            class = "lpsugar_error_na_values",
+            call = call
+        )
     }
     
     if (length(x) != ncol(problem)) {
@@ -191,6 +204,7 @@ variables_to_vec.default <- function(x, problem, miss_error = TRUE,
         m <- length(x)
         cli_abort(
             "`problem` has {n} variables but `{field}` is length {m}.",
+            class = "lpsugar_error_length_mismatch",
             call = call
         )
     }
@@ -210,7 +224,12 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
         
         if (is.null(xs)) {
             if (miss_error) {
-                cli_abort("Variable `{v$name}` not present in `{field}`.", call = call)
+                cli_abort(
+                    c("`{field}` should include all variables",
+                      "x" = "Missing variable: `{v$name}`."),
+                    class = "lpsugar_error_missing_variable",
+                    call = call
+                )
             } 
             else {
                 xs <- v$ind
@@ -224,7 +243,11 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
         xs[] <- as.numeric(xs)
         
         if (miss_error && anyNA(xs)) {
-            cli_abort("`{field}` must not contain NA values.", call = call)
+            cli_abort(
+                "`{field}` must not contain NA values.", 
+                class = "lpsugar_error_na_values",
+                call = call
+            )
         }
         
         dx <- dim(drop(xs))
@@ -233,10 +256,12 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
         if (any(dx != dv)) {
             dx_str <- paste(dim(xs), collapse = ", ")
             dv_str <- paste(dim(v), collapse = ", ")
+            
             cli_abort(
                 c("Dimensions of variable `{v$name}` do not match.",
                   "x" = "In `{field}` they are ({dx_str})",
                   "x" = "In `problem` they are ({dv_str})"), 
+                class = "lpsugar_error_dimension_mismatch",
                 call = call
             )
         }
@@ -245,6 +270,7 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
                 c("Length of variable `{v$name}` does not match.",
                   "x" = "In `{field}` it's length {length(xs)}",
                   "x" = "In `problem` it's length {length(v)}"),
+                class = "lpsugar_error_length_mismatch",
                 call = call
             )
         }
@@ -266,6 +292,7 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
                     c("Dimension names of variable `{v$name}` do not match.",
                       "!" = "In dimension '{dn_name}'",
                       ">" = "Make sure they are the same names in the same order."),
+                    class = "lpsugar_error_dimnames_mismatch",
                     call = call
                 )
             }
@@ -273,7 +300,11 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
         
         
         if (v$integer && !rlang::is_integerish(xs[!is.na(xs)])) {
-            cli_warn("`{v$name}` should be integer.", call = call)
+            cli_warn(
+                "`{v$name}` should be integer.", 
+                class = "lpsugar_warning_non_integer",
+                call = call
+            )
         }
         
         solution_vec[v$ind] <- xs
@@ -292,6 +323,7 @@ variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE,
         cli_abort(
             c("`{field}$variables` and `{field}$variables_vec` do not match.",
               "i" = "You can use either one of them in this function."),
+            class = "lpsugar_error_inconsistent_lp_soltution",
             call = call
         )
     }
@@ -339,7 +371,10 @@ as_quadratic <- function(x) {
         return(x)
     }
     if (!is_lp_variable(x) && !is_lp_objective(x)) {
-        cli_abort("`x` must be a variable or an objective function.")
+        cli_abort(
+            "`x` must be a variable or an objective function.",
+            class = "lpsugar_error_internal"
+        )
     }
     
     x$Q <- get_Q(x)
@@ -388,6 +423,7 @@ check_roi_solution <- function(solution, field_name = "solution") {
     if (!is.list(solution) || !all(expected_fields %in% names(solution))) {
         cli_abort(
             "`{field_name}` must be the output of `solve_model()` or `ROI::ROI_solve()`.",
+            class = "lpsugar_error_invalid_solution",
             call = parent.frame()
         )
     }
