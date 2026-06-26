@@ -15,7 +15,7 @@ whereas Available solvers needn't be installed."><meta name="google-site-verific
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.23.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.24.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,7 +98,7 @@ they will also be listed.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roi.r-forge.r-project.org/" class="external-link">ROI</a></span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ROI: R Optimization Infrastructure</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Registered solver plugins: nlminb, highs, nloptr.bobyqa, nloptr.crs2lm, nloptr.direct, nloptr.directL, nloptr.lbfgs, nloptr.neldermead, nloptr.newuoa, nloptr.sbplx, nloptr.stogo, nloptr.tnewton, nloptr.varmetric, nloptr.cobyla, nloptr.mma, nloptr.auglag, nloptr.isres, nloptr.slsqp, alabama.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Registered solver plugins: nlminb, highs, nloptr.bobyqa, nloptr.crs2lm, nloptr.direct, nloptr.directL, nloptr.lbfgs, nloptr.neldermead, nloptr.newuoa, nloptr.sbplx, nloptr.stogo, nloptr.tnewton, nloptr.varmetric, nloptr.cobyla, nloptr.mma, nloptr.auglag, nloptr.isres, nloptr.slsqp.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Default solver: auto.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">quadratic_prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
@@ -110,7 +110,7 @@ they will also be listed.</p>
 <span class="r-in"><span><span class="co"># Installed and loaded quadratic solvers</span></span></span>
 <span class="r-in"><span><span class="fu">lpsugar_applicable_solvers</span><span class="op">(</span><span class="va">quadratic_prob</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "highs"         "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "nloptr.isres"  "nloptr.slsqp"  "alabama"      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "nloptr.isres"  "nloptr.slsqp" </span>
 <span class="r-in"><span><span class="co"># All quadratic solvers</span></span></span>
 <span class="r-in"><span><span class="fu">lpsugar_available_solvers</span><span class="op">(</span><span class="va">quadratic_prob</span><span class="op">)</span> <span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Package"</span>, <span class="st">"Version"</span>, <span class="st">"Repository"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Package Version                       Repository</span>

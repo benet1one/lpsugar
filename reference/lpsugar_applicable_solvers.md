@@ -59,7 +59,7 @@ problems, they will also be listed.
 ``` r
 library(ROI)
 #> ROI: R Optimization Infrastructure
-#> Registered solver plugins: nlminb, highs, nloptr.bobyqa, nloptr.crs2lm, nloptr.direct, nloptr.directL, nloptr.lbfgs, nloptr.neldermead, nloptr.newuoa, nloptr.sbplx, nloptr.stogo, nloptr.tnewton, nloptr.varmetric, nloptr.cobyla, nloptr.mma, nloptr.auglag, nloptr.isres, nloptr.slsqp, alabama.
+#> Registered solver plugins: nlminb, highs, nloptr.bobyqa, nloptr.crs2lm, nloptr.direct, nloptr.directL, nloptr.lbfgs, nloptr.neldermead, nloptr.newuoa, nloptr.sbplx, nloptr.stogo, nloptr.tnewton, nloptr.varmetric, nloptr.cobyla, nloptr.mma, nloptr.auglag, nloptr.isres, nloptr.slsqp.
 #> Default solver: auto.
 
 quadratic_prob <- lp_problem() |> 
@@ -71,7 +71,7 @@ quadratic_prob <- lp_problem() |>
 # Installed and loaded quadratic solvers
 lpsugar_applicable_solvers(quadratic_prob)
 #> [1] "highs"         "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag"
-#> [5] "nloptr.isres"  "nloptr.slsqp"  "alabama"      
+#> [5] "nloptr.isres"  "nloptr.slsqp" 
 # All quadratic solvers
 lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
 #>                Package Version                       Repository
