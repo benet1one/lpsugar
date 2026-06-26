@@ -264,12 +264,12 @@ multiply_v_v <- function(x, y, call) {
     out <- x
     
     out$Q <- lapply(seq_len(max_n), function(i) {
-        xi <- x$L[rep(i, m), ]
-        yi <- y$L[rep(i, m), ]
-        qi <- t(xi) * yi + xi * t(yi)
+        xi <- x$L[i, ] |> c()
+        yi <- y$L[i, ] |> c()
+        qi <- outer(xi, yi) + outer(yi, xi)
         
         rownames(qi) <- colnames(qi) <- colnames(x$L)
-        qi
+        robust_index(qi)
     })
     
     out$L <-
