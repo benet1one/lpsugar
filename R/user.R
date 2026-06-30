@@ -234,12 +234,11 @@ compute_objective <- function(problem, solution) {
     out <- crossprod(L, solution) + A
     
     if (is_quadratic(problem$objective)) {
-        row_sol <- t(solution)
-        col_sol <- t(row_sol)
-        q <- problem$objective$Q
-        
-        q_out <- 0.5 * row_sol %*% q %*% col_sol
-        out <- out + q_out
+        row_x <- t(solution)
+        col_x <- t(row_x)
+        Q <- problem$objective$Q
+
+        out <- out + 0.5 * row_x %*% Q %*% col_x
     }
     
     out[1]
@@ -256,27 +255,5 @@ compute_aliases <- function(problem, solution) {
         field = "solution"
     )
     
-    purrr::map(problem$aliases, function(a) {
-        mat <- array(unclass(a$L), dim = dim(a$L))
-        add <- unclass(a$A)
-        out <- mat %*% solution + add
-        
-        if (is_quadratic(a)) {
-            row_sol <- t(solution)
-            col_sol <- t(row_sol)
-            
-            q_out <- purrr::map_dbl(a$Q, function(qi) {
-                0.5 * row_sol %*% qi %*% col_sol
-            })
-            
-            out <- out + q_out
-        }
-        
-        if (length(out) == 1L) {
-            unname(out[1])
-        } 
-        else {
-            array(out, dim = dim2(a), dimnames = dimnames(a))
-        }
-    })
+    purrr::map(problem$aliases, \(a) compute_quadratic(a, x = solution))
 }
