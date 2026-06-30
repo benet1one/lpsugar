@@ -65,7 +65,9 @@ my_problem <- lp_problem() |>
     )
 
 my_solution <- lp_solve(my_problem)
+
 my_solution$variables
+
 my_solution$objective
 ```
 
@@ -105,7 +107,9 @@ transportation_problem <- lp_problem() |>
     )
 
 transportation_solution <- lp_solve(transportation_problem)
+
 transportation_solution$variables$x
+
 transportation_solution$objective
 ```
 
