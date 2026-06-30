@@ -118,7 +118,9 @@ is to load all of `ROI` with `library(ROI)` and let it choose the solver automat
 ```{r}
 library(ROI.plugin.highs)
 solution <- lp_solve(transportation_problem, solver = "highs")
+
 solution$objective
+
 solution$variables
 ```
 
