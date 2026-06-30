@@ -1,8 +1,12 @@
 
+# User -------------------------------
+
 nonlinear <- function(expr) {
     quo <- rlang::enquo(expr)
     as_nonlinear_lp_variable(quo)
 }
+
+# Methods ----------------------------
 
 as_nonlinear_lp_variable <- function(x) {
     class(x) <- c(
@@ -21,6 +25,7 @@ print.nonlinear_lp_variable <- function(x, ...) {
     invisible(x)
 }
 
+# Uitls -----------------------------
 
 check_function_sanity_new <- function(fun_x, n0, call) {
     fun_out <- rlang::try_fetch(
@@ -97,7 +102,6 @@ bind_funs <- function(fn_list, problem) {
     }
 }
 
-
 subtract_nl <- function(lhs, rhs) {
     env <- rlang::get_env(lhs)
     lhs_expr <- rlang::get_expr(lhs)
@@ -112,5 +116,4 @@ subtract_nl <- function(lhs, rhs) {
     rlang::new_quosure(subtraction_expr, env = env) |> 
         as_nonlinear_lp_variable()
 }
-
 
