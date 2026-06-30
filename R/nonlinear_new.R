@@ -12,13 +12,13 @@ as_nonlinear_lp_variable <- function(x) {
     class(x) <- c(
         "nonlinear_lp_variable",
         "transformed_lp_variable",
-        "lp_variable",
         class(x)
     )
     
     return(x)
 }
 
+#' @export
 print.nonlinear_lp_variable <- function(x, ...) {
     cat(cli::col_grey("<nonlinear_lp_variable>"))
     print(x)
@@ -53,7 +53,7 @@ check_function_sanity_new <- function(fun_x, n0, call) {
 as.function.nonlinear_lp_variable <- function(nl, problem, ...) {
     check_problem(problem, field_name = "problem")
     
-    args <- rep(rlang::missing_arg(), length(problem$variables))
+    args <- list(substitute()) |> rep(length(problem$variables))
     names(args) <- names(problem$variables)
     
     expr <- rlang::get_expr(nl)
@@ -84,6 +84,8 @@ as.function.nonlinear_lp_variable <- function(nl, problem, ...) {
             call = expr
         )
     }
+    
+    return(fun_x)
 }
 
 #' @export

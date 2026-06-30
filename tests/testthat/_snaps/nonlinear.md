@@ -4,6 +4,6 @@
       p$objective
     Output
       minimize nonlinear function:
-      my_fun
+      x^3/y["b"] + z
       
 

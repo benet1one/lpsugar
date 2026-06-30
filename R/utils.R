@@ -413,6 +413,9 @@ is_lp_variable <- function(x) {
 is_transformed_lp_variable <- function(x) {
     inherits(x, "transformed_lp_variable")
 }
+is_nonlinear <- function(x) {
+    inherits(x, "nonlinear_lp_variable")
+}
 is_lp_objective <- function(x) {
     inherits(x, "lp_objective")
 }
