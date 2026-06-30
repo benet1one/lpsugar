@@ -45,9 +45,9 @@ separate each \\e_i\\ into:
 \\ e_i = e_i^+ - e_i^- \\ \\ e_i^+ \ge 0,\\ e_i^- \ge 0 \\ Then the
 problem can be written like this:
 
-\\ \begin{array}{rl} \min & \sum\_{i=1}^n{e_i^+ + e_i^-} \\ \text{st } &
+\\ \begin{array}{rl} \min & \sum\_{i=1}^n{e_i^+ + e_i^-} \\ \text{st} &
 e_i^+ \ge y_i - \hat{y_i} \\ & e_i^- \ge \hat{y_i} - y_i \\ & e_i^+ \ge
-0 \\ & e_i^- \ge 0 \\ \text{where } & \hat{y_i} = \sum\_{j=1}^k{\beta_j
+0 \\ & e_i^- \ge 0 \\ \text{where} & \hat{y_i} = \sum\_{j=1}^k{\beta_j
 x\_{ij}} \end{array} \\
 
 This works. The objective function attempts to push both \\e_i^+\\ and

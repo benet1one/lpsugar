@@ -44,12 +44,14 @@ my_problem <- lp_problem() |>
     )
 
 my_solution <- lp_solve(my_problem)
+
 my_solution$variables
 #> $x
 #> [1] 3
 #> 
 #> $y
 #> [1] 2
+
 my_solution$objective
 #> [1] 5
 ```
@@ -97,12 +99,14 @@ transportation_problem <- lp_problem() |>
     )
 
 transportation_solution <- lp_solve(transportation_problem)
+
 transportation_solution$variables$x
 #>        market
 #> factory Madrid Barcelona Valencia Seville
 #>     BLB      8         0        0      10
 #>     ACO      0        10        0       0
 #>     GRN      0         0       12       0
+
 transportation_solution$objective
 #> [1] 70
 ```

@@ -107,8 +107,10 @@ the solver automatically.
 
 library(ROI.plugin.highs)
 solution <- lp_solve(transportation_problem, solver = "highs")
+
 solution$objective
 #> [1] 70
+
 solution$variables
 #> $x
 #>        market

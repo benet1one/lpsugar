@@ -118,11 +118,11 @@ e_i^+ \ge 0,\ e_i^- \ge 0
 <p><span class="math display">\[
 \begin{array}{rl}
   \min &amp; \sum_{i=1}^n{e_i^+ + e_i^-} \\
-  \text{st } &amp; e_i^+ \ge y_i - \hat{y_i} \\
+  \text{st} &amp; e_i^+ \ge y_i - \hat{y_i} \\
             &amp; e_i^- \ge \hat{y_i} - y_i \\
             &amp; e_i^+ \ge 0 \\
             &amp; e_i^- \ge 0 \\
-  \text{where } &amp; \hat{y_i} = \sum_{j=1}^k{\beta_j x_{ij}}
+  \text{where} &amp; \hat{y_i} = \sum_{j=1}^k{\beta_j x_{ij}}
 \end{array}
 \]</span></p>
 <p>This works. The objective function attempts to push both <span class="math inline">\(e_i^+\)</span> and <span class="math inline">\(e_i^-\)</span> down, but the constraints ensure

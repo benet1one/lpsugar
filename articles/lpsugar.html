@@ -178,8 +178,10 @@ the solver automatically.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">ROI.plugin.highs</span><span class="op">)</span></span>
 <span><span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="va">transportation_problem</span>, solver <span class="op">=</span> <span class="st">"highs"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">solution</span><span class="op">$</span><span class="va">objective</span></span>
 <span><span class="co">#&gt; [1] 70</span></span>
+<span></span>
 <span><span class="va">solution</span><span class="op">$</span><span class="va">variables</span></span>
 <span><span class="co">#&gt; $x</span></span>
 <span><span class="co">#&gt;        market</span></span>
