@@ -1,31 +1,58 @@
 
 nonlinear <- function(expr) {
     quo <- rlang::enquo(expr)
-    
-    class(quo) <- c(
+    as_nonlinear_lp_variable(quo)
+}
+
+as_nonlinear_lp_variable <- function(x) {
+    class(x) <- c(
         "nonlinear_lp_variable",
         "transformed_lp_variable",
         "lp_variable",
-        class(quo)
+        class(x)
     )
     
-    return(quo)
+    return(x)
 }
 
 print.nonlinear_lp_variable <- function(x, ...) {
-    cat("<nonlinear_lp_variable>")
+    cat(cli::col_grey("<nonlinear_lp_variable>"))
     print(x)
     invisible(x)
 }
 
-nonlinear_to_function <- function(nonlinear_variable, problem) {
+
+check_function_sanity_new <- function(fun_x, n0, call) {
+    fun_out <- rlang::try_fetch(
+        fun_x(rep(0, n0)),
+        error = identity
+    )
+    
+    if (rlang::is_error(fun_out)) {
+        cli_abort(
+            c("Failed to evaluate expression.",
+              ">" = "Make sure it works when all variables are 0.",
+              "i" = "It can return -Inf or +Inf."),
+            class = "lpsugar_error_nonlinear_throws_error",
+            parent = fun_out,
+            call = call
+        )
+    }
+    
+    return(fun_out)
+}
+
+# Functional -----------------------------
+
+#' @export
+as.function.nonlinear_lp_variable <- function(nl, problem, ...) {
     check_problem(problem, field_name = "problem")
     
     args <- rep(rlang::missing_arg(), length(problem$variables))
     names(args) <- names(problem$variables)
     
-    expr <- rlang::get_expr(nonlinear_variable)
-    env <- rlang::get_env(nonlinear_variable)
+    expr <- rlang::get_expr(nl)
+    env <- rlang::get_env(nl)
     
     fun <- rlang::new_function(
         args = args,
@@ -54,22 +81,36 @@ nonlinear_to_function <- function(nonlinear_variable, problem) {
     }
 }
 
-check_function_sanity_new <- function(fun_x, n0, call) {
-    fun_out <- rlang::try_fetch(
-        fun_x(rep(0, n0)),
-        error = identity
-    )
-    
-    if (rlang::is_error(fun_out)) {
-        cli_abort(
-            c("Failed to evaluate expression.",
-              ">" = "Make sure it works when all variables are 0.",
-              "i" = "It can return -Inf or +Inf."),
-            class = "lpsugar_error_nonlinear_throws_error",
-            parent = fun_out,
-            call = call
-        )
+#' @export
+as.function.lp_variable <- function(v, problem, ...) {
+    function(x) {
+        compute_quadratic(v, x = x)
     }
-    
-    return(fun_out)
 }
+
+bind_funs <- function(fn_list, problem) {
+    fn_list <- purrr::map(fn_list, \(x) as.function(x, problem = problem))
+    
+    function(x) {
+        fn_values <- purrr::map(fn_list, \(fn) fn(x))
+        unlist(fn_values)
+    }
+}
+
+
+subtract_nl <- function(lhs, rhs) {
+    env <- rlang::get_env(lhs)
+    lhs_expr <- rlang::get_expr(lhs)
+    rhs_expr <- rlang::get_expr(rhs)
+    
+    subtraction_expr <- rlang::expr({
+        .L <- {!!lhs_expr}
+        .R <- {!!rhs_expr}
+        .L - .R
+    })
+    
+    rlang::new_quosure(subtraction_expr, env = env) |> 
+        as_nonlinear_lp_variable()
+}
+
+
