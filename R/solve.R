@@ -309,6 +309,10 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     check_problem(problem, field_name = "problem")
     check_roi_solution(solution)
     
+    if (length(solution$objval) == 0) {
+        solution$objval <- NA_real_
+    }
+    
     if (length(solution$solution) == 0) {
         out <- list(
             objective = NA_real_,
