@@ -381,6 +381,26 @@ as_quadratic <- function(x) {
     return(x)
 }
 
+compute_quadratic <- function(v, x) {
+    out <- v$L %*% x + v$A
+    out <- array(out, dim = dim2(v), dimnames = dimnames(v))
+    
+    if (is_quadratic(v)) {
+        row_x <- t(x)
+        col_x <- t(row_x)
+        
+        for (i in seq_along(v)) {
+            Qi <- v$Q[[i]]
+            out[i] <- out[i] + 0.5 * row_x %*% Qi %*% col_x
+        }
+    }
+    
+    if (length(out) == 1L) {
+        out <- unname(out[1])
+    }
+    
+    return(out)
+}
 
 # Inheritance -------------------
 
