@@ -1,3 +1,10 @@
+# lpsugar (development version)
+
+## Breaking Changes
+
+* Replaced `lp_minimize_function()` with 
+a different `nonlinear()` workflow.
+
 # lpsugar 0.24.0
 
 ## Breaking Changes
