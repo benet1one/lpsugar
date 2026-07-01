@@ -160,10 +160,19 @@ new_nonlinear_objective <- function(.problem, type, direction = NULL,
 #' apply `sum(objective)` and display a message. Suppress this message by writing
 #' the `sum` yourself.
 #'
-#' @returns The `.problem` with the new `$objective` function, a list with these fields:
-#' - `$Q` : If objective function is quadratic, matrix with the quadratic coefficients.
+#' @returns The `.problem` with the new `$objective` function.
+#' 
+#' If the function is linear or quadratic, `$objective` has these fields:
+#' - `$Q` : Matrix with the quadratic coefficients, or `NULL`.
 #' - `$L` : Vector with the coefficients for each variable.
 #' - `$A` : Numeric, addend to the final value. It is not used in the solver.
+#' 
+#' If the function is nonlinear, `$objective` has these fields:
+#' - `$NL` : The quoted expression that defined the objective function.
+#' - `$fun` : Function that takes a vector `x` of length
+#' `n = ncol(.problem)` and evaluates `$NL`.
+#' 
+#' These fields are always present:
 #' - `$direction` : String, goal of the solver. Can be `"minimize"` or `"maximize"`.
 #' - `$expr` : String, expression that defined the objective function.
 #' @export

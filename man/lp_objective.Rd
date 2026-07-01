@@ -23,11 +23,24 @@ Alternatively, set \code{objective = 0} to make the solver find a feasible solut
 instead of optimizing, just like \code{\link[=lp_find_feasible]{lp_find_feasible()}} does.}
 }
 \value{
-The \code{.problem} with the new \verb{$objective} function, a list with these fields:
+The \code{.problem} with the new \verb{$objective} function.
+
+If the function is linear or quadratic, \verb{$objective} has these fields:
 \itemize{
-\item \verb{$Q} : If objective function is quadratic, matrix with the quadratic coefficients.
+\item \verb{$Q} : Matrix with the quadratic coefficients, or \code{NULL}.
 \item \verb{$L} : Vector with the coefficients for each variable.
 \item \verb{$A} : Numeric, addend to the final value. It is not used in the solver.
+}
+
+If the function is nonlinear, \verb{$objective} has these fields:
+\itemize{
+\item \verb{$NL} : The quoted expression that defined the objective function.
+\item \verb{$fun} : Function that takes a vector \code{x} of length
+\code{n = ncol(.problem)} and evaluates \verb{$NL}.
+}
+
+These fields are always present:
+\itemize{
 \item \verb{$direction} : String, goal of the solver. Can be \code{"minimize"} or \code{"maximize"}.
 \item \verb{$expr} : String, expression that defined the objective function.
 }

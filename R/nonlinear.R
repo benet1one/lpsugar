@@ -1,6 +1,18 @@
 
 # User -------------------------------
 
+#' Nonlinear Expression
+#' 
+#' Nonlinear transformations and operations on variables.
+#' 
+#' @param expr (Unquoted) expression containing
+#' decision variables. Must return a numeric vector
+#' when evaluated.
+#' 
+#' @export
+#' @returns The quoted expression with class
+#' `"nonlinear_lp_variable"`
+#' @example inst/examples/example_nonlinear.R
 nonlinear <- function(expr) {
     quo <- rlang::enquo(expr)
     as_nonlinear_lp_variable(quo)
