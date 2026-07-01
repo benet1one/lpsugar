@@ -62,8 +62,9 @@ check_function_sanity <- function(fun_x, n0, call) {
 # Functional -----------------------------
 
 #' @export
-as.function.nonlinear_lp_variable <- function(nl, problem, ...) {
+as.function.nonlinear_lp_variable <- function(x, problem, ...) {
     check_problem(problem, field_name = "problem")
+    nl <- x
     
     args <- list(substitute()) |> rep(length(problem$variables))
     names(args) <- names(problem$variables)
@@ -101,9 +102,10 @@ as.function.nonlinear_lp_variable <- function(nl, problem, ...) {
 }
 
 #' @export
-as.function.lp_variable <- function(v, problem, ...) {
+as.function.lp_variable <- function(x, problem, ...) {
+    variable <- x
     function(x) {
-        compute_quadratic(v, x = x)
+        compute_quadratic(variable, x = x)
     }
 }
 
