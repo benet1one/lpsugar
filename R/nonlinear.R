@@ -27,7 +27,7 @@ print.nonlinear_lp_variable <- function(x, ...) {
 
 # Uitls -----------------------------
 
-check_function_sanity_new <- function(fun_x, n0, call) {
+check_function_sanity <- function(fun_x, n0, call) {
     fun_out <- rlang::try_fetch(
         fun_x(rep(0, n0)),
         error = identity
@@ -70,7 +70,7 @@ as.function.nonlinear_lp_variable <- function(nl, problem, ...) {
         do.call(fun, args = vars)
     }
     
-    fun_out <- check_function_sanity_new(
+    fun_out <- check_function_sanity(
         fun_x, 
         n0 = ncol(problem), 
         call = expr
