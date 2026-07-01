@@ -229,10 +229,7 @@ as.OP.lp_problem <- function(x) {
     
     if (x$objective$type == "undefined") {
         cli_abort(c(
-            paste(
-                "Must define an objective function with `lp_minimize()`, `lp_maximize()`,",
-                "`lp_minimize_function()` or `lp_maximize_function()`."
-            ),
+            "Must define an objective function with `lp_minimize()` or `lp_maximize()`.",
             "i" = paste(
                 "If you wish to find any feasible solution, use `lp_find_feasible()`",
                 "or set the objective function to 0 with `lp_minimize(0)`",

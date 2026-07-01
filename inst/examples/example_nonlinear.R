@@ -7,7 +7,7 @@ library(ROI.plugin.nloptr)
 p1 <- lp_problem() |> 
     lp_variable(x, lower = 0) |> 
     lp_variable(y, lower = 0) |> 
-    lp_maximize_function(\(x, y) sqrt(x) * log(y)) |> 
+    lp_maximize(nonlinear(sqrt(x) * log(y))) |> 
     lp_constraint(x + y <= 10)
 
 # There are some different solvers within `nloptr`

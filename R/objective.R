@@ -167,7 +167,7 @@ new_nonlinear_objective <- function(.problem, type, direction = NULL,
 #' - `$direction` : String, goal of the solver. Can be `"minimize"` or `"maximize"`.
 #' - `$expr` : String, expression that defined the objective function.
 #' @export
-#' @seealso [lp_minimize_function()] For general nonlinear optimization.
+#' @seealso [nonlinear()] For general nonlinear optimization.
 #' 
 #' @rdname lp_objective
 #' @example inst/examples/example_objective.R

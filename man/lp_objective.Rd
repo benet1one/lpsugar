@@ -64,5 +64,5 @@ s$objective
 sum(p$objective$L * s$variables_vec) + p$objective$A
 }
 \seealso{
-\code{\link[=lp_minimize_function]{lp_minimize_function()}} For general nonlinear optimization.
+\code{\link[=nonlinear]{nonlinear()}} For general nonlinear optimization.
 }
