@@ -11,18 +11,18 @@
 #' 
 #' @export
 #' @returns The quoted expression with class
-#' `"nonlinear_lp_variable"`
+#' `"nonlinear"`
 #' @example inst/examples/example_nonlinear.R
 nonlinear <- function(expr) {
     quo <- rlang::enquo(expr)
-    as_nonlinear_lp_variable(quo)
+    as_nonlinear(quo)
 }
 
 # Methods ----------------------------
 
-as_nonlinear_lp_variable <- function(x) {
+as_nonlinear <- function(x) {
     class(x) <- c(
-        "nonlinear_lp_variable",
+        "nonlinear",
         "transformed_lp_variable",
         class(x)
     )
@@ -31,9 +31,9 @@ as_nonlinear_lp_variable <- function(x) {
 }
 
 #' @export
-print.nonlinear_lp_variable <- function(x, ...) {
-    cat(cli::col_grey("<nonlinear_lp_variable>"))
-    print(x)
+print.nonlinear <- function(x, ...) {
+    cat(cli::col_grey("<nonlinear>\n"))
+    print(rlang::get_expr(x))
     invisible(x)
 }
 
@@ -62,7 +62,7 @@ check_function_sanity <- function(fun_x, n0, call) {
 # Functional -----------------------------
 
 #' @export
-as.function.nonlinear_lp_variable <- function(x, problem, ...) {
+as.function.nonlinear <- function(x, problem, ...) {
     check_problem(problem, field_name = "problem")
     nl <- x
     

@@ -132,7 +132,7 @@ new_nonlinear_objective <- function(.problem, type, direction = NULL,
         direction <- .problem$objective$direction
     }
     
-    fun <- as.function.nonlinear_lp_variable(NL, .problem)
+    fun <- as.function.nonlinear(NL, .problem)
     
     list(
         type = "nonlinear",
@@ -232,7 +232,7 @@ update_objective <- function(.problem) {
         return(.problem)
     } 
     else if (.problem$objective$type == "nonlinear") {
-        .problem$objective$fun <- as.function.nonlinear_lp_variable(
+        .problem$objective$fun <- as.function.nonlinear(
             .problem$objective$NL,
             .problem
         )

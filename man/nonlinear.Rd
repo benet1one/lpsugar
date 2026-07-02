@@ -13,7 +13,7 @@ when evaluated.}
 }
 \value{
 The quoted expression with class
-\code{"nonlinear_lp_variable"}
+\code{"nonlinear"}
 }
 \description{
 Nonlinear transformations and operations on variables.
