@@ -118,18 +118,87 @@ bind_funs <- function(fn_list, problem) {
     }
 }
 
-subtract_nl <- function(lhs, rhs) {
-    env <- rlang::get_env(lhs)
-    lhs_expr <- rlang::get_expr(lhs)
-    rhs_expr <- rlang::get_expr(rhs)
+# Comparison -----------------------------
+
+#' @export
+Ops.nonlinear <- function(e1, e2) {
+    op <- .Generic
+    call <- call(op, substitute(e1), substitute(e2))
     
-    subtraction_expr <- rlang::expr({
-        .L <- {!!lhs_expr}
-        .R <- {!!rhs_expr}
-        .L - .R
-    })
+    comparison_ops <- c("<", "<=", "==", ">=", ">")
     
-    rlang::new_quosure(subtraction_expr, env = env) |> 
-        as_nonlinear_lp_variable()
+    if (op %in% comparison_ops) {
+        compare_nl(e1, e2, op, call, parent_frame = parent.frame())
+    }
+    else if (op == "!=") {
+        cli_abort(
+            "Not equal `!=` is not supported in constraints.",
+            class = "lpsugar_error_not_equal_constraint",
+            call = call
+        )
+    }
+    else {
+        cli_abort(
+            "Unsupported operation `{op}`",
+            class = "lpsugar_error_unsupported_operation",
+            call = call,
+        )
+    }
 }
 
+compare_nl <- function(x, y, op, call, parent_frame) {
+    if (op == "<") {
+        op <- "<="
+    } 
+    else if (op == ">") {
+        op <- ">="
+    }
+    
+    if (!is_nonlinear(x) || !is.numeric(y)) {
+        cli_abort(
+            "Nonlinear constraints must be of form `nonlinear(...) <= constant`",
+            class = "lpsugar_error_bad_nonlinear_constraint",
+            call = call
+        )
+    }
+    
+    dir <- rep(op, length(y))
+    call <- rep(format1(call), length(y))
+    name <- character(length(y))
+    
+    list(NL = x, dir = op, rhs = y, name = name, call = call) |> 
+        structure(class = "lp_nonlinear_constraint")
+}
+
+check_nonlinear_constraint_sanity <- function(nl_con, problem) {
+    fun <- as.function.nonlinear(nl_con$NL, problem)
+    fun_out <- attr(fun, "fun_output")
+    
+    lhs_len <- length(fun_out)
+    rhs_len <- length(nl_con$rhs)
+    
+    if (lhs_len == rhs_len) {
+        return(fun)
+    }
+    
+    in_con <- if (nl_con$name != "") {
+        paste0(" in constraint '", nl_con$name, "'")
+    }
+    else {
+        ""
+    }
+    
+    call <- call(
+        nl_con$dir,
+        call(nonlinear, nl_con$NL),
+        nl_con$rhs
+    )
+    
+    cli_abort(
+        c("Length mismatch{in_con}.",
+          "x" = "Left-hand-side is length {lhs_len}.",
+          "x" = "Right-hand-side is length {rhs_len}."),
+        class = "lpsugar_error_nonlinear_constraint_length_mismatch",
+        call = call
+    )
+}
