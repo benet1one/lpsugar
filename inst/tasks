@@ -2,8 +2,10 @@
 Code
 - Check TODOs
 
-Function Objective
-- hessians
+Nonlinear
+- gradient
+- get length of NL output and recycle rhs in constraints
+- test errors
 
 Docs
 - Find another example for nonlinear
