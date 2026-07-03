@@ -91,14 +91,14 @@ as.function.nonlinear <- function(x, problem, ...) {
     
     if (!is.numeric(fun_out)) {
         cli_abort(
-            c("`fun` must return a numeric vector.",
-              "x" = "Returns {.type {fun_out}}."),
+            c("Nonlinear expression must return a numeric vector.",
+              "x" = "Instead returns {.type {fun_out}}."),
             class = "lpsugar_error_nonlinear_not_numeric",
             call = expr
         )
     }
     
-    return(fun_x)
+    structure(fun_x, fun_output = fun_out)
 }
 
 #' @export

@@ -133,6 +133,16 @@ new_nonlinear_objective <- function(.problem, type, direction = NULL,
     }
     
     fun <- as.function.nonlinear(NL, .problem)
+    fun_out <- attr(fun, "fun_output")
+    
+    if (length(fun_out) != 1L) {
+        cli_abort(
+            c("Nonlinear objective function must return a scalar.",
+              "x" = "Instead returns a length {length(fun_out)} vector."),
+            class = "lpsugar_error_objective_not_scalar",
+            call = parent.frame(3)
+        )
+    }
     
     list(
         type = "nonlinear",
