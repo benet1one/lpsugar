@@ -414,7 +414,18 @@ is_transformed_lp_variable <- function(x) {
     inherits(x, "transformed_lp_variable")
 }
 is_nonlinear <- function(x) {
-    inherits(x, "nonlinear")
+    if (inherits(x, "nonlinear")) {
+        TRUE
+    }
+    else if (is_lp_constraint(x)) {
+        length(x$nonlinear) > 0L
+    }
+    else if (is_lp_objective(x)) {
+        x$type == "nonlinear"
+    }
+    else {
+        FALSE
+    }
 }
 is_lp_objective <- function(x) {
     inherits(x, "lp_objective")
