@@ -79,6 +79,32 @@ Ops.lp_variable <- function(e1, e2) {
     )
 }
 
+#' @export
+Ops.nonlinear <- function(e1, e2) {
+    op <- .Generic
+    call <- call(op, substitute(e1), substitute(e2))
+    
+    comparison_ops <- c("<", "<=", "==", ">=", ">")
+    
+    if (op %in% comparison_ops) {
+        compare_nl(e1, e2, op, call, parent_frame = parent.frame())
+    }
+    else if (op == "!=") {
+        cli_abort(
+            "Not equal `!=` is not supported in constraints.",
+            class = "lpsugar_error_not_equal_constraint",
+            call = call
+        )
+    }
+    else {
+        cli_abort(
+            "Unsupported operation `{op}`",
+            class = "lpsugar_error_unsupported_operation",
+            call = call,
+        )
+    }
+}
+
 check_no_na <- function(e1, e2, call) {
     if (!is_lp_variable(e1) && anyNA(e1)) {
         cli_abort(
