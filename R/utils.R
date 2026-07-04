@@ -425,11 +425,11 @@ is_lp_constraint <- function(x, empty_valid = TRUE) {
         is_con
     } 
     else {
-        is_con && !is_empty_lp_constraint(x)
+        is_con && !is_empty_constraint(x)
     }
 }
-is_empty_lp_constraint <- function(x) {
-    inherits(x, "empty_lp_constraint")
+is_empty_constraint <- function(x) {
+    inherits(x, "lp_empty_constraint")
 }
 is_lp_solution <- function(x) {
     inherits(x, "lp_solution")

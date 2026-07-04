@@ -47,16 +47,8 @@ lp_constraint <- function(.problem, ...) {
             varnames = varnames
         )
     }
-    
-    cons <- bind_cons(!!!cons)
-    
-    if (length(.problem$constraints) == 0L) {
-        .problem$constraints <- cons
-    } 
-    else {
-        .problem$constraints <- bind_cons(.problem$constraints, cons)
-    }
-    
+
+    .problem$constraints <- bind_cons(.problem$constraints, !!!cons)
     return(.problem)
 }
 
@@ -192,13 +184,10 @@ update_constraints <- function(.problem) {
 }
 
 empty_constraint <- function() {
-    list(
-        L = slam::simple_triplet_zero_matrix(nrow = 0, ncol = 0),
-        dir = character(0),
-        rhs = matrix(nrow = 0, ncol = 1),
-        call = character(0),
-        name = character(0)
-    ) |> structure(class = c("empty_lp_constraint", "lp_constraint"))
+    structure(
+        list(),
+        class = c("lp_empty_constraint", "lp_constraint")
+    )
 }
 
 #' Define Multiple Constraints at Once
@@ -223,7 +212,7 @@ bind_cons <- function(...) {
             )
         }
         
-        !is_empty_lp_constraint(d)
+        !is_empty_constraint(d)
     })
     
     if (length(dots) == 0L) {
@@ -262,6 +251,10 @@ as.array.lp_constraint <- function(x, ...) {
 #' @export
 length.lp_constraint <- function(x) {
     length(x$dir)
+}
+#' @export
+length.lp_empty_constraint <- function(x) {
+    0
 }
 #' @export
 dim.lp_constraint <- function(x) {
