@@ -1,5 +1,20 @@
 # Changelog
 
+## lpsugar 0.25.0
+
+### Breaking Changes
+
+- Matrix Multiplication no longer drops dimensions of arguments
+
+### New Features
+
+- Implemented Matrix Multiplication between a quadratic variable and a
+  numeric matrix
+
+### Bug Fixes
+
+- Matrix Multiplication transforms row vectors into column vectors
+
 ## lpsugar 0.24.0
 
 ### Breaking Changes
