@@ -184,3 +184,35 @@ test_that("quadratic constraints", {
         ignore_attr = TRUE
     )
 })
+
+test_that("quadratic matrix multiplication", {
+    p <- lp_problem() |> 
+        lp_var(x[1:3, 1:2]) |> 
+        lp_var(y[1:3]) |> 
+        lp_alias(
+            a = t(y) %*% x,
+            b = (x*sum(y)) %*% c(2, 3),
+            c = t(c(1, 3, 4)) %*% x^2
+        )
+    
+    xval <- matrix(runif(6), 3, 2)
+    yval <- runif(3)
+    computed <- compute_aliases(p, list(x = xval, y = yval))
+    
+    expect_equal(
+        computed$a,
+        t(yval) %*% xval
+    )
+    expect_equal(
+        computed$b,
+        (xval*sum(yval)) %*% c(2, 3)
+    )
+    expect_equal(
+        computed$c,
+        t(c(1, 3, 4)) %*% xval^2
+    )
+    expect_error(
+        p |> lp_eval(t(y^2) %*% x),
+        "Non-quadratic"
+    )
+})

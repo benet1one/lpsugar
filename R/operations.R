@@ -358,8 +358,10 @@ negate_v <- function(x, call) {
     call <- rlang::call2("%*%", substitute(x), substitute(y))
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
+    xq <- is_quadratic(x)
+    yq <- is_quadratic(y)
     
-    if (is_quadratic(x) || is_quadratic(y)) {
+    if ((xq && yv) || (xv && yq)) {
         cli_abort(
             "Non-quadratic operation", 
             class = "lpsugar_error_non_quadratic_operation",
@@ -406,8 +408,7 @@ matrix_multiply_v_c <- function(x, y, call) {
     out$ind[] <- seq_along(out$ind)
     
     if (is_quadratic(x)) {
-        # TODO
-        cli_abort("`%*%` not yet implemented for quadratic variables.", call = call)
+        out$Q <- list()
     }
     
     out$L <- out$L[integer(), , drop = TRUE]
@@ -415,6 +416,10 @@ matrix_multiply_v_c <- function(x, y, call) {
     
     for (j in 1:ncol(y)) for (i in 1:nrow(x)) {
         z <- sum(x[i, ] * y[, j])
+        
+        if (is_quadratic(x)) {
+            out$Q <- c(out$Q, z$Q)
+        }
         out$L <- rbind(out$L, z$L)
         out$A <- rbind(out$A, z$A)
     }
@@ -427,9 +432,6 @@ matrix_multiply_v_c <- function(x, y, call) {
 
 # var %*% var
 matrix_multiply_v_v <- function(x, y, call) {
-    x$ind <- drop(x$ind)
-    y$ind <- drop(y$ind)
-    
     ndx <- ndim(x$ind)
     ndy <- ndim(y$ind)
     
