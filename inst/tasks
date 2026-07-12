@@ -4,6 +4,8 @@ Code
 
 Nonlinear
 - gradient
+- update objective and constraints
+- lp_delete_constraints
 - get length of NL output and recycle rhs in constraints
 - test errors
 
