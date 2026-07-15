@@ -240,14 +240,6 @@ print.lp_objective <- function(x, ...) {
 update_objective <- function(.problem) {
     if (.problem$objective$type == "undefined") {
         return(.problem)
-    } 
-    else if (.problem$objective$type == "nonlinear") {
-        .problem$objective$fun <- as.function.nonlinear(
-            .problem$objective$NL,
-            .problem
-        )
-        
-        return(.problem)
     }
     
     n_before <- length(.problem$objective$L)

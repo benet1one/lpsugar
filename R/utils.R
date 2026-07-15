@@ -404,7 +404,7 @@ compute_quadratic <- function(v, x) {
 
 # Inheritance -------------------
 
-is_problem <- function(x) {
+is_lp_problem <- function(x) {
     inherits(x, "lp_problem")
 }
 is_lp_variable <- function(x) {
@@ -412,20 +412,6 @@ is_lp_variable <- function(x) {
 }
 is_transformed_lp_variable <- function(x) {
     inherits(x, "transformed_lp_variable")
-}
-is_nonlinear <- function(x) {
-    if (inherits(x, "nonlinear")) {
-        TRUE
-    }
-    else if (is_lp_constraint(x)) {
-        length(x$nonlinear) > 0L
-    }
-    else if (is_lp_objective(x)) {
-        x$type == "nonlinear"
-    }
-    else {
-        FALSE
-    }
 }
 is_lp_objective <- function(x) {
     inherits(x, "lp_objective")
@@ -445,9 +431,27 @@ is_empty_constraint <- function(x) {
 is_lp_solution <- function(x) {
     inherits(x, "lp_solution")
 }
+is_nonlinear <- function(x) {
+    if (inherits(x, "nonlinear") || inherits(x, "lp_nonlinear_constraint")) {
+        TRUE
+    }
+    else if (is_lp_problem(x)) {
+        is_nonlinear(x$objective) || is_nonlinear(x$constraints)
+    }
+    else if (is_lp_objective(x)) {
+        x$type == "nonlinear"
+    }
+    else if (is_lp_constraint(x)) {
+        nl_con <- Position(is_nonlinear, x)
+        !is.na(nl_con)
+    }
+    else {
+        FALSE
+    }
+}
 
 check_problem <- function(problem, field_name = ".problem") {
-    if (!is_problem(problem)) {
+    if (!is_lp_problem(problem)) {
         cli_abort("`{field_name}` must be an `lp_problem`.", call = parent.frame())
     }
 }

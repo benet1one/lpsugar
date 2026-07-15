@@ -17,7 +17,7 @@
 lp_problem <- function() {
     list(
         variables = list(),
-        constraints = empty_constraint(),
+        constraints = structure(list(), class = "lp_constraint"),
         objective = list(
             type = "undefined",
             direction = "",
