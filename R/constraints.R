@@ -71,9 +71,14 @@ lp_constraint_internal <- function(quosure, name, data, varnames, problem) {
     cons <- for_split(quosure, data = data)
     inds <- rlang::names2(cons)
     
+    name_ind <- ifelse(
+        inds != "",
+        paste0(name, "[", inds, "]"),
+        name
+    )
+    
     for (i in seq_along(cons)) {
         con <- cons[[i]]
-        ind_str <- inds[i]
         
         if (is.null(con)) {
             next
@@ -88,35 +93,31 @@ lp_constraint_internal <- function(quosure, name, data, varnames, problem) {
             
             cli_abort(msg, call = quosure, class = "lpsugar_error_no_constraint")
         }
-        
-        name_ind <- if (ind_str == "") {
-            name
-        } 
-        else {
-            paste0(name, "[", ind_str, "]")
-        }
-        
+
         if (length(con$quadratic) > 0L) {
-            con[[i]]$quadratic <- treat_quadratic_constraint(
+            con$quadratic <- treat_quadratic_constraint(
                 con$quadratic,
                 name = name,
-                name_ind = name_ind
+                name_ind = name_ind[i]
             )
         }
         if (length(con$nonlinear) > 0L) {
-            con[[i]]$nonlinear <- treat_nonlinear_constraint(
+            con$nonlinear <- treat_nonlinear_constraint(
                 con$nonlinear,
                 name = name,
-                name_ind = name_ind,
+                name_ind = name_ind[i],
                 problem = problem
             )
         }
+        
+        cons[[i]] <- con
     }
     
     bind_cons(!!!cons)
 }
 
 treat_quadratic_constraint <- function(q, name, name_ind) {
+    q$name[] <- name
     names(q$Q) <- rownames(q$L) <- rownames(q$rhs) <-
         rep_len(name_ind, length(q$dir))
     return(q)
@@ -138,11 +139,12 @@ treat_nonlinear_constraint <- function(nl, name, name_ind, problem) {
 treat_one_nonlinear_constraint <- function(nl, name, name_ind, problem) {
     fun <- as.function.nonlinear(nl$NL, problem = problem)
     fun_out <- attr(fun, "fun_output")
+    len <- length(fun_out)
     
     if (length(nl$rhs) == 1L) {
-        nl$rhs <- rep(nl$rhs, length(fun_out))
+        nl$rhs <- rep(nl$rhs, len)
     }
-    else if (length(fun_out) != length(nl$rhs)) {
+    else if (length(nl$rhs) != len) {
         call <- call(
             nl_con$dir,
             call(nonlinear, nl_con$NL),
@@ -159,7 +161,10 @@ treat_one_nonlinear_constraint <- function(nl, name, name_ind, problem) {
     }
     
     nl$fun <- fun
+    nl$dir <- rep_len(nl$dir, len)
     nl$rhs <- matrix(nl$rhs, ncol = 1) |> robust_index()
+    
+    nl$name <- name
     rownames(nl$rhs)[] <- name_ind
     
     return(nl)
@@ -190,6 +195,8 @@ treat_one_nonlinear_constraint <- function(nl, name, name_ind, problem) {
 #'
 #' print(p)
 lp_delete_constraint <- function(.problem, names) {
+    cli_abort("NOT YET IMPLEMENTED FOR NONLINEAR CONSTRAINTS")
+    
     check_problem(.problem)
     stopifnot(is.character(names))
     
@@ -227,29 +234,33 @@ lp_subject_to <- lp_constraint
 # Utils --------------------
 
 update_constraints <- function(.problem) {
-    if (length(.problem$constraints) == 0L) {
+    qcon <- .problem$constraints$quadratic
+    
+    if (length(qcon) == 0L) {
         return(.problem)
     }
     
-    q_ind <- which(lengths(.problem$constraints$Q) > 0L)
+    q_ind <- which(lengths(qcon$Q) > 0L)
     
     for (i in q_ind) {
-        .problem$constraints$Q[[i]]$nrow[] <- ncol(.problem)
-        .problem$constraints$Q[[i]]$ncol[] <- ncol(.problem)
-        .problem$constraints$Q[[i]]$dimnames <- list(
+        qcon$Q[[i]]$nrow[] <- ncol(.problem)
+        qcon$Q[[i]]$ncol[] <- ncol(.problem)
+        qcon$Q[[i]]$dimnames <- list(
             attr(.problem, "varnames"),
             attr(.problem, "varnames")
         )
     }
     
-    .problem$constraints$L$ncol[] <- ncol(.problem)
-    colnames(.problem$constraints$L) <- attr(.problem, "varnames")
+    qcon$L$ncol[] <- ncol(.problem)
+    colnames(qcon$L) <- attr(.problem, "varnames")
+    .problem$constraints$quadratic <- qcon
+    
     .problem
 }
 
 empty_constraint <- function() {
     structure(
-        list(),
+        list(quadratic = list(), nonlinear = list()),
         class = c("lp_empty_constraint", "lp_constraint")
     )
 }
@@ -284,27 +295,32 @@ bind_cons <- function(...) {
     
     quadratic <- purrr::map(dots, "quadratic") |> bind_quad()
     nonlinear <- purrr::map(dots, "nonlinear") |> bind_nonlin()
-    
+
     list(quadratic = quadratic, nonlinear = nonlinear) |> 
         structure(class = "lp_constraint")
 }
 
 bind_quad <- function(quad) {
-    out <- out[lengths(out) > 0L]
+    quad <- quad[lengths(quad) > 0L]
+    
+    if (length(quad) == 0L) {
+        return(NULL)
+    }
+    
     out <- purrr::list_transpose(quad, simplify = FALSE)
     
-    out$Q <- unlist(out$Q, recursive = FALSE)
+    out$Q <- unlist(out$Q, recursive = FALSE, use.names = FALSE)
     out$L <- do.call(what = rbind, out$L)
     out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()
-    out$dir <- unlist(out$dir)
-    out$call <- unlist(out$call)
-    out$name <- unlist(out$name)
+    out$dir <- unlist(out$dir, use.names = FALSE)
+    out$expr <- unlist(out$expr, use.names = FALSE)
+    out$name <- unlist(out$name, use.names = FALSE)
     
     structure(out, class = "lp_quadratic_constraint")
 }
 bind_nonlin <- function(nonlin) {
-    out <- out[lengths(out) > 0L]
-    structure(out, class = "lp_nonlinear_constraint")
+    out <- unlist(nonlin, recursive = FALSE, use.names = FALSE)
+    out[lengths(out) > 0L]
 }
 
 # Methods ----------------------
@@ -326,6 +342,14 @@ as.array.lp_constraint <- function(x, ...) {
 
 #' @export
 length.lp_constraint <- function(x) {
+    length(x$quadratic) + sum(lengths(x$nonlinear))
+}
+#' @export
+length.lp_quadratic_constraint <- function(x) {
+    length(x$dir)
+}
+#' @export
+length.lp_nonlinear_constraint <- function(x) {
     length(x$dir)
 }
 #' @export
@@ -384,56 +408,57 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 
 #' @export
 print.lp_constraint <- function(x, compact = FALSE, ...) {
-    
+    NextMethod()
 }
 #' @export
 print.lp_quadratic_constraint <- function(x, compact = FALSE, ...) {
-    stopifnot(rlang::is_bool(compact))
-    
-    pairs <- cbind(x$name, x$call) |>
-        unique(MARGIN = 1L)
-    
-    if (!compact && ncol(x$L) > 200L) {
-        cat("\n")
-        cli_inform("Problem has over 200 variables, printing with `compact = TRUE`.")
-        compact <- TRUE
-    }
-    
-    for (i in seq_len(nrow(pairs))) {
-        name <- pairs[i, 1]
-        call <- pairs[i, 2]
-        
-        name_str <- if (name == "") {
-            "<unnamed>"
-        } 
-        else {
-            name
-        }
-        
-        if (compact) {
-            name_str <- format(name_str, width = 12L)
-        }
-        
-        ind <- x$name == name & x$call == call
-        quad <- is_quadratic(x[ind])
-        n <- sum(ind)
-        
-        cat(
-            "\n",
-            name_str,
-            " | n = ", n,
-            if (quad) " | quadratic",
-            " | ", call,
-            sep = ""
-        )
-        
-        if (!compact && !quad) {
-            cat("\n\n")
-            mc <- x[ind] |> as.matrix.lp_constraint()
-            print(mc, quote = FALSE)
-            cat("\n")
-        }
-    }
-    
-    invisible(x)
+    NextMethod()
+    # stopifnot(rlang::is_bool(compact))
+    # 
+    # pairs <- cbind(x$name, x$call) |>
+    #     unique(MARGIN = 1L)
+    # 
+    # if (!compact && ncol(x$L) > 200L) {
+    #     cat("\n")
+    #     cli_inform("Problem has over 200 variables, printing with `compact = TRUE`.")
+    #     compact <- TRUE
+    # }
+    # 
+    # for (i in seq_len(nrow(pairs))) {
+    #     name <- pairs[i, 1]
+    #     call <- pairs[i, 2]
+    #     
+    #     name_str <- if (name == "") {
+    #         "<unnamed>"
+    #     } 
+    #     else {
+    #         name
+    #     }
+    #     
+    #     if (compact) {
+    #         name_str <- format(name_str, width = 12L)
+    #     }
+    #     
+    #     ind <- x$name == name & x$call == call
+    #     quad <- is_quadratic(x[ind])
+    #     n <- sum(ind)
+    #     
+    #     cat(
+    #         "\n",
+    #         name_str,
+    #         " | n = ", n,
+    #         if (quad) " | quadratic",
+    #         " | ", call,
+    #         sep = ""
+    #     )
+    #     
+    #     if (!compact && !quad) {
+    #         cat("\n\n")
+    #         mc <- x[ind] |> as.matrix.lp_constraint()
+    #         print(mc, quote = FALSE)
+    #         cat("\n")
+    #     }
+    # }
+    # 
+    # invisible(x)
 }

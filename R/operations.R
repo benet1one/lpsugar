@@ -582,8 +582,10 @@ compare_lp <- function(x, y, op, call) {
     con <- list(Q = Q, L = L, dir = dir, rhs = rhs, 
                 name = name, expr = expr)
     
+    class(con) <- "lp_quadratic_constraint"
+    
     list(
-        quadratic = structure(con, class = "lp_quadratic_constraint"), 
+        quadratic = con, 
         nonlinear = list()
     ) |> structure(class = "lp_constraint")
 }
@@ -611,9 +613,11 @@ compare_nl <- function(x, y, op, call, parent_frame) {
     con <- list(NL = x, dir = op, rhs = y, 
                 name = "", expr = expr)
     
+    class(con) <- "lp_nonlinear_constraint"
+    
     list(
-        quadratic = list(),
-        nonlinear = structure(list(con), class = "lp_nonlinear_constraint")
+        quadratic = NULL,
+        nonlinear = list(con)
     ) |> structure(class = "lp_constraint")
 }
 
