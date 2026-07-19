@@ -417,8 +417,11 @@ is_nonlinear <- function(x) {
     if (inherits(x, "nonlinear")) {
         TRUE
     }
+    else if (is_lp_problem(x)) {
+        is_nonlinear(x$objective) || is_nonlinear(x$constraints)
+    }
     else if (is_lp_constraint(x)) {
-        length(x$nonlinear) > 0L
+        cli_abort("TODO")
     }
     else if (is_lp_objective(x)) {
         x$type == "nonlinear"

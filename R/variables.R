@@ -57,6 +57,14 @@ lp_variable <- function(.problem, definition,
                         lower = -Inf, upper = +Inf) {
     
     check_problem(.problem)
+    
+    if (is_nonlinear(.problem)) {
+        cli_abort(
+            "Cannot add variables to a nonlinear problem.",
+            class = "lpsugar_error_add_variables_to_nonlinear"
+        )
+    }
+    
     if (missing(definition)) {
         cli_abort("Argument `definition` is missing, with no default.")
     }

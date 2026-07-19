@@ -34,21 +34,9 @@ test_that("nonlinear", {
         rlang::eval_tidy(obj, data = var_values)
     )
 
-    pz <- p |> lp_variable(z, lower = -0.5)
-    
-    sz <- lp_solve(
-        pz,
-        solver = "nloptr.cobyla",
-        start = list(
-            x = 4,
-            y = c(3, 3, 3),
-            z = 0
-        )
-    )
-    
-    expect_equal(
-        sz$objective |> round(6) |> unname(),
-        0.3
+    expect_error(
+        pz <- p |> lp_variable(z, lower = -0.5),
+        "Cannot add variables to a nonlinear problem"
     )
 })
 
