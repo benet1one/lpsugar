@@ -84,18 +84,11 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
 
 # Steps -------------------
 
-ROI_objective_from_lpsugar <- function(problem) {
-    check_problem(problem, field_name = "problem")
-    
-    switch(
-        problem$objective$type,
-        "undefined" = cli_abort("Objective function is undefined."),
-        "feasible"  = ,
-        "linear"    = as.L_objective(problem),
-        "quadratic" = as.Q_objective(problem),
-        "nonlinear" = as.F_objective(problem),
-        cli_abort("Unknown type {problem$objective$type}.")
-    )
+#' @importFrom ROI as.objective
+#' @export
+as.objective.lp_objective <- function(x) {
+    class(x) <- class(x) |> setdiff("lp_objetive")
+    return(x)
 }
 
 ROI_constraint_from_lpsugar <- function(problem) {
@@ -110,52 +103,6 @@ ROI_constraint_from_lpsugar <- function(problem) {
     else {
         as.L_constraint(problem)
     }
-}
-
-#' @importFrom ROI as.L_objective
-#' @export
-as.L_objective.lp_problem <- function(x) {
-    if (x$objective$type == "nonlinear") {
-        cli_abort("Objective is nonlinear, use `as.F_objective()` instead.")
-    }
-    if (is_quadratic(x$objective)) {
-        cli_abort("Objective function is quadratic, use `as.Q_objective()` instead.")
-    }
-    
-    ROI::L_objective(
-        L = x$objective$L,
-        names = attr(x, "varnames")
-    )
-}
-
-#' @importFrom ROI as.Q_objective
-#' @export
-as.Q_objective.lp_problem <- function(x) {
-    if (x$objective$type == "nonlinear") {
-        cli_abort("Objective is nonlinear, use `as.F_objective()` instead.")
-    }
-    
-    ROI::Q_objective(
-        Q = x$objective$Q,
-        L = x$objective$L,
-        names = attr(x, "varnames")
-    )
-}
-
-#' @importFrom ROI as.F_objective
-#' @export
-as.F_objective.lp_problem <- function(x) {
-    if (x$objective$type != "nonlinear") {
-        ROI::as.F_objective(ROI_objective_from_lpsugar(x))
-    }
-    
-    ROI::F_objective(
-        x$objective$fun,
-        G = x$objective$gradient,
-        H = x$objective$hessian,
-        n = ncol(x),
-        names = attr(x, "varnames")
-    )
 }
 
 #' @importFrom ROI as.L_constraint
@@ -251,7 +198,7 @@ as.OP.lp_problem <- function(x) {
         )
     }
     
-    objective <- ROI_objective_from_lpsugar(x)
+    objective <- ROI::as.objective(x$objective)
     constraints <- ROI_constraint_from_lpsugar(x)
     
     types <- character(ncol(x))

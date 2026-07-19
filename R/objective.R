@@ -71,7 +71,7 @@ lp_objective_quadratic <- function(.problem, objective, expr = "") {
     else {
         type <- "linear"
     }
-    
+ 
     .problem$objective <- new_quadratic_objective(
         .problem,
         type = type,
@@ -116,18 +116,24 @@ new_quadratic_objective <- function(.problem, type, direction = NULL,
         A <- drop(A)
     }
     
-    list(
-        type = type,
-        direction = direction,
-        Q = Q,
-        L = L,
-        A = A,
-        expr = expr
-    ) |> structure(class = "lp_objective")
+    out <- if (is.null(Q)) {
+        ROI::L_objective(L = L)
+    }
+    else {
+        ROI::Q_objective(Q = Q, L = L)
+    }
+
+    out$A <- A
+    out$names <- attr(.problem, "varnames")
+    out$direction <- direction
+    out$type <- type
+    out$expr <- expr
+    
+    class(out) <- c("lp_objective", class(out))
+    out
 }
 
-new_nonlinear_objective <- function(.problem, type, direction = NULL,
-                                    NL = NULL, expr = "") {
+new_nonlinear_objective <- function(.problem, type, direction = NULL, NL, expr = "") {
     if (is.null(direction)) {
         direction <- .problem$objective$direction
     }
@@ -144,14 +150,15 @@ new_nonlinear_objective <- function(.problem, type, direction = NULL,
         )
     }
     
-    list(
-        type = "nonlinear",
-        direction = direction,
-        NL = NL,
-        fun = fun,
-        A = 0, # pretty_solution() always adds A
-        expr = expr
-    ) |> structure(class = "lp_objective")
+    out <- ROI::F_objective(fun, n = ncol(.problem))
+    
+    out$A <- 0
+    out$direction <- direction
+    out$type <- "nonlinear"
+    out$expr <- expr
+    
+    class(out) <- c("lp_objective", class(out))
+    out
 }
 
 # User -------------------------------
@@ -240,17 +247,9 @@ print.lp_objective <- function(x, ...) {
 update_objective <- function(.problem) {
     if (.problem$objective$type == "undefined") {
         return(.problem)
-    } 
-    else if (.problem$objective$type == "nonlinear") {
-        .problem$objective$fun <- as.function.nonlinear(
-            .problem$objective$NL,
-            .problem
-        )
-        
-        return(.problem)
     }
     
-    n_before <- length(.problem$objective$L)
+    n_before <- ncol(.problem$objective$L)
     n_after <- ncol(.problem)
     
     if (is_quadratic(.problem$objective)) {
@@ -261,12 +260,12 @@ update_objective <- function(.problem) {
             attr(.problem, "varnames")
         )
     }
-    
-    .problem$objective$L <- c(
+
+    .problem$objective$L <- cbind(
         .problem$objective$L,
-        numeric(n_after - n_before)
+        matrix(0, nrow = 1, ncol = n_after - n_before)
     )
     
-    names(.problem$objective$L) <- attr(.problem, "varnames")
+    colnames(.problem$objective$L) <- attr(.problem, "varnames")
     return(.problem)
 }

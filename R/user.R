@@ -226,7 +226,7 @@ compute_objective <- function(problem, solution) {
     solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
     
     if (problem$objective$type == "nonlinear") {
-        return(problem$objective$fun(solution))
+        return(problem$objective$F(solution))
     }
     
     L <- problem$objective$L
