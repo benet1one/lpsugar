@@ -404,7 +404,7 @@ compute_quadratic <- function(v, x) {
 
 # Inheritance -------------------
 
-is_problem <- function(x) {
+is_lp_problem <- function(x) {
     inherits(x, "lp_problem")
 }
 is_lp_variable <- function(x) {
@@ -447,7 +447,7 @@ is_lp_solution <- function(x) {
 }
 
 check_problem <- function(problem, field_name = ".problem") {
-    if (!is_problem(problem)) {
+    if (!is_lp_problem(problem)) {
         cli_abort("`{field_name}` must be an `lp_problem`.", call = parent.frame())
     }
 }
