@@ -150,7 +150,7 @@ test_that("quadratic solver", {
             (x - 3)^2 + (x + y - 5)^2
         )
 
-    s <- lp_solve(p)
+    s <- lp_solve(p, solver = "highs")
 
     expect_equal(
         s$variables,
