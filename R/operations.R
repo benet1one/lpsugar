@@ -106,14 +106,14 @@ Ops.nonlinear <- function(e1, e2) {
 }
 
 check_no_na <- function(e1, e2, call) {
-    if (!is_nonlinear(e1) && !is_lp_variable(e1) && anyNA(e1)) {
+    if (!is_lp_variable(e1) && anyNA(e1)) {
         cli_abort(
             "Left-hand-side object contains NA values.", 
             class = "lpsugar_error_na_values",
             call = call
         )
     }
-    if (!is_nonlinear(e2) && !is_lp_variable(e2) && anyNA(e2)) {
+    if (!is_lp_variable(e2) && anyNA(e2)) {
         cli_abort(
             "Right-hand-side object contains NA values.", 
             class = "lpsugar_error_na_values",
@@ -122,7 +122,7 @@ check_no_na <- function(e1, e2, call) {
     }
 }
 
-# Quadratic Arithmetics -----------------------
+# Arithmetics -----------------------
 
 add_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
@@ -576,45 +576,11 @@ compare_lp <- function(x, y, op, call) {
     rhs <- -var$A
     
     dir <- rep(op, length(rhs))
-    expr <- rep(format1(call), length(rhs))
+    call <- rep(format1(call), length(rhs))
     name <- character(length(rhs))
     
-    con <- list(Q = Q, L = L, dir = dir, rhs = rhs, 
-                name = name, expr = expr)
-    
-    list(
-        quadratic = structure(con, class = "lp_quadratic_constraint"), 
-        nonlinear = list()
-    ) |> structure(class = "lp_constraint")
-}
-
-
-compare_nl <- function(x, y, op, call, parent_frame) {
-    if (op == "<") {
-        op <- "<="
-    } 
-    else if (op == ">") {
-        op <- ">="
-    }
-    
-    if (!is_nonlinear(x) || !is.numeric(y)) {
-        cli_abort(
-            "Nonlinear constraints must be of form `nonlinear(...) <= constant`",
-            class = "lpsugar_error_bad_nonlinear_constraint",
-            call = call
-        )
-    }
-    
-    check_no_na(x, y, call = call)
-    expr <- format1(call)
-    
-    con <- list(NL = x, dir = op, rhs = y, 
-                name = "", expr = expr)
-    
-    list(
-        quadratic = list(),
-        nonlinear = structure(list(con), class = "lp_nonlinear_constraint")
-    ) |> structure(class = "lp_constraint")
+    list(Q = Q, L = L, dir = dir, rhs = rhs, name = name, call = call) |>
+        structure(class = "lp_constraint")
 }
 
 # Utils ----------------------

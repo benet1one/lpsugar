@@ -32,13 +32,10 @@
 #' @example inst/examples/example_constraint.R
 lp_constraint <- function(.problem, ...) {
     check_problem(.problem)
+    data <- data_mask(.problem)
     quos <- rlang::enquos(...)
     nams <- rlang::names2(quos)
-    data <- data_mask(.problem)
-    varnames <- c(
-        names(.problem$variables), 
-        names(.problem$aliases)
-    )
+    varnames <- c(names(.problem$variables), names(.problem$aliases))
     
     cons <- list()
     
@@ -47,8 +44,7 @@ lp_constraint <- function(.problem, ...) {
             quosure = quos[[i]],
             name = nams[i],
             data = data,
-            varnames = varnames,
-            problem = .problem
+            varnames = varnames
         )
     }
 
@@ -56,7 +52,7 @@ lp_constraint <- function(.problem, ...) {
     return(.problem)
 }
 
-lp_constraint_internal <- function(quosure, name, data, varnames, problem) {
+lp_constraint_internal <- function(quosure, name, data, varnames) {
     expr <- rlang::quo_get_expr(quosure)
     vars <- all.vars(expr)
     
@@ -79,6 +75,13 @@ lp_constraint_internal <- function(quosure, name, data, varnames, problem) {
             next
         }
         
+        name_ind <- if (ind_str == "") {
+            name
+        } 
+        else {
+            paste0(name, "[", ind_str, "]")
+        }
+        
         if (!is_lp_constraint(con)) {
             msg <- c(
                 "Expression did not evaluate to a constraint.",
@@ -89,80 +92,13 @@ lp_constraint_internal <- function(quosure, name, data, varnames, problem) {
             cli_abort(msg, call = quosure, class = "lpsugar_error_no_constraint")
         }
         
-        name_ind <- if (ind_str == "") {
-            name
-        } 
-        else {
-            paste0(name, "[", ind_str, "]")
-        }
-        
-        if (length(con$quadratic) > 0L) {
-            con[[i]]$quadratic <- treat_quadratic_constraint(
-                con$quadratic,
-                name = name,
-                name_ind = name_ind
-            )
-        }
-        if (length(con$nonlinear) > 0L) {
-            con[[i]]$nonlinear <- treat_nonlinear_constraint(
-                con$nonlinear,
-                name = name,
-                name_ind = name_ind,
-                problem = problem
-            )
-        }
+        rownames(cons[[i]]$L) <- rep_len(name_ind, length(con))
     }
     
-    bind_cons(!!!cons)
-}
-
-treat_quadratic_constraint <- function(q, name, name_ind) {
-    names(q$Q) <- rownames(q$L) <- rownames(q$rhs) <-
-        rep_len(name_ind, length(q$dir))
-    return(q)
-}
-
-
-treat_nonlinear_constraint <- function(nl, name, name_ind, problem) {
-    nl <- lapply(
-        nl, 
-        treat_one_nonlinear_constraint,
-        name = name,
-        name_ind = name_ind,
-        problem = problem
-    )
-    
-    names(nl)[] <- name
-    return(nl)
-}
-treat_one_nonlinear_constraint <- function(nl, name, name_ind, problem) {
-    fun <- as.function.nonlinear(nl$NL, problem = problem)
-    fun_out <- attr(fun, "fun_output")
-    
-    if (length(nl$rhs) == 1L) {
-        nl$rhs <- rep(nl$rhs, length(fun_out))
-    }
-    else if (length(fun_out) != length(nl$rhs)) {
-        call <- call(
-            nl_con$dir,
-            call(nonlinear, nl_con$NL),
-            nl_con$rhs
-        )
-        
-        cli_abort(
-            c("Length mismatch{in_con}.",
-              "x" = "Left-hand-side is length {length(fun_out)}.",
-              "x" = "Right-hand-side is length {length(nl$rhs)}."),
-            class = "lpsugar_error_nonlinear_constraint_length_mismatch",
-            call = call
-        )
-    }
-    
-    nl$fun <- fun
-    nl$rhs <- matrix(nl$rhs, ncol = 1) |> robust_index()
-    rownames(nl$rhs)[] <- name_ind
-    
-    return(nl)
+    cons <- bind_cons(!!!cons)
+    cons$name[] <- name
+    cons$call[] <- format1(expr)
+    return(cons)
 }
 
 #' Delete Constraints
@@ -267,8 +203,7 @@ bind_cons <- function(...) {
     
     dots <- rlang::dots_list(...)
     dots <- dots[lengths(dots) > 0]
-    
-    for (d in dots) {
+    dots <- purrr::keep(dots, function(d) {
         if (!is_lp_constraint(d)) {
             cli_abort(
                 "`bind_cons()` can only bind <lp_constraint>, not <{class(d)[1]}>.",
@@ -276,22 +211,15 @@ bind_cons <- function(...) {
                 call = call
             )
         }
-    }
-
+        
+        !is_empty_constraint(d)
+    })
+    
     if (length(dots) == 0L) {
         return(empty_constraint())
     }
     
-    quadratic <- purrr::map(dots, "quadratic") |> bind_quad()
-    nonlinear <- purrr::map(dots, "nonlinear") |> bind_nonlin()
-    
-    list(quadratic = quadratic, nonlinear = nonlinear) |> 
-        structure(class = "lp_constraint")
-}
-
-bind_quad <- function(quad) {
-    out <- out[lengths(out) > 0L]
-    out <- purrr::list_transpose(quad, simplify = FALSE)
+    out <- purrr::list_transpose(dots, simplify = FALSE)
     
     out$Q <- unlist(out$Q, recursive = FALSE)
     out$L <- do.call(what = rbind, out$L)
@@ -300,11 +228,7 @@ bind_quad <- function(quad) {
     out$call <- unlist(out$call)
     out$name <- unlist(out$name)
     
-    structure(out, class = "lp_quadratic_constraint")
-}
-bind_nonlin <- function(nonlin) {
-    out <- out[lengths(out) > 0L]
-    structure(out, class = "lp_nonlinear_constraint")
+    structure(out, class = "lp_constraint")
 }
 
 # Methods ----------------------
@@ -384,10 +308,6 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 
 #' @export
 print.lp_constraint <- function(x, compact = FALSE, ...) {
-    
-}
-#' @export
-print.lp_quadratic_constraint <- function(x, compact = FALSE, ...) {
     stopifnot(rlang::is_bool(compact))
     
     pairs <- cbind(x$name, x$call) |>

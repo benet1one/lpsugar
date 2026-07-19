@@ -1,5 +1,5 @@
 
-test_that("nonlinear objective", {
+test_that("nonlinear", {
     withr::local_package("ROI.plugin.nloptr")
     L <- letters[1:3]
     
@@ -52,7 +52,7 @@ test_that("nonlinear objective", {
     )
 })
 
-test_that("nonlinear objective constrained", {
+test_that("nonlinear constrained", {
     withr::local_package("ROI.plugin.highs")
     withr::local_package("ROI.plugin.nloptr")
 
@@ -71,10 +71,4 @@ test_that("nonlinear objective constrained", {
 
     with(s$variables, expect_equal(x, 10 - y, tolerance = 0.001))
     with(s$variables, expect_equal(s$objective, sqrt(x) * log(y)))
-})
-
-test_that("nonlinear constraints", {
-    p <- lp_problem() |> 
-        lp_var(x) |> 
-        lp_con(nonlinear(log(x)) >= 10)
 })
