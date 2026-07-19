@@ -1,6 +1,8 @@
 
 Code
 - Check TODOs
+- Consider using $maximum and $bounds for full consistency with ROI
+- Update all documentation
 
 Nonlinear
 - gradient
