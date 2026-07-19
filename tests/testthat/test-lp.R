@@ -11,7 +11,7 @@ test_that("printing", {
             2*x + y <= 10
         )
 
-    s <- lp_solve(p)
+    s <- lp_solve(p, solver = "highs")
     expect_snapshot(p)
     expect_snapshot(s)
 
@@ -31,7 +31,7 @@ test_that("solving with multivariate bounds", {
     s <- lp_problem() |>
         lp_variable(x[1:2, 1:2], lower = matrix(1:4, 2, 2), upper = 10) |>
         lp_minimize(x[1] + x[2] + x[3] - x[4]) |>
-        lp_solve()
+        lp_solve(solver = "highs")
 
     expect_equal(
         s$variables$x,
@@ -46,7 +46,7 @@ test_that("feasible", {
         lp_variable(x, lower = 5, upper = 10)
 
     expect_error(
-        lp_solve(no_obj),
+        lp_solve(no_obj, solver = "highs"),
         "Must define an objective function"
     )
 
@@ -75,7 +75,7 @@ test_that("pretty solution optimal", {
         lp_alias(total = sum(x)) |>
         lp_maximize(total + 1)
 
-    s <- lp_solve(p)
+    s <- lp_solve(p, solver = "highs")
 
     expect_equal(s$status$code, 0)
     expect_equal(s$objective, s$aliases$total + 1)
@@ -97,7 +97,7 @@ test_that("pretty solution optimal", {
         "double"
     )
 
-    sl <- lp_solve(p, binary_as_logical = TRUE)
+    sl <- lp_solve(p, solver = "highs", binary_as_logical = TRUE)
 
     expect_equal(
         storage.mode(sl$variables$x),
@@ -123,7 +123,7 @@ test_that("unbounded", {
         lp_variable(y[1:2]) |>
         lp_min(y[1])
 
-    s3 <- lp_solve(p_unb)
+    s3 <- lp_solve(p_unb, solver = "highs")
     expect_equal(s3$status$code, 1)
 })
 
@@ -140,7 +140,7 @@ test_that("binary bounds", {
         lp_var(x[set, set], binary = TRUE, upper = u) |>
         lp_var(y[set], binary = TRUE, lower = l) |>
         lp_max(sum(x) - sum(y)) |>
-        lp_solve("highs")
+        lp_solve(solver = "highs")
 
     expect_equal(s$variables$x, floor(u), ignore_attr = TRUE)
     expect_equal(s$variables$y, ceiling(l), ignore_attr = TRUE)

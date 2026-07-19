@@ -248,7 +248,7 @@ test_that("ifelse1", {
     )
     expect_equal(p1$constraints$rhs, p3$constraints$rhs)
 
-    s <- lp_solve(p1)
+    s <- lp_solve(p1, solver = "highs")
     s
 
     expect_error(

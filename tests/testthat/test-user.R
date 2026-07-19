@@ -82,7 +82,7 @@ test_that("solution summary", {
             x[1] + x[2] == 4
         )
 
-    s <- lp_solve(p)
+    s <- lp_solve(p, solver = "highs")
     s
 
     expect_equal(
