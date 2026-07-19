@@ -579,13 +579,10 @@ compare_lp <- function(x, y, op, call) {
     expr <- rep(format1(call), length(rhs))
     name <- character(length(rhs))
     
-    con <- list(Q = Q, L = L, dir = dir, rhs = rhs, 
-                name = name, expr = expr)
+    con <- list(Q = Q, L = L, dir = dir, rhs = rhs, expr = expr) |> 
+        structure(class = "lp_quadratic_constraint")
     
-    list(
-        quadratic = structure(con, class = "lp_quadratic_constraint"), 
-        nonlinear = list()
-    ) |> structure(class = "lp_constraint")
+    structure(list(con), class = "lp_constraint")
 }
 
 
@@ -608,13 +605,10 @@ compare_nl <- function(x, y, op, call, parent_frame) {
     check_no_na(x, y, call = call)
     expr <- format1(call)
     
-    con <- list(NL = x, dir = op, rhs = y, 
-                name = "", expr = expr)
+    con <- list(NL = x, dir = op, rhs = y, expr = expr) |> 
+        structure(class = "lp_nonlinear_constraint")
     
-    list(
-        quadratic = list(),
-        nonlinear = structure(list(con), class = "lp_nonlinear_constraint")
-    ) |> structure(class = "lp_constraint")
+    structure(list(con), class = "lp_constraint")
 }
 
 # Utils ----------------------
