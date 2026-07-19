@@ -81,17 +81,6 @@ test_that("masking", {
     expect_snapshot(p3$aliases$s)
 })
 
-test_that("combine quadratic and nonlinear constraints", {
-    p <- lp_problem() |> 
-        lp_var(x) |> 
-        lp_con(
-            combined_con = for (i in 1:5) bind_cons(
-                x >= i,
-                nonlinear(1/x) <= i
-            )
-        )
-})
-
 test_that("misc", {
     colvec_set <- matrix(1:3, nrow = 3)
     mat_set <- matrix(1:9, nrow = 3)

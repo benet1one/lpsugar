@@ -442,7 +442,8 @@ is_nonlinear <- function(x) {
         x$type == "nonlinear"
     }
     else if (is_lp_constraint(x)) {
-        length(x$nonlinear) > 0L
+        nl_con <- Position(is_nonlinear, x)
+        !is.na(nl_con)
     }
     else {
         FALSE
