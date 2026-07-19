@@ -50,6 +50,13 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
             call = parent.frame()
         )
     }
+    if (is_nonlinear(value)) {
+        cli_abort(
+            "Aliases cannot be `nonlinear()`",
+            class = "lpsugar_error_nonlinear_alias",
+            call = parent.frame()
+        )
+    }
     
     .problem$aliases[[name]] <- value
     return(.problem)
