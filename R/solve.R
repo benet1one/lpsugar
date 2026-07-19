@@ -87,7 +87,7 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
 #' @importFrom ROI as.objective
 #' @export
 as.objective.lp_objective <- function(x) {
-    class(x) <- class(x) |> setdiff("lp_objetive")
+    class(x) <- class(x) |> setdiff("lp_objective")
     return(x)
 }
 
@@ -198,7 +198,7 @@ as.OP.lp_problem <- function(x) {
         )
     }
     
-    objective <- ROI::as.objective(x$objective)
+    objective <- as.objective.lp_objective(x$objective)
     constraints <- ROI_constraint_from_lpsugar(x)
     
     types <- character(ncol(x))
