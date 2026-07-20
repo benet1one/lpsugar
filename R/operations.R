@@ -87,7 +87,7 @@ Ops.nonlinear <- function(e1, e2) {
     comparison_ops <- c("<", "<=", "==", ">=", ">")
     
     if (op %in% comparison_ops) {
-        compare_nl(e1, e2, op, call, parent_frame = parent.frame())
+        compare_nl(e1, e2, op, call)
     }
     else if (op == "!=") {
         cli_abort(
@@ -557,30 +557,92 @@ compare_lp <- function(x, y, op, call) {
     }
     
     var <- x - y
+    rhs <- c(-var$A)
+    dir <- rep(op, length(rhs))
     
-    if (is_quadratic(var)) {
-        Q <- lapply(var$Q, function(q) {
-            if (any(q != 0)) {
-                slam::as.simple_triplet_matrix(q)
-            } 
-            else {
-                NULL
-            }
-        })
-    } 
+    out <- if (is_quadratic(var)) {
+        ROI::Q_constraint(
+            Q = var$Q,
+            L = var$L,
+            dir = dir,
+            rhs = rhs,
+            names = colnames(var$L)
+        )
+    }
     else {
-        Q <- rep(list(NULL), length(var))
+        ROI::L_constraint(
+            L = var$L,
+            dir = dir,
+            rhs = rhs,
+            names = colnames(var$L)
+        )
     }
     
-    L <- slam::as.simple_triplet_matrix(var$L)
-    rhs <- -var$A
+    out$id <- out$id_ind <- character(length(rhs))
+    out$expr <- rep(format1(call), length(rhs))
+    class(out) <- c("lp_constraint", class(out))
+    
+    return(out)
+}
+
+compare_nl <- function(x, y, op, call) {
+    if (op == "<") {
+        op <- "<="
+    } 
+    else if (op == ">") {
+        op <- ">="
+    }
+    
+    if (!is_nonlinear(x) || !is.numeric(y)) {
+        cli_abort(
+            "Nonlinear constraints must be of form `nonlinear(...) <= constant`",
+            class = "lpsugar_error_bad_nonlinear_constraint",
+            call = call
+        )
+    }
+    
+    check_no_na(x, y, call = call)
+        
+    problem <- get_problem(default = NULL)
+    
+    if (is.null(problem)) {
+        cli_abort(
+            "Nonlinear constraints must be defined inside `lp_constraint(...)`",
+            class = "lpsugar_error_nonlinear_compare_outside_mask"
+        )
+    }
+    
+    fun <- as.function.nonlinear(x = x, problem = problem)
+    fun_out <- attr(fun, "fun_output")
+    rhs <- c(y)
+    
+    if (length(rhs) == 1L) {
+        rhs <- rep_len(rhs, length(fun_out))
+    }
+    else if (length(fun_out) != length(rhs)) {
+        cli_abort(
+            c("Length mismatch.",
+              "x" = "Left-hand-side is length {length(fun_out)}.",
+              "x" = "Right-hand-side is length {length(rhs)}."),
+            class = "lpsugar_error_nonlinear_constraint_length_mismatch",
+            call = call
+        )
+    }
     
     dir <- rep(op, length(rhs))
-    call <- rep(format1(call), length(rhs))
-    name <- character(length(rhs))
     
-    list(Q = Q, L = L, dir = dir, rhs = rhs, name = name, call = call) |>
-        structure(class = "lp_constraint")
+    out <- ROI::F_constraint(
+        fun,
+        dir = dir,
+        rhs = rhs,
+        names = variable.names(problem)
+    )
+    
+    out$id <- out$id_ind <- character(length(rhs))
+    out$expr <- rep(format1(call), length(rhs))
+    class(out) <- c("lp_constraint", class(out))
+    
+    return(out)
 }
 
 # Utils ----------------------
