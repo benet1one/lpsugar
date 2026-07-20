@@ -474,8 +474,33 @@ data_mask <- function(.problem) {
     fun <- custom_fun()
     var <- rlang::new_environment(.problem$variables, parent = fun)
     als <- rlang::new_environment(.problem$aliases, parent = var)
+    prb <- rlang::new_environment(
+        list(.___lpsugar_problem = .problem),
+        parent = als
+    )
     
-    rlang::new_data_mask(bottom = als, top = fun)
+    rlang::new_data_mask(bottom = prb, top = fun)
+}
+
+get_problem <- function(default) {
+    for (n in 2:20) {
+        problem <- rlang::env_get(
+            parent.frame(n), 
+            ".___lpsugar_problem", 
+            inherit = TRUE,
+            default = NULL
+        )
+
+        if (!is.null(problem)) {
+            return(problem)
+        }
+    }
+
+    if (missing(default)) {
+        cli_abort("Problem not found")
+    }
+
+    return(default)
 }
 
 # Eval an expression inside lp_min(), lp_con(), lp_alias(), ...
