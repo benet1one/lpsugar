@@ -504,24 +504,22 @@ data_mask <- function(.problem) {
     rlang::new_data_mask(bottom = prb, top = fun)
 }
 
-get_problem <- function(default) {
-    for (n in 2:20) {
-        problem <- rlang::env_get(
-            parent.frame(n), 
-            ".___lpsugar_problem", 
-            inherit = TRUE,
-            default = NULL
-        )
-
-        if (!is.null(problem)) {
-            return(problem)
-        }
+get_problem <- function(mask, default) {
+    problem <- rlang::env_get(
+        mask,
+        ".___lpsugar_problem", 
+        inherit = TRUE,
+        default = NULL
+    )
+    
+    if (!is.null(problem)) {
+        return(problem)
     }
-
+    
     if (missing(default)) {
-        cli_abort("Problem not found")
+        cli_abort("Problem not found.")
     }
-
+    
     return(default)
 }
 

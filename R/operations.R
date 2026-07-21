@@ -8,7 +8,8 @@
 #' @export
 Ops.lp_variable <- function(e1, e2) {
     op <- .Generic
-    call <- call(op, substitute(e1), substitute(e2))
+    call <- call(op, substitute(e1), substitute(e2)) |> 
+        rlang::as_quosure(env = parent.frame())
     
     # Single Element --------------------
     # +x, -x, !x
@@ -77,7 +78,8 @@ Ops.lp_variable <- function(e1, e2) {
 #' @export
 Ops.nonlinear <- function(e1, e2) {
     op <- .Generic
-    call <- call(op, substitute(e1), substitute(e2))
+    call <- call(op, substitute(e1), substitute(e2)) |> 
+        rlang::as_quosure(env = parent.frame())
     
     comparison_ops <- c("<", "<=", "==", ">=", ">")
     
@@ -594,7 +596,7 @@ compare_nl <- function(x, y, op, call) {
     
     check_no_na(x, y, call = call)
         
-    problem <- get_problem(default = NULL)
+    problem <- get_problem(mask = rlang::get_env(call), default = NULL)
     
     if (is.null(problem)) {
         cli_abort(
