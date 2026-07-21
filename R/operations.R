@@ -590,7 +590,7 @@ compare_nl <- function(x, y, op, call) {
         nonlinear_constraint_form_error(call = call)
     }
     
-    check_no_na(x, y, call = call)
+    check_no_na(0, y, call = call)
         
     problem <- get_problem(mask = rlang::get_env(call), default = NULL)
     
