@@ -541,11 +541,7 @@ diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
 
 compare_lp <- function(x, y, op, call) {
     if (is_nonlinear(x) || is_nonlinear(y)) {
-        cli_abort(
-            "Nonlinear constraints must be of form `nonlinear(...) <= constant`",
-            class = "lpsugar_error_bad_nonlinear_constraint",
-            call = call
-        )
+        nonlinear_constraint_form_error(call = call)
     }
     
     if (op == "<") {
@@ -593,11 +589,7 @@ compare_nl <- function(x, y, op, call) {
     }
     
     if (!is_nonlinear(x) || !is.numeric(y)) {
-        cli_abort(
-            "Nonlinear constraints must be of form `nonlinear(...) <= constant`",
-            class = "lpsugar_error_bad_nonlinear_constraint",
-            call = call
-        )
+        nonlinear_constraint_form_error(call = call)
     }
     
     check_no_na(x, y, call = call)
