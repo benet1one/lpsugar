@@ -3,11 +3,13 @@ Code
 - Check TODOs
 - Consider using $maximum and $bounds for full consistency with ROI
 - Update all documentation
+- test get_problem() in background jobs
 
 Nonlinear
 - gradient
 - get length of NL output and recycle rhs in constraints
 - test errors
+- constraint summary
 
 Docs
 - Find another example for nonlinear
