@@ -436,14 +436,14 @@ is_transformed_lp_variable <- function(x) {
     inherits(x, "transformed_lp_variable")
 }
 is_nonlinear <- function(x) {
-    if (inherits(x, "nonlinear")) {
+    if (rlang::inherits_any(x, c("nonlinear", "F_objective", "F_constraint"))) {
         TRUE
     }
     else if (is_lp_problem(x)) {
         is_nonlinear(x$objective) || is_nonlinear(x$constraints)
     }
     else if (is_lp_constraint(x)) {
-        cli_abort("TODO")
+        inherits(x$roi_con, "F_constraint")
     }
     else if (is_lp_objective(x)) {
         x$type == "nonlinear"
