@@ -557,7 +557,7 @@ compare_lp <- function(x, y, op, call) {
     rhs <- c(-var$A)
     dir <- rep(op, length(rhs))
     
-    out <- if (is_quadratic(var)) {
+    roi_con <- if (is_quadratic(var)) {
         ROI::Q_constraint(
             Q = var$Q,
             L = var$L,
@@ -575,11 +575,7 @@ compare_lp <- function(x, y, op, call) {
         )
     }
     
-    out$id <- out$id_ind <- character(length(rhs))
-    out$expr <- rep(format1(call), length(rhs))
-    class(out) <- c("lp_constraint", class(out))
-    
-    return(out)
+    new_constraint(roi_con, call = call)
 }
 
 compare_nl <- function(x, y, op, call) {
@@ -626,18 +622,14 @@ compare_nl <- function(x, y, op, call) {
     
     dir <- rep(op, length(rhs))
     
-    out <- ROI::F_constraint(
+    roi_con <- ROI::F_constraint(
         fun,
         dir = dir,
         rhs = rhs,
         names = variable.names(problem)
     )
     
-    out$id <- out$id_ind <- character(length(rhs))
-    out$expr <- rep(format1(call), length(rhs))
-    class(out) <- c("lp_constraint", class(out))
-    
-    return(out)
+    new_constraint(roi_con, call = call)
 }
 
 # Utils ----------------------
