@@ -35,12 +35,7 @@ Ops.lp_variable <- function(e1, e2) {
     check_no_na(e1, e2, call)
     
     # Compatible dims
-    comp <- compatible_dimensions(e1, e2, drop_dim = TRUE)
-    
-    if (!comp) {
-        why <- attr(comp, "cnd")
-        cli_abort(why$message, call = call)
-    }
+    check_conformable(e1, e2, drop_dim = TRUE, call = call)
     
     # Two element arithmetic
     if (op == "+") {
@@ -614,6 +609,8 @@ compare_nl <- function(x, y, op, call) {
     
     fun <- as.function.nonlinear(x = x, problem = problem)
     fun_out <- attr(fun, "fun_output")
+    check_conformable(fun_out, y, call = call)
+    
     rhs <- c(y)
     
     if (length(rhs) == 1L) {

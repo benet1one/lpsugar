@@ -60,7 +60,7 @@ ndim <- function(x, drop = FALSE) {
 
 # Returns FALSE if dimensions are incompatible
 # and a condition
-compatible_dimensions <- function(x, y, drop_dim = TRUE) {
+are_arguments_conformable <- function(x, y, drop_dim = TRUE) {
     if (is_lp_variable(x)) {
         x <- x$ind
     }
@@ -90,6 +90,16 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
     else {
         return(TRUE)
     }
+}
+check_conformable <- function(x, y, drop_dim = TRUE, call) {
+    conformable <- are_arguments_conformable(x, y)
+    
+    if (conformable) {
+        return()
+    }
+    
+    why <- attr(conformable, "cnd")
+    cli_abort(why$message, call = call)
 }
 
 dimnames_non_numeric <- function(dimnames) {
