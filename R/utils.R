@@ -26,6 +26,10 @@ format1 <- function(x, ...) {
         return(rlang::as_label(x))
     }
     
+    if (rlang::is_quosure(x)) {
+        x <- rlang::quo_get_expr(x)
+    }
+    
     y <- format(x, ...)
     
     if (length(y) == 1L) {
