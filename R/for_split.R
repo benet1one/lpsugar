@@ -1,7 +1,7 @@
 
 # Takes a loop or nested loops and returns a list
 # of results. Inspired in comprehenr::to_list().
-for_split <- function(quosure, data = NULL) {
+eval_split_for <- function(quosure, data = NULL) {
     check_for_split(quosure, call = parent.frame())
     expr <- rlang::get_expr(quosure)
     env <- rlang::get_env(quosure)

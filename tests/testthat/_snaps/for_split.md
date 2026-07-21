@@ -1,7 +1,7 @@
-# for_split works
+# eval_split_for works
 
     Code
-      for_split(q1)
+      eval_split_for(q1)
     Output
       $`i=1`
       [1] 1
@@ -16,7 +16,7 @@
 ---
 
     Code
-      for_split(q2, data = data_mask(p))
+      eval_split_for(q2, data = data_mask(p))
     Output
       $`i=1, j="a"`
       $L
@@ -91,10 +91,10 @@
       
       
 
-# advanced for_split
+# advanced eval_split_for
 
     Code
-      for_split(q_advanced)
+      eval_split_for(q_advanced)
     Output
       $`i=1, j=2`
       i j k 

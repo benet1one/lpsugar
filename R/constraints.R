@@ -64,7 +64,7 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
         )
     }
     
-    cons <- for_split(quosure, data = data)
+    cons <- eval_split_for(quosure, data = data)
     inds <- rlang::names2(cons)
     
     for (i in seq_along(cons)) {

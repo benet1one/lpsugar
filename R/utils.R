@@ -509,7 +509,7 @@ lp_eval <- function(.problem, expr, split_for = FALSE) {
     data <- data_mask(.problem)
     
     if (split_for) {
-        for_split(quosure, data = data)
+        eval_split_for(quosure, data = data)
     } 
     else {
         rlang::eval_tidy(quosure, data = data)

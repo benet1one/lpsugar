@@ -1,5 +1,5 @@
 
-test_that("for_split works", {
+test_that("eval_split_for works", {
     a <- 1:2
     b <- letters[1:3]
 
@@ -12,7 +12,7 @@ test_that("for_split works", {
         }
     )
 
-    for_split(q1) |> expect_snapshot()
+    eval_split_for(q1) |> expect_snapshot()
 
     q2 <- rlang::quo(
         for (i in a) for (j in b) {
@@ -20,10 +20,10 @@ test_that("for_split works", {
         }
     )
 
-    for_split(q2, data = data_mask(p)) |> expect_snapshot()
+    eval_split_for(q2, data = data_mask(p)) |> expect_snapshot()
 })
 
-test_that("for_split with interruption", {
+test_that("eval_split_for with interruption", {
     q <- rlang::quo(for (i in 1:4) {
         if (i == 3) {
             next
@@ -32,7 +32,7 @@ test_that("for_split with interruption", {
     })
 
     expect_equal(
-        for_split(q),
+        eval_split_for(q),
         list(
             "i=1" = 2,
             "i=2" = 4,
@@ -41,7 +41,7 @@ test_that("for_split with interruption", {
     )
 })
 
-test_that("advanced for_split", {
+test_that("advanced eval_split_for", {
     q_advanced <- rlang::quo(for (i in 1:4) {
         k <- i + 1
 
@@ -50,5 +50,5 @@ test_that("advanced for_split", {
         }
     })
 
-    for_split(q_advanced) |> expect_snapshot()
+    eval_split_for(q_advanced) |> expect_snapshot()
 })
