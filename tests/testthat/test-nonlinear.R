@@ -60,3 +60,10 @@ test_that("nonlinear constrained", {
     with(s$variables, expect_equal(x, 10 - y, tolerance = 0.001))
     with(s$variables, expect_equal(s$objective, sqrt(x) * log(y)))
 })
+
+test_that("operations outside nonlinear", {
+    expect_error(
+        nonlinear(x + 1) / 2,
+        r"(Instead try `nonlinear\(\(x \+ 1\) / 2\)`)"
+    )
+})

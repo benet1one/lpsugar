@@ -92,10 +92,14 @@ Ops.nonlinear <- function(e1, e2) {
         )
     }
     else {
+        e1_txt <- format1(e1)
+        e2_txt <- format1(e2)
         cli_abort(
-            "Unsupported operation `{op}`",
+            c("Syntax error.",
+              "x" = "Operations cannot be outside `nonlinear(...)`",
+              ">" = "Instead try `nonlinear(({e1_txt}) {op} {e2_txt})`."),
             class = "lpsugar_error_unsupported_operation",
-            call = call,
+            call = call
         )
     }
 }
