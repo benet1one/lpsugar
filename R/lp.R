@@ -18,11 +18,7 @@ lp_problem <- function() {
     list(
         variables = list(),
         constraints = empty_constraint(),
-        objective = list(
-            type = "undefined",
-            direction = "",
-            expr = ""
-        ) |> structure(class = "lp_objective"),
+        objective = empty_objective(),
         
         # Aka implicit variables (impvar)
         aliases = list()
@@ -48,7 +44,7 @@ print.lp_problem <- function(x, compact = TRUE, ...) {
         print_field(x, "variables")
     }
     
-    if (x$objective$direction != "") {
+    if (lpsugar_attributes(x$objective) $ type != "undefined") {
         print_field(x, "objective")
     }
     

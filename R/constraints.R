@@ -97,8 +97,8 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
         
         cons[[i]]$index[] <- indices[i]
         
-        if (!is_nonlinear(cons[[i]]) && !is_empty_constraint(cons[[i]])) {
-            rownames(cons[[i]]$roi_con$L) <- cons[[i]]$index
+        if (!is.null(cons[[i]]$L)) {
+            rownames(cons[[i]]$L) <- cons[[i]]$index
         }
     }
     
@@ -152,9 +152,9 @@ new_constraint <- function(roi_constraint, call) {
     n <- length(roi_constraint$rhs)
     
     structure(
-        class = "lp_constraint",
-        list(
-            roi_con = roi_constraint,
+        roi_constraint,
+        class = c("lp_constraint", class(roi_constraint)),
+        lpsugar_attributes = list(
             id = character(n),
             index = character(n),
             expr = rep_len(format1(call), n)
@@ -164,13 +164,8 @@ new_constraint <- function(roi_constraint, call) {
 
 empty_constraint <- function() {
     structure(
-        class = c("lp_empty_constraint", "lp_constraint"),
-        list(
-            roi_con = ROI::NO_constraint(0),
-            id = character(0),
-            index = character(0),
-            expr = character(0)
-        )
+        list(),
+        class = c("lp_empty_constraint", "lp_constraint")
     )
 }
 
@@ -179,19 +174,20 @@ update_constraints <- function(.problem) {
         return(.problem)
     }
     
-    q_ind <- which(lengths(.problem$constraints$roi_con$Q) > 0L)
+    varnames <- variable.names(.problem)
+    q_ind <- which(lengths(.problem$constraints$Q) > 0L)
     
     for (i in q_ind) {
-        .problem$constraints$roi_con$Q[[i]]$nrow[] <- ncol(.problem)
-        .problem$constraints$roi_con$Q[[i]]$ncol[] <- ncol(.problem)
-        .problem$constraints$roi_con$Q[[i]]$dimnames <- list(
-            attr(.problem, "varnames"),
-            attr(.problem, "varnames")
-        )
+        .problem$constraints$Q[[i]]$nrow[] <- ncol(.problem)
+        .problem$constraints$Q[[i]]$ncol[] <- ncol(.problem)
+        .problem$constraints$Q[[i]]$dimnames <- list(varnames, varnames)
     }
     
-    .problem$constraints$roi_con$L$ncol[] <- ncol(.problem)
-    colnames(.problem$constraints$roi_con$L) <- attr(.problem, "varnames")
+    
+    .problem$constraints$L$ncol[] <- ncol(.problem)
+    colnames(.problem$constraints$L) <- varnames
+    .problem$constraints$names <- varnames
+    
     .problem
 }
 
@@ -221,15 +217,14 @@ bind_cons <- function(...) {
         return(empty_constraint())
     }
     
-    out <- purrr::list_transpose(dots, simplify = FALSE)
-    
     roi_binder <- get("rbind.constraint", pos = getNamespace("ROI"))
-    out$roi_con <- rlang::exec(roi_binder, !!!out$roi_con)
-    out$id <- unlist(out$id, use.names = FALSE)
-    out$index <- unlist(out$index, use.names = FALSE)
-    out$expr <- unlist(out$expr, use.names = FALSE)
+    out <- rlang::exec(roi_binder, !!!dots)
+    class(out) <- c("lp_constraint", class(out))
     
-    class(out) <- "lp_constraint"
+    lpsugar_attributes(out) <- purrr::map(dots, lpsugar_attributes) |> 
+        purrr::list_transpose(simplify = FALSE) |> 
+        purrr::map(\(x) unlist(x, use.names = FALSE))
+
     return(out)
 }
 
@@ -243,16 +238,19 @@ rbind.lp_constraint <- function(..., deparse.level = 1) {
 
 #' @export
 as.matrix.lp_constraint <- function(x, ...) {
+    if (!inherits(x, "L_constraint")) {
+        cli_abort(
+            c("Can only convert linear constraints into matrices.",
+              "x" = "`x` is <{class(x)[2]}>"),
+            class = "lpsugar_error_as_matrix_constraint_not_linear"
+        )
+    }
+    
     cbind(as.matrix(x$L), dir = x$dir, rhs = x$rhs)
 }
 #' @export
 as.array.lp_constraint <- function(x, ...) {
     as.matrix.lp_constraint(x)
-}
-
-#' @export
-length.lp_constraint <- function(x) {
-    length(x$roi_con$dir)
 }
 #' @export
 length.lp_empty_constraint <- function(x) {
@@ -260,11 +258,11 @@ length.lp_empty_constraint <- function(x) {
 }
 #' @export
 dim.lp_constraint <- function(x) {
-    c(length(x$roi_con$dir), NA)
+    c(NextMethod(), NA)
 }
 #' @export
 dimnames.lp_constraint <- function(x) {
-    list(x$index, NA)
+    list(lpsugar_attributes(x) $ index, NULL)
 }
 
 #' @export

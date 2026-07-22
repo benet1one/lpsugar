@@ -123,13 +123,16 @@ new_quadratic_objective <- function(.problem, type, direction = NULL,
         ROI::Q_objective(Q = Q, L = L)
     }
 
-    out$A <- A
     out$names <- attr(.problem, "varnames")
-    out$direction <- direction
-    out$type <- type
-    out$expr <- expr
-    
     class(out) <- c("lp_objective", class(out))
+    
+    lpsugar_attributes(out) <- list(
+        A = A,
+        direction = direction,
+        type = type,
+        expr = expr
+    )
+
     out
 }
 
@@ -151,14 +154,28 @@ new_nonlinear_objective <- function(.problem, type, direction = NULL, NL, expr =
     }
     
     out <- ROI::F_objective(fun, n = ncol(.problem))
-    
-    out$A <- 0
-    out$direction <- direction
-    out$type <- "nonlinear"
-    out$expr <- expr
-    
     class(out) <- c("lp_objective", class(out))
+    
+    lpsugar_attributes(out) <- list(
+        A = 0,
+        direction = direction,
+        type = "nonlinear",
+        expr = expr
+    )
+
     out
+}
+
+empty_objective <- function() {
+    structure(
+        list(),
+        class = "lp_objective",
+        lpsugar_attributes = list(
+            type = "undefined",
+            direction = "",
+            expr = ""
+        )
+    )
 }
 
 # User -------------------------------
@@ -223,19 +240,21 @@ lp_max <- lp_maximize
 
 #' @export
 print.lp_objective <- function(x, ...) {
-    if (x$type == "undefined") {
+    info <- lpsugar_attributes(x)
+    
+    if (info$type == "undefined") {
         cat("no objective function\n\n")
         return(invisible(x))
     }
     
-    if (x$type == "feasible") {
+    if (info$type == "feasible") {
         cat("find a feasible solution\n\n")
         return(invisible(x))
     }
     
     cat(
-        x$direction, " ", x$type, " function:\n",
-        x$expr, "\n\n", 
+        info$direction, " ", info$type, " function:\n",
+        info$expr, "\n\n", 
         sep = ""
     )
     invisible(x)
@@ -245,20 +264,18 @@ print.lp_objective <- function(x, ...) {
 
 # Adds zeros to Q and L coefficients when a variable is added to the problem
 update_objective <- function(.problem) {
-    if (.problem$objective$type == "undefined") {
+    if (lpsugar_attributes(.problem$objective) $ type == "undefined") {
         return(.problem)
     }
     
+    varnames <- variable.names(.problem)
     n_before <- ncol(.problem$objective$L)
     n_after <- ncol(.problem)
     
     if (is_quadratic(.problem$objective)) {
         .problem$objective$Q$nrow <- n_after
         .problem$objective$Q$ncol <- n_after
-        .problem$objective$Q$dimnames <- list(
-            attr(.problem, "varnames"),
-            attr(.problem, "varnames")
-        )
+        .problem$objective$Q$dimnames <- list(varnames, varnames)
     }
 
     .problem$objective$L <- cbind(
@@ -266,6 +283,8 @@ update_objective <- function(.problem) {
         matrix(0, nrow = 1, ncol = n_after - n_before)
     )
     
-    colnames(.problem$objective$L) <- attr(.problem, "varnames")
+    colnames(.problem$objective$L) <- varnames
+    .problem$objective$names <- varnames
+    
     return(.problem)
 }

@@ -442,12 +442,6 @@ is_nonlinear <- function(x) {
     else if (is_lp_problem(x)) {
         is_nonlinear(x$objective) || is_nonlinear(x$constraints)
     }
-    else if (is_lp_constraint(x)) {
-        inherits(x$roi_con, "F_constraint")
-    }
-    else if (is_lp_objective(x)) {
-        x$type == "nonlinear"
-    }
     else {
         FALSE
     }
@@ -534,6 +528,16 @@ lp_eval <- function(.problem, expr, split_for = FALSE) {
     else {
         rlang::eval_tidy(quosure, data = data)
     }
+}
+
+# Attributes ----------------------
+
+lpsugar_attributes <- function(x) {
+    attr(x, "lpsugar_attributes")
+}
+`lpsugar_attributes<-` <- function(x, value) {
+    attr(x, "lpsugar_attributes") <- value
+    return(x)
 }
 
 # Printing ------------------------

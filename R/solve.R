@@ -31,7 +31,7 @@
 #' @example inst/examples/example_solve.R
 lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     check_problem(.problem)
-    op <- as.OP(.problem)
+    op <- as.OP.lp_problem(.problem)
     applicable <- ROI::ROI_applicable_solvers(op)
     
     if (length(applicable) == 0L) {
@@ -174,7 +174,9 @@ as.OP.lp_problem <- function(x) {
         )
     }
     
-    if (x$objective$type == "undefined") {
+    info <- lpsugar_attributes(x$objective)
+    
+    if (info$type == "undefined") {
         cli_abort(c(
             "Must define an objective function with `lp_minimize()` or `lp_maximize()`.",
             "i" = paste(
@@ -185,15 +187,15 @@ as.OP.lp_problem <- function(x) {
         ), class = "lpsugar_error_no_objective")
     }
     
-    if (x$objective$direction == "minimize") {
+    if (info$direction == "minimize") {
         maximize <- FALSE
     } 
-    else if (x$objective$direction == "maximize") {
+    else if (info$direction == "maximize") {
         maximize <- TRUE
     } 
     else {
         cli_abort(
-            "`$objective$direction` should be either 'minimize' or 'maximize'.",
+            "`direction` should be either 'minimize' or 'maximize'.",
             class = "lpsugar_error_bad_objective_direction"
         )
     }
@@ -276,7 +278,7 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     )
     
     als <- compute_aliases(problem, solution$solution)
-    objective <- solution$objval + problem$objective$A
+    objective <- solution$objval + lpsugar_attributes(problem$objective) $ A
     
     list(
         objective = objective,
