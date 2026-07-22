@@ -264,7 +264,9 @@ print.lp_objective <- function(x, ...) {
 
 # Adds zeros to Q and L coefficients when a variable is added to the problem
 update_objective <- function(.problem) {
-    if (lpsugar_attributes(.problem$objective) $ type == "undefined") {
+    info <- lpsugar_attributes(.problem$objective)
+    
+    if (info$type == "undefined") {
         return(.problem)
     }
     

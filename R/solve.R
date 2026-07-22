@@ -278,7 +278,8 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     )
     
     als <- compute_aliases(problem, solution$solution)
-    objective <- solution$objval + lpsugar_attributes(problem$objective) $ A
+    objective_info <- lpsugar_attributes(problem$objective)
+    objective <- solution$objval + objective_info$A
     
     list(
         objective = objective,

@@ -262,7 +262,8 @@ dim.lp_constraint <- function(x) {
 }
 #' @export
 dimnames.lp_constraint <- function(x) {
-    list(lpsugar_attributes(x) $ index, NULL)
+    info <- lpsugar_attributes(x)
+    list(info$index, NULL)
 }
 
 #' @export

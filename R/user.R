@@ -223,6 +223,7 @@ bound_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 compute_objective <- function(problem, solution) {
+    info <- lpsugar_attributes(problem$objective)
     solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
     
     if (is_nonlinear(problem$objective)) {
@@ -230,7 +231,7 @@ compute_objective <- function(problem, solution) {
     }
     
     L <- problem$objective$L
-    A <- lpsugar_attributes(problem$objective) $ A
+    A <- info$A
     out <- crossprod(L, solution) + A
     
     if (is_quadratic(problem$objective)) {
