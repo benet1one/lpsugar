@@ -31,7 +31,7 @@ lp_problem <- function() {
 }
 
 #' @export
-print.lp_problem <- function(x, compact = TRUE, ...) {
+print.lp_problem <- function(x, full = FALSE, ...) {
     cat(
         cli::col_grey(rep(cli::symbol$en_dash, 2)),
         cli::style_bold(" <lp_problem> "),
@@ -49,7 +49,7 @@ print.lp_problem <- function(x, compact = TRUE, ...) {
     }
     
     if (length(x$constraints) > 0L) {
-        print_field(x, "constraints", compact = compact)
+        print_field(x, "constraints", full = full)
     }
     
     invisible(x)

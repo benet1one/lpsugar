@@ -142,7 +142,7 @@ lp_delete_constraint <- function(.problem, ids) {
     stopifnot(is.character(ids))
     info <- lpsugar_attributes(.problem$constraints)
     
-    if (any(ids == "") || any(ids == "(unnamed constraint)")) {
+    if (any(ids == "") || any(ids == "#unnamed_constraint")) {
         cli_abort(
             "Cannot delete unnamed constraints.",
             class = "lpsugar_error_delete_unnamed_constraints"
@@ -278,7 +278,12 @@ rbind.lp_constraint <- function(..., deparse.level = 1) {
 
 #' @export
 as.matrix.lp_constraint <- function(x, ...) {
-    if (!inherits(x, "L_constraint")) {
+    acceptable <- any(
+        inherits(x, "L_constraint"),
+        inherits(x, "Q_constraint") && !is_quadratic(x)
+    )
+    
+    if (!acceptable) {
         cli_abort(
             c("Can only convert linear constraints into matrices.",
               "x" = "`x` is <{roi_constraint_class(x)}>"),
@@ -383,10 +388,68 @@ head.lp_constraint <- function(x, n = 6L, ...) {
     info$expr <- info$expr[i]
 
     lpsugar_attributes(x) <- info
-    return(x)
+    
+    if (length(x) == 0L) {
+        return(empty_constraint())
+    }
+    else {
+        return(x)
+    }
+}
+
+#' @export 
+print.empty_lp_constraint <- function(x, ...) {
+    cat("No constraints have been defined.")
+    invisible(x)
 }
 
 #' @export
-print.lp_constraint <- function(x, compact = FALSE, ...) {
+print.lp_constraint <- function(x, full = TRUE, ...) {
     NextMethod()
+    cat("\n")
+    
+    info <- lpsugar_attributes(x)
+    
+    conditions_for_full <- all(
+        inherits(x, "L_constraint") || inherits(x, "Q_constraint"),
+        ncol(x$L) <= 20
+    )
+    
+    if (!conditions_for_full) {
+        full <- FALSE
+    }
+    
+    pairs <- data.frame(id = info$id, expr = info$expr) |> 
+        unique()
+    
+    grey_bar <- cli::col_grey("| ")
+    
+    if (nrow(pairs) > 0L) for (i in 1:nrow(pairs)) {
+        id <- pairs$id[i]
+        expr <- pairs$expr[i]
+        where <- info$id == id & info$expr == expr
+        n <- sum(where)
+        
+        if (id == "") {
+            id <- "#unnamed_constraint"
+        }
+        
+        cat(
+            id, "\n",
+            grey_bar, expr, "\n",
+            grey_bar, "Rows = ", n, "\n\n",
+            sep = ""
+        )
+        
+        is_q <- is_quadratic(x[where])
+        
+        if (full && !is_q) {
+            mat <- as.matrix.lp_constraint(x[where])
+            rownames(mat) <- paste0("  ", rownames(mat))
+            print(mat, quote = FALSE)
+            cat("\n")
+        }
+    }
+    
+    invisible(x)
 }
