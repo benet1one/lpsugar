@@ -258,6 +258,16 @@ bind_cons <- function(...) {
     return(out)
 }
 
+roi_constraint_class <- function(con) {
+    out <- grepv(class(con), pattern = "^[A-Z]_constraint$")[1]
+    
+    if (length(out) == 0) {
+        class(con)[1]
+    } else {
+        out
+    }
+}
+
 # Methods ----------------------
 
 #' @export
@@ -271,7 +281,7 @@ as.matrix.lp_constraint <- function(x, ...) {
     if (!inherits(x, "L_constraint")) {
         cli_abort(
             c("Can only convert linear constraints into matrices.",
-              "x" = "`x` is <{class(x)[2]}>"),
+              "x" = "`x` is <{roi_constraint_class(x)}>"),
             class = "lpsugar_error_as_matrix_constraint_not_linear"
         )
     }
@@ -363,7 +373,7 @@ head.lp_constraint <- function(x, n = 6L, ...) {
     }
     else {
         cli_abort(
-            "Unsupported constraint class <{class(x)[2]}>.",
+            "Unsupported constraint class <{roi_constraint_class(x)}>.",
             class = "lpsugar_error_unsupported_constraint_class"
         )
     }
