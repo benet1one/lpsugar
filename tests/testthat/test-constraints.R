@@ -73,24 +73,26 @@ test_that("deleting constraints", {
 
     expect_true({
         p2 <- p |> lp_delete_constraint(c("first"))
-        all(p2$constraints$name == c("second", "second", ""))
+        info2 <- lpsugar_attributes(p2$constraints)
+        all(info2$id == c("second", "second", ""))
     })
     expect_true({
         p3 <- p |> lp_delete_constraint(c("first", "second"))
-        p3$constraints$name == ""
+        info3 <- lpsugar_attributes(p3$constraints)
+        info3$id == ""
     })
 
     expect_warning(
         p |> lp_delete_constraint(c("second", "third", "fourth")),
-        'The following constraints are not defined.+"third", "fourth"'
+        'Ignoring constraints: "third" and "fourth"'
     )
-    expect_warning(
-        p |> lp_delete_constraint(c("second", "<unnamed>")),
-        "Cannot delete unnamed constraints"
+    expect_error(
+        p |> lp_delete_constraint(c("second", "(unnamed constraint)")),
+        "Cannot delete unnamed constraints."
     )
-    expect_warning(
+    expect_error(
         p |> lp_delete_constraint(c("second", "")),
-        "Cannot delete unnamed constraints"
+        "Cannot delete unnamed constraints."
     )
 })
 
@@ -121,28 +123,71 @@ test_that("non constraint", {
 })
 
 test_that("indexing constraints", {
-    p <- problem_constraints()
+    # Linear --------------
+    
+    p <- lp_problem() |> 
+        lp_var(x[1:5]) |> 
+        lp_con(
+            vectorized = x * (2:6) >= 4:8,
+            fsplit = for (i in 1:5) {
+                x[i] / i <= i - 1
+            }
+        )
 
     expect_equal(
         p$constraints[1:3],
         p$constraints[1:3, ]
     )
     expect_equal(
-        p$constraints["my_con"][2],
-        p$constraints["my_con", ][2, ]
+        p$constraints["vectorized", ][2],
+        p$constraints["vectorized"][2, ]
     )
 
     expect_equal(
-        p$constraints["my_con"] |> head(2),
-        p$constraints["my_con"][1:2]
+        p$constraints["vectorized"] |> head(2),
+        p$constraints["vectorized"][1:2]
     )
 
-    p$constraints[c("my_con", "one_line_fs")]
+    expect_equal(
+        p$constraints[c("vectorized", "fsplit")],
+        p$constraints
+    )
 
     expect_error(p$constraints[], "Index constraints with")
     expect_error(p$constraints[, 1], "Index constraints with")
     expect_error(p$constraints[1, 1], "Index constraints with")
     expect_error(p$constraints[1, , ], "Index constraints with")
+    expect_error(
+        p$constraints[c("nope", "vectorized", "neither")],
+        'Undefined constraints: "nope" and "neither"'
+    )
+    
+    # Quadratic ----------
+    
+    q <- lp_problem() |> 
+        lp_var(x[1:4]) |> 
+        lp_con(
+            lc = 2*x + x[1] <= 50,
+            qc = x[1:3] * x[2:4] >= 5
+        )
+    
+    expect_no_error({
+        q$constraints["lc"]
+        q$constraints["qc"]
+        q$constraints[c("lc", "qc")]  
+    })
+
+    # Nonlinear ---------
+    
+    nl <- q |> 
+        lp_con(
+            nl = nonlinear(log(x) + x) >= 5
+        )
+    
+    expect_no_error({
+        nl$constraints["nl"]
+        nl$constraints[c("lc", "nl")]
+    })
 })
 
 test_that("bind constraints", {

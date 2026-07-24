@@ -132,8 +132,33 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
 #' }
 #'
 #' print(p)
-lp_delete_constraint <- function(.problem, names) {
-    cli_abort("TODO")
+lp_delete_constraint <- function(.problem, ids) {
+    check_problem(.problem)
+    stopifnot(is.character(ids))
+    info <- lpsugar_attributes(.problem$constraints)
+    
+    if (any(ids == "") || any(ids == "(unnamed constraint)")) {
+        cli_abort(
+            "Cannot delete unnamed constraints.",
+            class = "lpsugar_error_delete_unnamed_constraints"
+        )
+    }
+    
+    undefined <- setdiff(ids, info$id)
+    
+    if (length(undefined) > 0L) {
+        cli_warn(
+            c("Cannot delete constraints that haven't been defined.",
+              "x" = "Ignoring constraints: {.str {undefined}}"),
+            class = "lpsugar_warning_delete_undefined_constraints"
+        )
+        
+        ids <- intersect(ids, info$id)
+    }
+    
+    to_delete <- info$id %in% ids
+    .problem$constraints <- .problem$constraints[!to_delete]
+    return(.problem)
 }
 
 # Alias ----------------------------------
@@ -277,33 +302,72 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 `[.lp_constraint` <- function(x, ..., drop = FALSE) {
     warn_changed_args(drop = FALSE)
     dots <- rlang::dots_list(..., .preserve_empty = TRUE, .ignore_empty = "none")
+
+    if (is_empty_constraint(x)) {
+        cli_abort(
+            "Cannot index an empty constraint.",
+            class = "lpsugar_error_index_empty_constraint"
+        )
+    }
     
     wrong_index <-
         length(dots) == 0L ||
         rlang::is_missing(dots[[1L]]) ||
         length(dots) > 2L ||
         (length(dots) == 2L && !rlang::is_missing(dots[[2L]]))
-    
+
     if (wrong_index) {
         cli_abort(
             "Index constraints with `con[i]` or `con[i, ]`",
             class = "lpsugar_error_bad_constraint_index"
         )
     }
-    
+
     i <- dots[[1L]]
-    
+    info <- lpsugar_attributes(x)
+
     if (is.character(i)) {
-        i <- x$name %in% i
+        undefined <- setdiff(i, info$id)
+        
+        if (length(undefined) > 0L) {
+            cli_abort(
+                c("Cannot index constraints that haven't been defined.",
+                  "x" = "Undefined constraints: {.str {undefined}}"),
+                class = "lpsugar_error_undefined_constraint"
+            )
+        }
+        
+        i <- info$id %in% i
+    }
+
+    x$rhs <- x$rhs[i]
+    x$dir <- x$dir[i]
+    
+    if (inherits(x, "L_constraint")) {
+        x$L <- x$L[i, ]
+        attr(x, "n_L_constraints") <- length(x$dir)
+    }
+    else if (inherits(x, "Q_constraint")) {
+        x$Q <- x$Q[i]
+        x$L <- x$L[i, ]
+        attr(x, "n_Q_constraints") <- length(x$dir)
+    }
+    else if (inherits(x, "F_constraint")) {
+        x$F <- x$F[i]
+        attr(x, "n_F_constraints") <- length(x$dir)
+    }
+    else {
+        cli_abort(
+            "Unsupported constraint class <{class(x)[2]}>.",
+            class = "lpsugar_error_unsupported_constraint_class"
+        )
     }
     
-    x$Q <- x$Q[i]
-    x$L <- x$L[i, ]
-    x$rhs <- x$rhs[i, ]
-    x$dir <- x$dir[i]
-    x$call <- x$call[i]
-    x$name <- x$name[i]
-    
+    info$id <- info$id[i]
+    info$index <- info$index[i]
+    info$expr <- info$expr[i]
+
+    lpsugar_attributes(x) <- info
     return(x)
 }
 
