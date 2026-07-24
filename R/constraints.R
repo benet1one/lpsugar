@@ -322,7 +322,7 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 `[.lp_constraint` <- function(x, ..., drop = FALSE) {
     warn_changed_args(drop = FALSE)
     dots <- rlang::dots_list(..., .preserve_empty = TRUE, .ignore_empty = "none")
-
+    
     if (is_empty_constraint(x)) {
         cli_abort(
             "Cannot index an empty constraint.",
@@ -335,17 +335,17 @@ head.lp_constraint <- function(x, n = 6L, ...) {
         rlang::is_missing(dots[[1L]]) ||
         length(dots) > 2L ||
         (length(dots) == 2L && !rlang::is_missing(dots[[2L]]))
-
+    
     if (wrong_index) {
         cli_abort(
             "Index constraints with `con[i]` or `con[i, ]`",
             class = "lpsugar_error_bad_constraint_index"
         )
     }
-
+    
     i <- dots[[1L]]
     info <- lpsugar_attributes(x)
-
+    
     if (is.character(i)) {
         undefined <- setdiff(i, info$id)
         
@@ -359,7 +359,7 @@ head.lp_constraint <- function(x, n = 6L, ...) {
         
         i <- info$id %in% i
     }
-
+    
     x$rhs <- x$rhs[i]
     x$dir <- x$dir[i]
     
@@ -386,7 +386,7 @@ head.lp_constraint <- function(x, n = 6L, ...) {
     info$id <- info$id[i]
     info$index <- info$index[i]
     info$expr <- info$expr[i]
-
+    
     lpsugar_attributes(x) <- info
     
     if (length(x) == 0L) {

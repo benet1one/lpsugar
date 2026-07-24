@@ -591,7 +591,7 @@ compare_nl <- function(x, y, op, call) {
     }
     
     check_no_na(0, y, call = call)
-        
+    
     problem <- get_problem(mask = rlang::get_env(call), default = NULL)
     
     if (is.null(problem)) {
