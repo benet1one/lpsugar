@@ -355,6 +355,21 @@ variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE,
 
 # Quadratic ---------------------
 
+is_empty_Q <- function(Q) {
+    if (is.null(Q)) {
+        return(TRUE)
+    }
+    if (slam::is.simple_triplet_matrix(Q)) {
+        length(Q$v) == 0L
+    }
+    else if (is.matrix(Q)) {
+        all(Q == 0)
+    }
+    else {
+        cli_abort("internal_error")
+    }
+}
+
 # Returns or builds quadratic part of a variable or objective function
 get_Q <- function(x) {
     if (is_quadratic(x)) {
@@ -376,11 +391,25 @@ get_Q <- function(x) {
 
 # Is a variable, constraint, or objective function quadratic?
 is_quadratic <- function(x) {
-    if (is_lp_variable(x) || is_lp_objective(x)) {
-        return(!is.null(x$Q))
-    } 
-    else if (is_lp_constraint(x)) {
-        return(any(lengths(x$Q) > 0L))
+    non_quad_classes <- c(
+        "L_objective",
+        "L_constraint",
+        "F_objective",
+        "F_constraint"
+    )
+    
+    if (rlang::inherits_any(x, non_quad_classes)) {
+        return(FALSE)
+    }
+    
+    # Is variable, Q_objective, Q_constraint, or unknown class
+    
+    if (is_lp_objective(x)) {
+        return(!is_empty_Q(x$Q))
+    }
+    else if (is_lp_variable(x) || is_lp_constraint(x)) {
+        empty_Qs <- sapply(x$Q, is_empty_Q)
+        return(any(!empty_Qs))
     } 
     else {
         return(FALSE)
