@@ -88,24 +88,24 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
         if (!is_lp_constraint(cons[[i]])) {
             msg <- c(
                 "Expression did not evaluate to a constraint.",
-                "x" = "Problematic constraint: '{name_ind[i]}'.",
+                "x" = "Problematic constraint: '{indices[i]}'.",
                 ">" = "Did you forget the comparison operator? `<=/==/>=`"
             )
             
             cli_abort(msg, call = quosure, class = "lpsugar_error_no_constraint")
         }
         
-        cons[[i]]$index[] <- indices[i]
+        info <- lpsugar_attributes(cons[[i]])
+        info$id[] <- id
+        info$index[] <- indices[i]
+        lpsugar_attributes(cons[[i]]) <- info
         
         if (!is.null(cons[[i]]$L)) {
-            rownames(cons[[i]]$L) <- cons[[i]]$index
+            rownames(cons[[i]]$L) <- info$index
         }
     }
     
-    cons <- bind_cons(!!!cons)
-    cons$id[] <- id
-    
-    return(cons)
+    bind_cons(!!!cons)
 }
 
 #' Delete Constraints
