@@ -105,7 +105,12 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
         }
     }
     
-    bind_cons(!!!cons)
+    if (length(cons) != 1L) {
+        bind_cons(!!!cons)
+    }
+    else {
+        cons[[1]]
+    }
 }
 
 #' Delete Constraints
