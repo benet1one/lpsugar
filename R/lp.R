@@ -17,7 +17,7 @@
 lp_problem <- function() {
     list(
         variables = list(),
-        constraints = empty_constraint(),
+        constraints = empty_constraint(n = 0),
         objective = empty_objective(),
         
         # Aka implicit variables (impvar)

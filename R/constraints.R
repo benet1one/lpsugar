@@ -53,6 +53,11 @@ lp_constraint <- function(.problem, ...) {
     }
     
     .problem$constraints <- bind_cons(.problem$constraints, !!!cons)
+    
+    if (length(.problem$constraints) == 0L) {
+        .problem$constraints <- empty_constraint(n = ncol(.problem))
+    }
+    
     return(.problem)
 }
 
@@ -194,16 +199,23 @@ new_constraint <- function(roi_constraint, call) {
     )
 }
 
-empty_constraint <- function() {
+empty_constraint <- function(n = 0) {
+    roi_constraint <- ROI::NO_constraint(n)
+    
     structure(
-        list(),
-        class = c("lp_empty_constraint", "lp_constraint")
+        roi_constraint,
+        class = c("lp_empty_constraint", "lp_constraint", class(roi_constraint)),
+        lpsugar_attributes = list(
+            id = character(0),
+            index = character(0),
+            expr = character(0)
+        )
     )
 }
 
 update_constraints <- function(.problem) {
     if (length(.problem$constraints) == 0L) {
-        return(.problem)
+        .problem$constraints <- empty_constraint(ncol(.problem))
     }
     
     varnames <- variable.names(.problem)
@@ -246,7 +258,7 @@ bind_cons <- function(...) {
     })
     
     if (length(dots) == 0L) {
-        return(empty_constraint())
+        return(empty_constraint(0))
     }
     
     roi_binder <- get("rbind.constraint", pos = getNamespace("ROI"))
@@ -300,19 +312,10 @@ as.array.lp_constraint <- function(x, ...) {
     as.matrix.lp_constraint(x)
 }
 #' @export
-length.lp_empty_constraint <- function(x) {
-    0
-}
-#' @export
-dim.lp_constraint <- function(x) {
-    c(NextMethod(), NA)
-}
-#' @export
 dimnames.lp_constraint <- function(x) {
     info <- lpsugar_attributes(x)
     list(info$index, NULL)
 }
-
 #' @export
 head.lp_constraint <- function(x, n = 6L, ...) {
     rlang::check_dots_empty()
@@ -392,7 +395,7 @@ head.lp_constraint <- function(x, n = 6L, ...) {
     lpsugar_attributes(x) <- info
     
     if (length(x) == 0L) {
-        return(empty_constraint())
+        return(empty_constraint(ncol(x)))
     }
     else {
         return(x)
