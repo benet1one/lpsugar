@@ -84,64 +84,23 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
 
 # Steps -------------------
 
-#' @importFrom ROI as.objective
-#' @export
-as.objective.lp_objective <- function(x) {
-    class(x) <- class(x) |> setdiff("lp_objective")
+clear_lpsugar_classes <- function(x) {
+    lpsc <- class(x) |> startsWith("lp_")
+    class(x) <- class(x)[!lpsc]
+    attr(x, "lpsugar_attributes") <- NULL
     return(x)
 }
 
-ROI_constraint_from_lpsugar <- function(problem) {
-    check_problem(problem, field_name = "problem")
-    
-    if (length(problem$constraints) == 0L) {
-        ROI::NO_constraint(n_obj = ncol(problem))
-    } 
-    else if (is_quadratic(problem$constraint)) {
-        as.Q_constraint(problem)
-    } 
-    else {
-        as.L_constraint(problem)
-    }
+#' @importFrom ROI as.objective
+#' @export
+as.objective.lp_objective <- function(x) {
+    clear_lpsugar_classes(x)
 }
 
-#' @importFrom ROI as.L_constraint
+#' @importFrom ROI as.constraint
 #' @export
-as.L_constraint.lp_problem <- function(x, ...) {
-    rlang::check_dots_empty()
-    
-    if (length(x$constraints) == 0L) {
-        return(ROI::NO_constraint(n_obj = ncol(x)))
-    }
-    
-    if (is_quadratic(x$constraints)) {
-        cli_abort("Problem has quadratic constraints, use `as.Q_constraint()` instead.")
-    }
-    
-    ROI::L_constraint(
-        L = x$constraints$L,
-        dir = c(x$constraints$dir),
-        rhs = c(x$constraints$rhs),
-        names = attr(x, "varnames")
-    )
-}
-
-#' @importFrom ROI as.Q_constraint
-#' @export
-as.Q_constraint.lp_problem <- function(x, ...) {
-    rlang::check_dots_empty()
-    
-    if (length(x$constraints) == 0L) {
-        return(ROI::NO_constraint(n_obj = ncol(x)))
-    }
-    
-    ROI::Q_constraint(
-        Q = x$constraints$Q,
-        L = x$constraints$L,
-        dir = c(x$constraints$dir),
-        rhs = c(x$constraints$rhs),
-        names = attr(x, "varnames")
-    )
+as.constraint.lp_constraint <- function(x) {
+    clear_lpsugar_classes(x)
 }
 
 #' @importFrom ROI as.OP
@@ -201,7 +160,7 @@ as.OP.lp_problem <- function(x) {
     }
     
     objective <- as.objective.lp_objective(x$objective)
-    constraints <- ROI_constraint_from_lpsugar(x)
+    constraints <- as.constraint.lp_constraint(x$constraints)
     
     types <- character(ncol(x))
     lower <- numeric(ncol(x))
