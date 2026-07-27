@@ -69,11 +69,12 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
     }
     
     cons <- eval_split_for(quosure, data = data)
-    inds <- rlang::names2(cons)
+    expr <- format1(quosure)
+    ids <- rlang::names2(cons)
     
     indices <- ifelse(
-        inds != "", 
-        paste0(id, "[", inds, "]"),
+        ids != "", 
+        paste0(id, "[", ids, "]"),
         id
     )
     
@@ -97,6 +98,7 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
         
         info <- lpsugar_attributes(cons[[i]])
         info$id[] <- id
+        info$expr[] <- expr
         info$index[] <- indices[i]
         lpsugar_attributes(cons[[i]]) <- info
         
