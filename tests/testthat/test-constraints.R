@@ -16,14 +16,14 @@ test_that("printing", {
         lp_var(z[1:300]) |>
         lp_con(z >= 0, z <= 10)
     
-    print(p$constraints, compact = TRUE) |> expect_snapshot()
+    print(p$constraints, full = FALSE) |> expect_snapshot()
     print(p$constraints) |> expect_snapshot()
     
-    print(plong$constraints, compact = TRUE) |> expect_snapshot()
+    print(plong$constraints, full = FALSE) |> expect_snapshot()
     print(plong$constraints) |> expect_snapshot()
     
-    print(p_many_rows, compact = FALSE) |> expect_snapshot()
-    print(p_many_cols, compact = FALSE) |> expect_snapshot()
+    print(p_many_rows, full = TRUE) |> expect_snapshot()
+    print(p_many_cols, full = TRUE) |> expect_snapshot()
 })
 
 test_that("constraint updates", {
@@ -87,7 +87,7 @@ test_that("deleting constraints", {
         'Ignoring constraints: "third" and "fourth"'
     )
     expect_error(
-        p |> lp_delete_constraint(c("second", "(unnamed constraint)")),
+        p |> lp_delete_constraint(c("second", "#unnamed_constraint")),
         "Cannot delete unnamed constraints."
     )
     expect_error(

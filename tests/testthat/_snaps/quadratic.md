@@ -61,7 +61,11 @@
       x[4]    0    0    0    0
       
       [[3]]
-      NULL
+           x[1] x[2] x[3] x[4]
+      x[1]    0    0    0    0
+      x[2]    0    0    0    0
+      x[3]    0    0    0    0
+      x[4]    0    0    0    0
       
       [[4]]
            x[1] x[2] x[3] x[4]
@@ -76,11 +80,18 @@
     Code
       p$constraints
     Output
+      An object containing 1 linear constraint
+                           3 quadratic constraints.
       
-      <unnamed> | n = 3 | quadratic | x^2 < 1
-      <unnamed> | n = 1 | x[3] > 0
+      #unnamed_constraint
+      | x^2 < 1
+      | Rows = 3
       
-       x[1] x[2] x[3] dir  
-       0    0    1    >=  0
+      #unnamed_constraint
+      | x[3] > 0
+      | Rows = 1
+      
+         x[1] x[2] x[3] dir rhs
+         0    0    1    >=  0  
       
 
