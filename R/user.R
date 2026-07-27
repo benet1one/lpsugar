@@ -227,22 +227,11 @@ compute_objective <- function(problem, solution) {
     solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
     
     if (is_nonlinear(problem$objective)) {
-        return(problem$objective$F(solution))
+        problem$objective$F(solution)
     }
-    
-    L <- problem$objective$L
-    A <- info$A
-    out <- crossprod(L, solution) + A
-    
-    if (is_quadratic(problem$objective)) {
-        row_x <- t(solution)
-        col_x <- t(row_x)
-        Q <- problem$objective$Q
-
-        out <- out + 0.5 * row_x %*% Q %*% col_x
+    else {
+        compute_quadratic(problem$objective, solution)
     }
-    
-    out[1]
 }
 
 #' @rdname solution_summary

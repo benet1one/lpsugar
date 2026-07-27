@@ -433,16 +433,39 @@ as_quadratic <- function(x) {
 }
 
 compute_quadratic <- function(v, x) {
-    out <- v$L %*% x + v$A
-    out <- array(out, dim = dim2(v), dimnames = dimnames(v))
+    info <- lpsugar_attributes(v)
+    is_var <- is_lp_variable(v)
+    is_obj <- is_lp_objective(v)
+    is_con <- is_lp_constraint(v)
+    
+    if (is_var) {
+        A <- v$A
+    } else if (is_obj) {
+        A <- info$A
+    } else if (is_con) {
+        A <- 0
+    } else {
+        cli_abort("Internal error")
+    }
+    
+    out <- v$L %*% x + A
+    
+    if (is_var) {
+        out <- array(out, dim = dim2(v), dimnames = dimnames(v))
+    } else if (is_con) {
+        names(out) <- info$index
+    }
     
     if (is_quadratic(v)) {
-        row_x <- t(x)
-        col_x <- t(row_x)
+        row_x <- matrix(x, nrow = 1)
+        col_x <- matrix(x, ncol = 1)
         
-        for (i in seq_along(v)) {
+        if (is_var || is_con) for (i in seq_along(v)) {
             Qi <- v$Q[[i]]
             out[i] <- out[i] + 0.5 * row_x %*% Qi %*% col_x
+        }
+        else if (is_obj) {
+            out <- out + 0.5 * row_x %*% v$Q %*% col_x
         }
     }
     
