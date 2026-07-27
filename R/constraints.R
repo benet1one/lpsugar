@@ -263,7 +263,7 @@ bind_cons <- function(...) {
     
     roi_binder <- get("rbind.constraint", pos = getNamespace("ROI"))
     out <- rlang::exec(roi_binder, !!!dots)
-    class(out) <- c("lp_constraint", class(out))
+    class(out) <- c("lp_constraint", class(out)) |> unique()
     
     lpsugar_attributes(out) <- purrr::map(dots, lpsugar_attributes) |> 
         purrr::list_transpose(simplify = FALSE) |> 
