@@ -285,6 +285,22 @@ roi_constraint_class <- function(con) {
 # Methods ----------------------
 
 #' @export
+length.lp_constraint <- function(x) {
+    length(x$dir)
+}
+#' @export
+length.lp_empty_constraint <- function(x) {
+    0
+}
+#' @export
+dim.lp_constraint <- function(x) {
+    c(
+        length(x), 
+        attr(x, "n_obj") %||% length(x$names)
+    )
+}
+
+#' @export
 rbind.lp_constraint <- function(..., deparse.level = 1) {
     warn_changed_args(deparse.level = 1)
     bind_cons(...)
