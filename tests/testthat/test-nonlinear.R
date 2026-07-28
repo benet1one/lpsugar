@@ -61,6 +61,44 @@ test_that("nonlinear constrained", {
     with(s$variables, expect_equal(s$objective, sqrt(x) * log(y)))
 })
 
+test_that("nonlinear constraints", {
+    withr::local_package("ROI.plugin.nloptr")
+    
+    p <- lp_problem() |> 
+        lp_var(x) |> 
+        lp_var(y) |> 
+        lp_var(z[1:3]) |> 
+        lp_min(x^2) |> 
+        lp_con(
+            nonlinear(x/y) >= 1,
+            nonlinear(z^3) <= 100
+        )
+    
+    start <- list(x = 6, y = 2, z = 1:3)
+    
+    s <- lp_solve(
+        p, 
+        start = start,
+        solver = "nloptr.cobyla",
+        max_iter = 500
+    )
+    
+    s$status
+    
+    with(s$variables, {
+        expect_true(x^2 < 0.1)
+        expect_true(x/y >= 1)
+        expect_true(all(z^3 < 100))
+    })
+    
+    cs <- constraint_summary(p, start)
+    
+    expect_equal(
+        cs$lhs,
+        c(6/2, (1:3)^3)
+    )
+})
+
 test_that("operations outside nonlinear", {
     expect_error(
         nonlinear(x + 1) / 2,
