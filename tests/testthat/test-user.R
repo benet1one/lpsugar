@@ -173,11 +173,12 @@ test_that("quadratic constraint summary", {
         lp_var(x) |> 
         lp_var(y) |> 
         lp_con(
-            c1 = x^2 + y == 9,
+            c1 = x^2 + y <= 9,
             c2 = x*y == 10,
             c3 = x == 12 - 2*y
         )
     
     con_sum <- constraint_summary(p, list(x = 2, y = 5)) 
     expect_all_true(con_sum$satisfied)
+    expect_all_true(con_sum$saturated)
 })

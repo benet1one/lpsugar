@@ -476,6 +476,18 @@ compute_quadratic <- function(v, x) {
     return(out)
 }
 
+compute_nonlinear <- function(v, x) {
+    if (is.list(v$F)) {
+        lapply(v$F, \(fn) fn(x)) |> unlist()
+    }
+    else if (is.function(v$F)) {
+        v$F(x)
+    }
+    else {
+        cli_abort("Internal error.")
+    }
+}
+
 # Inheritance -------------------
 
 is_lp_problem <- function(x) {

@@ -144,24 +144,25 @@ solution_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 constraint_summary <- function(problem, solution, tol = 2e-6) {
-    solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
+    solution <- variables_to_vec(
+        solution, 
+        problem, 
+        call = environment(), 
+        field = "solution"
+    )
+    
     con <- problem$constraints
+    info <- lpsugar_attributes(con)
     
-    quadratic_part <- numeric(nrow(con))
-    q_ind <- which(lengths(con$Q) > 0L)
-    
-    for (i in q_ind) {
-        q <- con$Q[[i]]
-        row_sol <- t(solution)
-        col_sol <- t(row_sol)
-        quadratic_part[i] <- 0.5 * row_sol %*% q %*% col_sol
+    if (is_nonlinear(con)) {
+        lhs <- compute_nonlinear(con, solution)
+    } 
+    else {
+        lhs <- compute_quadratic(con, solution)
     }
     
-    linear_part <- con$L %*% solution
-    lhs <- quadratic_part + linear_part
     dir <- con$dir
-    rhs <- con$rhs[, 1]
-    diff <- rhs - lhs
+    rhs <- con$rhs
     
     less_than <- lhs <= rhs + tol
     greater_than <- lhs >= rhs - tol
@@ -173,12 +174,12 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
     satisfied[dir == "=="] <- equal_to[dir == "=="]
     
     feasible <- all(satisfied)
-    saturated <- diff > -tol  &  diff < +tol
+    saturated <- abs(lhs - rhs) < tol
     saturated[!satisfied] <- NA
     
     df <- data.frame(
-        name = con$name,
-        fullname = rownames(con),
+        id = info$id,
+        full_id = info$index,
         lhs = lhs,
         dir = dir,
         rhs = rhs,
