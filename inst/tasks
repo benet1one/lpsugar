@@ -7,9 +7,7 @@ Code
 
 Nonlinear
 - gradient
-- get length of NL output and recycle rhs in constraints
 - test errors
-- constraint summary
 
 Docs
 - Find another example for nonlinear
