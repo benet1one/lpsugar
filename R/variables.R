@@ -60,7 +60,8 @@ lp_variable <- function(.problem, definition,
     
     if (is_nonlinear(.problem)) {
         cli_abort(
-            "Cannot add variables to a nonlinear problem.",
+            c("Cannot add variables to a nonlinear problem.",
+              ">" = "Define all variables before the objective and the constraints"),
             class = "lpsugar_error_add_variables_to_nonlinear"
         )
     }
