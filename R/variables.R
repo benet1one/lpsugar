@@ -79,18 +79,10 @@ lp_variable <- function(.problem, definition,
         rlang::is_bool(binary)
     )
     
-    lower <- interpret_bound(lower, "lower", default = -Inf, dim = lengths(sets))
-    upper <- interpret_bound(upper, "upper", default = +Inf, dim = lengths(sets))
+    lower <- adjust_bound(lower, "lower", default = -Inf, dim = lengths(sets))
+    upper <- adjust_bound(upper, "upper", default = +Inf, dim = lengths(sets))
     
-    if (any(lower > upper)) {
-        cli_abort("`lower` bound ({lower}) cannot be greater than `upper` bound ({upper}).")
-    } 
-    else if (any(lower == +Inf)) {
-        cli_abort("`lower` bound cannot be +Inf.")
-    } 
-    else if (any(upper == -Inf)) {
-        cli_abort("`upper` bound cannot be -Inf.")
-    }
+    check_consistent_bounds(lower, upper)
     
     if (binary) {
         if (any(lower > 1)) {
@@ -683,7 +675,7 @@ check_variable_set <- function(set, name, call = environment()) {
 
 # Used in lp_variable()
 # Checks that bounds are correctly defined
-interpret_bound <- function(bound, bound_name, default, dim) {
+adjust_bound <- function(bound, bound_name, default, dim) {
     if (length(bound) == 0L) {
         cli_warn(
             "`{bound_name}` bound is `NULL` or zero-length, setting to {default}.",
@@ -695,7 +687,8 @@ interpret_bound <- function(bound, bound_name, default, dim) {
     if (length(bound) > 1L && !all(dim2(bound) == dim)) {
         cli_abort(
             "`dim({bound_name})` different from `dim(variable)`.",
-            call = parent.frame()
+            call = parent.frame(),
+            class = "lpsugar_error_inconsistent_bounds"
         )
     }
     
@@ -708,10 +701,46 @@ interpret_bound <- function(bound, bound_name, default, dim) {
     }
     
     if (!is.numeric(bound)) {
-        cli_abort("`{bound_name}` bound is not numeric.", call = parent.frame())
+        cli_abort(
+            "`{bound_name}` bound is not numeric.", 
+            call = parent.frame(),
+            class = "lpsugar_error_bound_not_numeric"
+        )
     }
     
     bound
+}
+
+check_consistent_bounds <- function(lower, upper, call = parent.frame()) {
+    err_class <- "lpsugar_error_inconsistent_bounds"
+    
+    if (any(lower > upper)) {
+        l <- lower[1]
+        u <- upper[1]
+        
+        msg <- if (all(lower == l) && all(upper == u)) {
+            "`lower` bound ({l}) cannot be greater than `upper` bound ({u})."
+        } 
+        else {
+            "`lower` bound cannot be greater than `upper` bound."
+        }
+        
+        cli_abort(msg, call = parent.frame(), class = err_class)
+    } 
+    else if (any(lower == +Inf)) {
+        cli_abort(
+            "`lower` bound cannot be +Inf.",
+            call = parent.frame(),
+            class = err_class
+        )
+    } 
+    else if (any(upper == -Inf)) {
+        cli_abort(
+            "`upper` bound cannot be -Inf.",
+            call = parent.frame(), 
+            class = err_class
+        )
+    }
 }
 
 # Gives the colnames of $L
