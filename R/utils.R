@@ -117,10 +117,11 @@ dimnames_non_numeric <- function(dimnames) {
     return(dimnames)
 }
 
-nonlinear_constraint_form_error <- function(...) {
+nonlinear_constraint_form_error <- function(call = parent.frame(), ...) {
     cli_abort(
         "Nonlinear constraints must be of form `nonlinear(...) <= constant`",
         class = "lpsugar_error_bad_nonlinear_constraint",
+        call = call,
         ...
     )
 }

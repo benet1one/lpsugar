@@ -89,7 +89,7 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
         }
         
         if (inherits(cons[[i]], "nonlinear")) {
-            nonlinear_constraint_form_error()
+            nonlinear_constraint_form_error(call = quosure)
         }
         if (!is_lp_constraint(cons[[i]])) {
             msg <- c(
