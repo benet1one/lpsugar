@@ -106,15 +106,12 @@ lp_variable <- function(.problem, definition,
         upper <- pmin(upper, 1)
     }
     
-    type <- if (binary && all(lower == 0) && all(upper == 1)) {
-        "B"
-    } 
-    else if (binary || integer) {
-        "I"
-    } 
-    else {
-        "C"
-    }
+    type <- roi_variable_type(
+        binary = binary, 
+        integer = integer,
+        lower = lower,
+        upper = upper
+    )
     
     # Index array of variable.
     # Indicates which objective coefficients correspond to this variable.
@@ -761,6 +758,21 @@ name_variable <- function(name, sets) {
     grid <- do.call(expand.grid, sets)
     index <- .mapply(dots = grid, FUN = paste, MoreArgs = list(sep = ","))
     paste0(name, "[", index, "]")
+}
+
+roi_variable_type <- function(binary, integer, lower, upper) {
+    # If type is "B", ROI adjusts bounds to be 0 and 1
+    # So if any of the bounds is different, the variable should be "I"
+    
+    if (binary && all(lower == 0) && all(upper == 1)) {
+        "B"
+    } 
+    else if (binary || integer) {
+        "I"
+    } 
+    else {
+        "C"
+    }
 }
 
 # Recycles a variable to length n
