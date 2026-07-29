@@ -61,6 +61,7 @@ test_that("nonlinear constrained", {
     with(s$variables, expect_equal(s$objective, sqrt(x) * log(y)))
 })
 
+
 test_that("nonlinear constraints", {
     withr::local_package("ROI.plugin.nloptr")
     
@@ -96,6 +97,52 @@ test_that("nonlinear constraints", {
     expect_equal(
         cs$lhs,
         c(6/2, (1:3)^3)
+    )
+})
+
+test_that("bad nonlinear outputs", {
+    p <- lp_problem() |> 
+        lp_var(x[1:3])
+    
+    expect_error(
+        p |> lp_con(nonlinear(x + "1") >= 0),
+        paste(
+            "Failed to evaluate expression.",
+            "Make sure it works when all variables are 0.",
+            "non-numeric argument to binary operator",
+            sep = "(.*)"
+        )
+    )
+    expect_error(
+        p |> lp_min(nonlinear(log(x))),
+        paste(
+            "Nonlinear objective function must return a scalar",
+            "Instead returns a length 3 vector.",
+            sep = "(.*)"
+        )
+    )
+    expect_error(
+        p |> lp_max(nonlinear(paste0(x, "0"))),
+        paste(
+            "Nonlinear expression must return a numeric vector",
+            "Instead returns a character vector.",
+            sep = "(.*)"
+        )
+    )
+})
+
+test_that("bad nonlinear constraints", {
+    p <- lp_problem() |> 
+        lp_var(x[1:3])
+    
+    # TODO fix call in first error
+    expect_error(
+        p |> lp_con(nonlinear(x <= 2)),
+        "Nonlinear constraints must be of form"
+    )
+    expect_error(
+        p |> lp_con(3 >= nonlinear(x^3)),
+        "Nonlinear constraints must be of form",
     )
 })
 
