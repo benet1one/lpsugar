@@ -1,5 +1,12 @@
 # Changelog
 
+## lpsugar (development version)
+
+### New Features
+
+- [`ROI::solution()`](https://rdrr.io/pkg/ROI/man/solution.html) now has
+  a method for class `<lp_solution>`
+
 ## lpsugar 0.25.0
 
 ### Breaking Changes
