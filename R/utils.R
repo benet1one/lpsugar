@@ -514,14 +514,11 @@ is_nonlinear <- function(x) {
 is_lp_objective <- function(x) {
     inherits(x, "lp_objective")
 }
-is_lp_constraint <- function(x, empty_valid = TRUE) {
-    is_con <- inherits(x, "lp_constraint")
-    if (empty_valid) {
-        is_con
-    } 
-    else {
-        is_con && !is_empty_constraint(x)
-    }
+is_empty_objective <- function(x) {
+    inherits(x, "lp_empty_objective")
+}
+is_lp_constraint <- function(x) {
+    inherits(x, "lp_constraint")
 }
 is_empty_constraint <- function(x) {
     inherits(x, "lp_empty_constraint")

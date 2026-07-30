@@ -169,7 +169,7 @@ new_nonlinear_objective <- function(.problem, type, direction = NULL, NL, expr =
 empty_objective <- function() {
     structure(
         list(),
-        class = "lp_objective",
+        class = c("lp_empty_objective", "lp_objective"),
         lpsugar_attributes = list(
             type = "undefined",
             direction = "",
