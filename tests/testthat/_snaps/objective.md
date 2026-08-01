@@ -3,7 +3,7 @@
     Code
       lp_maximize(p, -x)$objective
     Output
-      maximize linear function:
+      linear function:
       -x
       
 
@@ -12,7 +12,7 @@
     Code
       lp_minimize(p, sum(y))$objective
     Output
-      minimize linear function:
+      linear function:
       sum(y)
       
 
@@ -34,9 +34,6 @@
       attr(,"lpsugar_attributes")$A
       [1] 0
       
-      attr(,"lpsugar_attributes")$direction
-      [1] "minimize"
-      
       attr(,"lpsugar_attributes")$type
       [1] "linear"
       
@@ -49,7 +46,7 @@
     Code
       p$objective
     Output
-      minimize quadratic function:
+      quadratic function:
       sum(x^2) + sum(y)
       
 
@@ -76,9 +73,6 @@
       attr(,"lpsugar_attributes")
       attr(,"lpsugar_attributes")$A
       [1] 0
-      
-      attr(,"lpsugar_attributes")$direction
-      [1] "minimize"
       
       attr(,"lpsugar_attributes")$type
       [1] "quadratic"
@@ -110,9 +104,6 @@
       attr(,"lpsugar_attributes")
       attr(,"lpsugar_attributes")$A
       [1] 1
-      
-      attr(,"lpsugar_attributes")$direction
-      [1] "minimize"
       
       attr(,"lpsugar_attributes")$type
       [1] "quadratic"

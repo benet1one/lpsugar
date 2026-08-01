@@ -132,30 +132,16 @@ as.OP.lp_problem <- function(x) {
             class = "lpsugar_error_no_variables_defined"
         )
     }
-    
-    info <- lpsugar_attributes(x$objective)
-    
-    if (info$type == "undefined") {
-        cli_abort(c(
-            "Must define an objective function with `lp_minimize()` or `lp_maximize()`.",
-            "i" = paste(
-                "If you wish to find any feasible solution, use `lp_find_feasible()`",
-                "or set the objective function to 0 with `lp_minimize(0)`",
-                sep = "\n"
-            )
-        ), class = "lpsugar_error_no_objective")
-    }
-    
-    if (info$direction == "minimize") {
-        maximize <- FALSE
-    } 
-    else if (info$direction == "maximize") {
-        maximize <- TRUE
-    } 
-    else {
+
+    if (!rlang::is_scalar_logical(x$maximum) || is.na(x$maximum)) {
         cli_abort(
-            "`direction` should be either 'minimize' or 'maximize'.",
-            class = "lpsugar_error_bad_objective_direction"
+            c("Must define an objective function with `lp_minimize()` or `lp_maximize()`.",
+              "i" = paste(
+                  "If you wish to find any feasible solution, use `lp_find_feasible()`",
+                  "or set the objective function to 0 with `lp_minimize(0)`",
+                  sep = "\n"
+              )), 
+            class = "lpsugar_error_no_objective"
         )
     }
     
@@ -186,7 +172,7 @@ as.OP.lp_problem <- function(x) {
     
     ROI::OP(
         objective = objective,
-        maximum = maximize,
+        maximum = x$maximum,
         types = types,
         bounds = bounds,
         constraints = constraints

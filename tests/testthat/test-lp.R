@@ -50,6 +50,9 @@ test_that("feasible", {
         "Must define an objective function"
     )
 
+    p <- no_obj |> lp_minimize(0)
+    expect_snapshot(p)
+    
     s <- no_obj |> lp_minimize(0) |> lp_solve()
     f <- no_obj |> lp_find_feasible()
 
@@ -158,3 +161,18 @@ test_that("no applicable solver", {
     )
 })
 
+test_that("changing direction", {
+    p <- lp_problem() |> 
+        lp_var(x)
+    
+    expect_no_error({
+        maximum(p) <- TRUE
+        maximum(p) <- FALSE
+        maximum(p) <- NA
+    })
+    
+    expect_error(
+        maximum(p) <- c(FALSE, TRUE),
+        "`maximum` must be either `TRUE` or `FALSE`."
+    )
+})

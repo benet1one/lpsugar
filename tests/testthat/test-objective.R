@@ -10,7 +10,7 @@ test_that("printing", {
     )
     expect_output(
         print(p_max$objective),
-        "maximize linear function:"
+        "linear function:"
     )
     expect_output(
         print(p_feasible$objective),

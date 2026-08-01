@@ -76,6 +76,22 @@
       | Rows = 6
       
 
+# feasible
+
+    Code
+      p
+    Output
+      ---- <lp_problem> ----
+      
+      -- $variables
+      $x
+      Real scalar 'x'
+      5 <= x <= 10
+      
+      -- $objective
+      find a feasible solution
+      
+
 # infeasible
 
     Code

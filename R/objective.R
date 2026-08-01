@@ -7,14 +7,14 @@ lp_objective <- function(.problem, objective) {
     objective <- rlang::eval_tidy(quosure, data = data_mask(.problem))
     
     if (is.numeric(objective) && length(objective) == 1L && objective == 0) {
-        lp_objective_feasible(.problem)
+        .problem$objective <- objective_feasible(.problem)
     }
     else if (is_nonlinear(objective)) {
-        lp_objective_nonlinear(.problem, objective)
+        .problem$objective <- objective_nonlinear(.problem, objective)
     } 
     else if (is_lp_variable(objective)) {
         expr <- rlang::get_expr(quosure) |> rlang::as_label()
-        lp_objective_quadratic(.problem, objective, expr = expr)
+        .problem$objective <- objective_quadratic(.problem, objective, expr = expr)
     }
     else {
         cli_abort(
@@ -26,29 +26,27 @@ lp_objective <- function(.problem, objective) {
             call = parent.frame()
         )
     }
+
+    return(.problem)
 }
 
-lp_objective_feasible <- function(.problem) {
-    .problem$objective <- new_quadratic_objective(
+objective_feasible <- function(.problem) {
+    new_quadratic_objective(
         .problem,
         type = "feasible"
     )
-    
-    .problem
 }
 
-lp_objective_nonlinear <- function(.problem, objective) {
-    .problem$objective <- new_nonlinear_objective(
+objective_nonlinear <- function(.problem, objective) {
+    new_nonlinear_objective(
         .problem,
         type = "nonlinear",
         NL = objective,
         expr = rlang::as_label(objective)
     )
-    
-    .problem
 }
 
-lp_objective_quadratic <- function(.problem, objective, expr = "") {
+objective_quadratic <- function(.problem, objective, expr = "") {
     if (length(objective) == 0L) {
         cli_abort(
             "`objective` evaluated to a variable of length 0.",
@@ -72,7 +70,7 @@ lp_objective_quadratic <- function(.problem, objective, expr = "") {
         type <- "linear"
     }
  
-    .problem$objective <- new_quadratic_objective(
+    new_quadratic_objective(
         .problem,
         type = type,
         Q = objective$Q[[1]],
@@ -80,19 +78,12 @@ lp_objective_quadratic <- function(.problem, objective, expr = "") {
         A = unclass(objective$A),
         expr = expr
     )
-    
-    .problem
 }
 
 # Constructors -----------------------------
 
 # lp_objective object constructor for quadratic and linear objectives
-new_quadratic_objective <- function(.problem, type, direction = NULL, 
-                          Q = NULL, L = NULL, A = NULL, expr = "") {
-    if (is.null(direction)) {
-        direction <- .problem$objective$direction
-    }
-    
+new_quadratic_objective <- function(.problem, type, Q = NULL, L = NULL, A = NULL, expr = "") {
     if (!is.null(Q)) {
         Q <- slam::as.simple_triplet_matrix(Q)
         Q$dimnames <- list(
@@ -128,7 +119,6 @@ new_quadratic_objective <- function(.problem, type, direction = NULL,
     
     lpsugar_attributes(out) <- list(
         A = A,
-        direction = direction,
         type = type,
         expr = expr
     )
@@ -136,11 +126,7 @@ new_quadratic_objective <- function(.problem, type, direction = NULL,
     out
 }
 
-new_nonlinear_objective <- function(.problem, type, direction = NULL, NL, expr = "") {
-    if (is.null(direction)) {
-        direction <- .problem$objective$direction
-    }
-    
+new_nonlinear_objective <- function(.problem, type, NL, expr = "") {
     fun <- as.function.nonlinear(NL, .problem)
     fun_out <- attr(fun, "fun_output")
     
@@ -158,7 +144,6 @@ new_nonlinear_objective <- function(.problem, type, direction = NULL, NL, expr =
     
     lpsugar_attributes(out) <- list(
         A = 0,
-        direction = direction,
         type = "nonlinear",
         expr = expr
     )
@@ -172,7 +157,6 @@ empty_objective <- function() {
         class = c("lp_empty_objective", "lp_objective"),
         lpsugar_attributes = list(
             type = "undefined",
-            direction = "",
             expr = ""
         )
     )
@@ -206,9 +190,6 @@ empty_objective <- function() {
 #' - `$fun` : Function that takes a vector `x` of length
 #' `n = ncol(.problem)` and evaluates `$NL`.
 #' 
-#' These fields are always present:
-#' - `$direction` : String, goal of the solver. Can be `"minimize"` or `"maximize"`.
-#' - `$expr` : String, expression that defined the objective function.
 #' @export
 #' @seealso [nonlinear()] For general nonlinear optimization.
 #' 
@@ -216,14 +197,14 @@ empty_objective <- function() {
 #' @example inst/examples/example_objective.R
 lp_minimize <- function(.problem, objective) {
     check_problem(.problem)
-    .problem$objective$direction <- "minimize"
+    .problem$maximum <- FALSE
     lp_objective(.problem, {{ objective }})
 }
 #' @rdname lp_objective
 #' @export
 lp_maximize <- function(.problem, objective) {
     check_problem(.problem)
-    .problem$objective$direction <- "maximize"
+    .problem$maximum <- TRUE
     lp_objective(.problem, {{ objective }})
 }
 
@@ -253,7 +234,7 @@ print.lp_objective <- function(x, ...) {
     }
     
     cat(
-        info$direction, " ", info$type, " function:\n",
+        info$type, " function:\n",
         info$expr, "\n\n", 
         sep = ""
     )

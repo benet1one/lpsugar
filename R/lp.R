@@ -19,6 +19,7 @@ lp_problem <- function() {
         variables = list(),
         constraints = empty_constraint(n = 0),
         objective = empty_objective(),
+        maximum = NA,
         
         # Aka implicit variables (impvar)
         aliases = list()
@@ -44,8 +45,16 @@ print.lp_problem <- function(x, full = FALSE, ...) {
         print_field(x, "variables")
     }
     
-    if (lpsugar_attributes(x$objective) $ type != "undefined") {
+    obj_info <- lpsugar_attributes(x$objective)
+    
+    if (obj_info$type == "feasible") {
         print_field(x, "objective")
+    }
+    else if (obj_info$type != "undefined") {
+        direction <- ifelse(x$maximum, "maximize", "minimize")
+        print_field_name("objective")
+        cat(direction, " ", sep = "")
+        print(x$objective)
     }
     
     if (length(x$constraints) > 0L) {
@@ -67,4 +76,23 @@ dim.lp_problem <- function(x) {
 #' @export
 variable.names.lp_problem <- function(object, ...) {
     attr(object, "varnames")
+}
+
+#' @importFrom ROI `maximum<-`
+#' @export
+`maximum<-.lp_problem` <- function(x, value) {
+    valid <- any(
+        length(value) == 1L && is.na(value),
+        rlang::is_scalar_logical(value)
+    )
+    
+    if (!valid) {
+        cli_abort(
+            "`maximum` must be either `TRUE` or `FALSE`.",
+            class = "lpsugar_error_bad_maximum_assignment"
+        )
+    }
+    
+    x[["maximum"]] <- value
+    return(x)
 }
