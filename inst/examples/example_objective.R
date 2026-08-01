@@ -15,7 +15,7 @@ library(ROI.plugin.highs)
 (s <- lp_solve(p))
 
 s$aliases$total_profit
-sum(p$objective$L * s$variables_vec)
+sum(c(p$objective$L) * s$variables_vec)
 
+s$aliases$total_profit - fix_cost
 s$objective
-sum(p$objective$L * s$variables_vec) + p$objective$A
