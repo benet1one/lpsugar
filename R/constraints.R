@@ -144,19 +144,19 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
 #' }
 #'
 #' print(p)
-lp_delete_constraint <- function(.problem, ids) {
+lp_delete_constraint <- function(.problem, names) {
     check_problem(.problem)
-    stopifnot(is.character(ids))
+    stopifnot(is.character(names))
     info <- lpsugar_attributes(.problem$constraints)
     
-    if (any(ids == "") || any(ids == "#unnamed_constraint")) {
+    if (any(names == "") || any(names == "#unnamed_constraint")) {
         cli_abort(
             "Cannot delete unnamed constraints.",
             class = "lpsugar_error_delete_unnamed_constraints"
         )
     }
     
-    undefined <- setdiff(ids, info$id)
+    undefined <- setdiff(names, info$id)
     
     if (length(undefined) > 0L) {
         cli_warn(
@@ -165,10 +165,10 @@ lp_delete_constraint <- function(.problem, ids) {
             class = "lpsugar_warning_delete_undefined_constraints"
         )
         
-        ids <- intersect(ids, info$id)
+        names <- intersect(names, info$id)
     }
     
-    to_delete <- info$id %in% ids
+    to_delete <- info$id %in% names
     .problem$constraints <- .problem$constraints[!to_delete]
     return(.problem)
 }
