@@ -16,6 +16,18 @@ test_that("printing", {
         lp_var(z[1:300]) |>
         lp_con(z >= 0, z <= 10)
     
+    p_wrapped <- lp_problem() |> 
+        lp_var(x) |> 
+        lp_con(
+            my_con = {
+                x > 0
+            },
+            my_longer_con = {
+                a <- 50
+                x < a
+            }
+        )
+    
     print(p$constraints, compact = TRUE) |> expect_snapshot()
     print(p$constraints) |> expect_snapshot()
     
@@ -24,6 +36,11 @@ test_that("printing", {
     
     print(p_many_rows, compact = FALSE) |> expect_snapshot()
     print(p_many_cols, compact = FALSE) |> expect_snapshot()
+    
+    expect_output(
+        print(p_wrapped$constraints, compact = TRUE),
+        "x > 0"
+    )
 })
 
 test_that("constraint updates", {

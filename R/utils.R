@@ -20,12 +20,27 @@ warn_changed_args <- function(..., env = parent.frame(), call = env) {
 
 # Safety ------------------------
 
+inside_expr <- function(expr) {
+    if (!rlang::is_call(expr)) {
+        return(expr)
+    }
+    if (rlang::is_quosure(expr)) {
+        expr <- rlang::get_expr(expr)
+    }
+    if (expr[[1]] == quote(`{`) && length(expr) == 2L) {
+        return(expr[[2]])
+    }
+    
+    return(expr)
+}
+
 # Formats an object to a string (length 1)
 format1 <- function(x, ...) {
-    if (!rlang::is_symbolic(x)) {
+    if (!rlang::is_symbolic(x) || rlang::is_missing(x)) {
         return(rlang::as_label(x))
     }
     
+    x <- inside_expr(x)
     y <- format(x, ...)
     
     if (length(y) == 1L) {
