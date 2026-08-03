@@ -1,11 +1,13 @@
 # Changelog
 
-## lpsugar (development version)
+## lpsugar 0.25.1
 
 ### New Features
 
 - [`ROI::solution()`](https://rdrr.io/pkg/ROI/man/solution.html) now has
   a method for class `<lp_solution>`
+- Cleaner constraint printing for constraints wrapped in curly brackets
+  [`{}`](https://rdrr.io/r/base/Paren.html)
 
 ## lpsugar 0.25.0
 

@@ -364,7 +364,7 @@ p2 <- p |>
 
 p2$constraints["alt_constraint"]
 #> 
-#> alt_constraint | n = 3 | { ... }
+#> alt_constraint | n = 3 | (1:n) * x <= rev(y)
 #> 
 #>                x[1] x[2] x[3] y[1] y[2] y[3] dir  
 #> alt_constraint 1    0    0    0    0    -1   <=  0
