@@ -71,10 +71,8 @@ lp_variable <- function(.problem, definition,
     }
     
     def <- parse_variable_definition({{ definition }})
-    
     name <- def$name
     sets <- def$sets
-    dnames <- dimnames_non_numeric(sets)
     
     if (name %in% names(.problem$variables)) {
         cli_abort("Variable `{name}` already exists in this problem.")
@@ -112,17 +110,11 @@ lp_variable <- function(.problem, definition,
         lower = lower,
         upper = upper
     )
-    
-    # Index array of variable.
-    # Indicates which objective coefficients correspond to this variable.
-    if (def$scalar) {
-        ind <- ncol(.problem) + 1L
-        ind <- robust_index(ind)
-    } 
-    else {
-        ind <- array(dim = lengths(sets), dimnames = dnames) |> robust_index()
-        ind[] <- seq_along(ind) + ncol(.problem)
-    }
+
+    ind <- variable_indices(
+        old_n = ncol(.problem), 
+        definition = def
+    )
     
     attr(.problem, "n_variables") <- max(ind)
     attr(.problem, "varnames") <- c(
@@ -747,6 +739,23 @@ check_consistent_bounds <- function(lower, upper, call = parent.frame()) {
             class = err_class
         )
     }
+}
+
+# Index array of variable.
+# Indicates which objective coefficients correspond to this variable.
+variable_indices <- function(old_n, definition) {
+    if (definition$scalar) {
+        ind <- old_n + 1L
+    } 
+    else {
+        ind <- array(
+            dim = lengths(definition$sets),
+            dimnames = dimnames_non_numeric(definition$sets)
+        )
+        ind[] <- seq_along(ind) + old_n
+    }
+    
+    robust_index(ind)
 }
 
 # Gives the colnames of $L
