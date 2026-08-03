@@ -1,5 +1,4 @@
 # Linear Objective using an Alias ---------------
-
 profit   <- c(Phone = 60, Tablet = 20, eBook = 10)
 max_made <- c(Phone = 500, Tablet = 300, eBook = 950)
 product  <- names(profit)
@@ -25,8 +24,7 @@ s$objective
 
 
 # Nonlinear objective ---------------------------
-
-nl <- lp_problem() |> 
+nlp <- lp_problem() |> 
     lp_variable(x, lower = 0) |> 
     lp_variable(y, lower = 0) |> 
     lp_maximize(nonlinear(sqrt(x) * log(y))) |> 
@@ -34,10 +32,10 @@ nl <- lp_problem() |>
 
 # There are some different solvers within `nloptr`
 library(ROI.plugin.nloptr)
-lpsugar_applicable_solvers(nl)
+lpsugar_applicable_solvers(nlp)
 
 lp_solve(
-    nl, 
+    nlp, 
     solver = "nloptr.cobyla", 
     start = list(x = 1, y = 1)
 )

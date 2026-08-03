@@ -19,38 +19,33 @@ lp_subject_to(.problem, ...)
 \itemize{
 \item Contain one or more variables defined with \code{\link[=lp_variable]{lp_variable()}}
 \item Contain a comparison operator, such as \code{<=},  \code{==} or \verb{=>}.
+\item If it's a nonlinear constraint, it must be written as:
+
+\code{\link[=nonlinear]{nonlinear()}}\verb{ <= number}
 }}
 }
 \value{
-The \code{.problem} with added \verb{$constraints}. (Note: previous constraints are not
-overritten).
+The \code{.problem} with added \verb{$constraints}. Previous constraints are not
+overwritten, so it's possible to call \code{\link[=lp_constraint]{lp_constraint()}} multiple times without
+overwriting previously defined constraints.
 
-A constraint with \code{dir[i] = "<="} is represented as
-\eqn{\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i}}.
+The \verb{$constraints} inherit from \code{\link[ROI:L_constraint]{ROI::L_constraint()}}, \code{\link[ROI:Q_constraint]{ROI::Q_constraint()}}
+or \code{\link[ROI:F_constraint]{ROI::F_constraint()}}.
+\itemize{
+\item Quadratic constraints are represented as
 
-The \verb{$constraints} field has the following subfields:
-\itemize{
-\item \verb{$Q} : List of quadratic coefficient matrices:
-\itemize{
-\item \code{NULL} if the constraint is linear.
-\item \code{\link[slam:matrix]{slam::simple_triplet_matrix()}} if constraint is quadratic.
-}
-\item \verb{$L} : \code{\link[slam:matrix]{slam::simple_triplet_matrix()}} of linear coefficients,
-where each row is a constraint and each is a variable.
-\item \verb{$dir} : Character vector with elements \code{"<="}, \code{"=="}, or \code{">="},
-the direction of each constraint.
-\item \verb{$rhs} : Numeric column vector representing the right hand side of each constraint.
-\item \verb{$name} : Character vector with the names of the constraints, if \code{...} is named,
-or \code{""} for unnamed constraints.
-\item \verb{$call} : Expression that defined each constraint.
+\eqn{\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i} \qquad \forall i}
+\item While nonlinear constraints are represented as
+
+\eqn{F(x)_i \le \text{rhs}_i \qquad \forall i}
 }
 }
 \description{
 Restrict the variables in an \code{\link[=lp_problem]{lp_problem()}} with linear or quadratic constraints.
 }
 \examples{
-# Ordered variable constraint
-## ordered[i] > ordered[i-1]  for all i in 2:n
+# Order Constraint ------------------------------
+## ordered[i] > ordered[i-1]  forall i in 2:n
 n <- 4
 p <- lp_problem() |>
     lp_variable(ordered[1:n], lower = 0)
@@ -68,6 +63,19 @@ for (i in 2:n) {
     )
 }
 
-## The only difference are the rownames of the constraint matrix
+## The only difference are the row names of the constraint matrix when printing
 print(pc$constraints)
+
+
+# Nonlinear Constraint --------------------------
+## log(x + 1) > y  =>  log(x + 1) - y > 0
+nlp <- lp_problem() |> 
+    lp_variable(x, lower = 0) |> 
+    lp_variable(y) |> 
+    lp_constraint(
+        # Nonlinear constraints must always be written as `nonlinear(...) <= number`
+        nl_con = nonlinear(log(x + 1) - y) > 0
+    )
+
+print(nlp$constraints)
 }

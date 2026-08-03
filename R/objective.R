@@ -185,6 +185,14 @@ empty_objective <- function() {
 #' The `$objective` inherits from [ROI::L_objective()], [ROI::Q_objective()],
 #' or [ROI::F_objective()].
 #' 
+#' - A quadratic objective function is represented as
+#' 
+#'   \eqn{\frac{1}{2} x'Qx + Lx}
+#'   
+#' - While a nonlinear objective function is simply represented as
+#' 
+#'   \eqn{F(x)}
+#' 
 #' @export
 #' @seealso [nonlinear()] For general nonlinear optimization.
 #' 

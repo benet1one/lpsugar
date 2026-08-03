@@ -18,31 +18,26 @@ lp_max(.problem, objective)
 \arguments{
 \item{.problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
 
-\item{objective}{Expression to optimize, which must evaluate to an \code{lp_variable} object.
-Alternatively, set \code{objective = 0} to make the solver find a feasible solution
-instead of optimizing, just like \code{\link[=lp_find_feasible]{lp_find_feasible()}} does.}
+\item{objective}{Expression to optimize. Can be:
+\itemize{
+\item The number 0, in which case the solver will attempt to find any feasible solution.
+\code{\link[=lp_find_feasible]{lp_find_feasible()}} serves the same purpose.
+\item A linear or quadratic expression containing decision variables.
+\item A nonlinear expression wrapped in \code{\link[=nonlinear]{nonlinear()}}.
+}}
 }
 \value{
 The \code{.problem} with the new \verb{$objective} function.
 
-If the function is linear or quadratic, \verb{$objective} has these fields:
+The \verb{$objective} inherits from \code{\link[ROI:L_objective]{ROI::L_objective()}}, \code{\link[ROI:Q_objective]{ROI::Q_objective()}},
+or \code{\link[ROI:F_objective]{ROI::F_objective()}}.
 \itemize{
-\item \verb{$Q} : Matrix with the quadratic coefficients, or \code{NULL}.
-\item \verb{$L} : Vector with the coefficients for each variable.
-\item \verb{$A} : Numeric, addend to the final value. It is not used in the solver.
-}
+\item A quadratic objective function is represented as
 
-If the function is nonlinear, \verb{$objective} has these fields:
-\itemize{
-\item \verb{$NL} : The quoted expression that defined the objective function.
-\item \verb{$fun} : Function that takes a vector \code{x} of length
-\code{n = ncol(.problem)} and evaluates \verb{$NL}.
-}
+\eqn{\frac{1}{2} x'Qx + Lx}
+\item While a nonlinear objective function is simply represented as
 
-These fields are always present:
-\itemize{
-\item \verb{$direction} : String, goal of the solver. Can be \code{"minimize"} or \code{"maximize"}.
-\item \verb{$expr} : String, expression that defined the objective function.
+\eqn{F(x)}
 }
 }
 \description{
@@ -54,6 +49,7 @@ apply \code{sum(objective)} and display a message. Suppress this message by writ
 the \code{sum} yourself.
 }
 \examples{
+# Linear Objective using an Alias ---------------
 profit   <- c(Phone = 60, Tablet = 20, eBook = 10)
 max_made <- c(Phone = 500, Tablet = 300, eBook = 950)
 product  <- names(profit)
@@ -68,13 +64,35 @@ p <- lp_problem() |>
 p$objective
 
 library(ROI.plugin.highs)
-(s <- lp_solve(p))
+s <- lp_solve(p)
+print(s)
 
 s$aliases$total_profit
-sum(p$objective$L * s$variables_vec)
+sum(c(p$objective$L) * s$variables_vec)
 
+s$aliases$total_profit - fix_cost
 s$objective
-sum(p$objective$L * s$variables_vec) + p$objective$A
+
+
+# Nonlinear objective ---------------------------
+nlp <- lp_problem() |> 
+    lp_variable(x, lower = 0) |> 
+    lp_variable(y, lower = 0) |> 
+    lp_maximize(nonlinear(sqrt(x) * log(y))) |> 
+    lp_constraint(x + y <= 10)
+
+# There are some different solvers within `nloptr`
+library(ROI.plugin.nloptr)
+lpsugar_applicable_solvers(nlp)
+
+lp_solve(
+    nlp, 
+    solver = "nloptr.cobyla", 
+    start = list(x = 1, y = 1)
+)
+
+# See more examples in the Nonlinear vignette
+# vignette("nonlinear", package = "lpsugar")
 }
 \seealso{
 \code{\link[=nonlinear]{nonlinear()}} For general nonlinear optimization.

@@ -7,26 +7,25 @@
 #' @param ... One or more linear constraints. Can be named. They must:
 #' - Contain one or more variables defined with [lp_variable()]
 #' - Contain a comparison operator, such as `<=`,  `==` or `=>`.
+#' - If it's a nonlinear constraint, it must be written as:
+#'   
+#'   [nonlinear()]` <= number`
 #'
-#' @returns The `.problem` with added `$constraints`. (Note: previous constraints are not
-#' overritten).
+#' @returns The `.problem` with added `$constraints`. Previous constraints are not
+#' overwritten, so it's possible to call [lp_constraint()] multiple times without 
+#' overwriting previously defined constraints.
 #'
-#' A constraint with `dir[i] = "<="` is represented as 
-#' \eqn{\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i}}.
+#' The `$constraints` inherit from [ROI::L_constraint()], [ROI::Q_constraint()]
+#' or [ROI::F_constraint()].
 #'
-#' The `$constraints` field has the following subfields:
-#' - `$Q` : List of quadratic coefficient matrices:
-#'   - `NULL` if the constraint is linear.
-#'   - [slam::simple_triplet_matrix()] if constraint is quadratic.
-#' - `$L` : [slam::simple_triplet_matrix()] of linear coefficients, 
-#' where each row is a constraint and each is a variable.
-#' - `$dir` : Character vector with elements `"<="`, `"=="`, or `">="`,
-#' the direction of each constraint.
-#' - `$rhs` : Numeric column vector representing the right hand side of each constraint.
-#' - `$name` : Character vector with the names of the constraints, if `...` is named,
-#' or `""` for unnamed constraints.
-#' - `$call` : Expression that defined each constraint.
-#'
+#' - Quadratic constraints are represented as
+#'   
+#'   \eqn{\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i} \qquad \forall i}
+#' 
+#' - While nonlinear constraints are represented as
+#'   
+#'   \eqn{F(x)_i \le \text{rhs}_i \qquad \forall i}
+#' 
 #' @export
 #'
 #' @example inst/examples/example_constraint.R
