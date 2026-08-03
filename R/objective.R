@@ -169,9 +169,11 @@ empty_objective <- function() {
 #' Minimize of maximize a linear or quadratic expression.
 #'
 #' @param .problem An [lp_problem()].
-#' @param objective Expression to optimize, which must evaluate to an `lp_variable` object.
-#' Alternatively, set `objective = 0` to make the solver find a feasible solution
-#' instead of optimizing, just like [lp_find_feasible()] does.
+#' @param objective Expression to optimize. Can be:
+#' - The number 0, in which case the solver will attempt to find any feasible solution.
+#' [lp_find_feasible()] serves the same purpose.
+#' - A linear or quadratic expression containing decision variables.
+#' - A nonlinear expression wrapped in [nonlinear()].
 #'
 #' @details
 #' If `objective` evaluates to a multivariate variable instead of a scalar, it will
@@ -180,15 +182,8 @@ empty_objective <- function() {
 #'
 #' @returns The `.problem` with the new `$objective` function.
 #' 
-#' If the function is linear or quadratic, `$objective` has these fields:
-#' - `$Q` : Matrix with the quadratic coefficients, or `NULL`.
-#' - `$L` : Vector with the coefficients for each variable.
-#' - `$A` : Numeric, addend to the final value. It is not used in the solver.
-#' 
-#' If the function is nonlinear, `$objective` has these fields:
-#' - `$NL` : The quoted expression that defined the objective function.
-#' - `$fun` : Function that takes a vector `x` of length
-#' `n = ncol(.problem)` and evaluates `$NL`.
+#' The `$objective` inherits from [ROI::L_objective()], [ROI::Q_objective()],
+#' or [ROI::F_objective()].
 #' 
 #' @export
 #' @seealso [nonlinear()] For general nonlinear optimization.
