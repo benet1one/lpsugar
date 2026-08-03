@@ -1,7 +1,6 @@
 
 Code
 - Check TODOs
-- Consider using $maximum and $bounds for full consistency with ROI
 - Update all documentation
 - test get_problem() in background jobs
 
