@@ -179,14 +179,14 @@ test_that("indexing constraints", {
 
     # Nonlinear ---------
     
-    nl <- q |> 
+    nlp <- q |> 
         lp_con(
             nl = nonlinear(log(x) + x) >= 5
         )
     
     expect_no_error({
-        nl$constraints["nl"]
-        nl$constraints[c("lc", "nl")]
+        nlp$constraints["nl"]
+        nlp$constraints[c("lc", "nl")]
     })
 })
 

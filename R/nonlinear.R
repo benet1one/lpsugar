@@ -18,6 +18,10 @@ nonlinear <- function(expr) {
     as_nonlinear(quo)
 }
 
+#' @rdname nonlinear
+#' @export
+nl <- nonlinear
+
 # Methods ----------------------------
 
 as_nonlinear <- function(x) {

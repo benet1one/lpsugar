@@ -2,9 +2,12 @@
 % Please edit documentation in R/nonlinear.R
 \name{nonlinear}
 \alias{nonlinear}
+\alias{nl}
 \title{Nonlinear Expression}
 \usage{
 nonlinear(expr)
+
+nl(expr)
 }
 \arguments{
 \item{expr}{(Unquoted) expression containing
