@@ -31,6 +31,8 @@ lp_problem <- function() {
     )
 }
 
+# Methods ---------------------------
+
 #' @export
 print.lp_problem <- function(x, full = FALSE, ...) {
     cat(
