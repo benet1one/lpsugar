@@ -182,3 +182,21 @@ test_that("quadratic constraint summary", {
     expect_all_true(con_sum$satisfied)
     expect_all_true(con_sum$saturated)
 })
+
+test_that("other user functions", {
+    withr::local_package("ROI.plugin.highs")
+    
+    p <- lp_problem() |> 
+        lp_var(x, lower = 2) |> 
+        lp_min(x)
+    
+    applicable <- lpsugar_applicable_solvers(p)
+    expect_true("highs" %in% applicable)
+    
+    s <- lp_solve(p, solver = "highs")
+    
+    expect_equal(
+        ROI::solution(s, "objval"),
+        2
+    )
+})

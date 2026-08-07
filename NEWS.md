@@ -5,6 +5,30 @@
 * Replaced `lp_minimize_function()` with 
 a different `nonlinear()` workflow.
 
+# lpsugar 0.25.1
+
+## New Features
+
+* `ROI::solution()` now has a method for class `<lp_solution>`
+* Cleaner constraint printing for constraints wrapped in curly brackets `{}`
+
+# lpsugar 0.25.0
+
+## Breaking Changes
+
+* Matrix Multiplication no longer drops dimensions of
+arguments
+
+## New Features
+
+* Implemented Matrix Multiplication between a quadratic
+variable and a numeric matrix
+
+## Bug Fixes
+
+* Matrix Multiplication transforms row vectors into column
+vectors
+
 # lpsugar 0.24.0
 
 ## Breaking Changes

@@ -292,6 +292,22 @@ lpsugar_available_solvers <- function(problem) {
     ROI_available_solvers(problem)
 }
 
+#' @importFrom ROI solution
+#' @export
+solution.lp_solution <- function(
+        x, 
+        type = c("primal", "dual", "aux", "psd", "msg", "objval", "status", "status_code"),
+        force = FALSE,
+        ...
+) {
+    ROI::solution(
+        x$roi_solution, 
+        type = type, 
+        force = force, 
+        ...
+    )
+}
+
 # Methods -------------------------------
 
 #' @export
