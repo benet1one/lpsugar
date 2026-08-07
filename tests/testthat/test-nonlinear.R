@@ -138,7 +138,19 @@ test_that("bad nonlinear constraints", {
     # TODO fix call in first error
     expect_error(
         p |> lp_con(nonlinear(x <= 2)),
-        "Nonlinear constraints must be of form"
+        paste(
+            "Nonlinear constraints must be of form",
+            "Instead try `nonlinear\\(x\\) <= 2",
+            sep = ".*"
+        )
+    )
+    expect_error(
+        p |> lp_con(nonlinear(x^4 + 1 >= 5*2)),
+        paste(
+            "Nonlinear constraints must be of form",
+            r"(Instead try `nonlinear\(x\^4 \+ 1\) >= 5 \* 2`)",
+            sep = ".*"
+        )
     )
     expect_error(
         p |> lp_con(3 >= nonlinear(x^3)),

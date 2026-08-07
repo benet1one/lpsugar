@@ -129,8 +129,34 @@ dimnames_non_numeric <- function(dimnames) {
 }
 
 nonlinear_constraint_form_error <- function(call = parent.frame(), ...) {
+    msg <- "Nonlinear constraints must be of form `nonlinear(...) <= number`"
+    expr <- rlang::get_expr(call)
+    
+    custom_info <- all(
+        rlang::is_call(expr, name = "nonlinear"),
+        rlang::is_call(expr[[2]], name = COMPARISON_OPS)
+    )
+    
+    if (custom_info) {
+        cmp <- expr[[2]][[1]]
+        lhs <- expr[[2]][[2]]
+        rhs <- expr[[2]][[3]]
+        
+        correct_call <- call(
+            format(cmp),
+            call("nonlinear", lhs),
+            rhs
+        )
+        
+        suggest_call <- paste0("Instead try `", format(correct_call), "`")
+        
+        if (length(suggest_call) == 1L) {
+            msg <- c(msg, ">" = suggest_call)
+        }
+    }
+    
     cli_abort(
-        "Nonlinear constraints must be of form `nonlinear(...) <= number`",
+        msg,
         class = "lpsugar_error_bad_nonlinear_constraint",
         call = call,
         ...

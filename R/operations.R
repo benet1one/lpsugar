@@ -1,4 +1,6 @@
 
+COMPARISON_OPS <- c("<", "<=", "==", ">=", ">")
+
 # Wrappers -------------------
 
 # Wrapping all operations in Ops.lp_variable
@@ -56,8 +58,7 @@ Ops.lp_variable <- function(e1, e2) {
     }
     
     # Comparison -----------------------
-    comparison_ops <- c("<", "<=", "==", ">=", ">")
-    if (op %in% comparison_ops) {
+    if (op %in% COMPARISON_OPS) {
         return(compare_lp(e1, e2, op, call))
     } 
     else if (op == "!=") {
