@@ -91,7 +91,11 @@ are_arguments_conformable <- function(x, y, drop_dim = TRUE) {
     if (length(x) > 1L && length(y) > 1L && length(x) != length(y)) {
         cnd <- rlang::error_cnd(
             class = "lpsugar_error_non_conformable",
-            message = "non-conformable arrays"
+            message = c(
+                "Length mismatch.",
+                "x" = paste( "Left hand side is length", length(x)),
+                "x" = paste("Right hand side is length", length(y))
+            )
         )
         return(structure(FALSE, cnd = cnd))
     }

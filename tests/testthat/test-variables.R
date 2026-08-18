@@ -304,8 +304,8 @@ test_that("operations", {
         "Unsupported operation"
     )
 
-    expect_error(y + z, "non-conformable")
-    expect_error(y * 1:2, "non-conformable")
+    expect_error(y + z, "Length mismatch")
+    expect_error(y * 1:2, "Length mismatch")
     expect_error(z + t(z), "non-conformable")
 
     p2 <- lp_problem() |>
