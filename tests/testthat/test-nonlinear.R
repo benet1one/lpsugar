@@ -153,6 +153,15 @@ test_that("bad nonlinear constraints", {
         )
     )
     expect_error(
+        p |> lp_con(nl(sqrt(x)) > 1:5),
+        paste(
+            "Length mismatch",
+            "Left hand side is length 3",
+            "Right hand side is length 5",
+            sep = ".*"
+        )
+    )
+    expect_error(
         p |> lp_con(3 >= nonlinear(x^3)),
         "Nonlinear constraints must be of form",
     )

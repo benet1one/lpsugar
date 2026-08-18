@@ -607,22 +607,8 @@ compare_nl <- function(x, y, op, call) {
     fun <- as.function.nonlinear(x = x, problem = problem)
     fun_out <- attr(fun, "fun_output")
     check_conformable(fun_out, y, call = call)
-    
-    rhs <- c(y)
-    
-    if (length(rhs) == 1L) {
-        rhs <- rep_len(rhs, length(fun_out))
-    }
-    else if (length(fun_out) != length(rhs)) {
-        cli_abort(
-            c("Length mismatch.",
-              "x" = "Left-hand-side is length {length(fun_out)}.",
-              "x" = "Right-hand-side is length {length(rhs)}."),
-            class = "lpsugar_error_nonlinear_constraint_length_mismatch",
-            call = call
-        )
-    }
-    
+
+    rhs <- rep_len(c(y), length(fun_out))
     dir <- rep(op, length(rhs))
     
     roi_con <- ROI::F_constraint(
