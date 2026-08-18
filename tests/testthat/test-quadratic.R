@@ -192,7 +192,9 @@ test_that("quadratic matrix multiplication", {
         lp_alias(
             a = t(y) %*% x,
             b = (x*sum(y)) %*% c(2, 3),
-            c = t(c(1, 3, 4)) %*% x^2
+            c = t(c(1, 3, 4)) %*% x^2,
+            d1 = y %*% t(y),
+            d2 = t(y) %*% y,
         )
     
     xval <- matrix(runif(6), 3, 2)
@@ -210,6 +212,15 @@ test_that("quadratic matrix multiplication", {
     expect_equal(
         computed$c,
         t(c(1, 3, 4)) %*% xval^2
+    )
+    expect_equal(
+        computed$d1,
+        yval %*% t(yval)
+    )
+    expect_equal(
+        computed$d2,
+        t(yval) %*% yval,
+        ignore_attr = TRUE
     )
     expect_error(
         p |> lp_eval(t(y^2) %*% x),
