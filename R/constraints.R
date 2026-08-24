@@ -418,7 +418,7 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 }
 
 #' @export 
-print.empty_lp_constraint <- function(x, ...) {
+print.lp_empty_constraint <- function(x, ...) {
     cat("No constraints have been defined.")
     invisible(x)
 }

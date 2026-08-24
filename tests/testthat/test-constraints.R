@@ -41,6 +41,14 @@ test_that("printing", {
         print(p_wrapped$constraints, full = FALSE),
         "x > 0"
     )
+    expect_output(
+        lp_problem() |> lp_var(x) |> lp_min(x) |> _$constraints |> print(),
+        "No constraints have been defined."
+    )
+    expect_error(
+        lp_problem() |> lp_var(x) |> lp_con(x^2 > 1) |> _$constraints |> as.matrix(),
+        "`x` is <Q_constraint>"
+    )
 })
 
 test_that("constraint updates", {
