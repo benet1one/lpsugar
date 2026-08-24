@@ -43,17 +43,17 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
     
     value <- rlang::eval_tidy(quosure, data = data)
     
-    if (!is_lp_variable(value)) {
-        cli_abort(
-            "Alias `{name}` did not evaluate to a variable.", 
-            class = "lpsugar_error_alias_not_a_variable",
-            call = parent.frame()
-        )
-    }
     if (is_nonlinear(value)) {
         cli_abort(
             "Aliases cannot be `nonlinear()`",
             class = "lpsugar_error_nonlinear_alias",
+            call = parent.frame()
+        )
+    }
+    if (!is_lp_variable(value)) {
+        cli_abort(
+            "Alias `{name}` did not evaluate to a variable.", 
+            class = "lpsugar_error_alias_not_a_variable",
             call = parent.frame()
         )
     }
