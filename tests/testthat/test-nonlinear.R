@@ -71,8 +71,8 @@ test_that("nonlinear constraints", {
         lp_var(z[1:3]) |> 
         lp_min(x^2) |> 
         lp_con(
-            nonlinear(x/y) >= 1,
-            nonlinear(z^3) <= 100
+            c1 = nonlinear(x/y) >= 1,
+            c2 = nonlinear(z^3) <= 100
         )
     
     start <- list(x = 6, y = 2, z = 1:3)
@@ -97,6 +97,11 @@ test_that("nonlinear constraints", {
     expect_equal(
         cs$lhs,
         c(6/2, (1:3)^3)
+    )
+    
+    expect_error(
+        p |> lp_delete_constraint("c1"),
+        "Cannot index or delete nonlinear constraints."
     )
 })
 

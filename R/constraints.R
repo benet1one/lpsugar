@@ -393,8 +393,11 @@ head.lp_constraint <- function(x, n = 6L, ...) {
         attr(x, "n_Q_constraints") <- length(x$dir)
     }
     else if (inherits(x, "F_constraint")) {
-        x$F <- x$F[i]
-        attr(x, "n_F_constraints") <- length(x$dir)
+        # TODO find a way?
+        cli_abort(
+            "Cannot index or delete nonlinear constraints.",
+            class = "lpsugar_error_index_nonlinear_constraints"
+        )
     }
     else {
         cli_abort(
