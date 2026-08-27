@@ -16,6 +16,7 @@ reference:
   - starts_with("lp_")
   - lp_solve
 - title: Nonlinear objective and constraints
+  contents:
   - nonlinear
 - title: Utilities
   contents:
