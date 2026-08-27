@@ -7,52 +7,60 @@
 #' @param ... One or more linear constraints. Can be named. They must:
 #' - Contain one or more variables defined with [lp_variable()]
 #' - Contain a comparison operator, such as `<=`,  `==` or `=>`.
+#' - If it's a nonlinear constraint, it must be written as:
+#'   
+#'   [nonlinear()]` <= number`
 #'
-#' @returns The `.problem` with added `$constraints`. (Note: previous constraints are not
-#' overritten).
+#' @returns The `.problem` with added `$constraints`. Previous constraints are not
+#' overwritten, so it's possible to call [lp_constraint()] multiple times without 
+#' overwriting previously defined constraints.
 #'
-#' A constraint with `dir[i] = "<="` is represented as 
-#' \eqn{\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i}}.
+#' The `$constraints` inherit from [ROI::L_constraint()], [ROI::Q_constraint()]
+#' or [ROI::F_constraint()].
 #'
-#' The `$constraints` field has the following subfields:
-#' - `$Q` : List of quadratic coefficient matrices:
-#'   - `NULL` if the constraint is linear.
-#'   - [slam::simple_triplet_matrix()] if constraint is quadratic.
-#' - `$L` : [slam::simple_triplet_matrix()] of linear coefficients, 
-#' where each row is a constraint and each is a variable.
-#' - `$dir` : Character vector with elements `"<="`, `"=="`, or `">="`,
-#' the direction of each constraint.
-#' - `$rhs` : Numeric column vector representing the right hand side of each constraint.
-#' - `$name` : Character vector with the names of the constraints, if `...` is named,
-#' or `""` for unnamed constraints.
-#' - `$call` : Expression that defined each constraint.
-#'
+#' - Quadratic constraints are represented as
+#'   
+#'   \eqn{\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i} \qquad \forall i}
+#' 
+#' - While nonlinear constraints are represented as
+#'   
+#'   \eqn{F(x)_i \le \text{rhs}_i \qquad \forall i}
+#' 
 #' @export
 #'
 #' @example inst/examples/example_constraint.R
 lp_constraint <- function(.problem, ...) {
     check_problem(.problem)
-    data <- data_mask(.problem)
     quos <- rlang::enquos(...)
     nams <- rlang::names2(quos)
-    varnames <- c(names(.problem$variables), names(.problem$aliases))
+    data <- data_mask(.problem)
+    varnames <- c(
+        names(.problem$variables), 
+        names(.problem$aliases)
+    )
     
     cons <- list()
     
     for (i in seq_along(quos)) {
         cons[[i]] <- lp_constraint_internal(
             quosure = quos[[i]],
-            name = nams[i],
+            id = nams[i],
             data = data,
-            varnames = varnames
+            varnames = varnames,
+            problem = .problem
         )
     }
-
+    
     .problem$constraints <- bind_cons(.problem$constraints, !!!cons)
+    
+    if (length(.problem$constraints) == 0L) {
+        .problem$constraints <- empty_constraint(n = ncol(.problem))
+    }
+    
     return(.problem)
 }
 
-lp_constraint_internal <- function(quosure, name, data, varnames) {
+lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
     expr <- rlang::quo_get_expr(quosure)
     vars <- all.vars(expr)
     
@@ -65,40 +73,50 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
     }
     
     cons <- eval_split_for(quosure, data = data)
-    inds <- rlang::names2(cons)
+    expr <- format1(quosure)
+    ids <- rlang::names2(cons)
+    
+    indices <- ifelse(
+        ids != "", 
+        paste0(id, "[", ids, "]"),
+        id
+    )
     
     for (i in seq_along(cons)) {
-        con <- cons[[i]]
-        ind_str <- inds[i]
-        
-        if (is.null(con)) {
+        if (is.null(cons[[i]])) {
             next
         }
         
-        name_ind <- if (ind_str == "") {
-            name
-        } 
-        else {
-            paste0(name, "[", ind_str, "]")
+        if (inherits(cons[[i]], "nonlinear")) {
+            nonlinear_constraint_form_error(call = quosure)
         }
-        
-        if (!is_lp_constraint(con)) {
+        if (!is_lp_constraint(cons[[i]])) {
             msg <- c(
                 "Expression did not evaluate to a constraint.",
-                "x" = "Problematic constraint: '{name_ind}'.",
+                "x" = "Problematic constraint: '{indices[i]}'.",
                 ">" = "Did you forget the comparison operator? `<=/==/>=`"
             )
             
             cli_abort(msg, call = quosure, class = "lpsugar_error_no_constraint")
         }
         
-        rownames(cons[[i]]$L) <- rep_len(name_ind, length(con))
+        info <- lpsugar_attributes(cons[[i]])
+        info$id[] <- id
+        info$expr[] <- expr
+        info$index[] <- indices[i]
+        lpsugar_attributes(cons[[i]]) <- info
+        
+        if (!is.null(cons[[i]]$L)) {
+            rownames(cons[[i]]$L) <- info$index
+        }
     }
     
-    cons <- bind_cons(!!!cons)
-    cons$name[] <- name
-    cons$call[] <- format1(expr)
-    return(cons)
+    if (length(cons) != 1L) {
+        bind_cons(!!!cons)
+    }
+    else {
+        cons[[1]]
+    }
 }
 
 #' Delete Constraints
@@ -128,24 +146,28 @@ lp_constraint_internal <- function(quosure, name, data, varnames) {
 lp_delete_constraint <- function(.problem, names) {
     check_problem(.problem)
     stopifnot(is.character(names))
+    info <- lpsugar_attributes(.problem$constraints)
     
-    if (any(names == "") || any(names == "<unnamed>")) {
-        cli_warn("Cannot delete unnamed constraints.")
-        names <- names[names != "" & names != "<unnamed>"]
+    if (any(names == "") || any(names == "#unnamed_constraint")) {
+        cli_abort(
+            "Cannot delete unnamed constraints.",
+            class = "lpsugar_error_delete_unnamed_constraints"
+        )
     }
     
-    not_defined <- which(!(names %in% .problem$constraint$name))
+    undefined <- setdiff(names, info$id)
     
-    if (length(not_defined) > 0L) {
-        not_defined <- names[not_defined] |>
-            utils::head(6) |>
-            dQuote(q = FALSE) |>
-            paste(collapse = ", ")
+    if (length(undefined) > 0L) {
+        cli_warn(
+            c("Cannot delete constraints that haven't been defined.",
+              "x" = "Ignoring constraints: {.str {undefined}}"),
+            class = "lpsugar_warning_delete_undefined_constraints"
+        )
         
-        cli_warn("The following constraints are not defined: \n{not_defined}")
+        names <- intersect(names, info$id)
     }
     
-    to_delete <- .problem$constraints$name %in% names
+    to_delete <- info$id %in% names
     .problem$constraints <- .problem$constraints[!to_delete]
     return(.problem)
 }
@@ -162,32 +184,54 @@ lp_subject_to <- lp_constraint
 
 # Utils --------------------
 
+new_constraint <- function(roi_constraint, call) {
+    n <- length(roi_constraint$rhs)
+    
+    structure(
+        roi_constraint,
+        class = c("lp_constraint", class(roi_constraint)),
+        lpsugar_attributes = list(
+            id = character(n),
+            index = character(n),
+            expr = rep_len(format1(call), n)
+        )
+    )
+}
+
+empty_constraint <- function(n = 0) {
+    roi_constraint <- ROI::NO_constraint(n)
+    
+    structure(
+        roi_constraint,
+        class = c("lp_empty_constraint", "lp_constraint", class(roi_constraint)),
+        lpsugar_attributes = list(
+            id = character(0),
+            index = character(0),
+            expr = character(0)
+        )
+    )
+}
+
 update_constraints <- function(.problem) {
     if (length(.problem$constraints) == 0L) {
-        return(.problem)
+        .problem$constraints <- empty_constraint(ncol(.problem))
     }
     
+    varnames <- variable.names(.problem)
     q_ind <- which(lengths(.problem$constraints$Q) > 0L)
     
     for (i in q_ind) {
         .problem$constraints$Q[[i]]$nrow[] <- ncol(.problem)
         .problem$constraints$Q[[i]]$ncol[] <- ncol(.problem)
-        .problem$constraints$Q[[i]]$dimnames <- list(
-            attr(.problem, "varnames"),
-            attr(.problem, "varnames")
-        )
+        .problem$constraints$Q[[i]]$dimnames <- list(varnames, varnames)
     }
     
+    
     .problem$constraints$L$ncol[] <- ncol(.problem)
-    colnames(.problem$constraints$L) <- attr(.problem, "varnames")
+    colnames(.problem$constraints$L) <- varnames
+    .problem$constraints$names <- varnames
+    
     .problem
-}
-
-empty_constraint <- function() {
-    structure(
-        list(),
-        class = c("lp_empty_constraint", "lp_constraint")
-    )
 }
 
 #' Define Multiple Constraints at Once
@@ -199,16 +243,13 @@ empty_constraint <- function() {
 #' @export
 #' @example inst/examples/example_bind_cons.R
 bind_cons <- function(...) {
-    call <- environment()
-    
     dots <- rlang::dots_list(...)
     dots <- dots[lengths(dots) > 0]
     dots <- purrr::keep(dots, function(d) {
         if (!is_lp_constraint(d)) {
             cli_abort(
                 "`bind_cons()` can only bind <lp_constraint>, not <{class(d)[1]}>.",
-                class = "lpsugar_error_bind_non_constraint",
-                call = call
+                class = "lpsugar_error_bind_non_constraint"
             )
         }
         
@@ -216,37 +257,31 @@ bind_cons <- function(...) {
     })
     
     if (length(dots) == 0L) {
-        return(empty_constraint())
+        return(empty_constraint(0))
     }
     
-    out <- purrr::list_transpose(dots, simplify = FALSE)
+    roi_binder <- get("rbind.constraint", pos = getNamespace("ROI"))
+    out <- rlang::exec(roi_binder, !!!dots)
+    class(out) <- c("lp_constraint", class(out)) |> unique()
     
-    out$Q <- unlist(out$Q, recursive = FALSE)
-    out$L <- do.call(what = rbind, out$L)
-    out$rhs <- do.call(what = rbind, out$rhs) |> robust_index()
-    out$dir <- unlist(out$dir)
-    out$call <- unlist(out$call)
-    out$name <- unlist(out$name)
+    lpsugar_attributes(out) <- purrr::map(dots, lpsugar_attributes) |> 
+        purrr::list_transpose(simplify = FALSE) |> 
+        purrr::map(\(x) unlist(x, use.names = FALSE))
+
+    return(out)
+}
+
+roi_constraint_class <- function(con) {
+    out <- grepv(class(con), pattern = "^[A-Z]_constraint$")[1]
     
-    structure(out, class = "lp_constraint")
+    if (length(out) == 0) {
+        class(con)[1]
+    } else {
+        out
+    }
 }
 
 # Methods ----------------------
-
-#' @export
-rbind.lp_constraint <- function(..., deparse.level = 1) {
-    warn_changed_args(deparse.level = 1)
-    bind_cons(...)
-}
-
-#' @export
-as.matrix.lp_constraint <- function(x, ...) {
-    cbind(as.matrix(x$L), dir = x$dir, rhs = x$rhs)
-}
-#' @export
-as.array.lp_constraint <- function(x, ...) {
-    as.matrix.lp_constraint(x)
-}
 
 #' @export
 length.lp_constraint <- function(x) {
@@ -258,13 +293,44 @@ length.lp_empty_constraint <- function(x) {
 }
 #' @export
 dim.lp_constraint <- function(x) {
-    c(length(x$dir), NA)
+    c(
+        length(x), 
+        attr(x, "n_obj") %||% length(x$names)
+    )
+}
+
+#' @export
+rbind.lp_constraint <- function(..., deparse.level = 1) {
+    warn_changed_args(deparse.level = 1)
+    bind_cons(...)
+}
+
+#' @export
+as.matrix.lp_constraint <- function(x, ...) {
+    acceptable <- any(
+        inherits(x, "L_constraint"),
+        inherits(x, "Q_constraint") && !is_quadratic(x)
+    )
+    
+    if (!acceptable) {
+        cli_abort(
+            c("Can only convert linear constraints into matrices.",
+              "x" = "`x` is <{roi_constraint_class(x)}>"),
+            class = "lpsugar_error_as_matrix_constraint_not_linear"
+        )
+    }
+    
+    cbind(as.matrix(x$L), dir = x$dir, rhs = x$rhs)
+}
+#' @export
+as.array.lp_constraint <- function(x, ...) {
+    as.matrix.lp_constraint(x)
 }
 #' @export
 dimnames.lp_constraint <- function(x) {
-    list(rownames(x$L), NA)
+    info <- lpsugar_attributes(x)
+    list(info$index, NULL)
 }
-
 #' @export
 head.lp_constraint <- function(x, n = 6L, ...) {
     rlang::check_dots_empty()
@@ -276,6 +342,13 @@ head.lp_constraint <- function(x, n = 6L, ...) {
 `[.lp_constraint` <- function(x, ..., drop = FALSE) {
     warn_changed_args(drop = FALSE)
     dots <- rlang::dots_list(..., .preserve_empty = TRUE, .ignore_empty = "none")
+    
+    if (is_empty_constraint(x)) {
+        cli_abort(
+            "Cannot index an empty constraint.",
+            class = "lpsugar_error_index_empty_constraint"
+        )
+    }
     
     wrong_index <-
         length(dots) == 0L ||
@@ -291,66 +364,112 @@ head.lp_constraint <- function(x, n = 6L, ...) {
     }
     
     i <- dots[[1L]]
+    info <- lpsugar_attributes(x)
     
     if (is.character(i)) {
-        i <- x$name %in% i
+        undefined <- setdiff(i, info$id)
+        
+        if (length(undefined) > 0L) {
+            cli_abort(
+                c("Cannot index constraints that haven't been defined.",
+                  "x" = "Undefined constraints: {.str {undefined}}"),
+                class = "lpsugar_error_undefined_constraint"
+            )
+        }
+        
+        i <- info$id %in% i
     }
     
-    x$Q <- x$Q[i]
-    x$L <- x$L[i, ]
-    x$rhs <- x$rhs[i, ]
+    x$rhs <- x$rhs[i]
     x$dir <- x$dir[i]
-    x$call <- x$call[i]
-    x$name <- x$name[i]
     
-    return(x)
+    if (inherits(x, "L_constraint")) {
+        x$L <- x$L[i, ]
+        attr(x, "n_L_constraints") <- length(x$dir)
+    }
+    else if (inherits(x, "Q_constraint")) {
+        x$Q <- x$Q[i]
+        x$L <- x$L[i, ]
+        attr(x, "n_Q_constraints") <- length(x$dir)
+    }
+    else if (inherits(x, "F_constraint")) {
+        # TODO find a way?
+        cli_abort(
+            "Cannot index or delete nonlinear constraints.",
+            class = "lpsugar_error_index_nonlinear_constraints"
+        )
+    }
+    else {
+        cli_abort(
+            "Unsupported constraint class <{roi_constraint_class(x)}>.",
+            class = "lpsugar_error_unsupported_constraint_class"
+        )
+    }
+    
+    info$id <- info$id[i]
+    info$index <- info$index[i]
+    info$expr <- info$expr[i]
+    
+    lpsugar_attributes(x) <- info
+    
+    if (length(x) == 0L) {
+        return(empty_constraint(ncol(x)))
+    }
+    else {
+        return(x)
+    }
+}
+
+#' @export 
+print.lp_empty_constraint <- function(x, ...) {
+    cat("No constraints have been defined.")
+    invisible(x)
 }
 
 #' @export
-print.lp_constraint <- function(x, compact = FALSE, ...) {
-    stopifnot(rlang::is_bool(compact))
+print.lp_constraint <- function(x, full = TRUE, ...) {
+    NextMethod()
+    cat("\n")
     
-    pairs <- cbind(x$name, x$call) |>
-        unique(MARGIN = 1L)
+    info <- lpsugar_attributes(x)
     
-    if (!compact && ncol(x$L) > 200L) {
-        cat("\n")
-        cli_inform("Problem has over 200 variables, printing with `compact = TRUE`.")
-        compact <- TRUE
+    conditions_for_full <- all(
+        inherits(x, "L_constraint") || inherits(x, "Q_constraint"),
+        ncol(x$L) <= 20
+    )
+    
+    if (!conditions_for_full) {
+        full <- FALSE
     }
     
-    for (i in seq_len(nrow(pairs))) {
-        name <- pairs[i, 1]
-        call <- pairs[i, 2]
+    pairs <- data.frame(id = info$id, expr = info$expr) |> 
+        unique()
+    
+    grey_bar <- cli::col_grey("| ")
+    
+    if (nrow(pairs) > 0L) for (i in 1:nrow(pairs)) {
+        id <- pairs$id[i]
+        expr <- pairs$expr[i]
+        where <- info$id == id & info$expr == expr
+        n <- sum(where)
         
-        name_str <- if (name == "") {
-            "<unnamed>"
-        } 
-        else {
-            name
+        if (id == "") {
+            id <- "#unnamed_constraint"
         }
-        
-        if (compact) {
-            name_str <- format(name_str, width = 12L)
-        }
-        
-        ind <- x$name == name & x$call == call
-        quad <- is_quadratic(x[ind])
-        n <- sum(ind)
         
         cat(
-            "\n",
-            name_str,
-            " | n = ", n,
-            if (quad) " | quadratic",
-            " | ", call,
+            id, "\n",
+            grey_bar, expr, "\n",
+            grey_bar, "Rows = ", n, "\n\n",
             sep = ""
         )
         
-        if (!compact && !quad) {
-            cat("\n\n")
-            mc <- x[ind] |> as.matrix.lp_constraint()
-            print(mc, quote = FALSE)
+        is_q <- is_quadratic(x[where])
+        
+        if (full && !is_q) {
+            mat <- as.matrix.lp_constraint(x[where])
+            rownames(mat) <- paste0("  ", rownames(mat))
+            print(mat, quote = FALSE)
             cat("\n")
         }
     }

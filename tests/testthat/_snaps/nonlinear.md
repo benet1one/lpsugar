@@ -3,7 +3,7 @@
     Code
       p$objective
     Output
-      minimize nonlinear function:
-      my_fun
+      nonlinear function:
+      x^3/y["b"] + z
       
 

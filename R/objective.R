@@ -1,63 +1,89 @@
 
+# Internal -------------------------------
+
 # Main function, called by lp_minimize() and lp_maximize()
 lp_objective <- function(.problem, objective) {
     quosure <- rlang::enquo(objective)
-    expr <- rlang::as_label(quosure)
     objective <- rlang::eval_tidy(quosure, data = data_mask(.problem))
     
     if (is.numeric(objective) && length(objective) == 1L && objective == 0) {
-        .problem$objective <- new_objective(
-            .problem,
-            type = "feasible",
-            L = NULL,
-            A = 0,
-            expr = ""
-        )
-        
-        return(.problem)
+        .problem$objective <- objective_feasible(.problem)
     }
-    
-    if (!is_lp_variable(objective)) {
+    else if (is_nonlinear(objective)) {
+        .problem$objective <- objective_nonlinear(.problem, objective)
+    } 
+    else if (is_lp_variable(objective)) {
+        expr <- rlang::get_expr(quosure) |> rlang::as_label()
+        .problem$objective <- objective_quadratic(.problem, objective, expr = expr)
+    }
+    else {
         cli_abort(
-            c("`objective` must be an expression containing variables.",
-              "i" = "Alternatively, use `lp_minimize(0)` to set all coeficients to 0."),
-            class = "lpsugar_error_bad_objective"
+            c("`objective` must be one of",
+              ">" = "The number 0, to find any feasible solution.",
+              ">" = "An expression containing variables.",
+              ">" = "A call to `nonlinear()`",
+              "x" = "Instead found {.type {objective}}."),
+            call = parent.frame()
         )
     }
+
+    return(.problem)
+}
+
+objective_feasible <- function(.problem) {
+    new_quadratic_objective(
+        .problem,
+        type = "feasible"
+    )
+}
+
+objective_nonlinear <- function(.problem, objective) {
+    new_nonlinear_objective(
+        .problem,
+        type = "nonlinear",
+        NL = objective,
+        expr = rlang::as_label(objective)
+    )
+}
+
+objective_quadratic <- function(.problem, objective, expr = "") {
     if (length(objective) == 0L) {
         cli_abort(
             "`objective` evaluated to a variable of length 0.",
-            class = "lpsugar_error_bad_objective"
+            class = "lpsugar_error_bad_objective",
+            call = parent.frame(2)
         )
     }
     if (length(objective) > 1L) {
         objective <- sum(objective)
         cli_inform(
             "Summing variables in objective. Write `sum({expr})` to suppress this message.",
-            call = parent.frame()
+            call = parent.frame(2)
         )
         expr <- paste0("sum(", expr, ")")
     }
     
-    .problem$objective <- new_objective(
+    if (is_quadratic(objective)) {
+        type <- "quadratic" 
+    } 
+    else {
+        type <- "linear"
+    }
+ 
+    new_quadratic_objective(
         .problem,
-        type = if (is_quadratic(objective)) "quadratic" else "linear",
+        type = type,
         Q = objective$Q[[1]],
         L = unclass(objective$L),
         A = unclass(objective$A),
         expr = expr
     )
-    
-    return(.problem)
 }
 
+# Constructors -----------------------------
+
 # lp_objective object constructor for quadratic and linear objectives
-new_objective <- function(.problem, type, direction = NULL, 
-                          Q = NULL, L = NULL, A = NULL, expr = "") {
-    if (is.null(direction)) {
-        direction <- .problem$objective$direction
-    }
-    
+new_quadratic_objective <- function(.problem, type, Q = NULL, L = NULL, A = NULL, expr = "") {
     if (!is.null(Q)) {
         Q <- slam::as.simple_triplet_matrix(Q)
         Q$dimnames <- list(
@@ -81,14 +107,59 @@ new_objective <- function(.problem, type, direction = NULL,
         A <- drop(A)
     }
     
-    list(
-        type = type,
-        direction = direction,
-        Q = Q,
-        L = L,
+    out <- if (is.null(Q)) {
+        ROI::L_objective(L = L)
+    }
+    else {
+        ROI::Q_objective(Q = Q, L = L)
+    }
+
+    out$names <- attr(.problem, "varnames")
+    class(out) <- c("lp_objective", class(out))
+    
+    lpsugar_attributes(out) <- list(
         A = A,
+        type = type,
         expr = expr
-    ) |> structure(class = "lp_objective")
+    )
+
+    out
+}
+
+new_nonlinear_objective <- function(.problem, type, NL, expr = "") {
+    fun <- as.function.nonlinear(NL, .problem)
+    fun_out <- attr(fun, "fun_output")
+    
+    if (length(fun_out) != 1L) {
+        cli_abort(
+            c("Nonlinear objective function must return a scalar.",
+              "x" = "Instead returns a length {length(fun_out)} vector."),
+            class = "lpsugar_error_objective_not_scalar",
+            call = parent.frame(3)
+        )
+    }
+    
+    out <- ROI::F_objective(fun, n = ncol(.problem))
+    class(out) <- c("lp_objective", class(out))
+    
+    lpsugar_attributes(out) <- list(
+        A = 0,
+        type = "nonlinear",
+        expr = expr
+    )
+
+    out
+}
+
+empty_objective <- function() {
+    structure(
+        list(),
+        class = c("lp_empty_objective", "lp_objective"),
+        lpsugar_attributes = list(
+            type = "undefined",
+            expr = ""
+        )
+    )
 }
 
 # User -------------------------------
@@ -98,36 +169,45 @@ new_objective <- function(.problem, type, direction = NULL,
 #' Minimize of maximize a linear or quadratic expression.
 #'
 #' @param .problem An [lp_problem()].
-#' @param objective Expression to optimize, which must evaluate to an `lp_variable` object.
-#' Alternatively, set `objective = 0` to make the solver find a feasible solution
-#' instead of optimizing, just like [lp_find_feasible()] does.
+#' @param objective Expression to optimize. Can be:
+#' - The number 0, in which case the solver will attempt to find any feasible solution.
+#' [lp_find_feasible()] serves the same purpose.
+#' - A linear or quadratic expression containing decision variables.
+#' - A nonlinear expression wrapped in [nonlinear()].
 #'
 #' @details
 #' If `objective` evaluates to a multivariate variable instead of a scalar, it will
 #' apply `sum(objective)` and display a message. Suppress this message by writing
 #' the `sum` yourself.
 #'
-#' @returns The `.problem` with the new `$objective` function, a list with these fields:
-#' - `$Q` : If objective function is quadratic, matrix with the quadratic coefficients.
-#' - `$L` : Vector with the coefficients for each variable.
-#' - `$A` : Numeric, addend to the final value. It is not used in the solver.
-#' - `$direction` : String, goal of the solver. Can be `"minimize"` or `"maximize"`.
-#' - `$expr` : String, expression that defined the objective function.
+#' @returns The `.problem` with the new `$objective` function.
+#' 
+#' The `$objective` inherits from [ROI::L_objective()], [ROI::Q_objective()],
+#' or [ROI::F_objective()].
+#' 
+#' - A quadratic objective function is represented as
+#' 
+#'   \eqn{\frac{1}{2} x'Qx + Lx}
+#'   
+#' - While a nonlinear objective function is simply represented as
+#' 
+#'   \eqn{F(x)}
+#' 
 #' @export
-#' @seealso [lp_minimize_function()] For general nonlinear optimization.
+#' @seealso [nonlinear()] For general nonlinear optimization.
 #' 
 #' @rdname lp_objective
 #' @example inst/examples/example_objective.R
 lp_minimize <- function(.problem, objective) {
     check_problem(.problem)
-    .problem$objective$direction <- "minimize"
+    .problem$maximum <- FALSE
     lp_objective(.problem, {{ objective }})
 }
 #' @rdname lp_objective
 #' @export
 lp_maximize <- function(.problem, objective) {
     check_problem(.problem)
-    .problem$objective$direction <- "maximize"
+    .problem$maximum <- TRUE
     lp_objective(.problem, {{ objective }})
 }
 
@@ -144,19 +224,21 @@ lp_max <- lp_maximize
 
 #' @export
 print.lp_objective <- function(x, ...) {
-    if (x$type == "undefined") {
+    info <- lpsugar_attributes(x)
+    
+    if (info$type == "undefined") {
         cat("no objective function\n\n")
         return(invisible(x))
     }
     
-    if (x$type == "feasible") {
+    if (info$type == "feasible") {
         cat("find a feasible solution\n\n")
         return(invisible(x))
     }
     
     cat(
-        x$direction, " ", x$type, " function:\n",
-        x$expr, "\n\n", 
+        info$type, " function:\n",
+        info$expr, "\n\n", 
         sep = ""
     )
     invisible(x)
@@ -166,42 +248,29 @@ print.lp_objective <- function(x, ...) {
 
 # Adds zeros to Q and L coefficients when a variable is added to the problem
 update_objective <- function(.problem) {
-    if (.problem$objective$type == "undefined") {
+    info <- lpsugar_attributes(.problem$objective)
+    
+    if (info$type == "undefined") {
         return(.problem)
-    } 
-    else if (.problem$objective$type == "nonlinear") {
-        cli_abort(
-            c("Cannot add a variable to a nonlinear problem.",
-              ">" = paste(
-                  "Add the variable before using", 
-                  "`lp_minimize_function()` or `lp_maximize_function()`"
-              ),
-              ">" = paste(
-                  "Or reset the objective function with `lp_minimize(0)`",
-                  "before adding the variable"
-              )
-            ),
-            class = "lpsugar_error_nonlinear_add_variable"
-        )
     }
     
-    n_before <- length(.problem$objective$L)
+    varnames <- variable.names(.problem)
+    n_before <- ncol(.problem$objective$L)
     n_after <- ncol(.problem)
     
     if (is_quadratic(.problem$objective)) {
         .problem$objective$Q$nrow <- n_after
         .problem$objective$Q$ncol <- n_after
-        .problem$objective$Q$dimnames <- list(
-            attr(.problem, "varnames"),
-            attr(.problem, "varnames")
-        )
+        .problem$objective$Q$dimnames <- list(varnames, varnames)
     }
-    
-    .problem$objective$L <- c(
+
+    .problem$objective$L <- cbind(
         .problem$objective$L,
-        numeric(n_after - n_before)
+        matrix(0, nrow = 1, ncol = n_after - n_before)
     )
     
-    names(.problem$objective$L) <- attr(.problem, "varnames")
+    colnames(.problem$objective$L) <- varnames
+    .problem$objective$names <- varnames
+    
     return(.problem)
 }

@@ -57,15 +57,22 @@ lp_variable <- function(.problem, definition,
                         lower = -Inf, upper = +Inf) {
     
     check_problem(.problem)
+    
+    if (is_nonlinear(.problem)) {
+        cli_abort(
+            c("Cannot add variables to a nonlinear problem.",
+              ">" = "Define all variables before the objective and the constraints"),
+            class = "lpsugar_error_add_variables_to_nonlinear"
+        )
+    }
+    
     if (missing(definition)) {
         cli_abort("Argument `definition` is missing, with no default.")
     }
     
     def <- parse_variable_definition({{ definition }})
-    
     name <- def$name
     sets <- def$sets
-    dnames <- dimnames_non_numeric(sets)
     
     if (name %in% names(.problem$variables)) {
         cli_abort("Variable `{name}` already exists in this problem.")
@@ -103,17 +110,11 @@ lp_variable <- function(.problem, definition,
         lower = lower,
         upper = upper
     )
-    
-    # Index array of variable.
-    # Indicates which objective coefficients correspond to this variable.
-    if (def$scalar) {
-        ind <- ncol(.problem) + 1L
-        ind <- robust_index(ind)
-    } 
-    else {
-        ind <- array(dim = lengths(sets), dimnames = dnames) |> robust_index()
-        ind[] <- seq_along(ind) + ncol(.problem)
-    }
+
+    ind <- variable_indices(
+        old_n = ncol(.problem), 
+        definition = def
+    )
     
     attr(.problem, "n_variables") <- max(ind)
     attr(.problem, "varnames") <- c(
@@ -622,13 +623,12 @@ parse_variable_definition <- function(definition) {
         
         sets_names <- rlang::names2(sets_exprs)
         unnamed <- sets_names == ""
+        sets_names[unnamed] <- sets_exprs[unnamed] |> sapply(format1)
         
         for (s in sets_exprs) if (rlang::is_missing(s)) {
             cli_abort("Sets in `{name}[...]` cannot be missing.", call = parent.frame())
         }
         
-        sets_names[unnamed] <- sets_exprs[unnamed] |> 
-            sapply(format1)
         sets <- sets_exprs |>
             lapply(eval, envir = env) |>
             rlang::set_names(sets_names)
@@ -739,6 +739,23 @@ check_consistent_bounds <- function(lower, upper, call = parent.frame()) {
             class = err_class
         )
     }
+}
+
+# Index array of variable.
+# Indicates which objective coefficients correspond to this variable.
+variable_indices <- function(old_n, definition) {
+    if (definition$scalar) {
+        ind <- old_n + 1L
+    } 
+    else {
+        ind <- array(
+            dim = lengths(definition$sets),
+            dimnames = dimnames_non_numeric(definition$sets)
+        )
+        ind[] <- seq_along(ind) + old_n
+    }
+    
+    robust_index(ind)
 }
 
 # Gives the colnames of $L

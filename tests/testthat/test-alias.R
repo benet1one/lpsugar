@@ -36,4 +36,8 @@ test_that("alias", {
         p |> lp_alias(y = 1:3),
         "Alias `y` did not evaluate to a variable"
     )
+    expect_error(
+        p |> lp_alias(z = nonlinear(x[1,1]^3)),
+        "cannot be `nonlinear"
+    )
 })

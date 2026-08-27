@@ -39,7 +39,7 @@ format1 <- function(x, ...) {
     if (!rlang::is_symbolic(x) || rlang::is_missing(x)) {
         return(rlang::as_label(x))
     }
-    
+
     x <- inside_expr(x)
     y <- format(x, ...)
     
@@ -75,7 +75,7 @@ ndim <- function(x, drop = FALSE) {
 
 # Returns FALSE if dimensions are incompatible
 # and a condition
-compatible_dimensions <- function(x, y, drop_dim = TRUE) {
+are_arguments_conformable <- function(x, y, drop_dim = TRUE) {
     if (is_lp_variable(x)) {
         x <- x$ind
     }
@@ -110,6 +110,16 @@ compatible_dimensions <- function(x, y, drop_dim = TRUE) {
         return(TRUE)
     }
 }
+check_conformable <- function(x, y, drop_dim = TRUE, call) {
+    conformable <- are_arguments_conformable(x, y)
+    
+    if (conformable) {
+        return()
+    }
+    
+    why <- attr(conformable, "cnd")
+    cli_abort(why$message, call = call)
+}
 
 dimnames_non_numeric <- function(dimnames) {
     for (i in seq_along(dimnames)) {
@@ -120,6 +130,41 @@ dimnames_non_numeric <- function(dimnames) {
     }
     
     return(dimnames)
+}
+
+nonlinear_constraint_form_error <- function(call = parent.frame(), ...) {
+    msg <- "Nonlinear constraints must be of form `nonlinear(...) <= number`"
+    expr <- rlang::get_expr(call)
+    
+    custom_info <- all(
+        rlang::is_call(expr, name = "nonlinear"),
+        rlang::is_call(expr[[2]], name = COMPARISON_OPS)
+    )
+    
+    if (custom_info) {
+        cmp <- expr[[2]][[1]]
+        lhs <- expr[[2]][[2]]
+        rhs <- expr[[2]][[3]]
+        
+        correct_call <- call(
+            format(cmp),
+            call("nonlinear", lhs),
+            rhs
+        )
+        
+        suggest_call <- paste0("Instead try `", format(correct_call), "`")
+        
+        if (length(suggest_call) == 1L) {
+            msg <- c(msg, ">" = suggest_call)
+        }
+    }
+    
+    cli_abort(
+        msg,
+        class = "lpsugar_error_bad_nonlinear_constraint",
+        call = call,
+        ...
+    )
 }
 
 # Transforming variables -------------------------
@@ -352,6 +397,21 @@ variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE,
 
 # Quadratic ---------------------
 
+is_empty_Q <- function(Q) {
+    if (is.null(Q)) {
+        return(TRUE)
+    }
+    if (slam::is.simple_triplet_matrix(Q)) {
+        length(Q$v) == 0L
+    }
+    else if (is.matrix(Q)) {
+        all(Q == 0)
+    }
+    else {
+        cli_abort("internal_error")
+    }
+}
+
 # Returns or builds quadratic part of a variable or objective function
 get_Q <- function(x) {
     if (is_quadratic(x)) {
@@ -373,11 +433,25 @@ get_Q <- function(x) {
 
 # Is a variable, constraint, or objective function quadratic?
 is_quadratic <- function(x) {
-    if (is_lp_variable(x) || is_lp_objective(x)) {
-        return(!is.null(x$Q))
-    } 
-    else if (is_lp_constraint(x)) {
-        return(any(lengths(x$Q) > 0L))
+    non_quad_classes <- c(
+        "L_objective",
+        "L_constraint",
+        "F_objective",
+        "F_constraint"
+    )
+    
+    if (rlang::inherits_any(x, non_quad_classes)) {
+        return(FALSE)
+    }
+    
+    # Is variable, Q_objective, Q_constraint, or unknown class
+    
+    if (is_lp_objective(x)) {
+        return(!is_empty_Q(x$Q))
+    }
+    else if (is_lp_variable(x) || is_lp_constraint(x)) {
+        empty_Qs <- sapply(x$Q, is_empty_Q)
+        return(any(!empty_Qs))
     } 
     else {
         return(FALSE)
@@ -401,16 +475,39 @@ as_quadratic <- function(x) {
 }
 
 compute_quadratic <- function(v, x) {
-    out <- v$L %*% x + v$A
-    out <- array(out, dim = dim2(v), dimnames = dimnames(v))
+    info <- lpsugar_attributes(v)
+    is_var <- is_lp_variable(v)
+    is_obj <- is_lp_objective(v)
+    is_con <- is_lp_constraint(v)
+    
+    if (is_var) {
+        A <- v$A
+    } else if (is_obj) {
+        A <- info$A
+    } else if (is_con) {
+        A <- 0
+    } else {
+        cli_abort("Internal error")
+    }
+    
+    out <- v$L %*% x + A
+    
+    if (is_var) {
+        out <- array(out, dim = dim2(v), dimnames = dimnames(v))
+    } else if (is_con) {
+        names(out) <- info$index
+    }
     
     if (is_quadratic(v)) {
-        row_x <- t(x)
-        col_x <- t(row_x)
+        row_x <- matrix(x, nrow = 1)
+        col_x <- matrix(x, ncol = 1)
         
-        for (i in seq_along(v)) {
+        if (is_var || is_con) for (i in seq_along(v)) {
             Qi <- v$Q[[i]]
             out[i] <- out[i] + 0.5 * row_x %*% Qi %*% col_x
+        }
+        else if (is_obj) {
+            out <- out + 0.5 * row_x %*% v$Q %*% col_x
         }
     }
     
@@ -421,9 +518,21 @@ compute_quadratic <- function(v, x) {
     return(out)
 }
 
+compute_nonlinear <- function(v, x) {
+    if (is.list(v$F)) {
+        lapply(v$F, \(fn) fn(x)) |> unlist()
+    }
+    else if (is.function(v$F)) {
+        v$F(x)
+    }
+    else {
+        cli_abort("Internal error.")
+    }
+}
+
 # Inheritance -------------------
 
-is_problem <- function(x) {
+is_lp_problem <- function(x) {
     inherits(x, "lp_problem")
 }
 is_lp_variable <- function(x) {
@@ -432,17 +541,25 @@ is_lp_variable <- function(x) {
 is_transformed_lp_variable <- function(x) {
     inherits(x, "transformed_lp_variable")
 }
+is_nonlinear <- function(x) {
+    if (rlang::inherits_any(x, c("nonlinear", "F_objective", "F_constraint"))) {
+        TRUE
+    }
+    else if (is_lp_problem(x)) {
+        is_nonlinear(x$objective) || is_nonlinear(x$constraints)
+    }
+    else {
+        FALSE
+    }
+}
 is_lp_objective <- function(x) {
     inherits(x, "lp_objective")
 }
-is_lp_constraint <- function(x, empty_valid = TRUE) {
-    is_con <- inherits(x, "lp_constraint")
-    if (empty_valid) {
-        is_con
-    } 
-    else {
-        is_con && !is_empty_constraint(x)
-    }
+is_empty_objective <- function(x) {
+    inherits(x, "lp_empty_objective")
+}
+is_lp_constraint <- function(x) {
+    inherits(x, "lp_constraint")
 }
 is_empty_constraint <- function(x) {
     inherits(x, "lp_empty_constraint")
@@ -452,7 +569,7 @@ is_lp_solution <- function(x) {
 }
 
 check_problem <- function(problem, field_name = ".problem") {
-    if (!is_problem(problem)) {
+    if (!is_lp_problem(problem)) {
         cli_abort("`{field_name}` must be an `lp_problem`.", call = parent.frame())
     }
 }
@@ -476,8 +593,31 @@ data_mask <- function(.problem) {
     fun <- custom_fun()
     var <- rlang::new_environment(.problem$variables, parent = fun)
     als <- rlang::new_environment(.problem$aliases, parent = var)
+    prb <- rlang::new_environment(
+        list(.___lpsugar_problem = .problem),
+        parent = als
+    )
     
-    rlang::new_data_mask(bottom = als, top = fun)
+    rlang::new_data_mask(bottom = prb, top = fun)
+}
+
+get_problem <- function(mask, default) {
+    problem <- rlang::env_get(
+        mask,
+        ".___lpsugar_problem", 
+        inherit = TRUE,
+        default = NULL
+    )
+    
+    if (!is.null(problem)) {
+        return(problem)
+    }
+    
+    if (missing(default)) {
+        cli_abort("Problem not found.")
+    }
+    
+    return(default)
 }
 
 # Eval an expression inside lp_min(), lp_con(), lp_alias(), ...
@@ -491,6 +631,16 @@ lp_eval <- function(.problem, expr, split_for = FALSE) {
     else {
         rlang::eval_tidy(quosure, data = data)
     }
+}
+
+# Attributes ----------------------
+
+lpsugar_attributes <- function(x) {
+    attr(x, "lpsugar_attributes")
+}
+`lpsugar_attributes<-` <- function(x, value) {
+    attr(x, "lpsugar_attributes") <- value
+    return(x)
 }
 
 # Printing ------------------------

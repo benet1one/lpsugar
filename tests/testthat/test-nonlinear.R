@@ -3,165 +3,178 @@ test_that("nonlinear", {
     withr::local_package("ROI.plugin.nloptr")
     L <- letters[1:3]
     
-    my_fun <- function(x, y, z = 0) {
-        x^3 / y["b"] + z
-    }
+    obj <- nonlinear(x^3 / y["b"] + z)
+    z <- 0
     
-    p <- lp_problem() |> 
-        lp_var(x, lower = 2) |> 
-        lp_var(y[L], upper = 10) |> 
-        lp_minimize_function(my_fun)
-    
+    p <- lp_problem() |>
+        lp_var(x, lower = 2) |>
+        lp_var(y[L], upper = 10) |>
+        lp_minimize(obj)
+
     expect_snapshot(p$objective)
-    
+
     s <- lp_solve(
-        p, 
+        p,
         solver = "nloptr.cobyla",
         start = list(
-            y = c(3, 3, 3),
-            x = 4
+            x = 4,
+            y = c(3, 3, 3)
         )
     )
-    
+
     expect_equal(
-        s$objective |> round(6) |> unname(), 
+        s$objective |> round(6) |> unname(),
         0.8
     )
+
+    var_values <- list(x = 5, y = c(a=1, b=2, c=3))
     
     expect_equal(
-        compute_objective(p, list(x = 5, y = c(a=1, b=2, c=3))),
-        my_fun(x = 5, y = c(a=1, b=2, c=3))
+        compute_objective(p, var_values),
+        rlang::eval_tidy(obj, data = var_values)
     )
-    
+
     expect_error(
-        p |> lp_variable(z),
-        "Cannot add a variable to a nonlinear problem."
+        pz <- p |> lp_variable(z, lower = -0.5),
+        "Cannot add variables to a nonlinear problem"
     )
 })
 
 test_that("nonlinear constrained", {
     withr::local_package("ROI.plugin.highs")
     withr::local_package("ROI.plugin.nloptr")
-    
-    p <- lp_problem() |> 
-        lp_var(x, lower = 1) |> 
-        lp_var(y, lower = 1) |> 
-        lp_max_fun(\(x, y) sqrt(x) * log(y)) |> 
+
+    p <- lp_problem() |>
+        lp_var(x, lower = 1) |>
+        lp_var(y, lower = 1) |>
+        lp_max(nonlinear(sqrt(x) * log(y))) |>
         lp_con(x == 10 - y)
-    
+
     s <- lp_solve(
         p,
         solver = "nloptr.isres",
         start = lp_find_feasible(p, solver = "highs"),
         max_time = 1
     )
-    
+
     with(s$variables, expect_equal(x, 10 - y, tolerance = 0.001))
     with(s$variables, expect_equal(s$objective, sqrt(x) * log(y)))
 })
 
-test_that("nonlinear fun errors", {
-    f_error <- function(x) {
-        if (x == 0) stop("function does not work for x==0")
-        else x^3
-    }
-    f_char <- function(x) {
-        paste0(x, "00")
-    }
-    f_non_scalar <- function(x) {
-        rep(2*x, 3)
-    }
-    f_missing_vars <- function(x) {
-        x^3
-    }
-    
-    expect_error(
-        lp_problem() |> lp_var(x) |> lp_min_fun(f_error),
-        "Failed to evaluate `fun`(.+)Make sure it works when all variables are 0."
-    )
-    expect_error(
-        lp_problem() |> lp_var(x) |> lp_min_fun(f_char),
-        "`fun` must return a numeric scalar(.+)Returns a string."
-    )
-    expect_error(
-        lp_problem() |> lp_var(x) |> lp_min_fun(f_non_scalar),
-        "`fun` must return a numeric scalar.(.+)Returns a double vector."
-    )
-    expect_error(
-        lp_problem() |> lp_var(x) |> lp_var(y) |> lp_var(z) |> lp_min_fun(f_missing_vars),
-        "`fun` must have all problem variables as arguments.(.+)Missing variables: y and z"
-    )
-    expect_error(
-        lp_problem() |> lp_var(x) |> lp_alias(y = x^2) |> lp_min_fun(\(x, y) x + y),
-        "Aliases can not be passed to `fun`"
-    )
-})
 
-test_that("nonlinear gradient", {
-    f <- function(x, y) {
-        2*x + y^2 + 4*x*y
-    }
-    g <- function(x, y) {
-        list(
-            y = 2*y + 4*x,
-            x = 2 + 4*y
-        )
-    }
-    
-    p <- lp_problem() |> 
-        lp_var(x, lower = 0, upper = 10) |> 
-        lp_var(y, lower = 0, upper = 10) |> 
-        lp_max_fun(fun = f, gradient = g)
-    
-    expect_equal(
-        p$objective$gradient(c(5, 4)),
-        variables_to_vec(g(5, 4), p)
-    )
-})
-
-test_that("nonlinear gradient errors", {
-    f <- function(x, y) {
-        2*x + y^2 + 4*x*y
-    }
-    
-    g_error <- function(x, y) {
-        stop("an error")
-    }
-    g_bad_vec <- function(x, y) {
-        c(4, 2, 3, 1)
-    }
-    g_bad_list <- function(x, y) {
-        list(x = 3, y = 4:6)
-    }
-    g_missing_vars <- function(x) {
-        c(2, 2)
-    }
+test_that("nonlinear constraints", {
+    withr::local_package("ROI.plugin.nloptr")
     
     p <- lp_problem() |> 
         lp_var(x) |> 
-        lp_var(y)
+        lp_var(y) |> 
+        lp_var(z[1:3]) |> 
+        lp_min(x^2) |> 
+        lp_con(
+            c1 = nonlinear(x/y) >= 1,
+            c2 = nonlinear(z^3) <= 100
+        )
+    
+    start <- list(x = 6, y = 2, z = 1:3)
+    
+    s <- lp_solve(
+        p, 
+        start = start,
+        solver = "nloptr.cobyla",
+        max_iter = 500
+    )
+    
+    s$status
+    
+    with(s$variables, {
+        expect_true(x^2 < 0.1)
+        expect_true(x/y >= 1)
+        expect_true(all(z^3 < 100))
+    })
+    
+    cs <- constraint_summary(p, start)
+    
+    expect_equal(
+        cs$lhs,
+        c(6/2, (1:3)^3)
+    )
     
     expect_error(
-        p |> lp_min_fun(f, g_error),
-        "Failed to evaluate `gradient`."
+        p |> lp_delete_constraint("c1"),
+        "Cannot index or delete nonlinear constraints."
     )
+})
+
+test_that("bad nonlinear outputs", {
+    p <- lp_problem() |> 
+        lp_var(x[1:3])
+    
     expect_error(
-        p |> lp_min_fun(f, g_bad_vec),
-        "Invalid `gradient` output(.+)`problem` has 2 variables but `gradient\\(\\)` is length 4."
-    )
-    expect_error(
-        p |> lp_min_fun(f, g_bad_list),
-        regexp = paste(
-            "Invalid `gradient` output",
-            "It should be a numeric vector or a named list",
-            "Length of variable `y` does not match",
-            "In `gradient\\(\\)` it.s length 3",
-            "In `problem` it.s length 1",
-            sep = "(.+)"
+        p |> lp_con(nonlinear(x + "1") >= 0),
+        paste(
+            "Failed to evaluate expression.",
+            "Make sure it works when all variables are 0.",
+            "non-numeric argument to binary operator",
+            sep = "(.*)"
         )
     )
     expect_error(
-        p |> lp_min_fun(f, g_missing_vars),
-        "Missing variables: y"
+        p |> lp_min(nonlinear(log(x))),
+        paste(
+            "Nonlinear objective function must return a scalar",
+            "Instead returns a length 3 vector.",
+            sep = "(.*)"
+        )
+    )
+    expect_error(
+        p |> lp_max(nonlinear(paste0(x, "0"))),
+        paste(
+            "Nonlinear expression must return a numeric vector",
+            "Instead returns a character vector.",
+            sep = "(.*)"
+        )
+    )
+})
+
+test_that("bad nonlinear constraints", {
+    p <- lp_problem() |> 
+        lp_var(x[1:3])
+    
+    # TODO fix call in first error
+    expect_error(
+        p |> lp_con(nonlinear(x <= 2)),
+        paste(
+            "Nonlinear constraints must be of form",
+            "Instead try `nonlinear\\(x\\) <= 2",
+            sep = ".*"
+        )
+    )
+    expect_error(
+        p |> lp_con(nonlinear(x^4 + 1 >= 5*2)),
+        paste(
+            "Nonlinear constraints must be of form",
+            r"(Instead try `nonlinear\(x\^4 \+ 1\) >= 5 \* 2`)",
+            sep = ".*"
+        )
+    )
+    expect_error(
+        p |> lp_con(nl(sqrt(x)) > 1:5),
+        paste(
+            "Length mismatch",
+            "Left hand side is length 3",
+            "Right hand side is length 5",
+            sep = ".*"
+        )
+    )
+    expect_error(
+        p |> lp_con(3 >= nonlinear(x^3)),
+        "Nonlinear constraints must be of form",
+    )
+})
+
+test_that("operations outside nonlinear", {
+    expect_error(
+        nonlinear(x + 1) / 2,
+        r"(Instead try `nonlinear\(\(x \+ 1\) / 2\)`)"
     )
 })

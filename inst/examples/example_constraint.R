@@ -1,5 +1,5 @@
-# Ordered variable constraint
-## ordered[i] > ordered[i-1]  for all i in 2:n
+# Order Constraint ------------------------------
+## ordered[i] > ordered[i-1]  forall i in 2:n
 n <- 4
 p <- lp_problem() |>
     lp_variable(ordered[1:n], lower = 0)
@@ -17,5 +17,18 @@ for (i in 2:n) {
     )
 }
 
-## The only difference are the rownames of the constraint matrix
+## The only difference are the row names of the constraint matrix when printing
 print(pc$constraints)
+
+
+# Nonlinear Constraint --------------------------
+## log(x + 1) > y  =>  log(x + 1) - y > 0
+nlp <- lp_problem() |> 
+    lp_variable(x, lower = 0) |> 
+    lp_variable(y) |> 
+    lp_constraint(
+        # Nonlinear constraints must always be written as `nonlinear(...) <= number`
+        nl_con = nonlinear(log(x + 1) - y) > 0
+    )
+
+print(nlp$constraints)

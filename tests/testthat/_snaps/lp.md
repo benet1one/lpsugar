@@ -19,9 +19,16 @@
       x + y
       
       -- $constraints
+      An object containing 2 linear constraints.
       
-      <unnamed>    | n = 1 | x + 2 * y <= 10
-      <unnamed>    | n = 1 | 2 * x + y <= 10
+      #unnamed_constraint
+      | x + 2 * y <= 10
+      | Rows = 1
+      
+      #unnamed_constraint
+      | 2 * x + y <= 10
+      | Rows = 1
+      
 
 ---
 
@@ -62,8 +69,28 @@
       x[2]
       
       -- $constraints
+      An object containing 6 linear constraints.
       
-      <unnamed>    | n = 6 | for (i in 1:2) for (j in 1:3) i + j <= x[i * j]
+      #unnamed_constraint
+      | for (i in 1:2) for (j in 1:3) i + j <= x[i * j]
+      | Rows = 6
+      
+
+# feasible
+
+    Code
+      p
+    Output
+      ---- <lp_problem> ----
+      
+      -- $variables
+      $x
+      Real scalar 'x'
+      5 <= x <= 10
+      
+      -- $objective
+      find a feasible solution
+      
 
 # infeasible
 

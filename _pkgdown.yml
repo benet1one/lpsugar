@@ -15,6 +15,9 @@ reference:
   - lp_delete_constraint
   - starts_with("lp_")
   - lp_solve
+- title: Nonlinear objective and constraints
+  contents:
+  - nonlinear
 - title: Utilities
   contents:
   - sum_over
@@ -29,6 +32,6 @@ reference:
   - solution_summary
 - title: Manually solve a problem
   contents:
-  - ROI_solve
   - as.OP.lp_problem
+  - ROI_solve
   - pretty_solution

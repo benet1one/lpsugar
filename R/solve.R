@@ -31,7 +31,7 @@
 #' @example inst/examples/example_solve.R
 lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     check_problem(.problem)
-    op <- as.OP(.problem)
+    op <- as.OP.lp_problem(.problem)
     applicable <- ROI::ROI_applicable_solvers(op)
     
     if (length(applicable) == 0L) {
@@ -84,117 +84,23 @@ lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
 
 # Steps -------------------
 
-ROI_objective_from_lpsugar <- function(problem) {
-    check_problem(problem, field_name = "problem")
-    
-    switch(
-        problem$objective$type,
-        "undefined" = cli_abort("Objective function is undefined."),
-        "feasible"  = ,
-        "linear"    = as.L_objective(problem),
-        "quadratic" = as.Q_objective(problem),
-        "nonlinear" = as.F_objective(problem),
-        cli_abort("Unknown type {problem$objective$type}.")
-    )
+clear_lpsugar_classes <- function(x) {
+    lpsc <- class(x) |> startsWith("lp_")
+    class(x) <- class(x)[!lpsc]
+    attr(x, "lpsugar_attributes") <- NULL
+    return(x)
 }
 
-ROI_constraint_from_lpsugar <- function(problem) {
-    check_problem(problem, field_name = "problem")
-    
-    if (length(problem$constraints) == 0L) {
-        ROI::NO_constraint(n_obj = ncol(problem))
-    } 
-    else if (is_quadratic(problem$constraint)) {
-        as.Q_constraint(problem)
-    } 
-    else {
-        as.L_constraint(problem)
-    }
-}
-
-#' @importFrom ROI as.L_objective
+#' @importFrom ROI as.objective
 #' @export
-as.L_objective.lp_problem <- function(x) {
-    if (x$objective$type == "nonlinear") {
-        cli_abort("Objective is nonlinear, use `as.F_objective()` instead.")
-    }
-    if (is_quadratic(x$objective)) {
-        cli_abort("Objective function is quadratic, use `as.Q_objective()` instead.")
-    }
-    
-    ROI::L_objective(
-        L = x$objective$L,
-        names = attr(x, "varnames")
-    )
+as.objective.lp_objective <- function(x) {
+    clear_lpsugar_classes(x)
 }
 
-#' @importFrom ROI as.Q_objective
+#' @importFrom ROI as.constraint
 #' @export
-as.Q_objective.lp_problem <- function(x) {
-    if (x$objective$type == "nonlinear") {
-        cli_abort("Objective is nonlinear, use `as.F_objective()` instead.")
-    }
-    
-    ROI::Q_objective(
-        Q = x$objective$Q,
-        L = x$objective$L,
-        names = attr(x, "varnames")
-    )
-}
-
-#' @importFrom ROI as.F_objective
-#' @export
-as.F_objective.lp_problem <- function(x) {
-    if (x$objective$type != "nonlinear") {
-        ROI::as.F_objective(ROI_objective_from_lpsugar(x))
-    }
-    
-    ROI::F_objective(
-        x$objective$fun,
-        G = x$objective$gradient,
-        H = x$objective$hessian,
-        n = ncol(x),
-        names = attr(x, "varnames")
-    )
-}
-
-#' @importFrom ROI as.L_constraint
-#' @export
-as.L_constraint.lp_problem <- function(x, ...) {
-    rlang::check_dots_empty()
-    
-    if (length(x$constraints) == 0L) {
-        return(ROI::NO_constraint(n_obj = ncol(x)))
-    }
-    
-    if (is_quadratic(x$constraints)) {
-        cli_abort("Problem has quadratic constraints, use `as.Q_constraint()` instead.")
-    }
-    
-    ROI::L_constraint(
-        L = x$constraints$L,
-        dir = c(x$constraints$dir),
-        rhs = c(x$constraints$rhs),
-        names = attr(x, "varnames")
-    )
-}
-
-#' @importFrom ROI as.Q_constraint
-#' @export
-as.Q_constraint.lp_problem <- function(x, ...) {
-    rlang::check_dots_empty()
-    
-    if (length(x$constraints) == 0L) {
-        return(ROI::NO_constraint(n_obj = ncol(x)))
-    }
-    
-    ROI::Q_constraint(
-        Q = x$constraints$Q,
-        L = x$constraints$L,
-        dir = c(x$constraints$dir),
-        rhs = c(x$constraints$rhs),
-        names = attr(x, "varnames")
-    )
+as.constraint.lp_constraint <- function(x) {
+    clear_lpsugar_classes(x)
 }
 
 #' @importFrom ROI as.OP
@@ -226,36 +132,21 @@ as.OP.lp_problem <- function(x) {
             class = "lpsugar_error_no_variables_defined"
         )
     }
-    
-    if (x$objective$type == "undefined") {
-        cli_abort(c(
-            paste(
-                "Must define an objective function with `lp_minimize()`, `lp_maximize()`,",
-                "`lp_minimize_function()` or `lp_maximize_function()`."
-            ),
-            "i" = paste(
-                "If you wish to find any feasible solution, use `lp_find_feasible()`",
-                "or set the objective function to 0 with `lp_minimize(0)`",
-                sep = "\n"
-            )
-        ), class = "lpsugar_error_no_objective")
-    }
-    
-    if (x$objective$direction == "minimize") {
-        maximize <- FALSE
-    } 
-    else if (x$objective$direction == "maximize") {
-        maximize <- TRUE
-    } 
-    else {
+
+    if (!rlang::is_scalar_logical(x$maximum) || is.na(x$maximum)) {
         cli_abort(
-            "`$objective$direction` should be either 'minimize' or 'maximize'.",
-            class = "lpsugar_error_bad_objective_direction"
+            c("Must define an objective function with `lp_minimize()` or `lp_maximize()`.",
+              "i" = paste(
+                  "If you wish to find any feasible solution, use `lp_find_feasible()`",
+                  "or set the objective function to 0 with `lp_minimize(0)`",
+                  sep = "\n"
+              )), 
+            class = "lpsugar_error_no_objective"
         )
     }
     
-    objective <- ROI_objective_from_lpsugar(x)
-    constraints <- ROI_constraint_from_lpsugar(x)
+    objective <- as.objective.lp_objective(x$objective)
+    constraints <- as.constraint.lp_constraint(x$constraints)
     
     types <- character(ncol(x))
     lower <- numeric(ncol(x))
@@ -281,7 +172,7 @@ as.OP.lp_problem <- function(x) {
     
     ROI::OP(
         objective = objective,
-        maximum = maximize,
+        maximum = x$maximum,
         types = types,
         bounds = bounds,
         constraints = constraints
@@ -332,7 +223,8 @@ pretty_solution <- function(problem, solution, binary_as_logical = FALSE) {
     )
     
     als <- compute_aliases(problem, solution$solution)
-    objective <- solution$objval + problem$objective$A
+    objective_info <- lpsugar_attributes(problem$objective)
+    objective <- solution$objval + objective_info$A
     
     list(
         objective = objective,

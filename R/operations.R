@@ -1,4 +1,6 @@
 
+COMPARISON_OPS <- c("<", "<=", "==", ">=", ">")
+
 # Wrappers -------------------
 
 # Wrapping all operations in Ops.lp_variable
@@ -8,7 +10,8 @@
 #' @export
 Ops.lp_variable <- function(e1, e2) {
     op <- .Generic
-    call <- call(op, substitute(e1), substitute(e2))
+    call <- call(op, substitute(e1), substitute(e2)) |> 
+        rlang::as_quosure(env = parent.frame())
     
     # Single Element --------------------
     # +x, -x, !x
@@ -35,12 +38,7 @@ Ops.lp_variable <- function(e1, e2) {
     check_no_na(e1, e2, call)
     
     # Compatible dims
-    comp <- compatible_dimensions(e1, e2, drop_dim = TRUE)
-    
-    if (!comp) {
-        why <- attr(comp, "cnd")
-        cli_abort(why$message, call = call)
-    }
+    check_conformable(e1, e2, drop_dim = TRUE, call = call)
     
     # Two element arithmetic
     if (op == "+") {
@@ -60,8 +58,7 @@ Ops.lp_variable <- function(e1, e2) {
     }
     
     # Comparison -----------------------
-    comparison_ops <- c("<", "<=", "==", ">=", ">")
-    if (op %in% comparison_ops) {
+    if (op %in% COMPARISON_OPS) {
         return(compare_lp(e1, e2, op, call))
     } 
     else if (op == "!=") {
@@ -77,6 +74,37 @@ Ops.lp_variable <- function(e1, e2) {
         class = "lpsugar_error_unsupported_operation",
         call = call
     )
+}
+
+#' @export
+Ops.nonlinear <- function(e1, e2) {
+    op <- .Generic
+    call <- call(op, substitute(e1), substitute(e2)) |> 
+        rlang::as_quosure(env = parent.frame())
+    
+    comparison_ops <- c("<", "<=", "==", ">=", ">")
+    
+    if (op %in% comparison_ops) {
+        compare_nl(e1, e2, op, call)
+    }
+    else if (op == "!=") {
+        cli_abort(
+            "Not equal `!=` is not supported in constraints.",
+            class = "lpsugar_error_not_equal_constraint",
+            call = call
+        )
+    }
+    else {
+        e1_txt <- format1(e1)
+        e2_txt <- format1(e2)
+        cli_abort(
+            c("Syntax error.",
+              "x" = "Operations cannot be outside `nonlinear(...)`",
+              ">" = "Instead try `nonlinear(({e1_txt}) {op} {e2_txt})`."),
+            class = "lpsugar_error_unsupported_operation",
+            call = call
+        )
+    }
 }
 
 check_no_na <- function(e1, e2, call) {
@@ -517,6 +545,10 @@ diff.lp_variable <- function(x, lag = 1L, differences = 1L, ...) {
 # Comparison --------------------
 
 compare_lp <- function(x, y, op, call) {
+    if (is_nonlinear(x) || is_nonlinear(y)) {
+        nonlinear_constraint_form_error(call = call)
+    }
+    
     if (op == "<") {
         op <- "<="
     } 
@@ -525,30 +557,68 @@ compare_lp <- function(x, y, op, call) {
     }
     
     var <- x - y
+    rhs <- c(-var$A)
+    dir <- rep(op, length(rhs))
     
-    if (is_quadratic(var)) {
-        Q <- lapply(var$Q, function(q) {
-            if (any(q != 0)) {
-                slam::as.simple_triplet_matrix(q)
-            } 
-            else {
-                NULL
-            }
-        })
-    } 
+    roi_con <- if (is_quadratic(var)) {
+        ROI::Q_constraint(
+            Q = var$Q,
+            L = var$L,
+            dir = dir,
+            rhs = rhs,
+            names = colnames(var$L)
+        )
+    }
     else {
-        Q <- rep(list(NULL), length(var))
+        ROI::L_constraint(
+            L = var$L,
+            dir = dir,
+            rhs = rhs,
+            names = colnames(var$L)
+        )
     }
     
-    L <- slam::as.simple_triplet_matrix(var$L)
-    rhs <- -var$A
+    new_constraint(roi_con, call = call)
+}
+
+compare_nl <- function(x, y, op, call) {
+    if (op == "<") {
+        op <- "<="
+    } 
+    else if (op == ">") {
+        op <- ">="
+    }
     
+    if (!is_nonlinear(x) || !is.numeric(y)) {
+        nonlinear_constraint_form_error(call = call)
+    }
+    
+    check_no_na(0, y, call = call)
+    
+    problem <- get_problem(mask = rlang::get_env(call), default = NULL)
+    
+    if (is.null(problem)) {
+        cli_abort(
+            "Nonlinear constraints must be defined inside `lp_constraint(...)`",
+            class = "lpsugar_error_nonlinear_compare_outside_mask"
+        )
+    }
+    
+    fun <- as.function.nonlinear(x = x, problem = problem)
+    fun_out <- attr(fun, "fun_output")
+    check_conformable(fun_out, y, call = call)
+
+    rhs <- rep_len(c(y), length(fun_out))
     dir <- rep(op, length(rhs))
-    call <- rep(format1(call), length(rhs))
-    name <- character(length(rhs))
     
-    list(Q = Q, L = L, dir = dir, rhs = rhs, name = name, call = call) |>
-        structure(class = "lp_constraint")
+    roi_con <- ROI::F_constraint(
+        fun,
+        dir = dir,
+        rhs = rhs,
+        names = variable.names(problem)
+    )
+    
+    new_constraint(roi_con, call = call)
 }
 
 # Utils ----------------------

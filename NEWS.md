@@ -1,3 +1,14 @@
+# lpsugar (development version)
+
+## Breaking Changes
+
+* Replaced `lp_minimize_function()` with 
+a different `nonlinear()` workflow.
+
+* The `$objective` function and the `$constraints`
+now inherit from ROI's `objective` and `constraint`
+classes, respectively.
+
 # lpsugar 0.25.1
 
 ## New Features
