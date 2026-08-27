@@ -286,8 +286,7 @@ p <- lp_problem() |>
     )
 
 p$objective$L
-#> x[1,a] x[2,a] x[3,a] x[1,b] x[2,b] x[3,b] 
-#>      2      2      2      5      5      5
+#> A 1x6 simple triplet matrix.
 ```
 
 Sometimes the goal is to find any feasible solution. This can be done by
@@ -341,13 +340,16 @@ p <- lp_problem() |>
     )
 
 p$constraints
+#> An object containing 3 linear constraints.
 #> 
-#> my_constraint | n = 3 | for (k in 1:n) { ... }
+#> my_constraint
+#> | for (k in 1:n) { ... }
+#> | Rows = 3
 #> 
-#>                    x[1] x[2] x[3] y[1] y[2] y[3] dir  
-#> my_constraint[k=1] 1    0    0    0    0    -1   <=  0
-#> my_constraint[k=2] 0    2    0    0    -1   0    <=  0
-#> my_constraint[k=3] 0    0    3    -1   0    0    <=  0
+#>                      x[1] x[2] x[3] y[1] y[2] y[3] dir rhs
+#>   my_constraint[k=1] 1    0    0    0    0    -1   <=  0  
+#>   my_constraint[k=2] 0    2    0    0    -1   0    <=  0  
+#>   my_constraint[k=3] 0    0    3    -1   0    0    <=  0
 ```
 
 Since `lpsugar` supports vectorized operations, it’s possible to define
@@ -363,13 +365,16 @@ p2 <- p |>
     )
 
 p2$constraints["alt_constraint"]
+#> An object containing 3 linear constraints.
 #> 
-#> alt_constraint | n = 3 | (1:n) * x <= rev(y)
+#> alt_constraint
+#> | (1:n) * x <= rev(y)
+#> | Rows = 3
 #> 
-#>                x[1] x[2] x[3] y[1] y[2] y[3] dir  
-#> alt_constraint 1    0    0    0    0    -1   <=  0
-#> alt_constraint 0    2    0    0    -1   0    <=  0
-#> alt_constraint 0    0    3    -1   0    0    <=  0
+#>                  x[1] x[2] x[3] y[1] y[2] y[3] dir rhs
+#>   alt_constraint 1    0    0    0    0    -1   <=  0  
+#>   alt_constraint 0    2    0    0    -1   0    <=  0  
+#>   alt_constraint 0    0    3    -1   0    0    <=  0
 ```
 
 Constraints can contain multiple lines of code, which makes it possible
@@ -397,12 +402,15 @@ p <- lp_problem() |>
     )
 
 p$constraints
+#> An object containing 4 linear constraints.
 #> 
-#> order_con | n = 4 | for (t in 1:n) { ... }
+#> order_con
+#> | for (t in 1:n) { ... }
+#> | Rows = 4
 #> 
-#>                y[1] y[2] y[3] y[4] dir   
-#> order_con[t=1] 1    0    0    0    >=  12
-#> order_con[t=2] -2   1    0    0    >=  2 
-#> order_con[t=3] 0    -2   1    0    >=  2 
-#> order_con[t=4] 0    0    -2   1    >=  2
+#>                  y[1] y[2] y[3] y[4] dir rhs
+#>   order_con[t=1] 1    0    0    0    >=  12 
+#>   order_con[t=2] -2   1    0    0    >=  2  
+#>   order_con[t=3] 0    -2   1    0    >=  2  
+#>   order_con[t=4] 0    0    -2   1    >=  2
 ```

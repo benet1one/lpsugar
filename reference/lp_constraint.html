@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.25.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.26.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,32 +71,27 @@
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>One or more linear constraints. Can be named. They must:</p><ul><li><p>Contain one or more variables defined with <code><a href="lp_variable.html">lp_variable()</a></code></p></li>
 <li><p>Contain a comparison operator, such as <code>&lt;=</code>,  <code>==</code> or <code>=&gt;</code>.</p></li>
+<li><p>If it's a nonlinear constraint, it must be written as:</p>
+<p><code><a href="nonlinear.html">nonlinear()</a></code><code> &lt;= number</code></p></li>
 </ul></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The <code>.problem</code> with added <code>$constraints</code>. (Note: previous constraints are not
-overritten).</p>
-<p>A constraint with <code>dir[i] = "&lt;="</code> is represented as
-\(\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i}\).</p>
-<p>The <code>$constraints</code> field has the following subfields:</p><ul><li><p><code>$Q</code> : List of quadratic coefficient matrices:</p><ul><li><p><code>NULL</code> if the constraint is linear.</p></li>
-<li><p><code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix()</a></code> if constraint is quadratic.</p></li>
-</ul></li>
-<li><p><code>$L</code> : <code><a href="https://rdrr.io/pkg/slam/man/matrix.html" class="external-link">slam::simple_triplet_matrix()</a></code> of linear coefficients,
-where each row is a constraint and each is a variable.</p></li>
-<li><p><code>$dir</code> : Character vector with elements <code>"&lt;="</code>, <code>"=="</code>, or <code>"&gt;="</code>,
-the direction of each constraint.</p></li>
-<li><p><code>$rhs</code> : Numeric column vector representing the right hand side of each constraint.</p></li>
-<li><p><code>$name</code> : Character vector with the names of the constraints, if <code>...</code> is named,
-or <code>""</code> for unnamed constraints.</p></li>
-<li><p><code>$call</code> : Expression that defined each constraint.</p></li>
+    <p>The <code>.problem</code> with added <code>$constraints</code>. Previous constraints are not
+overwritten, so it's possible to call <code>lp_constraint()</code> multiple times without
+overwriting previously defined constraints.</p>
+<p>The <code>$constraints</code> inherit from <code><a href="https://rdrr.io/pkg/ROI/man/L_constraint.html" class="external-link">ROI::L_constraint()</a></code>, <code><a href="https://rdrr.io/pkg/ROI/man/Q_constraint.html" class="external-link">ROI::Q_constraint()</a></code>
+or <code><a href="https://rdrr.io/pkg/ROI/man/F_constraint.html" class="external-link">ROI::F_constraint()</a></code>.</p><ul><li><p>Quadratic constraints are represented as</p>
+<p>\(\frac{1}{2} x'Q_{i}x + L_{i}x \le \text{rhs}_{i} \qquad \forall i\)</p></li>
+<li><p>While nonlinear constraints are represented as</p>
+<p>\(F(x)_i \le \text{rhs}_i \qquad \forall i\)</p></li>
 </ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Ordered variable constraint</span></span></span>
-<span class="r-in"><span><span class="co">## ordered[i] &gt; ordered[i-1]  for all i in 2:n</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Order Constraint ------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## ordered[i] &gt; ordered[i-1]  forall i in 2:n</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">4</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">ordered</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
@@ -114,31 +109,55 @@ or <code>""</code> for unnamed constraints.</p></li>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## The only difference are the rownames of the constraint matrix</span></span></span>
+<span class="r-in"><span><span class="co">## The only difference are the row names of the constraint matrix when printing</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pc</span><span class="op">$</span><span class="va">constraints</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> An object containing 9 linear constraints.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt1 | n = 3 | ordered[2:n] &gt; ordered[1:(n - 1)]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alt1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>ordered[2:n] &gt; ordered[1:(n - 1)]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>Rows = 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      ordered[1] ordered[2] ordered[3] ordered[4] dir  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt1 -1         1          0          0          &gt;=  0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt1 0          -1         1          0          &gt;=  0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt1 0          0          -1         1          &gt;=  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        ordered[1] ordered[2] ordered[3] ordered[4] dir rhs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   alt1 -1         1          0          0          &gt;=  0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   alt1 0          -1         1          0          &gt;=  0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   alt1 0          0          -1         1          &gt;=  0  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alt2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>for (i in 2:n) ordered[i] &gt; ordered[i - 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>Rows = 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt2 | n = 3 | for (i in 2:n) ordered[i] &gt; ordered[i - 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             ordered[1] ordered[2] ordered[3] ordered[4] dir rhs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   alt2[i=2] -1         1          0          0          &gt;=  0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   alt2[i=3] 0          -1         1          0          &gt;=  0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   alt2[i=4] 0          0          -1         1          &gt;=  0  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           ordered[1] ordered[2] ordered[3] ordered[4] dir  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt2[i=2] -1         1          0          0          &gt;=  0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt2[i=3] 0          -1         1          0          &gt;=  0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt2[i=4] 0          0          -1         1          &gt;=  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alt3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>ordered[i] &gt; ordered[i - 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>Rows = 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        ordered[1] ordered[2] ordered[3] ordered[4] dir rhs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   alt3 -1         1          0          0          &gt;=  0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   alt3 0          -1         1          0          &gt;=  0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   alt3 0          0          -1         1          &gt;=  0  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt3 | n = 3 | ordered[i] &gt; ordered[i - 1]</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Nonlinear Constraint --------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## log(x + 1) &gt; y  =&gt;  log(x + 1) - y &gt; 0</span></span></span>
+<span class="r-in"><span><span class="va">nlp</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">x</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu">lp_constraint</span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="co"># Nonlinear constraints must always be written as `nonlinear(...) &lt;= number`</span></span></span>
+<span class="r-in"><span>        nl_con <span class="op">=</span> <span class="fu"><a href="nonlinear.html">nonlinear</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">-</span> <span class="va">y</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">nlp</span><span class="op">$</span><span class="va">constraints</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> An object containing 1 nonlinear constraint.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      ordered[1] ordered[2] ordered[3] ordered[4] dir  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt3 -1         1          0          0          &gt;=  0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt3 0          -1         1          0          &gt;=  0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alt3 0          0          -1         1          &gt;=  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> nl_con</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>nonlinear(log(x + 1) - y) &gt; 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>Rows = 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

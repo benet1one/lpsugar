@@ -37,24 +37,37 @@ p <- lp_problem() |>
     )
 
 p$constraints
+#> An object containing 9 linear constraints.
 #> 
-#> <unnamed> | n = 1 | sum(is_value) == 2
+#> #unnamed_constraint
+#> | sum(is_value) == 2
+#> | Rows = 1
 #> 
-#>  y[1] y[2] y[3] y[4] is_value[1] is_value[2] is_value[3] is_value[4] dir  
-#>  0    0    0    0    1           1           1           1           ==  2
+#>    y[1] y[2] y[3] y[4] is_value[1] is_value[2] is_value[3] is_value[4] dir rhs
+#>    0    0    0    0    1           1           1           1           ==  2  
 #> 
+#> #unnamed_constraint
+#> | for (i in 1:n) bind_cons(y[i] >= lower + is_value[i] * (value -  ...
+#> | Rows = 8
 #> 
-#> <unnamed> | n = 8 | for (i in 1:n) bind_cons(y[i] >= lower + is_value[i] * (value -  ...
-#> 
-#>       y[1] y[2] y[3] y[4] is_value[1] is_value[2] is_value[3] is_value[4] dir  
-#> [i=1] 1    0    0    0    -2          0           0           0           >=  1
-#> [i=1] 1    0    0    0    4           0           0           0           <=  7
-#> [i=2] 0    1    0    0    0           -2          0           0           >=  1
-#> [i=2] 0    1    0    0    0           4           0           0           <=  7
-#> [i=3] 0    0    1    0    0           0           -2          0           >=  1
-#> [i=3] 0    0    1    0    0           0           4           0           <=  7
-#> [i=4] 0    0    0    1    0           0           0           -2          >=  1
-#> [i=4] 0    0    0    1    0           0           0           4           <=  7
+#>         y[1] y[2] y[3] y[4] is_value[1] is_value[2] is_value[3] is_value[4] dir
+#>   [i=1] 1    0    0    0    -2          0           0           0           >= 
+#>   [i=1] 1    0    0    0    4           0           0           0           <= 
+#>   [i=2] 0    1    0    0    0           -2          0           0           >= 
+#>   [i=2] 0    1    0    0    0           4           0           0           <= 
+#>   [i=3] 0    0    1    0    0           0           -2          0           >= 
+#>   [i=3] 0    0    1    0    0           0           4           0           <= 
+#>   [i=4] 0    0    0    1    0           0           0           -2          >= 
+#>   [i=4] 0    0    0    1    0           0           0           4           <= 
+#>         rhs
+#>   [i=1] 1  
+#>   [i=1] 7  
+#>   [i=2] 1  
+#>   [i=2] 7  
+#>   [i=3] 1  
+#>   [i=3] 7  
+#>   [i=4] 1  
+#>   [i=4] 7  
 #> 
 
 library(ROI.plugin.highs)

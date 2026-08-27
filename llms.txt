@@ -156,15 +156,15 @@ package website.
 - [`lp_fix_vars()`](https://benet1one.github.io/lpsugar/reference/lp_fix_vars.md)
   : Fix Variables to a Value
 
-- [`lp_minimize_function()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
-  [`lp_maximize_function()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
-  [`lp_min_fun()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
-  [`lp_max_fun()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
-  : Set a General Nonlinear Objective Function
-
 - [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
   [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
   : Solve a Linear Problem
+
+## Nonlinear objective and constraints
+
+- [`nonlinear()`](https://benet1one.github.io/lpsugar/reference/nonlinear.md)
+  [`nl()`](https://benet1one.github.io/lpsugar/reference/nonlinear.md) :
+  Nonlinear Expression
 
 ## Utilities
 
@@ -194,15 +194,15 @@ package website.
 
 ## Manually solve a problem
 
-- [`reexports`](https://benet1one.github.io/lpsugar/reference/reexports.md)
-  [`as.OP`](https://benet1one.github.io/lpsugar/reference/reexports.md)
-  [`ROI_solve`](https://benet1one.github.io/lpsugar/reference/reexports.md)
-  : Objects exported from other packages
-
 - [`as.OP(`*`<lp_problem>`*`)`](https://benet1one.github.io/lpsugar/reference/as.OP.lp_problem.md)
   :
 
   Create a [`ROI::OP()`](https://rdrr.io/pkg/ROI/man/OP.html) Object.
+
+- [`reexports`](https://benet1one.github.io/lpsugar/reference/reexports.md)
+  [`as.OP`](https://benet1one.github.io/lpsugar/reference/reexports.md)
+  [`ROI_solve`](https://benet1one.github.io/lpsugar/reference/reexports.md)
+  : Objects exported from other packages
 
 - [`pretty_solution()`](https://benet1one.github.io/lpsugar/reference/pretty_solution.md)
   : Prettify the Solution of a Model.

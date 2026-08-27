@@ -45,6 +45,10 @@ print(p)
 #> Real scalar 'x'
 #> 
 #> – $constraints
+#> An object containing 1 linear constraint.
 #> 
-#> c2           | n = 1 | x < 10
+#> c2
+#> | x < 10
+#> | Rows = 1
+#> 
 ```

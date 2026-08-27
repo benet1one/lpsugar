@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.25.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.26.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,18 +71,21 @@
 
 
 <dt id="arg-objective">objective<a class="anchor" aria-label="anchor" href="#arg-objective"></a></dt>
-<dd><p>Expression to optimize, which must evaluate to an <code>lp_variable</code> object.
-Alternatively, set <code>objective = 0</code> to make the solver find a feasible solution
-instead of optimizing, just like <code><a href="lp_solve.html">lp_find_feasible()</a></code> does.</p></dd>
+<dd><p>Expression to optimize. Can be:</p><ul><li><p>The number 0, in which case the solver will attempt to find any feasible solution.
+<code><a href="lp_solve.html">lp_find_feasible()</a></code> serves the same purpose.</p></li>
+<li><p>A linear or quadratic expression containing decision variables.</p></li>
+<li><p>A nonlinear expression wrapped in <code><a href="nonlinear.html">nonlinear()</a></code>.</p></li>
+</ul></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The <code>.problem</code> with the new <code>$objective</code> function, a list with these fields:</p><ul><li><p><code>$Q</code> : If objective function is quadratic, matrix with the quadratic coefficients.</p></li>
-<li><p><code>$L</code> : Vector with the coefficients for each variable.</p></li>
-<li><p><code>$A</code> : Numeric, addend to the final value. It is not used in the solver.</p></li>
-<li><p><code>$direction</code> : String, goal of the solver. Can be <code>"minimize"</code> or <code>"maximize"</code>.</p></li>
-<li><p><code>$expr</code> : String, expression that defined the objective function.</p></li>
+    <p>The <code>.problem</code> with the new <code>$objective</code> function.</p>
+<p>The <code>$objective</code> inherits from <code><a href="https://rdrr.io/pkg/ROI/man/L_objective.html" class="external-link">ROI::L_objective()</a></code>, <code><a href="https://rdrr.io/pkg/ROI/man/Q_objective.html" class="external-link">ROI::Q_objective()</a></code>,
+or <code><a href="https://rdrr.io/pkg/ROI/man/F_objective.html" class="external-link">ROI::F_objective()</a></code>.</p><ul><li><p>A quadratic objective function is represented as</p>
+<p>\(\frac{1}{2} x'Qx + Lx\)</p></li>
+<li><p>While a nonlinear objective function is simply represented as</p>
+<p>\(F(x)\)</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -92,12 +95,13 @@ the <code>sum</code> yourself.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="lp_objective_function.html">lp_minimize_function()</a></code> For general nonlinear optimization.</p></div>
+    <div class="dont-index"><p><code><a href="nonlinear.html">nonlinear()</a></code> For general nonlinear optimization.</p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">profit</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Phone <span class="op">=</span> <span class="fl">60</span>, Tablet <span class="op">=</span> <span class="fl">20</span>, eBook <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Linear Objective using an Alias ---------------</span></span></span>
+<span class="r-in"><span><span class="va">profit</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Phone <span class="op">=</span> <span class="fl">60</span>, Tablet <span class="op">=</span> <span class="fl">20</span>, eBook <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">max_made</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Phone <span class="op">=</span> <span class="fl">500</span>, Tablet <span class="op">=</span> <span class="fl">300</span>, eBook <span class="op">=</span> <span class="fl">950</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">product</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">profit</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fix_cost</span> <span class="op">&lt;-</span> <span class="fl">11e3</span></span></span>
@@ -109,12 +113,13 @@ the <code>sum</code> yourself.</p>
 <span class="r-in"><span>    <span class="fu"><a href="lp_constraint.html">lp_constraint</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">made</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">1500</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">p</span><span class="op">$</span><span class="va">objective</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> maximize linear function:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> linear function:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> total_profit - fix_cost</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">ROI.plugin.highs</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">(</span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">–</span><span style="font-weight: bold;"> $variables</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $made</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> product</span>
@@ -134,13 +139,49 @@ the <code>sum</code> yourself.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">s</span><span class="op">$</span><span class="va">aliases</span><span class="op">$</span><span class="va">total_profit</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 43000</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">objective</span><span class="op">$</span><span class="va">L</span> <span class="op">*</span> <span class="va">s</span><span class="op">$</span><span class="va">variables_vec</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">objective</span><span class="op">$</span><span class="va">L</span><span class="op">)</span> <span class="op">*</span> <span class="va">s</span><span class="op">$</span><span class="va">variables_vec</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 43000</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">s</span><span class="op">$</span><span class="va">aliases</span><span class="op">$</span><span class="va">total_profit</span> <span class="op">-</span> <span class="va">fix_cost</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 32000</span>
 <span class="r-in"><span><span class="va">s</span><span class="op">$</span><span class="va">objective</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 32000</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">objective</span><span class="op">$</span><span class="va">L</span> <span class="op">*</span> <span class="va">s</span><span class="op">$</span><span class="va">variables_vec</span><span class="op">)</span> <span class="op">+</span> <span class="va">p</span><span class="op">$</span><span class="va">objective</span><span class="op">$</span><span class="va">A</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 32000</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Nonlinear objective ---------------------------</span></span></span>
+<span class="r-in"><span><span class="va">nlp</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">x</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">y</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu">lp_maximize</span><span class="op">(</span><span class="fu"><a href="nonlinear.html">nonlinear</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="lp_constraint.html">lp_constraint</a></span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span> <span class="op">&lt;=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># There are some different solvers within `nloptr`</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roigrp.gitlab.io" class="external-link">ROI.plugin.nloptr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="lpsugar_applicable_solvers.html">lpsugar_applicable_solvers</a></span><span class="op">(</span><span class="va">nlp</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag" "nloptr.isres" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "nloptr.slsqp" </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="lp_solve.html">lp_solve</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">nlp</span>, </span></span>
+<span class="r-in"><span>    solver <span class="op">=</span> <span class="st">"nloptr.cobyla"</span>, </span></span>
+<span class="r-in"><span>    start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">–</span><span style="font-weight: bold;"> $variables</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4.580018</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5.419982</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">–</span><span style="font-weight: bold;"> $objective</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.616963</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">–</span><span style="font-weight: bold;"> $status</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Optimal Solution Found ✔ </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># See more examples in the Nonlinear vignette</span></span></span>
+<span class="r-in"><span><span class="co"># vignette("nonlinear", package = "lpsugar")</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.25.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.26.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -336,8 +336,7 @@ minimize or maximize. It is set using <code><a href="../reference/lp_objective.h
 <span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="va">objective</span><span class="op">$</span><span class="va">L</span></span>
-<span><span class="co">#&gt; x[1,a] x[2,a] x[3,a] x[1,b] x[2,b] x[3,b] </span></span>
-<span><span class="co">#&gt;      2      2      2      5      5      5</span></span></code></pre></div>
+<span><span class="co">#&gt; A 1x6 simple triplet matrix.</span></span></code></pre></div>
 <p>Sometimes the goal is to find any feasible solution. This can be done
 by using <code><a href="../reference/lp_solve.html">lp_find_feasible()</a></code> instead of
 <code><a href="../reference/lp_solve.html">lp_solve()</a></code>. Alternatively, the objective coeficients can be
@@ -381,13 +380,16 @@ k \cdot x_k \le y_{n-k+1} \qquad \forall k \in 1..n
 <span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="va">constraints</span></span>
+<span><span class="co">#&gt; An object containing 3 linear constraints.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; my_constraint | n = 3 | for (k in 1:n) { ... }</span></span>
+<span><span class="co">#&gt; my_constraint</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">| </span>for (k in 1:n) { ... }</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">| </span>Rows = 3</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                    x[1] x[2] x[3] y[1] y[2] y[3] dir  </span></span>
-<span><span class="co">#&gt; my_constraint[k=1] 1    0    0    0    0    -1   &lt;=  0</span></span>
-<span><span class="co">#&gt; my_constraint[k=2] 0    2    0    0    -1   0    &lt;=  0</span></span>
-<span><span class="co">#&gt; my_constraint[k=3] 0    0    3    -1   0    0    &lt;=  0</span></span></code></pre></div>
+<span><span class="co">#&gt;                      x[1] x[2] x[3] y[1] y[2] y[3] dir rhs</span></span>
+<span><span class="co">#&gt;   my_constraint[k=1] 1    0    0    0    0    -1   &lt;=  0  </span></span>
+<span><span class="co">#&gt;   my_constraint[k=2] 0    2    0    0    -1   0    &lt;=  0  </span></span>
+<span><span class="co">#&gt;   my_constraint[k=3] 0    0    3    -1   0    0    &lt;=  0</span></span></code></pre></div>
 <p>Since <code>lpsugar</code> supports vectorized operations, it’s
 possible to define the same constraint as:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -399,13 +401,16 @@ possible to define the same constraint as:</p>
 <span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="va">p2</span><span class="op">$</span><span class="va">constraints</span><span class="op">[</span><span class="st">"alt_constraint"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; An object containing 3 linear constraints.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alt_constraint | n = 3 | (1:n) * x &lt;= rev(y)</span></span>
+<span><span class="co">#&gt; alt_constraint</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">| </span>(1:n) * x &lt;= rev(y)</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">| </span>Rows = 3</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                x[1] x[2] x[3] y[1] y[2] y[3] dir  </span></span>
-<span><span class="co">#&gt; alt_constraint 1    0    0    0    0    -1   &lt;=  0</span></span>
-<span><span class="co">#&gt; alt_constraint 0    2    0    0    -1   0    &lt;=  0</span></span>
-<span><span class="co">#&gt; alt_constraint 0    0    3    -1   0    0    &lt;=  0</span></span></code></pre></div>
+<span><span class="co">#&gt;                  x[1] x[2] x[3] y[1] y[2] y[3] dir rhs</span></span>
+<span><span class="co">#&gt;   alt_constraint 1    0    0    0    0    -1   &lt;=  0  </span></span>
+<span><span class="co">#&gt;   alt_constraint 0    2    0    0    -1   0    &lt;=  0  </span></span>
+<span><span class="co">#&gt;   alt_constraint 0    0    3    -1   0    0    &lt;=  0</span></span></code></pre></div>
 <p>Constraints can contain multiple lines of code, which makes it
 possible to divide complex operations more clearly. They can also
 contain <code>if</code> statements, as long as the condition does not
@@ -430,14 +435,17 @@ contain any variables.</p>
 <span>    <span class="op">)</span></span>
 <span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="va">constraints</span></span>
+<span><span class="co">#&gt; An object containing 4 linear constraints.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; order_con | n = 4 | for (t in 1:n) { ... }</span></span>
+<span><span class="co">#&gt; order_con</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">| </span>for (t in 1:n) { ... }</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">| </span>Rows = 4</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;                y[1] y[2] y[3] y[4] dir   </span></span>
-<span><span class="co">#&gt; order_con[t=1] 1    0    0    0    &gt;=  12</span></span>
-<span><span class="co">#&gt; order_con[t=2] -2   1    0    0    &gt;=  2 </span></span>
-<span><span class="co">#&gt; order_con[t=3] 0    -2   1    0    &gt;=  2 </span></span>
-<span><span class="co">#&gt; order_con[t=4] 0    0    -2   1    &gt;=  2</span></span></code></pre></div>
+<span><span class="co">#&gt;                  y[1] y[2] y[3] y[4] dir rhs</span></span>
+<span><span class="co">#&gt;   order_con[t=1] 1    0    0    0    &gt;=  12 </span></span>
+<span><span class="co">#&gt;   order_con[t=2] -2   1    0    0    &gt;=  2  </span></span>
+<span><span class="co">#&gt;   order_con[t=3] 0    -2   1    0    &gt;=  2  </span></span>
+<span><span class="co">#&gt;   order_con[t=4] 0    0    -2   1    &gt;=  2</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -58,27 +58,32 @@ p0 <- lp_problem() |>
 
 # But this problem has 3 extra variables and 3 extra constraints:
 p0$constraints
+#> An object containing 7 linear constraints.
 #> 
-#> some_constraint | n = 3 | (x + y >= 4)
+#> some_constraint
+#> | (x + y >= 4)
+#> | Rows = 3
 #> 
-#>                 x[a] x[b] x[c] y[a] y[b] y[c] z[a] z[b] z[c] dir  
-#> some_constraint 1    0    0    1    0    0    0    0    0    >=  4
-#> some_constraint 0    1    0    0    1    0    0    0    0    >=  4
-#> some_constraint 0    0    1    0    0    1    0    0    0    >=  4
+#>                   x[a] x[b] x[c] y[a] y[b] y[c] z[a] z[b] z[c] dir rhs
+#>   some_constraint 1    0    0    1    0    0    0    0    0    >=  4  
+#>   some_constraint 0    1    0    0    1    0    0    0    0    >=  4  
+#>   some_constraint 0    0    1    0    0    1    0    0    0    >=  4  
 #> 
+#> constraint_with_z
+#> | (z[1] <= 7)
+#> | Rows = 1
 #> 
-#> constraint_with_z | n = 1 | (z[1] <= 7)
+#>                     x[a] x[b] x[c] y[a] y[b] y[c] z[a] z[b] z[c] dir rhs
+#>   constraint_with_z 0    0    0    0    0    0    1    0    0    <=  7  
 #> 
-#>                   x[a] x[b] x[c] y[a] y[b] y[c] z[a] z[b] z[c] dir  
-#> constraint_with_z 0    0    0    0    0    0    1    0    0    <=  7
+#> xyz
+#> | for (i in 1:n) z[i] == 2 * x[i] + y[n - i + 1]
+#> | Rows = 3
 #> 
-#> 
-#> xyz | n = 3 | for (i in 1:n) z[i] == 2 * x[i] + y[n - i + 1]
-#> 
-#>          x[a] x[b] x[c] y[a] y[b] y[c] z[a] z[b] z[c] dir  
-#> xyz[i=1] -2   0    0    0    0    -1   1    0    0    ==  0
-#> xyz[i=2] 0    -2   0    0    -1   0    0    1    0    ==  0
-#> xyz[i=3] 0    0    -2   -1   0    0    0    0    1    ==  0
+#>            x[a] x[b] x[c] y[a] y[b] y[c] z[a] z[b] z[c] dir rhs
+#>   xyz[i=1] -2   0    0    0    0    -1   1    0    0    ==  0  
+#>   xyz[i=2] 0    -2   0    0    -1   0    0    1    0    ==  0  
+#>   xyz[i=3] 0    0    -2   -1   0    0    0    0    1    ==  0  
 #> 
 
 # Instead, we can define 'z' as an alias
@@ -96,19 +101,23 @@ p1 <- lp_problem() |>
 
 # This problem no extra variables or constraints!
 p1$constraints
+#> An object containing 4 linear constraints.
 #> 
-#> some_constraint | n = 3 | x + y >= 4
+#> some_constraint
+#> | x + y >= 4
+#> | Rows = 3
 #> 
-#>                 x[a] x[b] x[c] y[a] y[b] y[c] dir  
-#> some_constraint 1    0    0    1    0    0    >=  4
-#> some_constraint 0    1    0    0    1    0    >=  4
-#> some_constraint 0    0    1    0    0    1    >=  4
+#>                   x[a] x[b] x[c] y[a] y[b] y[c] dir rhs
+#>   some_constraint 1    0    0    1    0    0    >=  4  
+#>   some_constraint 0    1    0    0    1    0    >=  4  
+#>   some_constraint 0    0    1    0    0    1    >=  4  
 #> 
+#> constraint_with_z
+#> | (z[1] <= 7)
+#> | Rows = 1
 #> 
-#> constraint_with_z | n = 1 | (z[1] <= 7)
-#> 
-#>                   x[a] x[b] x[c] y[a] y[b] y[c] dir  
-#> constraint_with_z 2    0    0    0    0    1    <=  7
+#>                     x[a] x[b] x[c] y[a] y[b] y[c] dir rhs
+#>   constraint_with_z 2    0    0    0    0    1    <=  7  
 #> 
 
 # The solution is presented differently
@@ -203,66 +212,76 @@ p1 <- lp_problem() |>
 
 # The problems are equivalent
 p0$constraints
+#> An object containing 15 linear constraints.
 #> 
-#> min | n = 6 | for (j in Cols) for (i in seq_along(Rows)) { ... }
+#> min
+#> | for (j in Cols) for (i in seq_along(Rows)) { ... }
+#> | Rows = 6
 #> 
-#>                 x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  
-#> min[i=1, j="A"] 1      0      0      0      0      0      >=  1
-#> min[i=2, j="A"] 1      1      0      0      0      0      >=  1
-#> min[i=3, j="A"] 1      1      1      0      0      0      >=  5
-#> min[i=1, j="B"] 0      0      0      1      0      0      >=  0
-#> min[i=2, j="B"] 0      0      0      1      1      0      >=  0
-#> min[i=3, j="B"] 0      0      0      1      1      1      >=  3
+#>                   x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs
+#>   min[i=1, j="A"] 1      0      0      0      0      0      >=  1  
+#>   min[i=2, j="A"] 1      1      0      0      0      0      >=  1  
+#>   min[i=3, j="A"] 1      1      1      0      0      0      >=  5  
+#>   min[i=1, j="B"] 0      0      0      1      0      0      >=  0  
+#>   min[i=2, j="B"] 0      0      0      1      1      0      >=  0  
+#>   min[i=3, j="B"] 0      0      0      1      1      1      >=  3  
 #> 
+#> max
+#> | for (j in Cols) for (i in seq_along(Rows)) { ... }
+#> | Rows = 6
 #> 
-#> max | n = 6 | for (j in Cols) for (i in seq_along(Rows)) { ... }
+#>                   x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs
+#>   max[i=1, j="A"] 1      0      0      0      0      0      <=  4  
+#>   max[i=2, j="A"] 1      1      0      0      0      0      <=  5  
+#>   max[i=3, j="A"] 1      1      1      0      0      0      <=  9  
+#>   max[i=1, j="B"] 0      0      0      1      0      0      <=  3  
+#>   max[i=2, j="B"] 0      0      0      1      1      0      <=  9  
+#>   max[i=3, j="B"] 0      0      0      1      1      1      <=  7  
 #> 
-#>                 x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  
-#> max[i=1, j="A"] 1      0      0      0      0      0      <=  4
-#> max[i=2, j="A"] 1      1      0      0      0      0      <=  5
-#> max[i=3, j="A"] 1      1      1      0      0      0      <=  9
-#> max[i=1, j="B"] 0      0      0      1      0      0      <=  3
-#> max[i=2, j="B"] 0      0      0      1      1      0      <=  9
-#> max[i=3, j="B"] 0      0      0      1      1      1      <=  7
+#> A_less_than_B
+#> | for (i in seq_along(Rows)) { ... }
+#> | Rows = 3
 #> 
-#> 
-#> A_less_than_B | n = 3 | for (i in seq_along(Rows)) { ... }
-#> 
-#>                    x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  
-#> A_less_than_B[i=1] 1      0      0      -1     0      0      <=  0
-#> A_less_than_B[i=2] 1      1      0      -1     -1     0      <=  0
-#> A_less_than_B[i=3] 1      1      1      -1     -1     -1     <=  0
+#>                      x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs
+#>   A_less_than_B[i=1] 1      0      0      -1     0      0      <=  0  
+#>   A_less_than_B[i=2] 1      1      0      -1     -1     0      <=  0  
+#>   A_less_than_B[i=3] 1      1      1      -1     -1     -1     <=  0  
 #> 
 p1$constraints
+#> An object containing 15 linear constraints.
 #> 
-#> min | n = 6 | (col_cumsum >= min_col_cumsum)
+#> min
+#> | (col_cumsum >= min_col_cumsum)
+#> | Rows = 6
 #> 
-#>     x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  
-#> min 1      0      0      0      0      0      >=  1
-#> min 1      1      0      0      0      0      >=  1
-#> min 1      1      1      0      0      0      >=  5
-#> min 0      0      0      1      0      0      >=  0
-#> min 0      0      0      1      1      0      >=  0
-#> min 0      0      0      1      1      1      >=  3
+#>       x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs
+#>   min 1      0      0      0      0      0      >=  1  
+#>   min 1      1      0      0      0      0      >=  1  
+#>   min 1      1      1      0      0      0      >=  5  
+#>   min 0      0      0      1      0      0      >=  0  
+#>   min 0      0      0      1      1      0      >=  0  
+#>   min 0      0      0      1      1      1      >=  3  
 #> 
+#> max
+#> | (col_cumsum <= max_col_cumsum)
+#> | Rows = 6
 #> 
-#> max | n = 6 | (col_cumsum <= max_col_cumsum)
+#>       x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs
+#>   max 1      0      0      0      0      0      <=  4  
+#>   max 1      1      0      0      0      0      <=  5  
+#>   max 1      1      1      0      0      0      <=  9  
+#>   max 0      0      0      1      0      0      <=  3  
+#>   max 0      0      0      1      1      0      <=  9  
+#>   max 0      0      0      1      1      1      <=  7  
 #> 
-#>     x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  
-#> max 1      0      0      0      0      0      <=  4
-#> max 1      1      0      0      0      0      <=  5
-#> max 1      1      1      0      0      0      <=  9
-#> max 0      0      0      1      0      0      <=  3
-#> max 0      0      0      1      1      0      <=  9
-#> max 0      0      0      1      1      1      <=  7
+#> A_less_than_B
+#> | (col_cumsum[, "A"] <= col_cumsum[, "B"])
+#> | Rows = 3
 #> 
-#> 
-#> A_less_than_B | n = 3 | (col_cumsum[, "A"] <= col_cumsum[, "B"])
-#> 
-#>               x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir  
-#> A_less_than_B 1      0      0      -1     0      0      <=  0
-#> A_less_than_B 1      1      0      -1     -1     0      <=  0
-#> A_less_than_B 1      1      1      -1     -1     -1     <=  0
+#>                 x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs
+#>   A_less_than_B 1      0      0      -1     0      0      <=  0  
+#>   A_less_than_B 1      1      0      -1     -1     0      <=  0  
+#>   A_less_than_B 1      1      1      -1     -1     -1     <=  0  
 #> 
 
 # Notice it's not a variable, thus not adding complexity to the problem

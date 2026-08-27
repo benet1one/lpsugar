@@ -52,13 +52,13 @@ print(x)
 #> [1]  8.66  8.87 11.65  7.34 12.44
 ```
 
-We will find \\\mu\\ and \\\sigma\\ by maximum likelihood. Here’s the
-function that returns the loglikelihood. It’s arguments *must* be the
-variables of the problem.
+We will find \\\mu\\ and \\\sigma\\ by maximum likelihood. We use
+[`nonlinear()`](https://benet1one.github.io/lpsugar/reference/nonlinear.md)
+to define the expression to calculate it.
 
 ``` r
 
-loglikelihood_x <- function(mu, sigma) {
+loglikelihood_x <- nonlinear({
     LL <- 0
     
     for (i in 1:n) {
@@ -67,17 +67,18 @@ loglikelihood_x <- function(mu, sigma) {
     }
     
     return(LL)
-}
+})
 ```
 
-Now we solve the problem.
+Now we solve the problem, with \\\mu\\ and \\\sigma\\ as decision
+variables.
 
 ``` r
 
 constrained_mle <- lp_problem() |> 
     lp_var(mu[1:n]) |> 
     lp_var(sigma, lower = 0) |> 
-    lp_max_fun(loglikelihood_x) |> 
+    lp_max(loglikelihood_x) |> 
     lp_con(
         for (i in 2:n) mu[i] >= mu[i-1]
     ) |> 

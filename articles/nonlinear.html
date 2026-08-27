@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.25.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.26.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,11 +125,10 @@ j\in[1,m_i]
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[5]]</span></span>
 <span><span class="co">#&gt; [1]  8.66  8.87 11.65  7.34 12.44</span></span></code></pre></div>
-<p>We will find <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> by maximum likelihood. Here’s the
-function that returns the loglikelihood. It’s arguments <em>must</em> be
-the variables of the problem.</p>
+<p>We will find <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> by maximum likelihood. We use
+<code><a href="../reference/nonlinear.html">nonlinear()</a></code> to define the expression to calculate it.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">loglikelihood_x</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mu</span>, <span class="va">sigma</span><span class="op">)</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">loglikelihood_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nonlinear.html">nonlinear</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>    <span class="va">LL</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>    </span>
 <span>    <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
@@ -138,13 +137,13 @@ the variables of the problem.</p>
 <span>    <span class="op">}</span></span>
 <span>    </span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">LL</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>Now we solve the problem.</p>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<p>Now we solve the problem, with <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> as decision variables.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">constrained_mle</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">mu</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">sigma</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/lp_objective_function.html">lp_max_fun</a></span><span class="op">(</span><span class="va">loglikelihood_x</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_objective.html">lp_max</a></span><span class="op">(</span><span class="va">loglikelihood_x</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_con</a></span><span class="op">(</span></span>
 <span>        <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="va">mu</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="va">mu</span><span class="op">[</span><span class="va">i</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>

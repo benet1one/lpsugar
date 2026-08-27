@@ -70,11 +70,11 @@ solution_summary(problem, unfeasible_solution)
 #> 
 #> 
 #> $constraints
-#>   name fullname lhs dir rhs satisfied saturated
-#> 1   c1       c1   1  ==  10     FALSE        NA
-#> 2   c2  c2[i=1]   4  <=   1     FALSE        NA
-#> 3   c2  c2[i=2]   2  <=   2      TRUE      TRUE
-#> 4   c2  c2[i=3]  -3  <=   3      TRUE     FALSE
+#>   id full_id lhs dir rhs satisfied saturated
+#> 1 c1      c1   1  ==  10     FALSE        NA
+#> 2 c2 c2[i=1]   4  <=   1     FALSE        NA
+#> 3 c2 c2[i=2]   2  <=   2      TRUE      TRUE
+#> 4 c2 c2[i=3]  -3  <=   3      TRUE     FALSE
 #> 
 #> $bounds
 #>   variable lower value upper satisfied saturated

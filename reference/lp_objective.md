@@ -23,29 +23,34 @@ lp_max(.problem, objective)
 
 - objective:
 
-  Expression to optimize, which must evaluate to an `lp_variable`
-  object. Alternatively, set `objective = 0` to make the solver find a
-  feasible solution instead of optimizing, just like
-  [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
-  does.
+  Expression to optimize. Can be:
+
+  - The number 0, in which case the solver will attempt to find any
+    feasible solution.
+    [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
+    serves the same purpose.
+
+  - A linear or quadratic expression containing decision variables.
+
+  - A nonlinear expression wrapped in
+    [`nonlinear()`](https://benet1one.github.io/lpsugar/reference/nonlinear.md).
 
 ## Value
 
-The `.problem` with the new `$objective` function, a list with these
-fields:
+The `.problem` with the new `$objective` function.
 
-- `$Q` : If objective function is quadratic, matrix with the quadratic
-  coefficients.
+The `$objective` inherits from
+[`ROI::L_objective()`](https://rdrr.io/pkg/ROI/man/L_objective.html),
+[`ROI::Q_objective()`](https://rdrr.io/pkg/ROI/man/Q_objective.html), or
+[`ROI::F_objective()`](https://rdrr.io/pkg/ROI/man/F_objective.html).
 
-- `$L` : Vector with the coefficients for each variable.
+- A quadratic objective function is represented as
 
-- `$A` : Numeric, addend to the final value. It is not used in the
-  solver.
+  \\\frac{1}{2} x'Qx + Lx\\
 
-- `$direction` : String, goal of the solver. Can be `"minimize"` or
-  `"maximize"`.
+- While a nonlinear objective function is simply represented as
 
-- `$expr` : String, expression that defined the objective function.
+  \\F(x)\\
 
 ## Details
 
@@ -55,12 +60,13 @@ message by writing the `sum` yourself.
 
 ## See also
 
-[`lp_minimize_function()`](https://benet1one.github.io/lpsugar/reference/lp_objective_function.md)
+[`nonlinear()`](https://benet1one.github.io/lpsugar/reference/nonlinear.md)
 For general nonlinear optimization.
 
 ## Examples
 
 ``` r
+# Linear Objective using an Alias ---------------
 profit   <- c(Phone = 60, Tablet = 20, eBook = 10)
 max_made <- c(Phone = 500, Tablet = 300, eBook = 950)
 product  <- names(profit)
@@ -73,12 +79,13 @@ p <- lp_problem() |>
     lp_constraint(sum(made) <= 1500)
 
 p$objective
-#> maximize linear function:
+#> linear function:
 #> total_profit - fix_cost
 #> 
 
 library(ROI.plugin.highs)
-(s <- lp_solve(p))
+s <- lp_solve(p)
+print(s)
 #> – $variables
 #> $made
 #> product
@@ -98,11 +105,47 @@ library(ROI.plugin.highs)
 
 s$aliases$total_profit
 #> [1] 43000
-sum(p$objective$L * s$variables_vec)
+sum(c(p$objective$L) * s$variables_vec)
 #> [1] 43000
 
+s$aliases$total_profit - fix_cost
+#> [1] 32000
 s$objective
 #> [1] 32000
-sum(p$objective$L * s$variables_vec) + p$objective$A
-#> [1] 32000
+
+
+# Nonlinear objective ---------------------------
+nlp <- lp_problem() |> 
+    lp_variable(x, lower = 0) |> 
+    lp_variable(y, lower = 0) |> 
+    lp_maximize(nonlinear(sqrt(x) * log(y))) |> 
+    lp_constraint(x + y <= 10)
+
+# There are some different solvers within `nloptr`
+library(ROI.plugin.nloptr)
+lpsugar_applicable_solvers(nlp)
+#> [1] "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag" "nloptr.isres" 
+#> [5] "nloptr.slsqp" 
+
+lp_solve(
+    nlp, 
+    solver = "nloptr.cobyla", 
+    start = list(x = 1, y = 1)
+)
+#> – $variables
+#> $x
+#> [1] 4.580018
+#> 
+#> $y
+#> [1] 5.419982
+#> 
+#> – $objective
+#> [1] 3.616963
+#> 
+#> – $status
+#> Optimal Solution Found ✔ 
+#> 
+
+# See more examples in the Nonlinear vignette
+# vignette("nonlinear", package = "lpsugar")
 ```

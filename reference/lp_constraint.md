@@ -30,44 +30,36 @@ lp_subject_to(.problem, ...)
 
   - Contain a comparison operator, such as `<=`, `==` or `=>`.
 
+  - If it's a nonlinear constraint, it must be written as:
+
+    [`nonlinear()`](https://benet1one.github.io/lpsugar/reference/nonlinear.md)` <= number`
+
 ## Value
 
-The `.problem` with added `$constraints`. (Note: previous constraints
-are not overritten).
+The `.problem` with added `$constraints`. Previous constraints are not
+overwritten, so it's possible to call `lp_constraint()` multiple times
+without overwriting previously defined constraints.
 
-A constraint with `dir[i] = "<="` is represented as \\\frac{1}{2}
-x'Q\_{i}x + L\_{i}x \le \text{rhs}\_{i}\\.
+The `$constraints` inherit from
+[`ROI::L_constraint()`](https://rdrr.io/pkg/ROI/man/L_constraint.html),
+[`ROI::Q_constraint()`](https://rdrr.io/pkg/ROI/man/Q_constraint.html)
+or
+[`ROI::F_constraint()`](https://rdrr.io/pkg/ROI/man/F_constraint.html).
 
-The `$constraints` field has the following subfields:
+- Quadratic constraints are represented as
 
-- `$Q` : List of quadratic coefficient matrices:
+  \\\frac{1}{2} x'Q\_{i}x + L\_{i}x \le \text{rhs}\_{i} \qquad \forall
+  i\\
 
-  - `NULL` if the constraint is linear.
+- While nonlinear constraints are represented as
 
-  - [`slam::simple_triplet_matrix()`](https://rdrr.io/pkg/slam/man/matrix.html)
-    if constraint is quadratic.
-
-- `$L` :
-  [`slam::simple_triplet_matrix()`](https://rdrr.io/pkg/slam/man/matrix.html)
-  of linear coefficients, where each row is a constraint and each is a
-  variable.
-
-- `$dir` : Character vector with elements `"<="`, `"=="`, or `">="`, the
-  direction of each constraint.
-
-- `$rhs` : Numeric column vector representing the right hand side of
-  each constraint.
-
-- `$name` : Character vector with the names of the constraints, if `...`
-  is named, or `""` for unnamed constraints.
-
-- `$call` : Expression that defined each constraint.
+  \\F(x)\_i \le \text{rhs}\_i \qquad \forall i\\
 
 ## Examples
 
 ``` r
-# Ordered variable constraint
-## ordered[i] > ordered[i-1]  for all i in 2:n
+# Order Constraint ------------------------------
+## ordered[i] > ordered[i-1]  forall i in 2:n
 n <- 4
 p <- lp_problem() |>
     lp_variable(ordered[1:n], lower = 0)
@@ -85,30 +77,54 @@ for (i in 2:n) {
     )
 }
 
-## The only difference are the rownames of the constraint matrix
+## The only difference are the row names of the constraint matrix when printing
 print(pc$constraints)
+#> An object containing 9 linear constraints.
 #> 
-#> alt1 | n = 3 | ordered[2:n] > ordered[1:(n - 1)]
+#> alt1
+#> | ordered[2:n] > ordered[1:(n - 1)]
+#> | Rows = 3
 #> 
-#>      ordered[1] ordered[2] ordered[3] ordered[4] dir  
-#> alt1 -1         1          0          0          >=  0
-#> alt1 0          -1         1          0          >=  0
-#> alt1 0          0          -1         1          >=  0
+#>        ordered[1] ordered[2] ordered[3] ordered[4] dir rhs
+#>   alt1 -1         1          0          0          >=  0  
+#>   alt1 0          -1         1          0          >=  0  
+#>   alt1 0          0          -1         1          >=  0  
 #> 
+#> alt2
+#> | for (i in 2:n) ordered[i] > ordered[i - 1]
+#> | Rows = 3
 #> 
-#> alt2 | n = 3 | for (i in 2:n) ordered[i] > ordered[i - 1]
+#>             ordered[1] ordered[2] ordered[3] ordered[4] dir rhs
+#>   alt2[i=2] -1         1          0          0          >=  0  
+#>   alt2[i=3] 0          -1         1          0          >=  0  
+#>   alt2[i=4] 0          0          -1         1          >=  0  
 #> 
-#>           ordered[1] ordered[2] ordered[3] ordered[4] dir  
-#> alt2[i=2] -1         1          0          0          >=  0
-#> alt2[i=3] 0          -1         1          0          >=  0
-#> alt2[i=4] 0          0          -1         1          >=  0
+#> alt3
+#> | ordered[i] > ordered[i - 1]
+#> | Rows = 3
 #> 
+#>        ordered[1] ordered[2] ordered[3] ordered[4] dir rhs
+#>   alt3 -1         1          0          0          >=  0  
+#>   alt3 0          -1         1          0          >=  0  
+#>   alt3 0          0          -1         1          >=  0  
 #> 
-#> alt3 | n = 3 | ordered[i] > ordered[i - 1]
+
+
+# Nonlinear Constraint --------------------------
+## log(x + 1) > y  =>  log(x + 1) - y > 0
+nlp <- lp_problem() |> 
+    lp_variable(x, lower = 0) |> 
+    lp_variable(y) |> 
+    lp_constraint(
+        # Nonlinear constraints must always be written as `nonlinear(...) <= number`
+        nl_con = nonlinear(log(x + 1) - y) > 0
+    )
+
+print(nlp$constraints)
+#> An object containing 1 nonlinear constraint.
 #> 
-#>      ordered[1] ordered[2] ordered[3] ordered[4] dir  
-#> alt3 -1         1          0          0          >=  0
-#> alt3 0          -1         1          0          >=  0
-#> alt3 0          0          -1         1          >=  0
+#> nl_con
+#> | nonlinear(log(x + 1) - y) > 0
+#> | Rows = 1
 #> 
 ```

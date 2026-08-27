@@ -35,12 +35,15 @@ p <- lp_problem() |>
     )
 
 p$constraints
+#> An object containing 3 linear constraints.
 #> 
-#> <unnamed> | n = 3 | for (i in 2:length(y_full)) y_full[i] > y_full[i - 1]
+#> #unnamed_constraint
+#> | for (i in 2:length(y_full)) y_full[i] > y_full[i - 1]
+#> | Rows = 3
 #> 
-#>       y[1] y[2] y[3] dir  
-#> [i=2] 1    0    0    >=  4
-#> [i=3] -1   1    0    >=  0
-#> [i=4] 0    -1   1    >=  0
+#>         y[1] y[2] y[3] dir rhs
+#>   [i=2] 1    0    0    >=  4  
+#>   [i=3] -1   1    0    >=  0  
+#>   [i=4] 0    -1   1    >=  0  
 #> 
 ```
