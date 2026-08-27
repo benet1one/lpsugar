@@ -463,10 +463,8 @@ print.lp_constraint <- function(x, full = TRUE, ...) {
             grey_bar, "Rows = ", n, "\n\n",
             sep = ""
         )
-        
-        is_q <- is_quadratic(x[where])
-        
-        if (full && !is_q) {
+
+        if (full && !is_quadratic(x[where])) {
             mat <- as.matrix.lp_constraint(x[where])
             rownames(mat) <- paste0("  ", rownames(mat))
             print(mat, quote = FALSE)
