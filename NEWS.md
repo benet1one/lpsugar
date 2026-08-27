@@ -1,4 +1,4 @@
-# lpsugar (development version)
+# lpsugar 0.26.0
 
 ## Breaking Changes
 
