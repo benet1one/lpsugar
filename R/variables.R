@@ -104,6 +104,9 @@ lp_variable <- function(.problem, definition,
         upper <- pmin(upper, 1)
     }
     
+    fixed_at <- lower == upper
+    
+    
     type <- roi_variable_type(
         binary = binary, 
         integer = integer,
@@ -303,16 +306,16 @@ print.lp_variable <- function(x, ...) {
     
     cat("'")
     
-    if (length(x$lower) == 1L && length(x$upper) == 1L) {
-        if (x$lower != -Inf && x$upper != +Inf) {
+    if (all(x$lower == x$lower[1]) && all(x$upper == x$upper[1])) {
+        if (x$lower[1] != -Inf && x$upper[1] != +Inf) {
             cat("\n")
-            cat(x$lower, "<=", x$name, "<=", x$upper)
+            cat(x$lower[1], "<=", x$name, "<=", x$upper[1])
         } 
-        else if (x$lower != -Inf) {
-            cat("\n", x$name, " >= ", x$lower, sep = "")
+        else if (x$lower[1] != -Inf) {
+            cat("\n", x$name, " >= ", x$lower[1], sep = "")
         } 
-        else if (x$upper != +Inf) {
-            cat("\n", x$name, " <= ", x$upper, sep = "")
+        else if (x$upper[1] != +Inf) {
+            cat("\n", x$name, " <= ", x$upper[1], sep = "")
         }
     }
     
@@ -706,7 +709,7 @@ adjust_bound <- function(bound, bound_name, default, dim) {
         )
     }
     
-    bound
+    recycle_const(bound, prod(dim))
 }
 
 check_consistent_bounds <- function(lower, upper, call = parent.frame()) {
