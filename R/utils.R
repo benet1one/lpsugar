@@ -190,7 +190,11 @@ variables_to_list.default <- function(x, problem,
     }
     
     purrr::map(problem$variables, function(v) {
+        fixed_at <- is.na(v$ind)
+        fixed_values <- v$lower[fixed_at]
+        
         values <- x[v$ind]
+        values[fixed_at] <- fixed_values
         
         if (v$binary && binary_as_logical) {
             values <- values > 0.5

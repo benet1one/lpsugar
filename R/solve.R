@@ -153,9 +153,12 @@ as.OP.lp_problem <- function(x) {
     upper <- numeric(ncol(x))
     
     for (v in x$variables) {
-        types[v$ind] <- v$type
-        lower[v$ind] <- v$lower
-        upper[v$ind] <- v$upper
+        free <- !is.na(v$ind)
+        i <- v$ind[free]
+        
+        types[i] <- v$type
+        lower[i] <- v$lower[free]
+        upper[i] <- v$upper[free]
     }
     
     # Bound indices and bounds

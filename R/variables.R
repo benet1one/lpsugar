@@ -105,7 +105,7 @@ lp_variable <- function(.problem, definition,
     }
     
     fixed_at <- lower == upper
-    
+    fixed_values <- lower[fixed_at]
     
     type <- roi_variable_type(
         binary = binary, 
@@ -116,18 +116,28 @@ lp_variable <- function(.problem, definition,
 
     ind <- variable_indices(
         old_n = ncol(.problem), 
-        definition = def
+        definition = def,
+        fixed_at = fixed_at
     )
     
-    attr(.problem, "n_variables") <- max(ind)
+    attr(.problem, "n_variables") <- max(ind, na.rm = TRUE)
     attr(.problem, "varnames") <- c(
         attr(.problem, "varnames"),
-        name_variable(name, sets)
+        name_variable(name, sets, fixed_at)
     )
     
-    A <- matrix(0, nrow = length(ind), ncol = 1L) |> robust_index()
-    L <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> robust_index()
-    L[, ind] <- diag(length(ind))
+    A <- new_A_coef(
+        ind = ind, 
+        fixed_at = fixed_at, 
+        fixed_values = fixed_values
+    )
+    
+    L <- new_L_coef(
+        ind = ind,
+        ncol = ncol(.problem),
+        colnames = variable.names(.problem),
+        fixed_at = fixed_at
+    )
     
     new_variable <- list(
         name = name,
@@ -746,30 +756,48 @@ check_consistent_bounds <- function(lower, upper, call = parent.frame()) {
 
 # Index array of variable.
 # Indicates which objective coefficients correspond to this variable.
-variable_indices <- function(old_n, definition) {
+variable_indices <- function(old_n, definition, fixed_at) {
     if (definition$scalar) {
-        ind <- old_n + 1L
+        if (fixed_at) {
+            ind <- NA_integer_
+        }
+        else {
+            ind <- old_n + 1L
+        }
     } 
     else {
         ind <- array(
             dim = lengths(definition$sets),
             dimnames = dimnames_non_numeric(definition$sets)
         )
-        ind[] <- seq_along(ind) + old_n
+        ind[!fixed_at] <- seq_along(ind[!fixed_at]) + old_n
     }
     
     robust_index(ind)
 }
 
+new_A_coef <- function(ind, fixed_at, fixed_values) {
+    A <- matrix(0, ncol = 1, nrow = length(ind))
+    A[fixed_at] <- fixed_values
+    robust_index(A)
+}
+new_L_coef <- function(ind, ncol, colnames, fixed_at) {
+    L <- matrix(0, ncol = ncol, nrow = length(ind))
+    L[!fixed_at, ind[!fixed_at]] <- diag(sum(!fixed_at))
+    colnames(L) <- colnames
+    robust_index(L)
+}
+
 # Gives the colnames of $L
 # For instance c("x[1,1]", "x[2,1]", ...)
-name_variable <- function(name, sets) {
+name_variable <- function(name, sets, fixed_at) {
     if (length(sets) == 1L && lengths(sets) == 1L) {
         return(name)
     }
     grid <- do.call(expand.grid, sets)
     index <- .mapply(dots = grid, FUN = paste, MoreArgs = list(sep = ","))
-    paste0(name, "[", index, "]")
+    nams <- paste0(name, "[", index, "]")
+    nams[!fixed_at]
 }
 
 roi_variable_type <- function(binary, integer, lower, upper) {
