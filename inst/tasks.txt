@@ -8,6 +8,7 @@ Fixed
 - variables_to_vec and variables_to_list
 - documentation
 - lp_fix_vars
+- bound_summary
 
 Nonlinear
 - gradient
