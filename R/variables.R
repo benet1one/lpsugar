@@ -120,7 +120,11 @@ lp_variable <- function(.problem, definition,
         fixed_at = fixed_at
     )
     
-    attr(.problem, "n_variables") <- max(ind, na.rm = TRUE)
+    attr(.problem, "n_variables") <- max(
+        ncol(.problem), 
+        ind, 
+        na.rm = TRUE
+    )
     attr(.problem, "varnames") <- c(
         attr(.problem, "varnames"),
         name_variable(name, sets, fixed_at)
@@ -792,11 +796,14 @@ new_L_coef <- function(ind, ncol, colnames, fixed_at) {
 # For instance c("x[1,1]", "x[2,1]", ...)
 name_variable <- function(name, sets, fixed_at) {
     if (length(sets) == 1L && lengths(sets) == 1L) {
-        return(name)
+        nams <- name
+    } 
+    else {
+        grid <- do.call(expand.grid, sets)
+        index <- .mapply(dots = grid, FUN = paste, MoreArgs = list(sep = ","))
+        nams <- paste0(name, "[", index, "]")
     }
-    grid <- do.call(expand.grid, sets)
-    index <- .mapply(dots = grid, FUN = paste, MoreArgs = list(sep = ","))
-    nams <- paste0(name, "[", index, "]")
+    
     nams[!fixed_at]
 }
 
