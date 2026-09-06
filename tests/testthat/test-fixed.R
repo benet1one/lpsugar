@@ -11,7 +11,7 @@ test_that("linear fixed", {
         p$constraints |> as.array() |> print(quote = FALSE)
     )
     
-    s <- lp_solve(p)
+    s <- lp_solve(p, solver = "highs")
     
     expect_equal(
         s$variables$x,
@@ -23,3 +23,32 @@ test_that("linear fixed", {
 # TODO
 # test with quadratic
 # test with nonlinear
+
+test_that("nonlinear fixed", {
+    withr::local_package("ROI.plugin.nloptr")
+    
+    p <- lp_problem() |> 
+        lp_var(const, lower = 1, upper = 1) |> 
+        lp_var(x[1:4], lower = c(0, 0, 10, 10), upper = c(0, 10, 10, Inf)) |> 
+        lp_max(nl(sum(x^3))) |> 
+        lp_con(nl(x[2] + sqrt(x[4])) <= 20)
+    
+    s <- lp_solve(
+        p, 
+        solver = "nloptr.cobyla", 
+        start = list(
+            const = 1,
+            x = c(0, 5, 10, 15)
+        )
+    )
+    
+    expect_equal(
+        s$variables_vec,
+        variables_to_vec(s$variables, problem = p)
+    )
+    
+    cs <- constraint_summary(p, s, tol = 0.2)
+    expect_all_true(cs$satisfied)
+    expect_all_true()
+    s$variables$x
+})
