@@ -375,7 +375,8 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
             )
         }
         
-        solution_vec[v$ind] <- xs
+        fixed_at <- is.na(v$ind)
+        solution_vec[v$ind[!fixed_at]] <- xs[!fixed_at]
     }
     
     solution_vec
@@ -384,7 +385,7 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
 #' @export
 variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE, 
                                          call = environment(), field = "x") {
-    var_vec <- unlist(x$variables)
+    var_vec <- variables_to_vec(x$variables, problem = problem)
     true_vec <- x$variables_vec
     
     if (length(var_vec) != length(true_vec) || any(var_vec != true_vec)) {
