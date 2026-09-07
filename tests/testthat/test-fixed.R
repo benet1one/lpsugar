@@ -47,8 +47,6 @@ test_that("nonlinear fixed", {
         variables_to_vec(s$variables, problem = p)
     )
     
-    cs <- constraint_summary(p, s, tol = 0.2)
-    expect_all_true(cs$satisfied)
-    expect_all_true()
-    s$variables$x
+    ss <- solution_summary(p, s, tol = 0.2)
+    expect_true(ss$feasible)
 })

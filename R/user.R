@@ -200,8 +200,9 @@ bound_summary <- function(problem, solution, tol = 2e-6) {
     upper <- numeric(ncol(problem))
     
     for (x in problem$variables) {
-        lower[x$ind] <- x$lower
-        upper[x$ind] <- x$upper
+        fixed <- is.na(x$ind)
+        lower[x$ind[!fixed]] <- x$lower[!fixed]
+        upper[x$ind[!fixed]] <- x$upper[!fixed]
     }
     
     satisfied <- (solution >= lower - tol) & (solution <= upper + tol)
