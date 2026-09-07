@@ -6,7 +6,7 @@
 \alias{lpsugar-package}
 \title{lpsugar: Linear, Quadratic and Nonlinear Programming in R}
 \description{
-Algebraic Modeling Language for Optimization in R. Supports linear, quadratic, or nonlinear objective functions with linear and quadratic constraints. Problems can be solved with a variety of solvers using 'ROI'.
+Algebraic Modeling Language for Optimization in R. Supports linear, quadratic, or nonlinear programming. Problems can be solved with a variety of solvers using 'ROI'.
 }
 \seealso{
 Useful links:
