@@ -1,18 +1,13 @@
 
 Code
 - Check TODOs
-- Support for fixed variables
+- Simple linear feasibility check with proper handling
 
 Fixed
-- pretty_solution
-- variables_to_vec and variables_to_list
 - documentation
-- lp_fix_vars
-- bound_summary
 
 Nonlinear
 - gradient
-- test errors
 
 Docs
 - Find another example for nonlinear
