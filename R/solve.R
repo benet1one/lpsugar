@@ -148,18 +148,10 @@ as.OP.lp_problem <- function(x) {
     objective <- as.objective.lp_objective(x$objective)
     constraints <- as.constraint.lp_constraint(x$constraints)
     
-    types <- character(ncol(x))
-    lower <- numeric(ncol(x))
-    upper <- numeric(ncol(x))
-    
-    for (v in x$variables) {
-        free <- !is.na(v$ind)
-        i <- v$ind[free]
-        
-        types[i] <- v$type
-        lower[i] <- v$lower[free]
-        upper[i] <- v$upper[free]
-    }
+    bound_info <- get_bounds(x, include_fixed = FALSE)
+    types <- bound_info$types
+    lower <- bound_info$lower
+    upper <- bound_info$upper
     
     # Bound indices and bounds
     li <- which(lower != 0)

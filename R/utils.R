@@ -648,6 +648,32 @@ lpsugar_attributes <- function(x) {
     return(x)
 }
 
+get_bounds <- function(x, include_fixed = FALSE) {
+    UseMethod("get_bounds")
+}
+#' @export
+get_bounds.lp_variable <- function(x, include_fixed = FALSE) {
+    out <- data.frame(
+        lower = x$lower,
+        upper = x$upper,
+        types = x$type
+    )
+    
+    if (include_fixed) {
+        out
+    }
+    else {
+        fixed_at <- is.na(x$ind)
+        out[!fixed_at, ]
+    }
+}
+#' @export
+get_bounds.lp_problem <- function(x, include_fixed = FALSE) {
+    x$variables |> 
+        purrr::map(get_bounds, include_fixed = include_fixed) |> 
+        purrr::list_rbind()
+}
+
 # Printing ------------------------
 
 print_field_name <- function(name) {
