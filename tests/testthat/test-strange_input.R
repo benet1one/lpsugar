@@ -102,3 +102,27 @@ test_that("zero length variable", {
         r"(Set `character\(0\)` is length 0.)"
     )
 })
+
+test_that("fully fixed", {
+    xval <- c(3, 4, 5, 6)
+    yval <- c(4, 2, 1, 0)
+    
+    p <- lp_problem() |> 
+        lp_var(x[1:4], lower = xval, upper = xval) |> 
+        lp_var(y[1:4], lower = yval, upper = yval) |> 
+        lp_max(y[1]) |> 
+        lp_con(x + y >= 1)
+    
+    expect_true(ncol(p) == 0)
+    
+    expect_error(
+        lp_solve(p),
+        "Problem has no variables"
+    )
+    
+    p2 <- p |> 
+        lp_var(z) |> 
+        lp_con(z + x[1] <= 2)
+    
+    s2 <- lp_solve(p2)
+})
