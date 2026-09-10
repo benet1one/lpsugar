@@ -100,7 +100,7 @@
       [1] "x"    "y"    "z[1]" "z[2]"
       
       attr(,"nobj")
-      [1] 2
+      [1] 4
       attr(,"lpsugar_attributes")
       attr(,"lpsugar_attributes")$A
       [1] 1
