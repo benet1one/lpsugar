@@ -1,3 +1,9 @@
+# lpsugar 0.26.1
+
+## Bug Fixes
+
+* Fixed bug with updating objective after adding a new variable.
+
 # lpsugar 0.26.0
 
 ## Breaking Changes
