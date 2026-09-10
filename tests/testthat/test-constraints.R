@@ -251,7 +251,7 @@ test_that("conditional constraints", {
 
     p |>
         lp_con(if (FALSE) x[1] == 2) |>
-        lp_con(x[2] >= 5) |>
+        lp_con(x[2] >= -1) |>
         _$constraints
 
 
@@ -286,4 +286,23 @@ test_that("quadruple for", {
         })
 
     expect_snapshot(rownames(p$constraints))
+})
+
+test_that("warn infeasible", {
+    expect_warning(
+        lp_problem() |> 
+            lp_var(x, lower = 2, upper = 5) |> 
+            lp_var(y, lower = 6, upper = 9) |> 
+            lp_con(
+                my_con = for (i in 2) {
+                    y - x <= 0
+                }
+            ),
+        paste(
+            "Constraint is infeasible",
+            "my_con\\[i=2\\]",
+            "With call `for",
+            sep = ".*"
+        )
+    )
 })

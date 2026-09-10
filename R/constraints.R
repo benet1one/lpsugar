@@ -40,6 +40,11 @@ lp_constraint <- function(.problem, ...) {
     )
     
     cons <- list()
+    warn_if_infeasible <- lp_options(.problem) $ warn_if_infeasible
+    
+    if (warn_if_infeasible) {
+        bound_info <- get_bounds(.problem, include_fixed = FALSE)
+    }
     
     for (i in seq_along(quos)) {
         cons[[i]] <- lp_constraint_internal(
@@ -49,6 +54,10 @@ lp_constraint <- function(.problem, ...) {
             varnames = varnames,
             problem = .problem
         )
+
+        if (warn_if_infeasible && is_linear(cons[[i]])) {
+            check_linear_constraint(cons[[i]], bound_info = bound_info)
+        }
     }
     
     .problem$constraints <- bind_cons(.problem$constraints, !!!cons)
@@ -111,12 +120,7 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
         }
     }
     
-    if (length(cons) != 1L) {
-        bind_cons(!!!cons)
-    }
-    else {
-        cons[[1]]
-    }
+    bind_cons(!!!cons)
 }
 
 #' Delete Constraints
@@ -279,6 +283,65 @@ roi_constraint_class <- function(con) {
     } else {
         out
     }
+}
+
+check_linear_constraint <- function(con, bound_info, call = parent.frame()) {
+    L <- as.matrix(con$L)
+    dir <- con$dir
+    rhs <- con$rhs
+    
+    lower <- bound_info$lower
+    upper <- bound_info$upper
+    
+    for (i in seq_along(con)) {
+        Li <- L[i, ]
+        
+        if (dir[i] == ">=" || dir[i] == "==") {
+            max_lhs <- Li %*% ifelse(Li < 0, lower, upper)
+            
+            if (!is.nan(max_lhs) && max_lhs < rhs[i]) {
+                warn_infeasible_constraint(con, i, mx = TRUE, call = call)
+            }
+        }
+        if (dir[i] == "<=" || dir[i] == "==") {
+            min_lhs <- Li %*% ifelse(Li > 0, lower, upper)
+            
+            if (!is.nan(min_lhs) && min_lhs > rhs[i]) {
+                warn_infeasible_constraint(con, i, mx = FALSE, call = call)
+            }
+        }
+    }
+}
+
+warn_infeasible_constraint <- function(con, i, mx, call) {
+    info <- lpsugar_attributes(con)
+    msg <- c("Constraint is infeasible.")
+    
+    if (info$id[i] != "") {
+        msg <- c(
+            msg, 
+            "x" = paste0("Problematic constraint: '", {info$index[i]}, "'")
+        )
+    }
+    
+    explanation <- if (mx) {
+        "Maximum possible Left-hand-side is less than Right-hand-side."
+    }
+    else {
+        "Minimum possible Left-hand-side is greater than Right-hand-side."
+    }
+    
+    msg <- c(
+        msg, 
+        "x" = paste0("With call `", {info$expr[i]}, "`"), 
+        "i" = explanation
+    )
+    
+    rlang::warn(
+        msg,
+        call = call,
+        class = "lpsugar_warning_infeasible_constraint"
+    )
 }
 
 # Methods ----------------------
