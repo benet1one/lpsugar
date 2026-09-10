@@ -599,6 +599,9 @@ parse_variable_definition <- function(definition) {
 
 # Checks that sets are correctly defined
 check_variable_set <- function(set, name, call = environment()) {
+    if (length(set) == 0L) {
+        cli_abort("Set `{name}` is length 0.", call = call)
+    }
     if (!rlang::is_atomic(set)) {
         cli_abort("Set `{name}` is not atomic.", call = call)
     }

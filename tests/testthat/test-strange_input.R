@@ -95,3 +95,10 @@ test_that("misc", {
     # This should not throw an error, I guess...
     lp_problem() |> lp_var( uhh[{hey <- 1:3; hey}] )
 })
+
+test_that("zero length variable", {
+    expect_error(
+        lp_problem() |> lp_var(z[1:2, character(0)]),
+        r"(Set `character\(0\)` is length 0.)"
+    )
+})
