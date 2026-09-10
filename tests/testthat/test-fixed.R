@@ -20,9 +20,33 @@ test_that("linear fixed", {
     )
 })
 
-# TODO
-# test with quadratic
-# test with nonlinear
+test_that("quadratic fixed", {
+    withr::local_package("ROI.plugin.highs")
+    
+    p <- lp_problem() |> 
+        lp_var(x[1:2, 1:2], lower = 1, upper = matrix(c(4, 3, 1, 5), ncol = 2)) |> 
+        lp_alias(
+            a1 = 2 * x[1] * x[3],
+            a2 = x[2] * (x[3] + 1) - x[4],
+            a3 = sum(x^2)
+        )
+    
+    xval <- matrix(c(2, 3, 1, 4), ncol = 2)
+    als <- compute_aliases(p, solution = list(x = xval))
+    
+    expect_equal(
+        als$a1,
+        2 * xval[1] * xval[3]
+    )
+    expect_equal(
+        als$a2,
+        xval[2] * (xval[3] + 1) - xval[4]
+    )
+    expect_equal(
+        als$a3,
+        sum(xval^2)
+    )
+})
 
 test_that("nonlinear fixed", {
     withr::local_package("ROI.plugin.nloptr")
