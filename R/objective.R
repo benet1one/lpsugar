@@ -271,6 +271,7 @@ update_objective <- function(.problem) {
     
     colnames(.problem$objective$L) <- varnames
     .problem$objective$names <- varnames
+    attr(.problem$objective, "nobj")[] <- n_after
     
     return(.problem)
 }
