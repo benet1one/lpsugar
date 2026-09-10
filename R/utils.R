@@ -436,6 +436,19 @@ get_Q <- function(x) {
     list(qmat) |> rep(length(x))
 }
 
+# Is a variable, constraint, or objective function linear?
+is_linear <- function(x) {
+    if (is_lp_variable(x) || is_lp_constraint(x) || is_lp_objective(x)) {
+        all(!is_quadratic(x),
+            !is_nonlinear(x),
+            !is_empty_constraint(x),
+            !is_empty_objective(x))
+    }
+    else {
+        return(FALSE)
+    }
+}
+
 # Is a variable, constraint, or objective function quadratic?
 is_quadratic <- function(x) {
     non_quad_classes <- c(
