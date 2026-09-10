@@ -1,9 +1,8 @@
 # lpsugar: Linear, Quadratic and Nonlinear Programming in R
 
 Algebraic Modeling Language for Optimization in R. Supports linear,
-quadratic, or nonlinear objective functions with linear and quadratic
-constraints. Problems can be solved with a variety of solvers using
-'ROI'.
+quadratic, or nonlinear programming. Problems can be solved with a
+variety of solvers using 'ROI'.
 
 ## See also
 
