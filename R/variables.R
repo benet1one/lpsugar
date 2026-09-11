@@ -635,7 +635,7 @@ adjust_bound <- function(bound, bound_name, default, dim) {
         return(default)
     }
     
-    if (length(bound) > 1L && !all(dim2(bound) == dim)) {
+    if (length(bound) > 1L && !same_dimensions(bound, dim_y = dim)) {
         cli_abort(
             "`dim({bound_name})` different from `dim(variable)`.",
             call = parent.frame(),

@@ -73,6 +73,10 @@ ndim <- function(x, drop = FALSE) {
     }
 }
 
+same_dimensions <- function(x, y, dim_x = dim2(x), dim_y = dim2(y)) {
+    length(dim_x) == length(dim_y)  &&  all(dim_x == dim_y)
+}
+
 # Returns FALSE if dimensions are incompatible
 # and a condition
 are_arguments_conformable <- function(x, y, drop_dim = TRUE) {
