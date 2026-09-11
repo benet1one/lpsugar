@@ -86,8 +86,8 @@ lp_variable <- function(.problem, definition,
         rlang::is_bool(binary)
     )
     
-    lower <- adjust_bound(lower, "lower", default = -Inf, dim = lengths(sets))
-    upper <- adjust_bound(upper, "upper", default = +Inf, dim = lengths(sets))
+    lower <- adjust_bound(lower, "lower", default = -Inf, dim = lengths(sets), var_name = name)
+    upper <- adjust_bound(upper, "upper", default = +Inf, dim = lengths(sets), var_name = name)
     
     check_consistent_bounds(lower, upper)
     
@@ -673,7 +673,7 @@ check_variable_set <- function(set, name, call = environment()) {
 
 # Used in lp_variable()
 # Checks that bounds are correctly defined
-adjust_bound <- function(bound, bound_name, default, dim) {
+adjust_bound <- function(bound, bound_name, default, dim, var_name) {
     if (length(bound) == 0L) {
         cli_warn(
             "`{bound_name}` bound is `NULL` or zero-length, setting to {default}.",
@@ -682,9 +682,11 @@ adjust_bound <- function(bound, bound_name, default, dim) {
         return(default)
     }
     
-    if (length(bound) > 1L && !all(dim2(bound) == dim)) {
+    if (length(bound) > 1L && !same_dimensions(bound, dim_y = dim)) {
         cli_abort(
-            "`dim({bound_name})` different from `dim(variable)`.",
+            c("`dim({bound_name})` different from `dim({var_name})`.",
+              "*" = "`dim({bound_name})` = {format_dim(bound)}",
+              "*" = "`dim({var_name})` = {format_dim(dim = dim)}"),
             call = parent.frame(),
             class = "lpsugar_error_inconsistent_bounds"
         )

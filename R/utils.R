@@ -62,6 +62,10 @@ dim2 <- function(x) {
         dim(x)
     }
 }
+format_dim <- function(x, dim = dim2(x)) {
+    paste0("(", paste(dim, collapse = ", "), ")")
+}
+
 # Number of dimensions
 ndim <- function(x, drop = FALSE) {
     if (drop) {
@@ -71,6 +75,10 @@ ndim <- function(x, drop = FALSE) {
     else {
         length(dim2(x))
     }
+}
+
+same_dimensions <- function(x, y, dim_x = dim2(x), dim_y = dim2(y)) {
+    length(dim_x) == length(dim_y)  &&  all(dim_x == dim_y)
 }
 
 # Returns FALSE if dimensions are incompatible

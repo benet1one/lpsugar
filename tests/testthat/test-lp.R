@@ -38,6 +38,16 @@ test_that("solving with multivariate bounds", {
         matrix(c(1, 2, 3, 10), 2, 2),
         ignore_attr = TRUE
     )
+    
+    expect_error(
+        lp_problem() |> lp_var(x[1:2, 1:3, 1:5], lower = matrix(0, 3, 2)),
+        paste(
+            r"(`dim\(lower\)` different from `dim\(x\)`.)",
+            r"(`dim\(lower\)` = \(3, 2\))",
+            r"(`dim\(x\)` = \(2, 3, 5\))",
+            sep = ".*"
+        )
+    )
 })
 
 test_that("feasible", {
