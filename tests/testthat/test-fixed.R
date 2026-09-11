@@ -74,3 +74,14 @@ test_that("nonlinear fixed", {
     ss <- solution_summary(p, s, tol = 0.2)
     expect_true(ss$feasible)
 })
+
+test_that("fixed argument", {
+    p <- lp_problem() |> 
+        lp_var(x[1:5], lower = 0, upper = 0:4, fixed = c(NA, NA, 1, NA, 3))
+    
+    expect_equal(
+        p$variables$x$ind,
+        c(NA, 1, NA, 2, NA),
+        ignore_attr = TRUE
+    )
+})

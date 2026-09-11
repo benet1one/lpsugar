@@ -25,6 +25,10 @@
 #' @param binary Boolean, whether to treat variable as binary, \{0, 1\}.
 #' @param lower Numeric scalar or array. Lower bound for the variable.
 #' @param upper Numeric scalar or array. Upper bound for the variable.
+#' @param fixed Numeric array used to fix variables to a certain value. 
+#' Where `fixed` is `NA`, the variable will remain free. Where `fixed` is 
+#' a numeric value, the variable will be fixed to that value. Values where
+#' `lower == upper` will also be fixed, and do not need to be specified here.
 #'
 #' @returns The `.problem` with an added variable in `$variables`.
 #' The fields of `lp_variable` objects are intended for internal use, modifying them is
@@ -54,7 +58,7 @@
 #' @example inst/examples/example_variable.R
 lp_variable <- function(.problem, definition,
                         integer = FALSE, binary = FALSE,
-                        lower = -Inf, upper = +Inf) {
+                        lower = -Inf, upper = +Inf, fixed = NULL) {
     
     check_problem(.problem)
     
@@ -102,6 +106,14 @@ lp_variable <- function(.problem, definition,
         integer <- TRUE
         lower <- pmax(lower, 0)
         upper <- pmin(upper, 1)
+    }
+    
+    if (!is.null(fixed)) {
+        check_fixed(fixed, dim = lengths(sets))
+        pre_fixed_at <- !is.na(fixed)
+        pre_fixed_values <- fixed[pre_fixed_at]
+        lower[pre_fixed_at] <- pre_fixed_values
+        upper[pre_fixed_at] <- pre_fixed_values
     }
     
     fixed_at <- lower == upper
@@ -660,6 +672,23 @@ adjust_bound <- function(bound, bound_name, default, dim) {
     }
     
     recycle_const(bound, prod(dim))
+}
+
+check_fixed <- function(fixed, dim) {
+    if (!is.numeric(fixed) || any(is.infinite(fixed))) {
+        cli_abort(
+            "`fixed` must be a finite numeric array.",
+            call = parent.frame(),
+            class = "lpsugar_error_fixed_non_numeric"
+        )
+    }
+    if (!same_dimensions(fixed, dim_y = dim)) {
+        cli_abort(
+            "`dim(fixed)` different from `dim(variable)`.",
+            call = parent.frame(),
+            class = "lpsugar_error_inconsistent_fixed"
+        )
+    }
 }
 
 check_consistent_bounds <- function(lower, upper, call = parent.frame()) {

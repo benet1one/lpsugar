@@ -11,7 +11,8 @@ lp_variable(
   integer = FALSE,
   binary = FALSE,
   lower = -Inf,
-  upper = +Inf
+  upper = +Inf,
+  fixed = NULL
 )
 
 lp_var(
@@ -20,7 +21,8 @@ lp_var(
   integer = FALSE,
   binary = FALSE,
   lower = -Inf,
-  upper = +Inf
+  upper = +Inf,
+  fixed = NULL
 )
 }
 \arguments{
@@ -56,6 +58,11 @@ for every dimension (\code{\link[base:dimnames]{base::dimnames()}}), comma-separ
 \item{lower}{Numeric scalar or array. Lower bound for the variable.}
 
 \item{upper}{Numeric scalar or array. Upper bound for the variable.}
+
+\item{fixed}{Numeric array used to fix variables to a certain value.
+Where \code{fixed} is \code{NA}, the variable will remain free. Where \code{fixed} is
+a numeric value, the variable will be fixed to that value. Values where
+\code{lower == upper} will also be fixed, and do not need to be specified here.}
 }
 \value{
 The \code{.problem} with an added variable in \verb{$variables}.
