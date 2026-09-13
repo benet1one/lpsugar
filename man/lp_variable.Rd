@@ -71,13 +71,16 @@ highly discouraged.
 \itemize{
 \item \verb{$name} : String, name of the variable.
 \item \verb{$lower} and \verb{$upper} : Bounds.
-\item \verb{$type} : String, one of \code{"real"}, \code{"integer"} or \code{"binary"}.
+\item \verb{$type} : String. \code{"C"} if the variable is real/continuous; \code{"I"} if the variable
+is integer, and \code{"B"} if the variable is binary. Note: if a binary variable
+has custom bounds, it will have a type of \code{"I"}.
 \item \verb{$integer} and \verb{$binary} : Booleans. If \verb{$binary} is true, then \verb{$integer} is also true.
 }
 
 The following fields are meant for internal use only.
 \itemize{
 \item \verb{$ind} : Integer array. Indicates which indices correspond to this variable.
+\code{NA} values mean the variable is fixed to a value at that position.
 Meant for internal use only.
 \item \verb{$L} : Numeric matrix of linear coefficients.
 The number of rows is the length of the variable, the number

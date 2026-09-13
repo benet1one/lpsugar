@@ -35,12 +35,15 @@
 #' highly discouraged.
 #' - `$name` : String, name of the variable.
 #' - `$lower` and `$upper` : Bounds.
-#' - `$type` : String, one of `"real"`, `"integer"` or `"binary"`.
+#' - `$type` : String. `"C"` if the variable is real/continuous; `"I"` if the variable
+#' is integer, and `"B"` if the variable is binary. Note: if a binary variable
+#' has custom bounds, it will have a type of `"I"`.
 #' - `$integer` and `$binary` : Booleans. If `$binary` is true, then `$integer` is also true.
 #'
 #' The following fields are meant for internal use only.
 #'
 #' - `$ind` : Integer array. Indicates which indices correspond to this variable.
+#' `NA` values mean the variable is fixed to a value at that position.
 #' Meant for internal use only.
 #'
 #' - `$L` : Numeric matrix of linear coefficients. 
