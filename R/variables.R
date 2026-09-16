@@ -26,7 +26,7 @@
 #' @param lower Numeric scalar or array. Lower bound for the variable.
 #' @param upper Numeric scalar or array. Upper bound for the variable.
 #' @param fixed Numeric array used to fix variables to a certain value. 
-#' Where `fixed` is `NA`, the variable will remain free. Where `fixed` is 
+#' Wherever `fixed` is `NA`, the variable will remain free. Wherever `fixed` is 
 #' a numeric value, the variable will be fixed to that value. Values where
 #' `lower == upper` will also be fixed, and do not need to be specified here.
 #'

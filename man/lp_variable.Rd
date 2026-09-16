@@ -60,7 +60,7 @@ for every dimension (\code{\link[base:dimnames]{base::dimnames()}}), comma-separ
 \item{upper}{Numeric scalar or array. Upper bound for the variable.}
 
 \item{fixed}{Numeric array used to fix variables to a certain value.
-Where \code{fixed} is \code{NA}, the variable will remain free. Where \code{fixed} is
+Wherever \code{fixed} is \code{NA}, the variable will remain free. Wherever \code{fixed} is
 a numeric value, the variable will be fixed to that value. Values where
 \code{lower == upper} will also be fixed, and do not need to be specified here.}
 }
