@@ -5,3 +5,4 @@
 inst/doc
 /Meta/
 docs
+inst/run_benchmark.R
