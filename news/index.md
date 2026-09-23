@@ -1,5 +1,12 @@
 # Changelog
 
+## lpsugar 0.26.2
+
+### Bug Fixes
+
+- Incorrect error message when dimensions of variable differ from
+  dimensions of its bounds.
+
 ## lpsugar 0.26.1
 
 ### Bug Fixes
