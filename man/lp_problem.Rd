@@ -4,10 +4,10 @@
 \alias{lp_problem}
 \title{Create a Linear Problem}
 \usage{
-lp_problem(warn_if_infeasible = TRUE, ...)
+lp_problem(warn_infeasible = TRUE, ...)
 }
 \arguments{
-\item{warn_if_infeasible}{If TRUE (the default), will throw a warning
+\item{warn_infeasible}{If TRUE (the default), will throw a warning
 when a linear constraint is infeasible, as soon as the constraint is defined.}
 
 \item{...}{These dots are for future extensions and should be left empty.}

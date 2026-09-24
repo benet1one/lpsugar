@@ -40,9 +40,9 @@ lp_constraint <- function(.problem, ...) {
     )
     
     cons <- list()
-    warn_if_infeasible <- lp_options(.problem) $ warn_if_infeasible
+    warn_infeasible <- lp_options(.problem) $ warn_infeasible
     
-    if (warn_if_infeasible) {
+    if (warn_infeasible) {
         bound_info <- get_bounds(.problem, include_fixed = FALSE)
     }
     
@@ -55,7 +55,7 @@ lp_constraint <- function(.problem, ...) {
             problem = .problem
         )
 
-        if (warn_if_infeasible && is_linear(cons[[i]])) {
+        if (warn_infeasible && is_linear(cons[[i]])) {
             check_linear_constraint(cons[[i]], bound_info = bound_info)
         }
     }
@@ -320,7 +320,7 @@ warn_infeasible_constraint <- function(con, i, mx, call) {
     if (info$id[i] != "") {
         msg <- c(
             msg, 
-            "x" = paste0("Problematic constraint: '", {info$index[i]}, "'")
+            "*" = paste0("Problematic constraint: '", {info$index[i]}, "'")
         )
     }
     
@@ -333,8 +333,9 @@ warn_infeasible_constraint <- function(con, i, mx, call) {
     
     msg <- c(
         msg, 
-        "x" = paste0("With call `", {info$expr[i]}, "`"), 
-        "i" = explanation
+        "*" = paste0("With call `", {info$expr[i]}, "`"), 
+        "x" = explanation,
+        "i" = "Suppress this message with `lp_problem(warn_infeasible = FALSE)`."
     )
     
     rlang::warn(

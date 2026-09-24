@@ -6,7 +6,7 @@
 #' [lp_constraint()] to add constraints and
 #' [lp_solve()] to find the optimum.
 #'
-#' @param warn_if_infeasible If TRUE (the default), will throw a warning
+#' @param warn_infeasible If TRUE (the default), will throw a warning
 #' when a linear constraint is infeasible, as soon as the constraint is defined.
 #' @param ... These dots are for future extensions and should be left empty.
 #'
@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @example inst/examples/example_problem.R
-lp_problem <- function(warn_if_infeasible = TRUE, ...) {
+lp_problem <- function(warn_infeasible = TRUE, ...) {
     rlang::check_dots_empty()
     
     list(
@@ -35,7 +35,7 @@ lp_problem <- function(warn_if_infeasible = TRUE, ...) {
         n_variables = 0L, # Must equal length of objective coefficients.
         varnames = character(), # Names of variables with their respective indices, e.g. "x[A, 2]".
         options = list(
-            warn_if_infeasible = warn_if_infeasible
+            warn_infeasible = warn_infeasible
         )
     )
 }
