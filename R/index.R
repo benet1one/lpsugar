@@ -1,4 +1,6 @@
 
+# Legacy -------------------------------------------
+
 # check out-of-bounds indices and makes drop = FALSE by default
 robust_index <- function(x) {
     if (slam::is.simple_triplet_matrix(x)) {
@@ -137,5 +139,72 @@ check_index_valid_vector <- function(x, index, call = parent.frame()) {
     } 
     else {
         cli_abort("Invalid subscript of class `{class(index)}`.", call = call)
+    }
+}
+
+
+# New --------------------------------------
+
+# check out-of-bounds indices and makes drop = FALSE by default
+strict_index <- function(x) {
+    structure(x, class = c("strict_index", class(x)))
+}
+
+#' @export
+print.strict_index <- function(x, ...) {
+    print(unclass(x))
+    cat("with class 'strict_index' from package 'lpsugar'\n")
+    invisible(x)
+}
+
+#' @export
+`[.strict_index` <- function(x, ..., drop = FALSE) {
+    dots <- rlang::dots_list(..., .preserve_empty = TRUE, .ignore_empty = "none")
+    args <- rlang::names2(dots)
+    dn <- dimnames(x) %||% list(names(x))
+    d <- dim2(x)
+    
+    if (length(dots) == 1L && ndim(x) != 1L) {
+        check_index(i = dots[[1]], n = length(x), arg = args[[1]])
+    }
+    else if (length(dots) > 1L && length(dots) != ndim(x)) {
+        cli_abort(
+            c("Incorrect number of dimensions.",
+              "x" = "Object has {ndim(x)} dimensions.")
+        )
+    }
+    else for (k in seq_along(dots)) if (!rlang::is_missing(dots[[k]])) {
+        check_index(i = dots[[k]], n = d[k], names = dn[[k]], arg = args[[k]])
+    }
+    
+    NextMethod(drop = drop) |> strict_index()
+}
+
+check_index <- function(i, n, names = NULL, arg, call = parent.frame()) {
+    if (is.factor(i)) {
+        i <- as.character(i)
+    }
+    if (inherits(i, "strict_index")) {
+        class(i) <- class(i) |> setdiff("strict_index")
+    }
+    if (is.numeric(i)) {
+        vctrs::num_as_location(
+            i, n, 
+            missing = "error", 
+            negative = "invert", 
+            oob = "error",
+            zero = "error",
+            arg = arg,
+            call = call
+        )
+    }
+    else {
+        vctrs::vec_as_location(
+            i, n,
+            names = names,
+            missing = "error",
+            arg = arg,
+            call = call
+        )
     }
 }

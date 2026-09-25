@@ -297,7 +297,7 @@ multiply_v_v <- function(x, y, call) {
         qi <- outer(xi, yi) + outer(yi, xi)
         
         rownames(qi) <- colnames(qi) <- colnames(x$L)
-        robust_index(qi)
+        strict_index(qi)
     })
     
     out$L <-
@@ -452,8 +452,8 @@ matrix_multiply_v_c <- function(x, y, call) {
         out$A <- rbind(out$A, z$A)
     }
     
-    out$L <- robust_index(out$L)
-    out$A <- robust_index(out$A)
+    out$L <- strict_index(out$L)
+    out$A <- strict_index(out$A)
     
     transformed_variable(out)
 }
@@ -504,8 +504,8 @@ matrix_multiply_v_v <- function(x, y, call) {
         out$A <- rbind(out$A, z$A)
     }
     
-    out$L <- robust_index(out$L)
-    out$A <- robust_index(out$A)
+    out$L <- strict_index(out$L)
+    out$A <- strict_index(out$A)
     
     transformed_variable(out)
 }

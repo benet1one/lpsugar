@@ -21,7 +21,8 @@ Imports:
     ROI,
     slam,
     stats,
-    utils
+    utils,
+    vctrs
 Suggests: 
     dplyr,
     knitr,

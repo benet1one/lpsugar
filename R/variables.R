@@ -122,8 +122,8 @@ lp_variable <- function(.problem, definition,
         name_variable(name, sets)
     )
     
-    A <- matrix(0, nrow = length(ind), ncol = 1L) |> robust_index()
-    L <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> robust_index()
+    A <- matrix(0, nrow = length(ind), ncol = 1L) |> strict_index()
+    L <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> strict_index()
     L[, ind] <- diag(length(ind))
     
     new_variable <- list(
@@ -173,7 +173,7 @@ update_variables <- function(.problem, field = "variables") {
             )
         )
         
-        x$L <- robust_index(x$L)
+        x$L <- strict_index(x$L)
         colnames(x$L) <- varnames
         
         vars[[i]] <- x
@@ -419,7 +419,7 @@ bind_vv <- function(x, y) {
     z <- x
     z$ind  <- seq_len(length(x) + length(y)) |>
         unname() |>
-        robust_index()
+        strict_index()
     
     if (is_quadratic(x) || is_quadratic(y)) {
         x <- as_quadratic(x)
@@ -427,8 +427,8 @@ bind_vv <- function(x, y) {
         z$Q <- c(x$Q, y$Q)
     }
     
-    z$L <- rbind(x$L, y$L) |> robust_index()
-    z$A  <- rbind(x$A,  y$A)  |> robust_index()
+    z$L <- rbind(x$L, y$L) |> strict_index()
+    z$A  <- rbind(x$A,  y$A)  |> strict_index()
     
     transformed_variable(z)
 }
@@ -436,7 +436,7 @@ bind_vv <- function(x, y) {
 bind_vc <- function(x, y) {
     x$ind <- c(x$ind, numeric(length(y))) |>
         unname() |>
-        robust_index()
+        strict_index()
     x$ind[] <- seq_along(x$ind)
     
     if (is_quadratic(x)) {
@@ -447,12 +447,12 @@ bind_vc <- function(x, y) {
     x$L <- rbind(
         x$L,
         matrix(0, nrow = length(y), ncol = ncol(x$L))
-    ) |> robust_index()
+    ) |> strict_index()
     
     x$A <- rbind(
         x$A,
         matrix(y, ncol = 1L)
-    ) |> robust_index()
+    ) |> strict_index()
     
     transformed_variable(x)
 }
@@ -460,7 +460,7 @@ bind_vc <- function(x, y) {
 bind_cv <- function(x, y) {
     i <- c(seq_along(x) + length(y), seq_along(y))
     z <- bind_vc(y, x)[i]
-    z$ind <- seq_along(i) |> robust_index()
+    z$ind <- seq_along(i) |> strict_index()
     return(z)
 }
 
@@ -480,7 +480,8 @@ bind_cv <- function(x, y) {
     if (rlang::is_condition(old_ind)) {
         dots <- rlang::enexprs(..., .ignore_empty = "none")
         call <- rlang::expr((!!substitute(x))[!!!dots])
-        cli_abort(old_ind$message, call = call)
+        message <- rlang::cnd_message(old_ind)
+        rlang::abort(message = message, call = call)
     }
     
     old_ind <- c(old_ind)
@@ -757,7 +758,7 @@ variable_indices <- function(old_n, definition) {
         ind[] <- seq_along(ind) + old_n
     }
     
-    robust_index(ind)
+    strict_index(ind)
 }
 
 # Gives the colnames of $L

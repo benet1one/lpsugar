@@ -171,10 +171,10 @@ test_that("variable indexing", {
     expect_all_true(dim(z1) == c(1, 3))
     expect_true(is.null(dim(z1_dropped)))
 
-    expect_error(y[4], "out of bounds")
-    expect_error(y[-4], "out of bounds")
-    expect_error(y[0], "Invalid subscript")
-    expect_error(y["d"], "Invalid subscript 'd'")
+    expect_error(y[4], "Can't subset elements past the end")
+    expect_error(y[-4], "Can't negate elements past the end")
+    expect_error(y[0], "Subscript can't contain `0` values")
+    expect_error(y["d"], "Element `d` doesn't exist.")
     expect_error(y[1,1], "Incorrect number of dimensions")
 
     # Transpose

@@ -67,10 +67,10 @@ sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     
     x$L <- colSums(x$L) |>
         matrix(nrow = 1L) |>
-        robust_index()
+        strict_index()
     x$A <- sum(x$A) |>
         matrix(nrow = 1L, ncol = 1L) |>
-        robust_index()
+        strict_index()
     
     colnames(x$L) <- varnames
     
@@ -283,7 +283,7 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     
     ind <- x$ind
     ind[] <- seq_along(ind)
-    ind_list <- apply(ind, margin, identity, simplify = FALSE)
+    ind_list <- apply(ind, margin, c, simplify = FALSE)
     
     out_list <- purrr::map(ind_list, \(i) fun(x[i], ...))
     
@@ -303,7 +303,7 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     
     if (is.array(out_ind)) {
         out_ind[] <- seq_along(out_ind)
-        out$ind <- out_ind |> robust_index()
+        out$ind <- out_ind |> strict_index()
     } 
     else {
         out$ind <- 1:nrow(out$L)

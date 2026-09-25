@@ -64,11 +64,11 @@
       $L
            x[1] x[2] x[3] i
       [1,]    1    2    3 0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'strict_index' from package 'lpsugar'
       
       $A
            [,1]
       [1,]    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'strict_index' from package 'lpsugar'
       
 
