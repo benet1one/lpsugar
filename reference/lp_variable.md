@@ -11,7 +11,8 @@ lp_variable(
   integer = FALSE,
   binary = FALSE,
   lower = -Inf,
-  upper = +Inf
+  upper = +Inf,
+  fixed = NULL
 )
 
 lp_var(
@@ -20,7 +21,8 @@ lp_var(
   integer = FALSE,
   binary = FALSE,
   lower = -Inf,
-  upper = +Inf
+  upper = +Inf,
+  fixed = NULL
 )
 ```
 
@@ -78,6 +80,14 @@ lp_var(
 
   Numeric scalar or array. Upper bound for the variable.
 
+- fixed:
+
+  Numeric array used to fix variables to a certain value. Wherever
+  `fixed` is `NA`, the variable will remain free. Wherever `fixed` is a
+  numeric value, the variable will be fixed to that value. Values where
+  `lower == upper` will also be fixed, and do not need to be specified
+  here.
+
 ## Value
 
 The `.problem` with an added variable in `$variables`. The fields of
@@ -88,7 +98,9 @@ highly discouraged.
 
 - `$lower` and `$upper` : Bounds.
 
-- `$type` : String, one of `"real"`, `"integer"` or `"binary"`.
+- `$type` : String. `"C"` if the variable is real/continuous; `"I"` if
+  the variable is integer, and `"B"` if the variable is binary. Note: if
+  a binary variable has custom bounds, it will have a type of `"I"`.
 
 - `$integer` and `$binary` : Booleans. If `$binary` is true, then
   `$integer` is also true.
@@ -96,7 +108,8 @@ highly discouraged.
 The following fields are meant for internal use only.
 
 - `$ind` : Integer array. Indicates which indices correspond to this
-  variable. Meant for internal use only.
+  variable. `NA` values mean the variable is fixed to a value at that
+  position. Meant for internal use only.
 
 - `$L` : Numeric matrix of linear coefficients. The number of rows is
   the length of the variable, the number of columns is the total amount

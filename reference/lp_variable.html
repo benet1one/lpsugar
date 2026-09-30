@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.26.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.27.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,8 @@
 <span>  integer <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  binary <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  lower <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
-<span>  upper <span class="op">=</span> <span class="op">+</span><span class="cn">Inf</span></span>
+<span>  upper <span class="op">=</span> <span class="op">+</span><span class="cn">Inf</span>,</span>
+<span>  fixed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">lp_var</span><span class="op">(</span></span>
@@ -68,7 +69,8 @@
 <span>  integer <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  binary <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  lower <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
-<span>  upper <span class="op">=</span> <span class="op">+</span><span class="cn">Inf</span></span>
+<span>  upper <span class="op">=</span> <span class="op">+</span><span class="cn">Inf</span>,</span>
+<span>  fixed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -110,6 +112,13 @@ for every dimension (<code><a href="https://rdrr.io/r/base/dimnames.html" class=
 <dt id="arg-upper">upper<a class="anchor" aria-label="anchor" href="#arg-upper"></a></dt>
 <dd><p>Numeric scalar or array. Upper bound for the variable.</p></dd>
 
+
+<dt id="arg-fixed">fixed<a class="anchor" aria-label="anchor" href="#arg-fixed"></a></dt>
+<dd><p>Numeric array used to fix variables to a certain value.
+Wherever <code>fixed</code> is <code>NA</code>, the variable will remain free. Wherever <code>fixed</code> is
+a numeric value, the variable will be fixed to that value. Values where
+<code>lower == upper</code> will also be fixed, and do not need to be specified here.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -117,9 +126,12 @@ for every dimension (<code><a href="https://rdrr.io/r/base/dimnames.html" class=
 The fields of <code>lp_variable</code> objects are intended for internal use, modifying them is
 highly discouraged.</p><ul><li><p><code>$name</code> : String, name of the variable.</p></li>
 <li><p><code>$lower</code> and <code>$upper</code> : Bounds.</p></li>
-<li><p><code>$type</code> : String, one of <code>"real"</code>, <code>"integer"</code> or <code>"binary"</code>.</p></li>
+<li><p><code>$type</code> : String. <code>"C"</code> if the variable is real/continuous; <code>"I"</code> if the variable
+is integer, and <code>"B"</code> if the variable is binary. Note: if a binary variable
+has custom bounds, it will have a type of <code>"I"</code>.</p></li>
 <li><p><code>$integer</code> and <code>$binary</code> : Booleans. If <code>$binary</code> is true, then <code>$integer</code> is also true.</p></li>
 </ul><p>The following fields are meant for internal use only.</p><ul><li><p><code>$ind</code> : Integer array. Indicates which indices correspond to this variable.
+<code>NA</code> values mean the variable is fixed to a value at that position.
 Meant for internal use only.</p></li>
 <li><p><code>$L</code> : Numeric matrix of linear coefficients.
 The number of rows is the length of the variable, the number

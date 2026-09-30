@@ -19,7 +19,7 @@ lp_solve() to find the optimum."><meta name="google-site-verification" content="
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.26.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.27.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,9 +62,22 @@ lp_solve() to find the optimum."><meta name="google-site-verification" content="
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">lp_problem</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">lp_problem</span><span class="op">(</span>warn_infeasible <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
+
+
+<dl><dt id="arg-warn-infeasible">warn_infeasible<a class="anchor" aria-label="anchor" href="#arg-warn-infeasible"></a></dt>
+<dd><p>If TRUE (the default), will throw a warning
+when a linear constraint is infeasible, as soon as the constraint is defined.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>These dots are for future extensions and should be left empty.</p></dd>
+
+</dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An <code>lp_problem</code> object with fields:</p><ul><li><p><code>$variables</code> : List of variables defined with <code><a href="lp_variable.html">lp_variable()</a></code>.</p></li>

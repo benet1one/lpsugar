@@ -15,8 +15,19 @@ to find the optimum.
 ## Usage
 
 ``` r
-lp_problem()
+lp_problem(warn_infeasible = TRUE, ...)
 ```
+
+## Arguments
+
+- warn_infeasible:
+
+  If TRUE (the default), will throw a warning when a linear constraint
+  is infeasible, as soon as the constraint is defined.
+
+- ...:
+
+  These dots are for future extensions and should be left empty.
 
 ## Value
 

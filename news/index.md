@@ -1,5 +1,16 @@
 # Changelog
 
+## lpsugar 0.27.0
+
+### New Features
+
+- New argument `fixed` in `lp_variable` allows the user to fix part of
+  the variable to certain constant values.
+
+### Performance Improvements
+
+- Problems where many variables are fixed are now faster and lighter.
+
 ## lpsugar 0.26.2
 
 ### Bug Fixes

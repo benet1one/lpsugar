@@ -153,9 +153,6 @@ package website.
   [`lp_impvar()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
   : Define an Alias or Implicit Variable (IMPVAR)
 
-- [`lp_fix_vars()`](https://benet1one.github.io/lpsugar/reference/lp_fix_vars.md)
-  : Fix Variables to a Value
-
 - [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
   [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
   : Solve a Linear Problem
