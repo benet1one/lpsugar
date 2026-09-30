@@ -1,10 +1,6 @@
 
 Code
 - Check TODOs
-- Simple linear feasibility check with proper handling
-
-Fixed
-- documentation
 
 Nonlinear
 - gradient
