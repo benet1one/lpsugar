@@ -23,7 +23,9 @@ lp_problem(warn_infeasible = TRUE, ...)
 - warn_infeasible:
 
   If TRUE (the default), will throw a warning when a linear constraint
-  is infeasible, as soon as the constraint is defined.
+  is infeasible, as soon as the constraint is defined. This check only
+  uses the variable's bounds. A problem may be still be infeasible even
+  if no warning is thrown.
 
 - ...:
 

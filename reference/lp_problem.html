@@ -71,7 +71,9 @@ lp_solve() to find the optimum."><meta name="google-site-verification" content="
 
 <dl><dt id="arg-warn-infeasible">warn_infeasible<a class="anchor" aria-label="anchor" href="#arg-warn-infeasible"></a></dt>
 <dd><p>If TRUE (the default), will throw a warning
-when a linear constraint is infeasible, as soon as the constraint is defined.</p></dd>
+when a linear constraint is infeasible, as soon as the constraint is defined.
+This check only uses the variable's bounds. A problem may be still be infeasible
+even if no warning is thrown.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
