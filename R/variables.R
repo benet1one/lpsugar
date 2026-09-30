@@ -25,18 +25,25 @@
 #' @param binary Boolean, whether to treat variable as binary, \{0, 1\}.
 #' @param lower Numeric scalar or array. Lower bound for the variable.
 #' @param upper Numeric scalar or array. Upper bound for the variable.
+#' @param fixed Numeric array used to fix variables to a certain value. 
+#' Wherever `fixed` is `NA`, the variable will remain free. Wherever `fixed` is 
+#' a numeric value, the variable will be fixed to that value. Values where
+#' `lower == upper` will also be fixed, and do not need to be specified here.
 #'
 #' @returns The `.problem` with an added variable in `$variables`.
 #' The fields of `lp_variable` objects are intended for internal use, modifying them is
 #' highly discouraged.
 #' - `$name` : String, name of the variable.
 #' - `$lower` and `$upper` : Bounds.
-#' - `$type` : String, one of `"real"`, `"integer"` or `"binary"`.
+#' - `$type` : String. `"C"` if the variable is real/continuous; `"I"` if the variable
+#' is integer, and `"B"` if the variable is binary. Note: if a binary variable
+#' has custom bounds, it will have a type of `"I"`.
 #' - `$integer` and `$binary` : Booleans. If `$binary` is true, then `$integer` is also true.
 #'
 #' The following fields are meant for internal use only.
 #'
 #' - `$ind` : Integer array. Indicates which indices correspond to this variable.
+#' `NA` values mean the variable is fixed to a value at that position.
 #' Meant for internal use only.
 #'
 #' - `$L` : Numeric matrix of linear coefficients. 
@@ -54,7 +61,7 @@
 #' @example inst/examples/example_variable.R
 lp_variable <- function(.problem, definition,
                         integer = FALSE, binary = FALSE,
-                        lower = -Inf, upper = +Inf) {
+                        lower = -Inf, upper = +Inf, fixed = NULL) {
     
     check_problem(.problem)
     
@@ -104,6 +111,17 @@ lp_variable <- function(.problem, definition,
         upper <- pmin(upper, 1)
     }
     
+    if (!is.null(fixed)) {
+        check_fixed(fixed, dim = lengths(sets), var_name = name)
+        pre_fixed_at <- !is.na(fixed)
+        pre_fixed_values <- fixed[pre_fixed_at]
+        lower[pre_fixed_at] <- pre_fixed_values
+        upper[pre_fixed_at] <- pre_fixed_values
+    }
+    
+    fixed_at <- lower == upper
+    fixed_values <- lower[fixed_at]
+    
     type <- roi_variable_type(
         binary = binary, 
         integer = integer,
@@ -113,18 +131,32 @@ lp_variable <- function(.problem, definition,
 
     ind <- variable_indices(
         old_n = ncol(.problem), 
-        definition = def
+        definition = def,
+        fixed_at = fixed_at
     )
     
-    attr(.problem, "n_variables") <- max(ind)
+    attr(.problem, "n_variables") <- max(
+        ncol(.problem), 
+        ind, 
+        na.rm = TRUE
+    )
     attr(.problem, "varnames") <- c(
         attr(.problem, "varnames"),
-        name_variable(name, sets)
+        name_variable(name, sets, fixed_at)
     )
     
-    A <- matrix(0, nrow = length(ind), ncol = 1L) |> robust_index()
-    L <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> robust_index()
-    L[, ind] <- diag(length(ind))
+    A <- new_A_coef(
+        ind = ind, 
+        fixed_at = fixed_at, 
+        fixed_values = fixed_values
+    )
+    
+    L <- new_L_coef(
+        ind = ind,
+        ncol = ncol(.problem),
+        colnames = variable.names(.problem),
+        fixed_at = fixed_at
+    )
     
     new_variable <- list(
         name = name,
@@ -206,73 +238,6 @@ transformed_variable <- function(x) {
 lp_var <- lp_variable
 
 
-# Fix Vars -------------------
-
-#' Fix Variables to a Value
-#' 
-#' Set the lower and upper bounds of variables to a fixed value.
-#'
-#' @param .problem An [lp_problem()].
-#' @param ... Name-value pairs, variables with their respective values. 
-#' `NA` values are not fixed, and will remain free within their bounds.
-#'
-#' @returns The `.problem` with modified lower and upper bounds for the variables.
-#' @export
-#'
-#' @example inst/examples/example_fix_vars.R
-lp_fix_vars <- function(.problem, ...) {
-    vars <- rlang::dots_list(...)
-    nams <- rlang::names2(vars)
-    
-    if (any(nams == "")) {
-        cli_abort("`...` must be named with the names of the variables to fix.")
-    }
-    
-    non_vars <- nams[!is.element(nams, names(.problem$variables))]
-    
-    if (length(non_vars) > 0) {
-        cli_warn(c(
-            "Variables not defined in `.problem`",
-            ">" = "Problematic variables: {non_vars}"
-        ))
-    }
-    
-    fix <- variables_to_list(
-        x = vars, 
-        problem = .problem,
-        miss_error = FALSE,
-        call = environment()
-    )
-    
-    for (v in names(fix)) {
-        pv <- .problem$variables[[v]]
-        fv <- fix[[v]]
-        miss <- is.na(fv)
-        
-        if (all(miss)) {
-            next
-        }
-        
-        pv$lower <- recycle_const(pv$lower, length(pv))
-        pv$upper <- recycle_const(pv$upper, length(pv))
-        
-        if (any(fv[!miss] < pv$lower[!miss])) {
-            cli_warn("Fixed variable `{v}` to a value less than its lower bound.")
-        }
-        if (any(fv[!miss] > pv$upper[!miss])) {
-            cli_warn("Fixed variable `{v}` to a value greater than its upper bound.")
-        }
-        
-        pv$lower[!miss] <- fv[!miss]
-        pv$upper[!miss] <- fv[!miss]
-        
-        .problem$variables[[v]] <- pv
-    }
-    
-    .problem
-}
-
-
 # Methods --------------------
 
 #' @export
@@ -303,16 +268,16 @@ print.lp_variable <- function(x, ...) {
     
     cat("'")
     
-    if (length(x$lower) == 1L && length(x$upper) == 1L) {
-        if (x$lower != -Inf && x$upper != +Inf) {
+    if (all(x$lower == x$lower[1]) && all(x$upper == x$upper[1])) {
+        if (x$lower[1] != -Inf && x$upper[1] != +Inf) {
             cat("\n")
-            cat(x$lower, "<=", x$name, "<=", x$upper)
+            cat(x$lower[1], "<=", x$name, "<=", x$upper[1])
         } 
-        else if (x$lower != -Inf) {
-            cat("\n", x$name, " >= ", x$lower, sep = "")
+        else if (x$lower[1] != -Inf) {
+            cat("\n", x$name, " >= ", x$lower[1], sep = "")
         } 
-        else if (x$upper != +Inf) {
-            cat("\n", x$name, " <= ", x$upper, sep = "")
+        else if (x$upper[1] != +Inf) {
+            cat("\n", x$name, " <= ", x$upper[1], sep = "")
         }
     }
     
@@ -649,6 +614,9 @@ parse_variable_definition <- function(definition) {
 
 # Checks that sets are correctly defined
 check_variable_set <- function(set, name, call = environment()) {
+    if (length(set) == 0L) {
+        cli_abort("Set `{name}` is length 0.", call = call)
+    }
     if (!rlang::is_atomic(set)) {
         cli_abort("Set `{name}` is not atomic.", call = call)
     }
@@ -708,7 +676,26 @@ adjust_bound <- function(bound, bound_name, default, dim, var_name) {
         )
     }
     
-    bound
+    recycle_const(bound, prod(dim))
+}
+
+check_fixed <- function(fixed, dim, var_name) {
+    if (!is.numeric(fixed) || any(is.infinite(fixed))) {
+        cli_abort(
+            "`fixed` must be a finite numeric array.",
+            call = parent.frame(),
+            class = "lpsugar_error_fixed_non_numeric"
+        )
+    }
+    if (!same_dimensions(fixed, dim_y = dim)) {
+        cli_abort(
+            c("`dim(fixed)` different from `dim({var_name})`.",
+              "*" = "`dim(fixed)` = {format_dim(fixed)}",
+              "*" = "`dim({var_name})` = {format_dim(dim = dim)}"),
+            call = parent.frame(),
+            class = "lpsugar_error_inconsistent_bounds"
+        )
+    }
 }
 
 check_consistent_bounds <- function(lower, upper, call = parent.frame()) {
@@ -745,30 +732,51 @@ check_consistent_bounds <- function(lower, upper, call = parent.frame()) {
 
 # Index array of variable.
 # Indicates which objective coefficients correspond to this variable.
-variable_indices <- function(old_n, definition) {
+variable_indices <- function(old_n, definition, fixed_at) {
     if (definition$scalar) {
-        ind <- old_n + 1L
+        if (fixed_at) {
+            ind <- NA_integer_
+        }
+        else {
+            ind <- old_n + 1L
+        }
     } 
     else {
         ind <- array(
             dim = lengths(definition$sets),
             dimnames = dimnames_non_numeric(definition$sets)
         )
-        ind[] <- seq_along(ind) + old_n
+        ind[!fixed_at] <- seq_along(ind[!fixed_at]) + old_n
     }
     
     robust_index(ind)
 }
 
+new_A_coef <- function(ind, fixed_at, fixed_values) {
+    A <- matrix(0, ncol = 1, nrow = length(ind))
+    A[fixed_at] <- fixed_values
+    robust_index(A)
+}
+new_L_coef <- function(ind, ncol, colnames, fixed_at) {
+    L <- matrix(0, ncol = ncol, nrow = length(ind))
+    L[!fixed_at, ind[!fixed_at]] <- diag(sum(!fixed_at))
+    colnames(L) <- colnames
+    robust_index(L)
+}
+
 # Gives the colnames of $L
 # For instance c("x[1,1]", "x[2,1]", ...)
-name_variable <- function(name, sets) {
+name_variable <- function(name, sets, fixed_at) {
     if (length(sets) == 1L && lengths(sets) == 1L) {
-        return(name)
+        nams <- name
+    } 
+    else {
+        grid <- do.call(expand.grid, sets)
+        index <- .mapply(dots = grid, FUN = paste, MoreArgs = list(sep = ","))
+        nams <- paste0(name, "[", index, "]")
     }
-    grid <- do.call(expand.grid, sets)
-    index <- .mapply(dots = grid, FUN = paste, MoreArgs = list(sep = ","))
-    paste0(name, "[", index, "]")
+    
+    nams[!fixed_at]
 }
 
 roi_variable_type <- function(binary, integer, lower, upper) {

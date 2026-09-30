@@ -48,6 +48,15 @@ test_that("solving with multivariate bounds", {
             sep = ".*"
         )
     )
+    expect_error(
+        lp_problem() |> lp_var(ay_yo[1:7], fixed = matrix(0, 3, 2)),
+        paste(
+            r"(`dim\(fixed\)` different from `dim\(ay_yo\)`.)",
+            r"(`dim\(fixed\)` = \(3, 2\))",
+            r"(`dim\(ay_yo\)` = \(7))",
+            sep = ".*"
+        )
+    )
 })
 
 test_that("feasible", {

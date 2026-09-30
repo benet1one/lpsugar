@@ -198,7 +198,11 @@ variables_to_list.default <- function(x, problem,
     }
     
     purrr::map(problem$variables, function(v) {
+        fixed_at <- is.na(v$ind)
+        fixed_values <- v$lower[fixed_at]
+        
         values <- x[v$ind]
+        values[fixed_at] <- fixed_values
         
         if (v$binary && binary_as_logical) {
             values <- values > 0.5
@@ -379,7 +383,8 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
             )
         }
         
-        solution_vec[v$ind] <- xs
+        fixed_at <- is.na(v$ind)
+        solution_vec[v$ind[!fixed_at]] <- xs[!fixed_at]
     }
     
     solution_vec
@@ -388,7 +393,7 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
 #' @export
 variables_to_vec.lp_solution <- function(x, problem, miss_error = TRUE, 
                                          call = environment(), field = "x") {
-    var_vec <- unlist(x$variables)
+    var_vec <- variables_to_vec(x$variables, problem = problem)
     true_vec <- x$variables_vec
     
     if (length(var_vec) != length(true_vec) || any(var_vec != true_vec)) {
@@ -437,6 +442,19 @@ get_Q <- function(x) {
     )
     
     list(qmat) |> rep(length(x))
+}
+
+# Is a variable, constraint, or objective function linear?
+is_linear <- function(x) {
+    if (is_lp_variable(x) || is_lp_constraint(x) || is_lp_objective(x)) {
+        all(!is_quadratic(x),
+            !is_nonlinear(x),
+            !is_empty_constraint(x),
+            !is_empty_objective(x))
+    }
+    else {
+        return(FALSE)
+    }
 }
 
 # Is a variable, constraint, or objective function quadratic?
@@ -649,6 +667,32 @@ lpsugar_attributes <- function(x) {
 `lpsugar_attributes<-` <- function(x, value) {
     attr(x, "lpsugar_attributes") <- value
     return(x)
+}
+
+get_bounds <- function(x, include_fixed = FALSE) {
+    UseMethod("get_bounds")
+}
+#' @export
+get_bounds.lp_variable <- function(x, include_fixed = FALSE) {
+    out <- data.frame(
+        lower = x$lower,
+        upper = x$upper,
+        types = x$type
+    )
+    
+    if (include_fixed) {
+        out
+    }
+    else {
+        fixed_at <- is.na(x$ind)
+        out[!fixed_at, ]
+    }
+}
+#' @export
+get_bounds.lp_problem <- function(x, include_fixed = FALSE) {
+    x$variables |> 
+        purrr::map(get_bounds, include_fixed = include_fixed) |> 
+        purrr::list_rbind()
 }
 
 # Printing ------------------------

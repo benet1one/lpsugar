@@ -196,13 +196,9 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
 bound_summary <- function(problem, solution, tol = 2e-6) {
     solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
     
-    lower <- numeric(ncol(problem))
-    upper <- numeric(ncol(problem))
-    
-    for (x in problem$variables) {
-        lower[x$ind] <- x$lower
-        upper[x$ind] <- x$upper
-    }
+    bound_info <- get_bounds(problem, include_fixed = FALSE)
+    lower <- bound_info$lower
+    upper <- bound_info$upper
     
     satisfied <- (solution >= lower - tol) & (solution <= upper + tol)
     saturated <- (solution <= lower + tol) | (solution >= upper - tol)
