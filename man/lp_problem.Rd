@@ -8,7 +8,9 @@ lp_problem(warn_infeasible = TRUE, ...)
 }
 \arguments{
 \item{warn_infeasible}{If TRUE (the default), will throw a warning
-when a linear constraint is infeasible, as soon as the constraint is defined.}
+when a linear constraint is infeasible, as soon as the constraint is defined.
+This check only uses the variable's bounds. A problem may be still be infeasible
+even if no warning is thrown.}
 
 \item{...}{These dots are for future extensions and should be left empty.}
 }
