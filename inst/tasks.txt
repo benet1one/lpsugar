@@ -1,6 +1,9 @@
 
 Code
 - Check TODOs
+- Speed up sum_over
+- Consider strict_index branch
+- Consider custom rbind.constraint to make it faster
 
 Nonlinear
 - gradient
