@@ -269,7 +269,7 @@ bind_cons <- function(...) {
     class(out) <- c("lp_constraint", class(out)) |> unique()
     
     lpsugar_attributes(out) <- purrr::map(dots, lpsugar_attributes) |> 
-        purrr::list_transpose(simplify = FALSE) |> 
+        purrr::list_transpose(simplify = FALSE, template = c("id", "index", "expr")) |> 
         purrr::map(\(x) unlist(x, use.names = FALSE))
 
     return(out)
