@@ -1,3 +1,9 @@
+# lpsugar 0.27.1
+
+## Performance Improvements
+
+* Slightly improved performance when programatically adding constraints.
+
 # lpsugar 0.27.0
 
 ## New Features
