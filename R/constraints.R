@@ -263,10 +263,11 @@ bind_cons <- function(...) {
     if (length(dots) == 0L) {
         return(empty_constraint(0))
     }
+    else if (length(dots) == 1L) {
+        return(dots[[1]])
+    }
     
-    roi_binder <- get("rbind.constraint", pos = getNamespace("ROI"))
-    out <- rlang::exec(roi_binder, !!!dots)
-    class(out) <- c("lp_constraint", class(out)) |> unique()
+    out <- bind_cons_internal(dots)
     
     lpsugar_attributes(out) <- purrr::map(dots, lpsugar_attributes) |> 
         purrr::list_transpose(simplify = FALSE, template = c("id", "index", "expr")) |> 
@@ -275,14 +276,56 @@ bind_cons <- function(...) {
     return(out)
 }
 
-roi_constraint_class <- function(con) {
-    out <- grepv(class(con), pattern = "^[A-Z]_constraint$")[1]
+bind_cons_internal_old <- function(cons) {
+    roi_binder <- get("rbind.constraint", pos = getNamespace("ROI"))
+    out <- rlang::exec(roi_binder, !!!cons)
+    class(out) <- c("lp_constraint", class(out)) |> unique()
+    lpsugar_attributes(out) <- NULL
     
-    if (length(out) == 0) {
-        class(con)[1]
-    } else {
-        out
+    out
+}
+
+bind_cons_internal <- function(cons) {
+    classes <- purrr::map_chr(cons, roi_constraint_class)
+    
+    if (any(classes != "L_constraint") || length(cons) < 20) {
+        roi_binder <- get("rbind.constraint", pos = getNamespace("ROI"))
+        out <- rlang::exec(roi_binder, !!!cons)
     }
+    else {
+        out <- bind_linear_cons(cons)
+    }
+    
+    class(out) <- c("lp_constraint", class(out)) |> unique()
+    out
+}
+
+bind_linear_cons <- function(cons) {
+    out <- purrr::list_transpose(cons, template = c("L", "dir", "rhs"))
+    
+    ROI::L_constraint(
+        L = bind_simple_triplet_matrices(out$L),
+        dir = unlist(out$dir) |> unname(),
+        rhs = unlist(out$rhs) |> unname(),
+        names = cons[[1]] $ names
+    )
+}
+
+bind_simple_triplet_matrices <- function(mats) {
+    # TODO Try to improve performance?
+    rlang::exec(rbind, !!!mats)
+}
+
+roi_constraint_class <- function(con) {
+    roi_constraint_classes <- get("available_constraint_classes", pos = getNamespace("ROI"))
+    out <- class(con)[class(con) %in% roi_constraint_classes()]
+    
+    if (length(out) == 0L) {
+        cli_warn("Object does not inherit from a ROI constraint class.")
+        character(0)
+    }
+    
+    out[1]
 }
 
 check_linear_constraint <- function(con, bound_info, call = parent.frame()) {
