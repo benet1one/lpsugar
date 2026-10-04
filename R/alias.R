@@ -67,6 +67,95 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
 #' @rdname lp_alias
 #' @export
 lp_implicit_variable <- lp_alias
+
 #' @rdname lp_alias
 #' @export
 lp_impvar <- lp_alias
+
+
+
+# New Impvars ---------------
+
+#' Define an Alias or Implicit Variable (IMPVAR)
+#'
+#' @param .problem An [lp_problem()].
+#' @param definition 
+#' @param expression 
+#' @param default 
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+lp_alias_2 <- function(.problem, definition, expression, default = 0) {
+    check_problem(.problem)
+    
+    if (missing(definition)) {
+        cli_abort("Argument `definition` is missing, with no default.")
+    }
+    
+    stopifnot(is.numeric(default) && length(default) == 1)
+    
+    def <- parse_variable_definition({{ definition }})
+    name <- def$name
+    sets <- def$sets
+    
+    if (name %in% names(.problem$variables)) {
+        cli_abort(
+            "Cannot override variable `{name}`.", 
+            class = "lpsugar_error_impvar_override_variable",
+            call = parent.frame()
+        )
+    } 
+    else if (name %in% names(.problem$impvars)) {
+        cli_inform("Overriding impvar `{name}`.", call = parent.frame())
+    }
+    
+    fixed_at <- rep(FALSE, prod(lengths(sets)))
+    fixed_values <- NA
+    
+    ind <- variable_indices(
+        old_n = 0L, 
+        definition = def,
+        fixed_at = fixed_at
+    )
+    
+    A <- new_A_coef(
+        ind = ind, 
+        fixed_at = fixed_at, 
+        fixed_values = fixed_values
+    )
+    
+    L <- new_L_coef(
+        ind = ind,
+        ncol = ncol(.problem),
+        colnames = variable.names(.problem),
+        fixed_at = fixed_at
+    )
+    
+    L[] <- 0
+    A[] <- default
+    
+    variable <- list(
+        binary = FALSE,
+        ind = ind,
+        L = L,
+        A = A
+    ) |> structure(class = c("transformed_lp_variable", "lp_variable"))
+    
+    quo <- rlang::enquo(expression)
+    expr <- rlang::get_expr(quo)
+    
+    expr <- rlang::expr({
+        !!expr
+        !!rlang::sym(name)
+    })
+    
+    env <- rlang::get_env(quo)
+    env[[name]] <- variable
+    
+    variable_new <- rlang::eval_tidy(expr, env = env, data = data_mask(.problem))
+    .problem$impvars[[name]] <- variable_new
+
+    return(.problem)
+}

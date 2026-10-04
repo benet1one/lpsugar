@@ -41,3 +41,30 @@ test_that("alias", {
         "cannot be `nonlinear"
     )
 })
+
+test_that("new impvar", {
+    A <- letters[1:3]
+    B <- LETTERS[1:2]
+    
+    p <- lp_problem() |> 
+        lp_var(x[A, B]) |> 
+        lp_impvar_2(
+            y[A],
+            for (a in 1:2) y[a] = sum(x[a, ]),
+            default = 5
+        )
+    
+    
+    expect_snapshot(unclass(p$impvars$y))
+    
+    p2 <- lp_problem() |> 
+        lp_var(x[A, A]) |> 
+        lp_impvar_2(
+            z[A, A],
+            for (i in A) {
+                z[, i] <- x[i, i] + 2
+            }
+        )
+    
+    expect_snapshot(unclass(p2$impvars$z))
+})
