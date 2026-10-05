@@ -434,6 +434,16 @@ bind_cv <- function(x, y) {
 
 #' @export
 `[.lp_variable` <- function(x, ..., drop = FALSE) {
+    non_empty <- rlang::dots_list(..., .ignore_empty = "all")
+    
+    if (length(non_empty) == 0L) {
+        if (drop) {
+            x$ind <- drop(x$ind)
+            x <- transformed_variable(x)
+        }
+        return(x)
+    }
+    
     old_ind <- x$ind
     old_ind[] <- seq_along(old_ind)
     
@@ -465,12 +475,19 @@ bind_cv <- function(x, y) {
     ind <- x$ind
     ind[] <- seq_along(ind)
     
-    i <- rlang::try_fetch(ind[...], error = identity)
+    non_empty <- rlang::dots_list(..., .ignore_empty = "all")
     
-    if (rlang::is_condition(i)) {
-        dots <- rlang::enexprs(..., .ignore_empty = "none")
-        call <- rlang::expr((!!substitute(x))[!!!dots])
-        cli_abort(i$message, call = call)
+    if (length(non_empty) == 0L) {
+        i <- ind
+    }
+    else {
+        i <- rlang::try_fetch(ind[...], error = identity)
+        
+        if (rlang::is_condition(i)) {
+            dots <- rlang::enexprs(..., .ignore_empty = "none")
+            call <- rlang::expr((!!substitute(x))[!!!dots])
+            cli_abort(i$message, call = call)
+        }
     }
     
     i <- c(i)
