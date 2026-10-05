@@ -1,3 +1,13 @@
+# lpsugar 0.27.2
+
+## Performance Improvements
+
+* Improved performance when binding many linear constraints.
+
+## Bug Fixes
+
+* Fixed bug with indexing variables.
+
 # lpsugar 0.27.1
 
 ## Performance Improvements
