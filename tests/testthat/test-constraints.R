@@ -145,6 +145,10 @@ test_that("non constraint", {
         p |> lp_constraint(x != 0),
         "Not equal"
     )
+    expect_error(
+        p |> lp_constraint(x = 0),
+        "Did you accidentally use `=` instead of `==`?"
+    )
 })
 
 test_that("indexing constraints", {
