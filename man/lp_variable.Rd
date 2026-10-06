@@ -28,7 +28,7 @@ lp_var(
 \arguments{
 \item{.problem}{An \code{\link[=lp_problem]{lp_problem()}} object.}
 
-\item{definition}{Expression.
+\item{definition}{Name and dimensions of the variable.
 \itemize{
 \item If the variable is a scalar, simply type it's name.
 \itemize{

@@ -2,15 +2,15 @@
 % Please edit documentation in R/alias.R
 \name{lp_alias}
 \alias{lp_alias}
-\alias{lp_implicit_variable}
 \alias{lp_impvar}
+\alias{lp_implicit_variable}
 \title{Define an Alias or Implicit Variable (IMPVAR)}
 \usage{
 lp_alias(.problem, ...)
 
-lp_implicit_variable(.problem, ...)
-
 lp_impvar(.problem, ...)
+
+lp_implicit_variable(.problem, ...)
 }
 \arguments{
 \item{.problem}{An \code{\link[=lp_problem]{lp_problem()}}.}
@@ -134,4 +134,7 @@ library(ROI.plugin.highs)
 s <- lp_solve(p1)
 s$variables
 s$aliases
+}
+\seealso{
+\code{\link[=lp_alias_manual]{lp_alias_manual()}}
 }

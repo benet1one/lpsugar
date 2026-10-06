@@ -10,12 +10,21 @@
 #'
 #' @returns The `.problem` with the added `$aliases`.
 #' @export
+#' 
+#' @seealso [lp_alias_manual()]
 #'
 #' @example inst/examples/example_alias.R
 lp_alias <- function(.problem, ...) {
     check_problem(.problem)
     dots <- rlang::enquos(...)
     nams <- rlang::names2(dots)
+    
+    if (ncol(.problem) == 0L) {
+        cli_abort(
+            "Must define variables before aliases.", 
+            class = "lpsugar_error_alias_before_variables"
+        )
+    }
     
     if (any(nams == "")) {
         cli_abort("Aliases must be named.", class = "lpsugar_error_unnamed_alias")
@@ -62,39 +71,38 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
     return(.problem)
 }
 
-# Alias --------------------
+# New Aliases ---------------
 
-#' @rdname lp_alias
-#' @export
-lp_implicit_variable <- lp_alias
-
-#' @rdname lp_alias
-#' @export
-lp_impvar <- lp_alias
-
-
-
-# New Impvars ---------------
-
-#' Define an Alias or Implicit Variable (IMPVAR)
+#' Manually Define an Alias by Assigning its Values
+#' 
+#' This function does the same as [lp_alias()], but gives more freedom. 
+#' It provides a better syntax for defining aliases that cannot be defined
+#' in a single line of code.
 #'
-#' @param .problem An [lp_problem()].
-#' @param definition 
-#' @param expression 
-#' @param default 
-#'
-#' @returns
+#' @inheritParams lp_variable
+#' 
+#' @param expression Code to assign values to the alias. The values must be
+#' numeric or `<lp_variable>`. See examples.
+#' 
+#' @returns The `.problem` with the added alias in `$aliases`.
 #' @export
+#'
+#' @seealso [lp_alias()]
 #'
 #' @examples
-lp_alias_2 <- function(.problem, definition, expression, default = 0) {
+lp_alias_manual <- function(.problem, definition, expression) {
     check_problem(.problem)
+    
+    if (ncol(.problem) == 0L) {
+        cli_abort(
+            "Must define variables before aliases.", 
+            class = "lpsugar_error_alias_before_variables"
+        )
+    }
     
     if (missing(definition)) {
         cli_abort("Argument `definition` is missing, with no default.")
     }
-    
-    stopifnot(is.numeric(default) && length(default) == 1)
     
     def <- parse_variable_definition({{ definition }})
     name <- def$name
@@ -107,35 +115,26 @@ lp_alias_2 <- function(.problem, definition, expression, default = 0) {
             call = parent.frame()
         )
     } 
-    else if (name %in% names(.problem$impvars)) {
+    else if (name %in% names(.problem$aliases)) {
         cli_inform("Overriding impvar `{name}`.", call = parent.frame())
     }
     
     fixed_at <- rep(FALSE, prod(lengths(sets)))
-    fixed_values <- NA
     
     ind <- variable_indices(
         old_n = 0L, 
         definition = def,
         fixed_at = fixed_at
     )
+
+    A <- matrix(NA_real_, nrow = length(ind), ncol = 1L) |> 
+        robust_index()
     
-    A <- new_A_coef(
-        ind = ind, 
-        fixed_at = fixed_at, 
-        fixed_values = fixed_values
-    )
+    L <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> 
+        robust_index()
     
-    L <- new_L_coef(
-        ind = ind,
-        ncol = ncol(.problem),
-        colnames = variable.names(.problem),
-        fixed_at = fixed_at
-    )
-    
-    L[] <- 0
-    A[] <- default
-    
+    colnames(L) <- variable.names(.problem)
+
     variable <- list(
         binary = FALSE,
         ind = ind,
@@ -154,8 +153,36 @@ lp_alias_2 <- function(.problem, definition, expression, default = 0) {
     env <- rlang::get_env(quo)
     env[[name]] <- variable
     
-    variable_new <- rlang::eval_tidy(expr, env = env, data = data_mask(.problem))
-    .problem$impvars[[name]] <- variable_new
+    alias <- rlang::eval_tidy(expr, env = env, data = data_mask(.problem))
+    .problem$aliases[[name]] <- alias
+
+    if (anyNA(alias$A)) {
+        i <- unclass(alias$ind)
+        i[] <- c(is.na(alias$A))
+        first_miss <- which(i == 1, arr.ind = TRUE)[1, ]
+        first_miss <- format_dim(dim = first_miss)
+        
+        cli_abort(
+            c("Alias is not fully defined.",
+              "x" = "{sum(i)} unassigned values.",
+              "x" = "First unassigned value at {first_miss}."),
+            class = "lpsugar_error_alias_undefined"
+        )
+    }
 
     return(.problem)
 }
+
+# Alias --------------------
+
+#' @rdname lp_alias
+#' @export
+lp_impvar <- lp_alias
+
+#' @rdname lp_alias
+#' @export
+lp_implicit_variable <- lp_alias
+
+#' @rdname lp_alias_manual
+#' @export
+lp_impvar_manual <- lp_alias_manual

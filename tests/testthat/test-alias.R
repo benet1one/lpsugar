@@ -42,29 +42,54 @@ test_that("alias", {
     )
 })
 
-test_that("new impvar", {
+test_that("new alias", {
     A <- letters[1:3]
     B <- LETTERS[1:2]
     
     p <- lp_problem() |> 
         lp_var(x[A, B]) |> 
-        lp_impvar_2(
-            y[A],
-            for (a in 1:2) y[a] = sum(x[a, ]),
-            default = 5
+        lp_impvar_manual(
+            y[A], {
+                y[] <- 5
+                for (a in 1:2) {
+                    y[a] = sum(x[a, ])
+                }
+            }
         )
     
-    
-    expect_snapshot(unclass(p$impvars$y))
-    
+    expect_snapshot(unclass(p$aliases$y))
+
     p2 <- lp_problem() |> 
         lp_var(x[A, A]) |> 
-        lp_impvar_2(
+        lp_alias_manual(
             z[A, A],
             for (i in A) {
                 z[, i] <- x[i, i] + 2
             }
         )
     
-    expect_snapshot(unclass(p2$impvars$z))
+    expect_snapshot(unclass(p2$aliases$z))
+    
+    p3 <- lp_problem() |> 
+        lp_var(x[A]) |> 
+        lp_alias_manual(
+            y[A], {
+                for (a in 1:2) y[a] = 2*x[a]
+                y[3] = sum(x)^2
+            }
+        )
+    
+    expect_snapshot(unclass(p3$aliases$y))
+    
+    expect_error(
+        lp_problem() |> 
+            lp_var(x) |> 
+            lp_alias_manual(d[A, A, A], d[1, 1, 1] <- 1),
+        paste(
+            "Alias is not fully defined.",
+            "26 unassigned values.",
+            "First unassigned value at \\(2, 1, 1\\).",
+            sep = ".*"
+        )
+    )
 })

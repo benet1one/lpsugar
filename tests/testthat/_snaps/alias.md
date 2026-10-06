@@ -1,7 +1,7 @@
-# new impvar
+# new alias
 
     Code
-      unclass(p$impvars$y)
+      unclass(p$aliases$y)
     Output
       $binary
       [1] FALSE
@@ -30,7 +30,7 @@
 ---
 
     Code
-      unclass(p2$impvars$z)
+      unclass(p2$aliases$z)
     Output
       $binary
       [1] FALSE
@@ -68,5 +68,55 @@
        [8,]    2
        [9,]    2
       with class 'robust_index' from package 'lpsugar'
+      
+
+---
+
+    Code
+      unclass(p3$aliases$y)
+    Output
+      $binary
+      [1] FALSE
+      
+      $ind
+      A
+      a b c 
+      1 2 3 
+      with class 'robust_index' from package 'lpsugar'
+      
+      $L
+           x[a] x[b] x[c]
+      [1,]    2    0    0
+      [2,]    0    2    0
+      [3,]    0    0    0
+      with class 'robust_index' from package 'lpsugar'
+      
+      $A
+           [,1]
+      [1,]    0
+      [2,]    0
+      [3,]    0
+      with class 'robust_index' from package 'lpsugar'
+      
+      $Q
+      $Q[[1]]
+           x[a] x[b] x[c]
+      x[a]    0    0    0
+      x[b]    0    0    0
+      x[c]    0    0    0
+      
+      $Q[[2]]
+           x[a] x[b] x[c]
+      x[a]    0    0    0
+      x[b]    0    0    0
+      x[c]    0    0    0
+      
+      $Q[[3]]
+           x[a] x[b] x[c]
+      x[a]    2    2    2
+      x[b]    2    2    2
+      x[c]    2    2    2
+      with class 'robust_index' from package 'lpsugar'
+      
       
 

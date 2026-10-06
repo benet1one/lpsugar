@@ -4,7 +4,7 @@
 #' Define a variable with it's name, dimensions, type, and bounds.
 #'
 #' @param .problem An [lp_problem()] object.
-#' @param definition Expression.
+#' @param definition Name and dimensions of the variable.
 #' - If the variable is a scalar, simply type it's name.
 #'   - `lp_variable(x)`
 #'
