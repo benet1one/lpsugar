@@ -1,0 +1,107 @@
+---
+title: "Input Output Model"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Input Output Model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(lpsugar)
+library(ROI.plugin.highs)
+```
+
+Make up some data
+
+```{r}
+sector <- c("Agriculture", "Industrial", "Services")
+
+z <- c(
+    400, 100, 150,
+    350, 900, 200,
+    250, 500, 800
+) |> parameter(sector, sector)
+
+va <- c(400, 600, 200) |> parameter(sector)
+demand <- c(500, 200, 700) |> parameter(sector)
+emissions <- c(400, 900, 50) |> parameter(sector)
+output <- colSums(z) + va
+```
+
+Calculate relatives
+
+```{r}
+a <- z
+relative_va <- va / output
+relative_emissions <- emissions / output
+
+for (j in sector) {
+    a[, j] <- z[, j] / output[j]
+}
+```
+
+Make up some parameters.
+
+```{r}
+min_a <- a * 0.8
+coef <- 0 |> parameter(sector, sector)
+
+for (j in sector) {
+    importance <- runif(3)
+    importance <- importance / sum(importance)
+    coef[, j] <- importance / a[, j]
+}
+
+penalty <- c(0.05, 0.01, 0.04) |> parameter(sector)
+```
+
+Model
+
+```{r}
+input_output_model <- lp_problem() |> 
+    lp_variable(
+        z[sector, sector],
+        lower = 0
+    ) |> 
+    # lp_alias_manual(
+    #     output[sector], 
+    #     for (j in sector) {
+    #         output[j] = sum_over(i = sector, coef[i, j] * z[i, j]) - penalty[j] * sum(emissions)
+    #     }
+    # ) |> 
+    lp_alias(
+        output = colSums(coef * z) - penalty * sum(emissions)
+    ) |> 
+    lp_alias(
+        emissions = output * relative_emissions
+    ) |> 
+    lp_minimize(
+        sum(emissions)
+    ) |> 
+    lp_constraint(
+        for (i in seq_along(sector)) {
+            output[i] - sum(z[i, ]) >= demand[i]
+        },
+        for (i in seq_along(sector)) for (j in seq_along(sector)) {
+            z[i, j] >= min_a[i, j] * output[j]
+        }
+    )
+
+efficient_solution <- lp_solve(input_output_model, solver = "highs")
+```
+
+Improvement!
+
+```{r}
+sum(emissions)
+sum(efficient_solution$aliases$emissions)
+```
+
