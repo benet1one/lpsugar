@@ -8,9 +8,9 @@ without adding complexity to the problem.
 ``` r
 lp_alias(.problem, ...)
 
-lp_implicit_variable(.problem, ...)
-
 lp_impvar(.problem, ...)
+
+lp_implicit_variable(.problem, ...)
 ```
 
 ## Arguments
@@ -28,6 +28,10 @@ lp_impvar(.problem, ...)
 ## Value
 
 The `.problem` with the added `$aliases`.
+
+## See also
+
+[`lp_alias_manual()`](https://benet1one.github.io/lpsugar/reference/lp_alias_manual.md)
 
 ## Examples
 

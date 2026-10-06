@@ -36,7 +36,7 @@ lp_var(
 
 - definition:
 
-  Expression.
+  Name and dimensions of the variable.
 
   - If the variable is a scalar, simply type it's name.
 

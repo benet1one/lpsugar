@@ -1,5 +1,13 @@
 # Changelog
 
+## lpsugar 0.28.0
+
+### New Features
+
+- New function
+  [`lp_alias_manual()`](https://benet1one.github.io/lpsugar/reference/lp_alias_manual.md)
+  which provides a much more powerful syntax for defining aliases.
+
 ## lpsugar 0.27.2
 
 ### Performance Improvements

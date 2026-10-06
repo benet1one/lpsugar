@@ -30,9 +30,13 @@
   : Delete Constraints
 
 - [`lp_alias()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
-  [`lp_implicit_variable()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
   [`lp_impvar()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
+  [`lp_implicit_variable()`](https://benet1one.github.io/lpsugar/reference/lp_alias.md)
   : Define an Alias or Implicit Variable (IMPVAR)
+
+- [`lp_alias_manual()`](https://benet1one.github.io/lpsugar/reference/lp_alias_manual.md)
+  [`lp_impvar_manual()`](https://benet1one.github.io/lpsugar/reference/lp_alias_manual.md)
+  : Manually Define an Alias by Assigning its Values
 
 - [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
   [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
