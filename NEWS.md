@@ -1,4 +1,4 @@
-# lpsugar (development)
+# lpsugar 0.28.0
 
 ## New Features
 
