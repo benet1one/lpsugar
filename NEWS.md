@@ -1,3 +1,10 @@
+# lpsugar (development)
+
+## New Features
+
+* New function `lp_alias_manual()` which provides a much more
+powerful syntax for defining aliases.
+
 # lpsugar 0.27.2
 
 ## Performance Improvements
