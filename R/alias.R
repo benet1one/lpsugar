@@ -89,7 +89,7 @@ lp_alias_internal <- function(.problem, quosure, name, data) {
 #'
 #' @seealso [lp_alias()]
 #'
-#' @examples
+#' @example inst/examples/example_alias_manual.R
 lp_alias_manual <- function(.problem, definition, expression) {
     check_problem(.problem)
     
