@@ -66,7 +66,7 @@ penalty <- c(0.05, 0.01, 0.04) |> parameter(sector)
 Model
 
 ```{r}
-input_output_model <- lp_problem() |> 
+io <- lp_problem() |> 
     lp_variable(
         z[sector, sector],
         lower = 0
@@ -88,20 +88,91 @@ input_output_model <- lp_problem() |>
     ) |> 
     lp_constraint(
         for (i in seq_along(sector)) {
-            output[i] - sum(z[i, ]) >= demand[i]
+            sum(z[i, ]) + demand[i] == output[i]
         },
         for (i in seq_along(sector)) for (j in seq_along(sector)) {
             z[i, j] >= min_a[i, j] * output[j]
         }
     )
 
-efficient_solution <- lp_solve(input_output_model, solver = "highs")
+io_solution <- lp_solve(io, solver = "highs")
 ```
 
 Improvement!
 
 ```{r}
 sum(emissions)
-sum(efficient_solution$aliases$emissions)
+sum(io_solution$aliases$emissions)
+```
+
+## Model With Different Production Techniques
+
+```{r}
+library(dplyr)
+
+random_technique <- function(produces) {
+    list(
+        produces = produces,
+        inputs = runif(3, 100, 500) |> 
+            parameter(sector) |> 
+            round() |> 
+            list(),
+        output = runif(1, 300, 1000) |> 
+            round(),
+        emissions = 30 * rexp(1),
+        variable_cost = 50 * rexp(1),
+        fix_cost = 200 * rexp(1)
+    )
+}
+
+produces <- c(
+    rep("Agriculture", 2),
+    rep("Industry", 4),
+    rep("Services", 3)
+)
+
+tech_df <- purrr::map_df(produces, random_technique)
+tech_df
+
+tech <- 1:nrow(tech_df)
+inputs <- bind_rows(tech_list$inputs)
+output <- tech_df$output
+
+emissions <- tech_df$emissions
+variable_cost <- tech_df$variable_cost 
+fix_cost <- tech_df$fix_cost
+
+
+io2 <- lp_problem() |> 
+    lp_variable(
+        usage[tech],
+        integer = TRUE,
+        lower = 0
+    ) |> 
+    lp_variable(
+        any_usage[tech],
+        binary = TRUE
+    ) |> 
+    lp_alias_manual(
+        total_output[sector], for (j in sector) {
+            tj <- which(produces == j)
+            total_output[j] = sum_over(t = tj, usage[t] * output[t])
+        }
+    ) |> 
+    lp_alias_manual(
+        spent[sector], for (j in sector) {
+            spent[j] = sum_over(t = tech, usage[t] * inputs[t, j])
+        }
+    ) |> 
+    lp_alias_manual(
+        final_supply[sector], for (j in sector) {
+            final_supply[j] = total_output[j] - spent[j]
+        }
+    ) |> 
+    lp_constraint(
+        for (t in tech) usage[t] <= 1000 * any_usage[tech],
+        for (j in sector) final_supply[j] >= demand[j]
+    )
+
 ```
 
