@@ -84,9 +84,19 @@ test_that("new alias", {
     expect_error(
         lp_problem() |> 
             lp_var(x) |> 
+            lp_alias_manual(d[1:3], {}),
+        paste(
+            "No values defined for `d`",
+            "Did you accidentally use `==` instead of `<-` or `=`?",
+            sep = ".*"
+        )
+    )
+    expect_error(
+        lp_problem() |> 
+            lp_var(x) |> 
             lp_alias_manual(d[A, A, A], d[1, 1, 1] <- 1),
         paste(
-            "Alias is not fully defined.",
+            "Alias `d` is not fully defined.",
             "26 unassigned values.",
             "First unassigned value at \\(2, 1, 1\\).",
             sep = ".*"

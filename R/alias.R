@@ -156,14 +156,21 @@ lp_alias_manual <- function(.problem, definition, expression) {
     alias <- rlang::eval_tidy(expr, env = env, data = data_mask(.problem))
     .problem$aliases[[name]] <- alias
 
-    if (anyNA(alias$A)) {
+    if (all(is.na(alias$A))) {
+        cli_abort(
+            c("No values defined for `{name}`.",
+              "i" = "Did you accidentally use `==` instead of `<-` or `=`?"),
+            class = "lpsugar_error_alias_undefined"
+        )
+    }
+    else if (anyNA(alias$A)) {
         i <- unclass(alias$ind)
         i[] <- c(is.na(alias$A))
         first_miss <- which(i == 1, arr.ind = TRUE)[1, ]
         first_miss <- format_dim(dim = first_miss)
         
         cli_abort(
-            c("Alias is not fully defined.",
+            c("Alias `{name}` is not fully defined.",
               "x" = "{sum(i)} unassigned values.",
               "x" = "First unassigned value at {first_miss}."),
             class = "lpsugar_error_alias_undefined"
