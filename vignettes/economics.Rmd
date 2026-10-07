@@ -190,6 +190,9 @@ io2_min_emissions <- io2 |>
     lp_minimize(sum(tech_emissions)) |> 
     lp_solve(solver = "highs")
 
+io2_min_cost$variables$usage |> round()
+io2_min_emissions$variables$usage |> round()
+
 solution_data <- function(solution) {
     c(cost = sum(solution$aliases$tech_cost),
       emissions = sum(solution$aliases$tech_emissions),
@@ -200,14 +203,10 @@ cbind(min_cost = solution_data(io2_min_cost),
       min_emissions = solution_data(io2_min_emissions))
 ```
 
-```{r}
-io2_min_cost$variables$usage |> round()
-io2_min_emissions$variables$usage |> round()
-```
-
+Excess output:
 
 ```{r}
-io2_min_cost$aliases
-io2_min_emissions$aliases
+round(io2_min_cost$aliases$final_supply - demand)
+round(io2_min_emissions$aliases$final_supply - demand)
 ```
 
