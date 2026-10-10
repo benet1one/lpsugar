@@ -5,52 +5,54 @@
 #'
 #' Sum over one or more indexing variables.
 #'
-#' @param ... The first argument(s) must be named: the name represents the indexing variable,
-#' and the values represent the sequence over which to sum.
-#'
-#' The last argument is the expression of the sum.
+#' @param .expr Values to sum.
+#' @param ... Indices and filters. 
+#' - Named arguments are indices, `<name> = <vector>`.
+#' - Unnamed arguments are filters on the indices.
 #'
 #' @details
 #' The syntax is similar to the one used in math. For instance,
-#' \eqn{ \sum_{i=1}^n \sum_{j=1}^m {x_{ij} * c_j} }
+#' 
+#' \verb{  } \eqn{ \sum_{i=1}^n \sum_{j=i}^m {x_{ij} * a_j} }
+#' 
 #' would be written as
-#' `sum_over(i = 1:n, j = 1:n, x[i,j] * c[j])`.
+#' 
+#' \verb{  } `sum_over(x[i,j] * a[j], i = 1:n, j = i:m)`
 #'
 #' @returns The value of the sum.
 #' @export
 #'
 #' @examples
-#' cost <- c(5, 2, 7)
+#' a <- c(5, 2, 7)
 #' p <- lp_problem() |>
 #'   lp_variable(x[1:2, 1:3]) |>
-#'   lp_minimize(sum_over(i = 1:2, j = 1:3, x[i, j] * cost[j]))
-#' p$objective
-sum_over <- function(...) {
-    dots <- rlang::enquos(..., .homonyms = "error")
-    nams <- rlang::names2(dots)
-    n <- length(dots)
+#'   lp_minimize(sum_over(x[i, j] * a[j], i = 1:2, j = i:3))
+sum_over <- function(.expr, ...) {
+    .expr <- rlang::enquo(.expr)
+    .dots <- rlang::enquos(...)
     
-    if (nams[n] != "") {
+    if (rlang::is_missing(rlang::get_expr(.expr))) {
         cli_abort(
-            "Last element in `...` should be an unnamed expression to sum.",
-            class = "lpsugar_error_last_element_named"
-        )
-    }
-    if (nams[1L] == "") {
-        cli_abort(
-            "First element in `...` must be a name value pair `<ind> = <set>`",
-            class = "lpsugar_error_first_elements_unnamed"
+            "`.expr` must be an expression with the values to sum.",
+            class = "lpsugar_error_missing_arg"
         )
     }
     
-    env <- rlang::get_env(dots[[n]])
-    expr <- rlang::get_expr(dots[[n]])
+    if (...length() > 0L && is.null(...names())) {
+        cli_abort(
+            "`...` must contain at least one named argument, indicating the indices to sum over."
+        )
+    }
     
-    listcomp::gen_list(!!expr, !!!dots[-n], .env = env) |>
-        purrr::map(sum) |>
-        purrr::reduce(`+`, .init = 0)
+    vals <- listcomp::gen_list(!!.expr, !!!.dots, .env = parent.frame())
+    res <- 0
+    
+    for (x in vals) {
+        res <- res + sum(x)
+    }
+    
+    res
 }
-
 
 # Methods ---------------------------------------
 
