@@ -57,6 +57,16 @@ sum_over <- function(...) {
 #' @export
 sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     stopifnot(rlang::is_bool(na.rm))
+    s <- sum(..., na.rm = na.rm)
+    
+    if (length(x) == 0L) {
+        return(s)
+    }
+    else if (length(x) == 1L) {
+        x <- x + s
+        x <- transformed_variable(x)
+        return(x)
+    }
     
     varnames <- colnames(x$L)
     x$ind <- x$ind[1]
@@ -74,10 +84,7 @@ sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     
     colnames(x$L) <- varnames
     
-    if (...length() > 0L) {
-        x <- x + sum(..., na.rm = na.rm)
-    }
-    
+    x <- x + s
     transformed_variable(x)
 }
 #' @export
