@@ -51,6 +51,8 @@ for (j in sector) {
 Make up some parameters.
 
 ```{r}
+set.seed(123)
+
 min_a <- a * 0.8
 coef <- 0 |> parameter(sector, sector)
 
@@ -108,7 +110,7 @@ sum(io_solution$aliases$emissions)
 ## Model With Different Production Techniques
 
 ```{r}
-library(dplyr)
+set.seed(1234)
 
 random_technique <- function(produces) {
     list(
@@ -135,12 +137,14 @@ tech_df <- purrr::map_df(produces, random_technique)
 tech_df
 
 tech <- 1:nrow(tech_df)
-inputs <- bind_rows(tech_df$inputs) |> as.matrix()
+inputs <- dplyr::bind_rows(tech_df$inputs) |> as.matrix()
 output <- tech_df$output
 
 emissions <- tech_df$emissions
 variable_cost <- tech_df$variable_cost 
 fix_cost <- tech_df$fix_cost
+
+labour_capacity = 18000
 ```
 
 
@@ -171,12 +175,16 @@ io2 <- lp_problem() |>
         final_supply = total_output - spent,
         # Per tech
         tech_cost = fix_cost * any_usage + variable_cost * usage,
-        tech_emissions = emissions * usage
+        tech_emissions = emissions * usage,
+        # Total
+        total_labour = sum(tech_cost),
+        total_emissions = sum(tech_emissions)
     ) |> 
     lp_constraint(
         for (t in tech) usage[t] <= 1000 * any_usage[t],
         for (t in tech) any_usage[t] <= usage[t],
-        for (j in sector) final_supply[j] >= demand[j]
+        for (j in sector) final_supply[j] >= demand[j],
+        total_labour <= labour_capacity
     )
 ```
 
