@@ -68,11 +68,13 @@ as.function.nonlinear <- function(x, problem, ...) {
     check_problem(problem, field_name = "problem")
     nl <- x
     
-    args <- list(substitute()) |> rep(length(problem$variables))
-    names(args) <- c(
+    argnames <- c(
         names(problem$variables),
         names(problem$aliases)
     )
+    
+    args <- list(substitute()) |> rep(length(argnames))
+    names(args) <- argnames
     
     expr <- rlang::get_expr(nl)
     env <- rlang::get_env(nl)
@@ -88,7 +90,7 @@ as.function.nonlinear <- function(x, problem, ...) {
         als <- compute_aliases(problem, solution = x)
         do.call(fun, args = c(vars, als))
     }
-    
+
     fun_out <- check_function_sanity(
         fun_x, 
         n0 = ncol(problem), 
