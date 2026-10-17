@@ -234,6 +234,10 @@ compute_objective <- function(problem, solution) {
 #' @rdname solution_summary
 #' @export
 compute_aliases <- function(problem, solution) {
+    if (length(problem$aliases) == 0L) {
+        return(list())
+    }
+    
     solution <- variables_to_vec(
         solution, 
         problem, 
