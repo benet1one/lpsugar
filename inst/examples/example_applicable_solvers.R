@@ -8,5 +8,6 @@ quadratic_prob <- lp_problem() |>
 
 # Installed and loaded quadratic solvers
 lpsugar_applicable_solvers(quadratic_prob)
-# All quadratic solvers
-lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
+
+# All quadratic solvers (needs an internet connection)
+# lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
