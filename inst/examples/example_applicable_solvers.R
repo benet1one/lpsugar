@@ -10,4 +10,6 @@ quadratic_prob <- lp_problem() |>
 lpsugar_applicable_solvers(quadratic_prob)
 
 # All quadratic solvers (needs an internet connection)
-# lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
+if (interactive()) {
+    lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
+}
