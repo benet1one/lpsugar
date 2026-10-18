@@ -70,14 +70,16 @@ lp_constraint <- function(.problem, ...) {
 }
 
 lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
-    expr <- rlang::quo_get_expr(quosure)
-    vars <- all.vars(expr)
-    
-    if (!any(vars %in% varnames)) {
+    if (!any(all.vars(quosure) %in% varnames)) {
+        msg <- "Constraint does not contain any variables."
+        
+        if (id %in% varnames) {
+            msg <- c(msg, ">" = "Did you accidentally use `=` instead of `==`?")
+        }
         cli_abort(
-            "Constraint does not contain any variables.", 
+            msg, 
             class = "lpsugar_error_no_constraint",
-            call = expr
+            call = quosure
         )
     }
     
@@ -103,9 +105,10 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
             msg <- c(
                 "Expression did not evaluate to a constraint.",
                 "x" = "Problematic constraint: '{indices[i]}'.",
-                ">" = "Did you forget the comparison operator? `<=/==/>=`"
+                ">" = "Did you forget the comparison operator? `<=/==/>=`",
+                ">" = "Did you accidentally use `=` instead of `==`?"
             )
-            
+
             cli_abort(msg, call = quosure, class = "lpsugar_error_no_constraint")
         }
         

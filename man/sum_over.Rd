@@ -4,13 +4,16 @@
 \alias{sum_over}
 \title{Index Based Summation}
 \usage{
-sum_over(...)
+sum_over(.expr, ...)
 }
 \arguments{
-\item{...}{The first argument(s) must be named: the name represents the indexing variable,
-and the values represent the sequence over which to sum.
+\item{.expr}{Values to sum.}
 
-The last argument is the expression of the sum.}
+\item{...}{Indices and filters.
+\itemize{
+\item Named arguments are indices, \verb{<name> = <vector>}.
+\item Unnamed arguments are filters on the indices.
+}}
 }
 \value{
 The value of the sum.
@@ -20,14 +23,16 @@ Sum over one or more indexing variables.
 }
 \details{
 The syntax is similar to the one used in math. For instance,
-\eqn{ \sum_{i=1}^n \sum_{j=1}^m {x_{ij} * c_j} }
+
+\verb{  } \eqn{ \sum_{i=1}^n \sum_{j=i}^m {x_{ij} * a_j} }
+
 would be written as
-\code{sum_over(i = 1:n, j = 1:n, x[i,j] * c[j])}.
+
+\verb{  } \code{sum_over(x[i,j] * a[j], i = 1:n, j = i:m)}
 }
 \examples{
-cost <- c(5, 2, 7)
+a <- c(5, 2, 7)
 p <- lp_problem() |>
   lp_variable(x[1:2, 1:3]) |>
-  lp_minimize(sum_over(i = 1:2, j = 1:3, x[i, j] * cost[j]))
-p$objective
+  lp_minimize(sum_over(x[i, j] * a[j], i = 1:2, j = i:3))
 }

@@ -171,6 +171,17 @@ test_that("variable indexing", {
     expect_all_true(dim(z1) == c(1, 3))
     expect_true(is.null(dim(z1_dropped)))
 
+    p2 <- lp_problem() |> 
+        lp_var(a[1, 1:3])
+    
+    a <- p2$variables$a
+    b <- a[]
+    d <- a[drop = TRUE]
+    
+    expect_equal(a, b)
+    expect_equal(dim2(d), 3)
+    expect_equal(d$L, diag(3), ignore_attr = TRUE)
+    
     expect_error(y[4], "out of bounds")
     expect_error(y[-4], "out of bounds")
     expect_error(y[0], "Invalid subscript")
@@ -231,6 +242,19 @@ test_that("variable replacement", {
     computed <- compute_aliases(p, list(x = xval, y = yval))
     expect_equal(computed$z, zval, ignore_attr = TRUE)
     expect_equal(dim(computed$z), c(2, 2), ignore_attr = TRUE)
+    
+    p2 <- lp_problem() |> 
+        lp_var(x[1:3]) |> 
+        lp_var(y) |> 
+        lp_alias(
+            z = {
+                x[] <- y
+                (x)
+            }
+        )
+    
+    expect_true(all(p2$aliases$z$L[, -4] == 0))
+    expect_true(all(p2$aliases$z$L[, "y"] == 1))
 })
 
 test_that("operations", {

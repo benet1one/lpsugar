@@ -132,11 +132,11 @@ test_that("sum over", {
     
     expect_error(
         sum_over(2+2, 3+3),
-        "First element in `...` must be a name value pair `<ind> = <set>`"
+        "`...` must contain at least one named argument, indicating the indices to sum over."
     )
     expect_error(
         sum_over(i = 1:3, j = 1:2),
-        "Last element in `...` should be an unnamed expression to sum."
+        "`.expr` must be an expression with the values to sum."
     )
 })
 

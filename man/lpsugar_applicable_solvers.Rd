@@ -52,8 +52,11 @@ quadratic_prob <- lp_problem() |>
 
 # Installed and loaded quadratic solvers
 lpsugar_applicable_solvers(quadratic_prob)
-# All quadratic solvers
-lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
+
+# All quadratic solvers (needs an internet connection)
+if (interactive()) {
+    lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
+}
 }
 \seealso{
 \code{\link[ROI:ROI_applicable_solvers]{ROI::ROI_applicable_solvers()}}, \code{\link[ROI:ROI_available_solvers]{ROI::ROI_available_solvers()}}.

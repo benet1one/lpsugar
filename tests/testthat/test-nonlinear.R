@@ -105,6 +105,21 @@ test_that("nonlinear constraints", {
     )
 })
 
+test_that("nonlinear with aliases", {
+    p <- lp_problem() |> 
+        lp_var(x[1:3]) |> 
+        lp_alias(y = 3*x + 1) |> 
+        lp_min(nl(log(sum(x)) * y[1]))
+    
+    xval <- c(3, 6, -2)
+    yval <- 3*xval + 1
+
+    expect_equal(
+        compute_objective(p, solution = xval),
+        log(sum(xval)) * yval[1]
+    )    
+})
+
 test_that("bad nonlinear outputs", {
     p <- lp_problem() |> 
         lp_var(x[1:3])

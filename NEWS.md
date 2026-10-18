@@ -1,3 +1,35 @@
+# lpsugar 0.29.0
+
+## Breaking Changes
+
+* `sum_over()` now uses a different syntax, where the first element is the 
+expression to sum and the rest of the arguments are indices and filters.
+
+## Bug Fixes
+
+* Fixed bug with `nonlinear()` when a problem had aliases.
+
+## Performance Improvements
+
+* Improved performance for nonlinear problems.
+
+# lpsugar 0.28.0
+
+## New Features
+
+* New function `lp_alias_manual()` which provides a much more
+powerful syntax for defining aliases.
+
+# lpsugar 0.27.2
+
+## Performance Improvements
+
+* Improved performance when binding many linear constraints.
+
+## Bug Fixes
+
+* Fixed bug with indexing variables.
+
 # lpsugar 0.27.1
 
 ## Performance Improvements
