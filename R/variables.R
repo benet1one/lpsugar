@@ -434,9 +434,7 @@ bind_cv <- function(x, y) {
 
 #' @export
 `[.lp_variable` <- function(x, ..., drop = FALSE) {
-    non_empty <- rlang::dots_list(..., .ignore_empty = "all")
-    
-    if (length(non_empty) == 0L) {
+    if (dots_missing(...)) {
         if (drop) {
             x$ind <- drop(x$ind)
             x <- transformed_variable(x)
@@ -474,10 +472,8 @@ bind_cv <- function(x, y) {
 `[<-.lp_variable` <- function(x, ..., value) {
     ind <- x$ind
     ind[] <- seq_along(ind)
-    
-    non_empty <- rlang::dots_list(..., .ignore_empty = "all")
-    
-    if (length(non_empty) == 0L) {
+
+    if (dots_missing(...)) {
         i <- ind
     }
     else {

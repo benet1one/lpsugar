@@ -217,6 +217,14 @@ test_that("variable indexing", {
     )
 })
 
+test_that("named variable indexing", {
+    p <- lp_problem() |> 
+        lp_var(x[row = 1:3, col = 1:2, depth = 1:2])
+    
+    x <- p$variables$x
+    expect_no_error(x[row = 1, col = , depth = 1])
+})
+
 test_that("variable replacement", {
     p <- lp_problem() |> 
         lp_var(x[1:2, 1:2]) |> 

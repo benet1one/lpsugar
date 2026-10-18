@@ -175,6 +175,10 @@ nonlinear_constraint_form_error <- function(call = parent.frame(), ...) {
     )
 }
 
+dots_missing <- function(...) {
+    ...length() == 0L || (...length() == 1L && rlang::is_missing(...))
+}
+
 # Transforming variables -------------------------
 
 # Returns a named list with the variable's values
