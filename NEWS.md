@@ -1,3 +1,9 @@
+# lpsugar 0.29.1
+
+## Bug Fixes
+
+* Fixed bug with indexing variables with missing dimensions.
+
 # lpsugar 0.29.0
 
 ## Breaking Changes
