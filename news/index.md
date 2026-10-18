@@ -1,5 +1,23 @@
 # Changelog
 
+## lpsugar 0.29.0
+
+### Breaking Changes
+
+- [`sum_over()`](https://benet1one.github.io/lpsugar/reference/sum_over.md)
+  now uses a different syntax, where the first element is the expression
+  to sum and the rest of the arguments are indices and filters.
+
+### Bug Fixes
+
+- Fixed bug with
+  [`nonlinear()`](https://benet1one.github.io/lpsugar/reference/nonlinear.md)
+  when a problem had aliases.
+
+### Performance Improvements
+
+- Improved performance for nonlinear problems.
+
 ## lpsugar 0.28.0
 
 ### New Features

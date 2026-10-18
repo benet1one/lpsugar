@@ -5,17 +5,22 @@ Sum over one or more indexing variables.
 ## Usage
 
 ``` r
-sum_over(...)
+sum_over(.expr, ...)
 ```
 
 ## Arguments
 
+- .expr:
+
+  Values to sum.
+
 - ...:
 
-  The first argument(s) must be named: the name represents the indexing
-  variable, and the values represent the sequence over which to sum.
+  Indices and filters.
 
-  The last argument is the expression of the sum.
+  - Named arguments are indices, `<name> = <vector>`.
+
+  - Unnamed arguments are filters on the indices.
 
 ## Value
 
@@ -23,19 +28,19 @@ The value of the sum.
 
 ## Details
 
-The syntax is similar to the one used in math. For instance, \\
-\sum\_{i=1}^n \sum\_{j=1}^m {x\_{ij} \* c_j} \\ would be written as
-`sum_over(i = 1:n, j = 1:n, x[i,j] * c[j])`.
+The syntax is similar to the one used in math. For instance,
+
+` ` \\ \sum\_{i=1}^n \sum\_{j=i}^m {x\_{ij} \* a_j} \\
+
+would be written as
+
+` ` `sum_over(x[i,j] * a[j], i = 1:n, j = i:m)`
 
 ## Examples
 
 ``` r
-cost <- c(5, 2, 7)
+a <- c(5, 2, 7)
 p <- lp_problem() |>
   lp_variable(x[1:2, 1:3]) |>
-  lp_minimize(sum_over(i = 1:2, j = 1:3, x[i, j] * cost[j]))
-p$objective
-#> linear function:
-#> sum_over(i = 1:2, j = 1:3, x[i, j] * cost[j])
-#> 
+  lp_minimize(sum_over(x[i, j] * a[j], i = 1:2, j = i:3))
 ```

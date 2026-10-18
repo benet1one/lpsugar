@@ -15,7 +15,7 @@ whereas Available solvers needn't be installed."><meta name="google-site-verific
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.28.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.29.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,27 +111,11 @@ they will also be listed.</p>
 <span class="r-in"><span><span class="fu">lpsugar_applicable_solvers</span><span class="op">(</span><span class="va">quadratic_prob</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "highs"         "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5] "nloptr.isres"  "nloptr.slsqp" </span>
-<span class="r-in"><span><span class="co"># All quadratic solvers</span></span></span>
-<span class="r-in"><span><span class="fu">lpsugar_available_solvers</span><span class="op">(</span><span class="va">quadratic_prob</span><span class="op">)</span> <span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Package"</span>, <span class="st">"Version"</span>, <span class="st">"Repository"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                Package Version                       Repository</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   ROI.plugin.alabama   1.0-0       https://CRAN.R-project.org</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     ROI.plugin.cplex   0.3-0       https://CRAN.R-project.org</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     ROI.plugin.highs   1.0-2       https://CRAN.R-project.org</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7      ROI.plugin.ipop   1.0-0       https://CRAN.R-project.org</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10     ROI.plugin.neos   1.0-0       https://CRAN.R-project.org</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11   ROI.plugin.nloptr   1.0-0       https://CRAN.R-project.org</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13     ROI.plugin.osqp   1.0-0       https://CRAN.R-project.org</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14  ROI.plugin.qpoases   1.0-2       https://CRAN.R-project.org</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15 ROI.plugin.quadprog   1.0-0       https://CRAN.R-project.org</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18  ROI.plugin.alabama   1.0-0 https://gitlab.com/roigrp/solver</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22   ROI.plugin.gurobi   1.0-0 https://gitlab.com/roigrp/solver</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23    ROI.plugin.highs   1.0-2 https://gitlab.com/roigrp/solver</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24    ROI.plugin.mosek   1.0-0 https://gitlab.com/roigrp/solver</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26     ROI.plugin.neos   1.0-0 https://gitlab.com/roigrp/solver</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27   ROI.plugin.nloptr   1.0-0 https://gitlab.com/roigrp/solver</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29     ROI.plugin.osqp   1.0-0 https://gitlab.com/roigrp/solver</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30  ROI.plugin.qpoases   1.0-2 https://gitlab.com/roigrp/solver</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31 ROI.plugin.quadprog   1.0-0 https://gitlab.com/roigrp/solver</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># All quadratic solvers (needs an internet connection)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="fu">lpsugar_available_solvers</span><span class="op">(</span><span class="va">quadratic_prob</span><span class="op">)</span> <span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Package"</span>, <span class="st">"Version"</span>, <span class="st">"Repository"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

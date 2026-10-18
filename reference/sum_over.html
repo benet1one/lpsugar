@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.28.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.29.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,17 +53,21 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sum_over</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sum_over</span><span class="op">(</span><span class="va">.expr</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>The first argument(s) must be named: the name represents the indexing variable,
-and the values represent the sequence over which to sum.</p>
-<p>The last argument is the expression of the sum.</p></dd>
+<dl><dt id="arg--expr">.expr<a class="anchor" aria-label="anchor" href="#arg--expr"></a></dt>
+<dd><p>Values to sum.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Indices and filters.</p><ul><li><p>Named arguments are indices, <code>&lt;name&gt; = &lt;vector&gt;</code>.</p></li>
+<li><p>Unnamed arguments are filters on the indices.</p></li>
+</ul></dd>
 
 </dl></div>
     <div class="section level2">
@@ -72,22 +76,18 @@ and the values represent the sequence over which to sum.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The syntax is similar to the one used in math. For instance,
-\( \sum_{i=1}^n \sum_{j=1}^m {x_{ij} * c_j} \)
-would be written as
-<code>sum_over(i = 1:n, j = 1:n, x[i,j] * c[j])</code>.</p>
+    <p>The syntax is similar to the one used in math. For instance,</p>
+<p><code>  </code> \( \sum_{i=1}^n \sum_{j=i}^m {x_{ij} * a_j} \)</p>
+<p>would be written as</p>
+<p><code>  </code> <code>sum_over(x[i,j] * a[j], i = 1:n, j = i:m)</code></p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">cost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">2</span>, <span class="fl">7</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="lp_objective.html">lp_minimize</a></span><span class="op">(</span><span class="fu">sum_over</span><span class="op">(</span>i <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">cost</span><span class="op">[</span><span class="va">j</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">p</span><span class="op">$</span><span class="va">objective</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> linear function:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sum_over(i = 1:2, j = 1:3, x[i, j] * cost[j])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span>  <span class="fu"><a href="lp_objective.html">lp_minimize</a></span><span class="op">(</span><span class="fu">sum_over</span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">a</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, i <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, j <span class="op">=</span> <span class="va">i</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -72,25 +72,9 @@ quadratic_prob <- lp_problem() |>
 lpsugar_applicable_solvers(quadratic_prob)
 #> [1] "highs"         "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag"
 #> [5] "nloptr.isres"  "nloptr.slsqp" 
-# All quadratic solvers
-lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
-#>                Package Version                       Repository
-#> 1   ROI.plugin.alabama   1.0-0       https://CRAN.R-project.org
-#> 2     ROI.plugin.cplex   0.3-0       https://CRAN.R-project.org
-#> 6     ROI.plugin.highs   1.0-2       https://CRAN.R-project.org
-#> 7      ROI.plugin.ipop   1.0-0       https://CRAN.R-project.org
-#> 10     ROI.plugin.neos   1.0-0       https://CRAN.R-project.org
-#> 11   ROI.plugin.nloptr   1.0-0       https://CRAN.R-project.org
-#> 13     ROI.plugin.osqp   1.0-0       https://CRAN.R-project.org
-#> 14  ROI.plugin.qpoases   1.0-2       https://CRAN.R-project.org
-#> 15 ROI.plugin.quadprog   1.0-0       https://CRAN.R-project.org
-#> 18  ROI.plugin.alabama   1.0-0 https://gitlab.com/roigrp/solver
-#> 22   ROI.plugin.gurobi   1.0-0 https://gitlab.com/roigrp/solver
-#> 23    ROI.plugin.highs   1.0-2 https://gitlab.com/roigrp/solver
-#> 24    ROI.plugin.mosek   1.0-0 https://gitlab.com/roigrp/solver
-#> 26     ROI.plugin.neos   1.0-0 https://gitlab.com/roigrp/solver
-#> 27   ROI.plugin.nloptr   1.0-0 https://gitlab.com/roigrp/solver
-#> 29     ROI.plugin.osqp   1.0-0 https://gitlab.com/roigrp/solver
-#> 30  ROI.plugin.qpoases   1.0-2 https://gitlab.com/roigrp/solver
-#> 31 ROI.plugin.quadprog   1.0-0 https://gitlab.com/roigrp/solver
+
+# All quadratic solvers (needs an internet connection)
+if (interactive()) {
+    lpsugar_available_solvers(quadratic_prob) [c("Package", "Version", "Repository")]
+}
 ```
