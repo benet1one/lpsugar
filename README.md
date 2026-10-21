@@ -31,11 +31,13 @@ pak::pak("benet1one/lpsugar")
 
 Start with a simple problem to show the basic syntax.
 
-$$\begin{array}{rl}
+$$
+\begin{array}{rl}
   \text{max} & x+y \\
   \text{st} & 2x + y \le 8 \\
             & 2x + 3y \le 12
-\end{array}$$
+\end{array}
+$$
 
 Let’s write the problem in `lpsugar` and solve it!
 
@@ -99,7 +101,7 @@ transportation_problem <- lp_problem() |>
         lower = 0
     ) |> 
     lp_minimize(
-        sum_over(f = factory, m = market, x[f, m] * cost[f, m])
+        sum_over(x[f, m] * cost[f, m], f = factory, m = market)
     ) |> 
     lp_constraint(
         for (f in factory) sum(x[f, ]) <= supply[f],
