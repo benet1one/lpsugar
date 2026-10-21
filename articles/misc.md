@@ -74,7 +74,7 @@ browser_problem <- lp_problem() |>
     lp_maximize(score["Ours"] - second_best_score) |> 
     lp_subject_to(
         for (b in browsers) {
-            score[b] == sum_over(i=features, ratings[i, b] * weight[i])
+            score[b] == sum_over(ratings[i, b] * weight[i], i=features)
         },
         for (b in browsers) if (b != "Ours") {
             second_best_score >= score[b]
@@ -103,7 +103,7 @@ browser. These prove that Ours is the best browser!
 
 new_scores <- numeric()
 for (b in browsers) 
-    new_scores[b] <- sum_over(i=features, ratings[i, b] * optimal_weights[i])
+    new_scores[b] <- sum_over(ratings[i, b] * optimal_weights[i], i=features)
 
 sort(new_scores, decreasing = TRUE)
 #>    Ours Firefox  Safari  Chrome   Opera 

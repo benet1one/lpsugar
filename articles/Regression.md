@@ -158,11 +158,11 @@ svm_hard <- lp_problem() |>
     lp_min(sum(w^2)) |> 
     lp_constraint(
         true_y = for (i in which(y)) {
-            predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
+            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
             predicted >= +1
         },
         false_y = for (i in which(!y)) {
-            predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
+            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
             predicted <= -1
         }
     ) |> 
@@ -211,11 +211,11 @@ svm_soft <- lp_problem() |>
     lp_min(sum(w^2) + C * sum(slack)) |> 
     lp_constraint(
         true_y = for (i in which(y)) {
-            predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
+            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
             predicted >= +1 - slack[i]
         },
         false_y = for (i in which(!y)) {
-            predicted <- sum_over(j = 1:k, x[i,j] * w[j]) + b
+            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
             predicted <= -1 + slack[i]
         }
     ) |> 
