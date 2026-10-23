@@ -337,3 +337,10 @@ print.lp_solution <- function(x, ...) {
         print(x$status)
     }
 }
+
+#' @importFrom ROI ROI_plugin_solution_dual
+#' @export
+ROI_plugin_solution_dual.lp_solution <- function(x) {
+    ROI::ROI_plugin_solution_dual(x$roi_solution)
+}
+

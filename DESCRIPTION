@@ -27,6 +27,7 @@ Suggests:
     knitr,
     pkgload,
     rmarkdown,
+    ROI.plugin.coinclp,
     ROI.plugin.highs,
     ROI.plugin.nloptr,
     testthat (>= 3.0.0),
