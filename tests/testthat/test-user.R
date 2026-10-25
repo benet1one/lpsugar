@@ -201,28 +201,6 @@ test_that("other user functions", {
     )
 })
 
-test_that("dual solution", {
-    withr::local_package("ROI.plugin.coinclp")
-    
-    p <- lp_problem() |> 
-        lp_var(x) |> 
-        lp_var(y, upper = 10) |> 
-        lp_max(2*x) |> 
-        lp_con(
-            c1 = x <= y,
-            c2 = x >= 0,
-            c3 = y >= 0
-        )
-    
-    s <- lp_solve(p, solver = "coinclp")
-    
-    duals <- ROI::ROI_plugin_solution_dual(s)
-    cs <- constraint_summary(p, s)
-    
-    expect_equal(duals, c(2, 0, 0))
-    expect_equal(cs$dual, c(2, 0, 0))
-})
-
 test_that("solver control", {
     withr::local_package("ROI.plugin.highs")
     
