@@ -55,6 +55,10 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
         )
     }
     
+    if (!missing(solver)) {
+        solver <- match_solver(solver)
+    }
+    
     roi_sol <- ROI_solve(
         op,
         solver = solver,

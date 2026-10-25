@@ -195,3 +195,23 @@ test_that("changing direction", {
         "`maximum` must be either `TRUE` or `FALSE`."
     )
 })
+
+test_that("solvers", {
+    withr::local_package("ROI.plugin.highs")
+    
+    p <- lp_problem() |> 
+        lp_var(x, upper = 10) |> 
+        lp_max(x)
+    
+    lp_solve(p, solver = c("lows", "mids", "highs"))
+    lp_solve(p, solver = c("lows", "mids", "ROI.plugin.highs"))
+    
+    expect_error(
+        lp_solve(p, solver = c("lows", "mids")),
+        paste(
+            "Could not find solver 'lows'.",
+            "Did you forget to load it with `library\\(ROI.plugin.lows\\)",
+            sep = ".*"
+        )
+    )
+})
