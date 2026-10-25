@@ -15,7 +15,8 @@ lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
 \item{solver}{String specifying the solver to use.
 If missing, then the default solver returned by \code{\link[ROI:ROI_options]{ROI::ROI_options()}} is used.}
 
-\item{...}{Control arguments to be passed on to the solver.}
+\item{...}{Control arguments to be passed on to the solver.
+Use \code{\link[=solver_control_args]{solver_control_args()}} to see which arguments each solver supports.}
 
 \item{start}{Start value of variables, for nonlinear solvers. One of:
 \itemize{

@@ -8,6 +8,7 @@
 #' @param solver String specifying the solver to use.
 #' If missing, then the default solver returned by [ROI::ROI_options()] is used.
 #' @param ... Control arguments to be passed on to the solver.
+#' Use [solver_control_args()] to see which arguments each solver supports.
 #' @param start Start value of variables, for nonlinear solvers. One of:
 #' - Named list of variables with their respective values.
 #' If a variable is missing, it is set to `pmax(0, lower)`.
@@ -289,6 +290,25 @@ lpsugar_applicable_solvers <- function(problem) {
 #' @export
 lpsugar_available_solvers <- function(problem) {
     ROI_available_solvers(problem)
+}
+
+#' Show Control Arguments for a Solver
+#'
+#' Get a data frame with the names of the solver's hyperparameters, for
+#' using in [lp_solve()].
+#' 
+#' @param solver String, name of the solver.
+#'
+#' @returns A data frame with the names of the control arguments.
+#' Both options are valid.
+#' @export
+#'
+#' @examples
+#' solver_control_args("nlminb")
+solver_control_args <- function(solver) {
+    stopifnot(rlang::is_string(solver))
+    solver <- match_solver(solver)
+    ROI::ROI_registered_solver_control(solver)
 }
 
 #' @importFrom ROI solution

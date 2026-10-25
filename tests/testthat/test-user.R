@@ -222,3 +222,21 @@ test_that("dual solution", {
     expect_equal(duals, c(2, 0, 0))
     expect_equal(cs$dual, c(2, 0, 0))
 })
+
+test_that("solver control", {
+    withr::local_package("ROI.plugin.highs")
+    
+    expect_equal(
+        solver_control_args("ROI.plugin.highs"),
+        solver_control_args("highs")
+    )
+    expect_error(
+        solver_control_args("lows"),
+        paste(
+            "Could not find solver 'lows'.",
+            "Loaded solvers are .+",
+            "Did you forget to load it with `library\\(ROI.plugin.lows\\)`?",
+            sep = ".*"
+        )
+    )
+})
