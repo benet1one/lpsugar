@@ -1,3 +1,10 @@
+# lpsugar (development version)
+
+## New Features
+
+* New function `solver_control_args()` for displaying names of solver hyperparameters.
+* `constraint_summary()` now returns `$dual` value (shadow cost) if the solver supports it.
+
 # lpsugar 0.29.1
 
 ## Bug Fixes
