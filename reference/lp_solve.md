@@ -28,7 +28,9 @@ lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
 
 - ...:
 
-  Control arguments to be passed on to the solver.
+  Control arguments to be passed on to the solver. Use
+  [`solver_control_args()`](https://benet1one.github.io/lpsugar/reference/solver_control_args.md)
+  to see which arguments each solver supports.
 
 - start:
 

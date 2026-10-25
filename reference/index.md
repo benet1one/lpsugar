@@ -57,6 +57,8 @@
 - [`lpsugar_applicable_solvers()`](https://benet1one.github.io/lpsugar/reference/lpsugar_applicable_solvers.md)
   [`lpsugar_available_solvers()`](https://benet1one.github.io/lpsugar/reference/lpsugar_applicable_solvers.md)
   : List Applicable and Available Solvers
+- [`solver_control_args()`](https://benet1one.github.io/lpsugar/reference/solver_control_args.md)
+  : Show Control Arguments for a Solver
 
 ## Bind variables or constraints
 

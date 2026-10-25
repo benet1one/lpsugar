@@ -1,5 +1,15 @@
 # Changelog
 
+## lpsugar 0.30.0
+
+### New Features
+
+- New function
+  [`solver_control_args()`](https://benet1one.github.io/lpsugar/reference/solver_control_args.md)
+  for displaying names of solver hyperparameters.
+- [`constraint_summary()`](https://benet1one.github.io/lpsugar/reference/solution_summary.md)
+  now returns `$dual` value (shadow cost) if the solver supports it.
+
 ## lpsugar 0.29.1
 
 ### Bug Fixes
