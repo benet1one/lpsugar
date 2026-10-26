@@ -40,7 +40,6 @@ objective_feasible <- function(.problem) {
 objective_nonlinear <- function(.problem, objective) {
     new_nonlinear_objective(
         .problem,
-        type = "nonlinear",
         NL = objective,
         expr = rlang::as_label(objective)
     )
@@ -126,7 +125,7 @@ new_quadratic_objective <- function(.problem, type, Q = NULL, L = NULL, A = NULL
     out
 }
 
-new_nonlinear_objective <- function(.problem, type, NL, expr = "") {
+new_nonlinear_objective <- function(.problem, NL, expr = "") {
     fun <- as.function.nonlinear(NL, .problem)
     fun_out <- attr(fun, "fun_output")
     

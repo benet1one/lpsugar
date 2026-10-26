@@ -20,7 +20,7 @@ Ops.lp_variable <- function(e1, e2) {
             return(e1)
         } 
         else if (op == "-") {
-            return(minus_v(e1))
+            return(minus_v(e1, call))
         } 
         else if (op == "!") {
             return(negate_v(e1, call))
@@ -198,8 +198,8 @@ power_lp <- function(x, y, call) {
 }
 
 # -var
-minus_v <- function(x) {
-    multiply_v_c(x, -1)
+minus_v <- function(x, call) {
+    multiply_v_c(x, -1, call = call)
 }
 
 # var + var
