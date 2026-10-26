@@ -7,7 +7,7 @@
 \usage{
 lp_solve(.problem, solver, ..., start, binary_as_logical = FALSE)
 
-lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
+lp_find_feasible(.problem, solver, ..., start, binary_as_logical = FALSE)
 }
 \arguments{
 \item{.problem}{An \code{\link[=lp_problem]{lp_problem()}}.}

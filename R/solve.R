@@ -79,12 +79,17 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
 
 #' @rdname lp_solve
 #' @export
-lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
+lp_find_feasible <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     check_problem(.problem)
     
     .problem |>
         lp_minimize(0) |>
-        lp_solve(binary_as_logical = binary_as_logical, ...)
+        lp_solve(
+            solver = solver,
+            ...,
+            start = start,
+            binary_as_logical = binary_as_logical
+        )
 }
 
 # Steps -------------------
