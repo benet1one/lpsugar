@@ -1,3 +1,9 @@
+# lpsugar 0.30.1
+
+## Improvements
+
+* `lp_find_feasible()` now has the same arguments as `lp_solve()`.
+
 # lpsugar 0.30.0
 
 ## New Features
