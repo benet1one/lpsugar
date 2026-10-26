@@ -9,7 +9,7 @@ whereas `lp_find_feasible()` returns an arbitrary feasible solution.
 ``` r
 lp_solve(.problem, solver, ..., start, binary_as_logical = FALSE)
 
-lp_find_feasible(.problem, binary_as_logical = FALSE, ...)
+lp_find_feasible(.problem, solver, ..., start, binary_as_logical = FALSE)
 ```
 
 ## Arguments

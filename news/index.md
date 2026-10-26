@@ -1,5 +1,13 @@
 # Changelog
 
+## lpsugar 0.30.1
+
+### Improvements
+
+- [`lp_find_feasible()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md)
+  now has the same arguments as
+  [`lp_solve()`](https://benet1one.github.io/lpsugar/reference/lp_solve.md).
+
 ## lpsugar 0.30.0
 
 ### New Features
