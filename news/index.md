@@ -1,5 +1,12 @@
 # Changelog
 
+## lpsugar 0.30.2
+
+### Improvements
+
+- New error when an operation produces NA or NaN values within an
+  `<lp_problem>`.
+
 ## lpsugar 0.30.1
 
 ### Improvements
