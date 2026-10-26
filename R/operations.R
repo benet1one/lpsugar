@@ -224,7 +224,7 @@ add_v_v <- function(x, y, call) {
     out$A <- out$A + y$A
     out$binary <- FALSE
     
-    transformed_variable(out)
+    transformed_variable(out, call = call)
 }
 # var + constant
 add_v_c <- function(x, c, call) {
@@ -235,7 +235,7 @@ add_v_c <- function(x, c, call) {
     x$A <- x$A + c
     x$binary <- FALSE
     
-    transformed_variable(x)
+    transformed_variable(x, call = call)
 }
 
 
@@ -273,7 +273,7 @@ multiply_v_c <- function(x, c, call) {
     x$A <- x$A * c
     x$binary <- FALSE
     
-    transformed_variable(x)
+    transformed_variable(x, call = call)
 }
 # var * var
 multiply_v_v <- function(x, y, call) {
@@ -305,7 +305,7 @@ multiply_v_v <- function(x, y, call) {
         horizontal_multiply(y$L, x$A)
     
     out$A <- x$A * y$A
-    transformed_variable(out)
+    transformed_variable(out, check_na = FALSE)
 }
 
 # var / constant
@@ -358,7 +358,7 @@ power_v_c <- function(x, c, call) {
     x$L[c == 0, ] <- 0
     x$A[c == 0, ] <- 1
     
-    transformed_variable(x)
+    transformed_variable(x, call = call)
 }
 
 # Logic ------------------------
@@ -376,7 +376,7 @@ negate_v <- function(x, call) {
     x$L <- -x$L
     x$A <- -x$A + 1
     
-    transformed_variable(x)
+    transformed_variable(x, check_na = FALSE)
 }
 
 # Matrix Operations -------------
@@ -455,7 +455,7 @@ matrix_multiply_v_c <- function(x, y, call) {
     out$L <- robust_index(out$L)
     out$A <- robust_index(out$A)
     
-    transformed_variable(out)
+    transformed_variable(out, call = call)
 }
 
 # var %*% var
@@ -507,7 +507,7 @@ matrix_multiply_v_v <- function(x, y, call) {
     out$L <- robust_index(out$L)
     out$A <- robust_index(out$A)
     
-    transformed_variable(out)
+    transformed_variable(out, call = call)
 }
 
 # Methods -----------------------

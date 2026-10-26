@@ -126,3 +126,12 @@ test_that("fully fixed", {
     
     s2 <- lp_solve(p2)
 })
+
+test_that("NA/NaN", {
+    p <- lp_problem() |> 
+        lp_var(x)
+    
+    expect_error(p |> lp_max(x/0))
+    expect_error(p |> lp_min(x^2 / 0))
+    expect_error(p |> lp_con(x <= NaN))
+})
