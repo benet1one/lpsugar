@@ -594,6 +594,9 @@ is_lp_variable <- function(x) {
 is_transformed_lp_variable <- function(x) {
     inherits(x, "transformed_lp_variable")
 }
+is_abs_lp_variable <- function(x) {
+    inherits(x, "abs_lp_variable")
+}
 is_nonlinear <- function(x) {
     if (rlang::inherits_any(x, c("nonlinear", "F_objective", "F_constraint"))) {
         TRUE

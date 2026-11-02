@@ -316,3 +316,43 @@ test_that("warn infeasible", {
         )
     )
 })
+
+test_that("convex abs constraints", {
+    p <- lp_problem() |> 
+        lp_var(x) |> 
+        lp_var(y) |> 
+        lp_con(
+            "lhs" = abs(2*x) < 3,
+            "rhs" = 3 > abs(2*x),
+            "xy" = abs(x) < y + 1
+        )
+    
+    p$constraints["lhs"]
+    p$constraints["rhs"]
+    p$constraints["xy"]
+    
+    expect_equal(
+        p$constraints["lhs"]$L$v,
+        c(2, 2)
+    )
+    expect_equal(
+        p$constraints["lhs"]$dir,
+        c("<=", ">=")
+    )
+    expect_equal(
+        p$constraints["lhs"]$rhs,
+        c(+3, -3)
+    )
+    
+    expect_error(
+        p |> lp_con(abs(x) > 1),
+        "Incorrect usage of `abs\\(\\)`"
+    )
+    expect_error(
+        p |> lp_con(abs(x) < abs(y)),
+        "Incorrect usage of `abs\\(\\)`"
+    )
+    expect_no_error(
+        p |> lp_con(abs(-2) > x)
+    )
+})
