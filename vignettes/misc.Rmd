@@ -107,3 +107,61 @@ for (b in browsers)
 
 sort(new_scores, decreasing = TRUE)
 ```
+
+
+## Not-So-Random Number Generator (NSRNG)
+
+We want to generate a sequence of values according to a probability distribution.
+
+$$
+y_t \sim \text{Bernoulli}(p = 0.308) \qquad t \in [1,n]
+$$
+
+But we will do it in a not-so-random way. Let $y_{1:k}$ denote the subsequence $\{y_t\}_{t \in [1,k]}$.
+For each of these subsequences, we will minimize the absolute difference between
+the real probability $p$ and the estimated probability $\hat{p}_k$
+
+$$
+\min_y \sum_{k=1}^n{|p - \hat{p}_k|}
+$$
+$$
+\hat{p}_k = \frac{1}{k}\sum_{t=1}^k{y_t}
+$$
+
+```{r}
+n = 40
+p = 0.308
+
+nsrng <- lp_problem() |> 
+    lp_var(y[1:n], binary = TRUE) |> 
+    lp_alias(phat = cumsum(y) / (1:n)) |> 
+    lp_var(err[1:n]) |> 
+    lp_con(err >= abs(phat - p)) |> 
+    lp_min(sum(err)) |> 
+    lp_solve(solver = "highs")
+
+phat <- nsrng$aliases$phat
+```
+
+See how quickly $\hat{p}$ converges to the true probability $p$.
+
+```{r, fig.height=5, fig.width=6}
+plot(phat, pch = 16)
+lines(1:n, phat)
+abline(h = p, lty = 2)
+```
+
+For reference, in blue you can see how a random sequence would converge.
+
+```{r, fig.height=5, fig.width=6}
+set.seed(101)
+rng <- rbinom(n, size = 1, prob = p)
+phat_rng <- cumsum(rng) / (1:n)
+
+plot(phat, pch = 16)
+lines(1:n, phat)
+points(1:n, phat_rng, col = "royalblue")
+lines(1:n, phat_rng, col = "royalblue")
+abline(h = p, lty = 2)
+```
+
