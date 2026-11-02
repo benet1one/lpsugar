@@ -218,6 +218,10 @@ update_variables <- function(.problem, field = "variables") {
 # Used when any transformation is applied to a variable
 # indexing, operations, etc.
 transformed_variable <- function(x, check_na = TRUE, call = parent.frame()) {
+    if (is_abs_lp_variable(x)) {
+        throw_abs_error(call)
+    }
+    
     x$name    <- NULL
     x$lower   <- NULL
     x$upper   <- NULL
@@ -229,18 +233,22 @@ transformed_variable <- function(x, check_na = TRUE, call = parent.frame()) {
     
     class(x) <- c("transformed_lp_variable", "lp_variable")
     
-    if (!check_na) {
-        return(x)
-    }
-    
-    if ((length(x$Q) > 0L && anyNA(x$Q)) || anyNA(x$L) || anyNA(x$A)) {
-        cli_abort(
-            "NAs or NaNs produced.",
-            class = "lpsugar_error_na_result",
-            call = call
+    if (check_na) {
+        any_na <- any(
+            length(x$Q) > 0L && anyNA(x$Q),
+            anyNA(x$L),
+            anyNA(x$A)
         )
+        
+        if (any_na) {
+            cli_abort(
+                "NAs or NaNs produced.",
+                class = "lpsugar_error_na_result",
+                call = call
+            )
+        }
     }
-    
+
     return(x)
 }
 

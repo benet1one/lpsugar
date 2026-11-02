@@ -105,16 +105,6 @@ Math.lp_variable <- function(x, ...) {
         return(cumsum_v(x, call))
     }
     
-    if (fun == "abs") {
-        abs_url <- "https://optimization.cbe.cornell.edu/index.php?title=Optimization_with_absolute_values"
-        message <- paste(
-            "Function `abs()` is not linear.",
-            "See how to implement absolute values in linear programming here:",
-            "{.url {abs_url}}"
-        )
-        cli_abort(message, call = call, class = "lpsugar_error_abs")
-    }
-    
     cli_abort(
         "Function `{fun}()` is not supported in a linear problem.", 
         class = "lpsugar_error_unsupported_math",

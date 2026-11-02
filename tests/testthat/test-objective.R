@@ -74,3 +74,13 @@ test_that("update objective", {
     p$objective$L <- as.vector(p$objective$L)
     expect_snapshot(unclass(p$objective))
 })
+
+test_that("abs objective", {
+    p <- lp_problem() |> 
+        lp_var(x)
+    
+    expect_error(
+        p |> lp_min(abs(x)),
+        "Incorrect usage of `abs"
+    )
+})

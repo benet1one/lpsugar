@@ -60,7 +60,7 @@ Ops.lp_variable <- function(e1, e2) {
     # Comparison -----------------------
     if (op %in% COMPARISON_OPS) {
         return(compare_lp(e1, e2, op, call))
-    } 
+    }
     else if (op == "!=") {
         cli_abort(
             "Not equal `!=` is not supported in constraints.",
@@ -554,6 +554,10 @@ compare_lp <- function(x, y, op, call) {
     } 
     else if (op == ">") {
         op <- ">="
+    }
+    
+    if (is_abs_lp_variable(x) || is_abs_lp_variable(y)) {
+        return(abs_constraint(x, y, op, call))
     }
     
     var <- x - y

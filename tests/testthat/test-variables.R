@@ -293,8 +293,9 @@ test_that("operations", {
     expect_error(!(y[1] + x), "only supported for binary variables")
     expect_error(!(x + y[1]), "only supported for binary variables")
 
-    expect_error(abs(x), "absolute value")
     expect_error(exp(x), "exp")
+    expect_error(-abs(x), "absolute value")
+    expect_error(abs(x) + 1, "absolute value")
 
     expect_error(y | y, "Unsupported operation")
     expect_error(y & y, "Unsupported operation")
