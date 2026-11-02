@@ -23,6 +23,7 @@ reference:
   - sum_over
   - parameter
   - lpsugar_applicable_solvers
+  - solver_control_args
 - title: Bind variables or constraints
   contents:
   - bind_vars

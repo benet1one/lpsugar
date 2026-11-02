@@ -217,7 +217,7 @@ update_variables <- function(.problem, field = "variables") {
 
 # Used when any transformation is applied to a variable
 # indexing, operations, etc.
-transformed_variable <- function(x) {
+transformed_variable <- function(x, check_na = TRUE, call = parent.frame()) {
     x$name    <- NULL
     x$lower   <- NULL
     x$upper   <- NULL
@@ -228,6 +228,19 @@ transformed_variable <- function(x) {
     # fields x$ind, x$L, x$A are necessary
     
     class(x) <- c("transformed_lp_variable", "lp_variable")
+    
+    if (!check_na) {
+        return(x)
+    }
+    
+    if ((length(x$Q) > 0L && anyNA(x$Q)) || anyNA(x$L) || anyNA(x$A)) {
+        cli_abort(
+            "NAs or NaNs produced.",
+            class = "lpsugar_error_na_result",
+            call = call
+        )
+    }
+    
     return(x)
 }
 
@@ -395,7 +408,7 @@ bind_vv <- function(x, y) {
     z$L <- rbind(x$L, y$L) |> robust_index()
     z$A  <- rbind(x$A,  y$A)  |> robust_index()
     
-    transformed_variable(z)
+    transformed_variable(z, check_na = FALSE)
 }
 # bind_vars(var, const)
 bind_vc <- function(x, y) {
@@ -437,7 +450,7 @@ bind_cv <- function(x, y) {
     if (dots_missing(...)) {
         if (drop) {
             x$ind <- drop(x$ind)
-            x <- transformed_variable(x)
+            x <- transformed_variable(x, check_na = FALSE)
         }
         return(x)
     }
@@ -466,7 +479,7 @@ bind_cv <- function(x, y) {
     x$L <- x$L[old_ind, ]
     x$A <- x$A[old_ind, ]
     
-    transformed_variable(x)
+    transformed_variable(x, check_na = FALSE)
 }
 #' @export
 `[<-.lp_variable` <- function(x, ..., value) {
@@ -501,7 +514,7 @@ bind_cv <- function(x, y) {
         x$A[i] <- y$A
         
         x$binary <- x$binary && y$binary
-        return(transformed_variable(x))
+        return(transformed_variable(x, check_na = FALSE))
     } 
     else if (is.numeric(value) || is.logical(value)) {
         y <- recycle_const(as.numeric(value), length(i))
@@ -514,7 +527,7 @@ bind_cv <- function(x, y) {
         x$A[i] <- y
         
         x$binary <- x$binary && is.logical(value)
-        return(transformed_variable(x))
+        return(transformed_variable(x, check_na = FALSE))
     }
     
     cli_abort(c(
@@ -825,7 +838,7 @@ recycle_var <- function(x, n) {
         x$L <- x$L[i, ]
         x$A <- x$A[i, ]
         
-        return(transformed_variable(x))
+        return(transformed_variable(x, check_na = FALSE))
     }
     
     cli_abort("Attempt to recycle variable of length {length(x)} to length {n}.")

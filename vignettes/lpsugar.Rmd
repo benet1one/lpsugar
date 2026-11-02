@@ -52,7 +52,7 @@ $$
 $$
 
 ```r
-minimize sum_over(f = factory, m = market, cost[f, m] * x[f, m])
+minimize sum_over(cost[f, m] * x[f, m], f = factory, m = market)
 ```
 
 #### Constraints
@@ -101,7 +101,7 @@ transportation_problem <- lp_problem() |>
         lower = 0
     ) |> 
     lp_minimize(
-        sum_over(f = factory, m = market, x[f, m] * cost[f, m])
+        sum_over(x[f, m] * cost[f, m], f = factory, m = market)
     ) |> 
     lp_constraint(
         for (f in factory) sum(x[f, ]) <= supply[f],
@@ -148,7 +148,6 @@ p$variables$x
 ```
 
 Note: Sets can be numeric, but they must go from `1:n`, where `n` is the length of the set.
-This ensures indexing works as expected (`x[1]` is always equal to `x["1"]`).
 
 ### Parameters
 
@@ -244,7 +243,7 @@ s <- c(a = 2, b = 5)
 p <- lp_problem() |> 
     lp_variable(x[I, J]) |> 
     lp_minimize(
-        sum_over(i=I, j=J, s[j] * x[i, j])
+        sum_over(s[j] * x[i, j], i=I, j=J)
     )
 
 p$objective$L
@@ -321,8 +320,8 @@ n <- 4
 y0 <- 5
 
 p <- lp_problem() |> 
-    lp_var(y[1:n], lower = 0) |> 
-    lp_con(
+    lp_variable(y[1:n], lower = 0) |> 
+    lp_constraint(
         order_con = for (t in 1:n) {
             if (t == 1) {
                 y_prior <- y0

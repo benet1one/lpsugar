@@ -179,6 +179,29 @@ dots_missing <- function(...) {
     ...length() == 0L || (...length() == 1L && rlang::is_missing(...))
 }
 
+match_solver <- function(solver, call = parent.frame()) {
+    solver_clean <- sub(
+        x = trimws(solver),
+        pattern = "^ROI\\.plugin\\.",
+        replacement = ""
+    )
+    
+    loaded_solvers <- names(ROI::ROI_registered_solvers())
+    out <- solver_clean[solver_clean %in% loaded_solvers]
+    
+    if (length(out) == 0L) {
+        cli_abort(
+            c("Could not find solver '{solver[1]}'.",
+              "i" = "Loaded solvers are {sQuote(loaded_solvers)}.",
+              ">" = "Did you forget to load it with `library(ROI.plugin.{solver_clean[1]})`?"),
+            call = call,
+            class = "lpsugar_error_unknown_solver"
+        )
+    }
+    
+    solver_clean
+}
+
 # Transforming variables -------------------------
 
 # Returns a named list with the variable's values

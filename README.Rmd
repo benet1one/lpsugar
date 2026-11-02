@@ -99,7 +99,7 @@ transportation_problem <- lp_problem() |>
         lower = 0
     ) |> 
     lp_minimize(
-        sum_over(f = factory, m = market, x[f, m] * cost[f, m])
+        sum_over(x[f, m] * cost[f, m], f = factory, m = market)
     ) |> 
     lp_constraint(
         for (f in factory) sum(x[f, ]) <= supply[f],

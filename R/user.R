@@ -127,9 +127,9 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
 #'
 #' @example inst/examples/example_solution_summary.R
 solution_summary <- function(problem, solution, tol = 2e-6) {
+    constraints <- constraint_summary(problem, solution, tol = tol)
     solution <- variables_to_vec(solution, problem, call = environment(), field = "solution")
     aliases <- compute_aliases(problem, solution)
-    constraints <- constraint_summary(problem, solution, tol = tol)
     bounds <- bound_summary(problem, solution, tol = tol)
     
     list(
@@ -144,6 +144,17 @@ solution_summary <- function(problem, solution, tol = 2e-6) {
 #' @rdname solution_summary
 #' @export
 constraint_summary <- function(problem, solution, tol = 2e-6) {
+    if (is_lp_solution(solution)) {
+        dual <- ROI::ROI_plugin_solution_dual(solution)
+        
+        if (identical(dual, NA)) {
+            dual <- NULL
+        }
+    }
+    else {
+        dual <- NULL
+    }
+    
     solution <- variables_to_vec(
         solution, 
         problem, 
@@ -187,6 +198,7 @@ constraint_summary <- function(problem, solution, tol = 2e-6) {
         saturated = saturated
     )
     
+    df$dual <- dual
     rownames(df) <- NULL
     df
 }
@@ -248,3 +260,4 @@ compute_aliases <- function(problem, solution) {
     
     purrr::map(problem$aliases, \(a) compute_quadratic(a, x = solution))
 }
+

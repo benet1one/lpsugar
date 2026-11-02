@@ -8,6 +8,7 @@
 #' @param solver String specifying the solver to use.
 #' If missing, then the default solver returned by [ROI::ROI_options()] is used.
 #' @param ... Control arguments to be passed on to the solver.
+#' Use [solver_control_args()] to see which arguments each solver supports.
 #' @param start Start value of variables, for nonlinear solvers. One of:
 #' - Named list of variables with their respective values.
 #' If a variable is missing, it is set to `pmax(0, lower)`.
@@ -55,6 +56,10 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
         )
     }
     
+    if (!missing(solver)) {
+        solver <- match_solver(solver)
+    }
+    
     roi_sol <- ROI_solve(
         op,
         solver = solver,
@@ -74,12 +79,17 @@ lp_solve <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
 
 #' @rdname lp_solve
 #' @export
-lp_find_feasible <- function(.problem, binary_as_logical = FALSE, ...) {
+lp_find_feasible <- function(.problem, solver, ..., start, binary_as_logical = FALSE) {
     check_problem(.problem)
     
     .problem |>
         lp_minimize(0) |>
-        lp_solve(binary_as_logical = binary_as_logical, ...)
+        lp_solve(
+            solver = solver,
+            ...,
+            start = start,
+            binary_as_logical = binary_as_logical
+        )
 }
 
 # Steps -------------------
@@ -287,6 +297,25 @@ lpsugar_available_solvers <- function(problem) {
     ROI_available_solvers(problem)
 }
 
+#' Show Control Arguments for a Solver
+#'
+#' Get a data frame with the names of the solver's hyperparameters, for
+#' using in [lp_solve()].
+#' 
+#' @param solver String, name of the solver.
+#'
+#' @returns A data frame with the names of the control arguments.
+#' Both options are valid.
+#' @export
+#'
+#' @examples
+#' solver_control_args("nlminb")
+solver_control_args <- function(solver) {
+    stopifnot(rlang::is_string(solver))
+    solver <- match_solver(solver)
+    ROI::ROI_registered_solver_control(solver)
+}
+
 #' @importFrom ROI solution
 #' @export
 solution.lp_solution <- function(
@@ -337,3 +366,10 @@ print.lp_solution <- function(x, ...) {
         print(x$status)
     }
 }
+
+#' @importFrom ROI ROI_plugin_solution_dual
+#' @export
+ROI_plugin_solution_dual.lp_solution <- function(x) {
+    ROI::ROI_plugin_solution_dual(x$roi_solution)
+}
+
