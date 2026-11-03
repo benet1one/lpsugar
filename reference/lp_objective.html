@@ -100,7 +100,7 @@ the <code>sum</code> yourself.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Linear Objective using an Alias ---------------</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Linear Objective using an Alias ---------------</span></span></span>
 <span class="r-in"><span><span class="va">profit</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Phone <span class="op">=</span> <span class="fl">60</span>, Tablet <span class="op">=</span> <span class="fl">20</span>, eBook <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">max_made</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Phone <span class="op">=</span> <span class="fl">500</span>, Tablet <span class="op">=</span> <span class="fl">300</span>, eBook <span class="op">=</span> <span class="fl">950</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">product</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">profit</span><span class="op">)</span></span></span>
@@ -148,14 +148,14 @@ the <code>sum</code> yourself.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 32000</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Nonlinear objective ---------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Nonlinear objective ---------------------------</span></span></span>
 <span class="r-in"><span><span class="va">nlp</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">x</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">y</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span>    <span class="fu">lp_maximize</span><span class="op">(</span><span class="fu"><a href="nonlinear.html">nonlinear</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_constraint.html">lp_constraint</a></span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span> <span class="op">&lt;=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># There are some different solvers within `nloptr`</span></span></span>
+<span class="r-in"><span><span class="co">## There are some different solvers within `nloptr`</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roigrp.gitlab.io" class="external-link">ROI.plugin.nloptr</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="lpsugar_applicable_solvers.html">lpsugar_applicable_solvers</a></span><span class="op">(</span><span class="va">nlp</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag" "nloptr.isres" </span>
@@ -180,7 +180,7 @@ the <code>sum</code> yourself.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Optimal Solution Found ✔ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># See more examples in the Nonlinear vignette</span></span></span>
+<span class="r-in"><span><span class="co">## See more examples in the Nonlinear vignette</span></span></span>
 <span class="r-in"><span><span class="co"># vignette("nonlinear", package = "lpsugar")</span></span></span>
 </code></pre></div>
     </div>

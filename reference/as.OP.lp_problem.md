@@ -41,7 +41,7 @@ problem <- lp_problem() |>
     lp_alias(sum_x = sum(x)) |>
     lp_max(sum_x + 5)
 
-# Solve directly with lp_solve()
+## Solve directly with lp_solve()
 direct_solution <- lp_solve(problem)
 direct_solution
 #> – $variables
@@ -62,12 +62,12 @@ direct_solution
 #> Optimal Solution Found ✔ 
 #> 
 
-# Or run each step manually
+## Or run each step manually
 op <- as.OP(problem)
 solution_raw <- ROI_solve(op)
 solution_pretty <- pretty_solution(problem, solution = solution_raw)
 
-# pretty_solution() gives each variable its dim and dimnames.
+## pretty_solution() gives each variable its dim and dimnames.
 solution_raw$solution
 #> x[1,1] x[2,1] x[1,2] x[2,2] 
 #>     10     10     10     10 
@@ -79,15 +79,15 @@ solution_pretty$variables
 #>   [2,]   10   10
 #> 
 
-# It also computes aliases
+## It also computes aliases
 solution_pretty$aliases
 #> $sum_x
 #> [1] 40
 #> 
 
-# Notice that in solution_raw, the objective value is 40 instead of 45.
-# The objective function is (sum(x) + 5), but the addend (+5) is irrelevant
-# for finding the optimum, so ROI ignores it.
+## Notice that in solution_raw, the objective value is 40 instead of 45.
+## The objective function is (sum(x) + 5), but the addend (+5) is irrelevant
+## for finding the optimum, so ROI ignores it.
 solution_raw$objval
 #> [1] 40
 solution_pretty$objective

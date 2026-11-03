@@ -107,12 +107,12 @@ they will also be listed.</p>
 <span class="r-in"><span>    <span class="fu"><a href="lp_objective.html">lp_min</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_constraint.html">lp_con</a></span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span> <span class="op">&gt;=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Installed and loaded quadratic solvers</span></span></span>
+<span class="r-in"><span><span class="co">## Installed and loaded quadratic solvers</span></span></span>
 <span class="r-in"><span><span class="fu">lpsugar_applicable_solvers</span><span class="op">(</span><span class="va">quadratic_prob</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "highs"         "nloptr.cobyla" "nloptr.mma"    "nloptr.auglag"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5] "nloptr.isres"  "nloptr.slsqp" </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># All quadratic solvers (needs an internet connection)</span></span></span>
+<span class="r-in"><span><span class="co">## All quadratic solvers (needs an internet connection)</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="fu">lpsugar_available_solvers</span><span class="op">(</span><span class="va">quadratic_prob</span><span class="op">)</span> <span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Package"</span>, <span class="st">"Version"</span>, <span class="st">"Repository"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>

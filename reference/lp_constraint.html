@@ -90,7 +90,7 @@ or <code><a href="https://rdrr.io/pkg/ROI/man/F_constraint.html" class="external
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Order Constraint ------------------------------</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Order Constraint ------------------------------</span></span></span>
 <span class="r-in"><span><span class="co">## ordered[i] &gt; ordered[i-1]  forall i in 2:n</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">4</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
@@ -142,13 +142,13 @@ or <code><a href="https://rdrr.io/pkg/ROI/man/F_constraint.html" class="external
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Nonlinear Constraint --------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Nonlinear Constraint --------------------------</span></span></span>
 <span class="r-in"><span><span class="co">## log(x + 1) &gt; y  =&gt;  log(x + 1) - y &gt; 0</span></span></span>
 <span class="r-in"><span><span class="va">nlp</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">x</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span>    <span class="fu">lp_constraint</span><span class="op">(</span></span></span>
-<span class="r-in"><span>        <span class="co"># Nonlinear constraints must always be written as `nonlinear(...) &lt;= number`</span></span></span>
+<span class="r-in"><span>        <span class="co">## Nonlinear constraints must always be written as `nonlinear(...) &lt;= number`</span></span></span>
 <span class="r-in"><span>        nl_con <span class="op">=</span> <span class="fu"><a href="nonlinear.html">nonlinear</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">-</span> <span class="va">y</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

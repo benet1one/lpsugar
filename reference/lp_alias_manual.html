@@ -103,19 +103,62 @@ numeric or <code>&lt;lp_variable&gt;</code>. See examples.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># We have a 4x4 matrix X</span></span></span>
-<span class="r-in"><span><span class="co"># We want an alias A, of length 4, such that</span></span></span>
-<span class="r-in"><span><span class="co"># A[i] &lt;- i * X[i, i+1]</span></span></span>
-<span class="r-in"><span><span class="co"># A[4] &lt;- 4</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Simple Example ---------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## We have a 4x4 matrix X</span></span></span>
+<span class="r-in"><span><span class="co">## We want an alias A, of length 4, such that</span></span></span>
+<span class="r-in"><span><span class="co">## A[i] &lt;- i * X[i, i+1]</span></span></span>
+<span class="r-in"><span><span class="co">## A[4] &lt;- 4</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
-<span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>        <span class="va">X</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">X</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
 <span class="r-in"><span>    <span class="fu">lp_alias_manual</span><span class="op">(</span></span></span>
 <span class="r-in"><span>        <span class="va">A</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, <span class="op">{</span></span></span>
 <span class="r-in"><span>            <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span> <span class="va">A</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">i</span> <span class="op">*</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="va">i</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span></span></span>
 <span class="r-in"><span>            <span class="va">A</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">4</span></span></span>
+<span class="r-in"><span>        <span class="op">}</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Stock Problem ---------------------------</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Say a company has a 'stock[p, t]' of product 'p' at the end of day 't'.</span></span></span>
+<span class="r-in"><span><span class="co">## with an initial stock is 'stock_t0[p]' at day 0.</span></span></span>
+<span class="r-in"><span><span class="co">## The decision variable is the 'production[p, t]'</span></span></span>
+<span class="r-in"><span><span class="co">## to satisfy the 'sells[p, t]'</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">products</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Notebooks"</span>, <span class="st">"Planners"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">days</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">stock_t0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    Notebooks <span class="op">=</span> <span class="fl">40</span>, </span></span>
+<span class="r-in"><span>    Planners  <span class="op">=</span> <span class="fl">15</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sells</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fl">20</span>, <span class="fl">30</span>, <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>    <span class="fl">10</span>, <span class="fl">25</span>, <span class="fl">40</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="parameter.html">parameter</a></span><span class="op">(</span><span class="va">products</span>, <span class="va">days</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">stock_problem</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="va">production</span><span class="op">[</span><span class="va">products</span>, <span class="va">days</span><span class="op">]</span>, </span></span>
+<span class="r-in"><span>        lower <span class="op">=</span> <span class="fl">0</span>, upper <span class="op">=</span> <span class="fl">20</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu">lp_alias_manual</span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="va">stock</span><span class="op">[</span><span class="va">products</span>, <span class="va">days</span><span class="op">]</span>, <span class="kw">for</span> <span class="op">(</span><span class="va">p</span> <span class="kw">in</span> <span class="va">products</span><span class="op">)</span> <span class="kw">for</span> <span class="op">(</span><span class="va">t</span> <span class="kw">in</span> <span class="va">days</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>            <span class="kw">if</span> <span class="op">(</span><span class="va">t</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>                <span class="va">stock</span><span class="op">[</span><span class="va">p</span>, <span class="va">t</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">stock_t0</span><span class="op">[</span><span class="va">p</span><span class="op">]</span>   <span class="op">+</span> <span class="va">production</span><span class="op">[</span><span class="va">p</span>, <span class="va">t</span><span class="op">]</span> <span class="op">-</span> <span class="va">sells</span><span class="op">[</span><span class="va">p</span>, <span class="va">t</span><span class="op">]</span></span></span>
+<span class="r-in"><span>            <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>                <span class="va">stock</span><span class="op">[</span><span class="va">p</span>, <span class="va">t</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">stock</span><span class="op">[</span><span class="va">p</span>, <span class="va">t</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">production</span><span class="op">[</span><span class="va">p</span>, <span class="va">t</span><span class="op">]</span> <span class="op">-</span> <span class="va">sells</span><span class="op">[</span><span class="va">p</span>, <span class="va">t</span><span class="op">]</span></span></span>
+<span class="r-in"><span>            <span class="op">}</span></span></span>
+<span class="r-in"><span>        <span class="op">}</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span> <span class="op">|&gt;</span> </span></span>
+<span class="r-in"><span>    <span class="fu"><a href="lp_constraint.html">lp_constraint</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="co">## Non-negative stock</span></span></span>
+<span class="r-in"><span>        <span class="va">stock</span> <span class="op">&gt;=</span> <span class="fl">0</span>,</span></span>
+<span class="r-in"><span>        <span class="co">## Capacity to store at most 50 products</span></span></span>
+<span class="r-in"><span>        <span class="kw">for</span> <span class="op">(</span><span class="va">t</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>            <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">stock</span><span class="op">[</span>, <span class="va">t</span><span class="op">]</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">50</span></span></span>
 <span class="r-in"><span>        <span class="op">}</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 </code></pre></div>

@@ -84,7 +84,7 @@ library(ROI.plugin.highs)
 r <- letters[1:2]
 c <- LETTERS[1:3]
 
-# Problem with Optimal Solution
+## Problem with Optimal Solution
 p_opt <- lp_problem() |>
     lp_variable(x[r, c], binary = TRUE) |>
     lp_alias(total = sum(x)) |>
@@ -121,7 +121,7 @@ s2$variables$x
 #>   b FALSE TRUE TRUE
 
 
-# Problem with Unbounded Solution
+## Problem with Unbounded Solution
 p_unb <- lp_problem() |>
     lp_variable(y) |>
     lp_max(y)
@@ -138,10 +138,10 @@ s3$status
 #>  message Unbounded
 #> roi_code 1
 #> 
-s3$objective # Might change depending on solver
+s3$objective ## Might change depending on solver
 #> [1] 0
 
-# Infeasible Problem
+## Infeasible Problem
 p_no <- lp_problem() |>
     lp_variable(z[letters]) |>
     lp_constraint(z[1] <= z[1] - 10)

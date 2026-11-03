@@ -87,15 +87,15 @@ a linear function of previously defined variables or aliases.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Aliases are meant to avoid having to compute the same values</span></span></span>
-<span class="r-in"><span><span class="co"># for multiple different constraints and possibly the objective function.</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Aliases are meant to avoid having to compute the same values</span></span></span>
+<span class="r-in"><span><span class="co">## for multiple different constraints and possibly the objective function.</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Simple Example ----------------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## Simple Example ----------------------------------</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Say we had x, y, and wanted to define z such that</span></span></span>
-<span class="r-in"><span><span class="co"># z[i] = 2*x[i] + y[n-i+1]</span></span></span>
+<span class="r-in"><span><span class="co">## Say we had x, y, and wanted to define z such that</span></span></span>
+<span class="r-in"><span><span class="co">## z[i] = 2*x[i] + y[n-i+1]</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># One option is to use constraints</span></span></span>
+<span class="r-in"><span><span class="co">## One option is to use constraints</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span><span class="va">set</span> <span class="op">&lt;-</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">obj_coef</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span></span></span>
@@ -111,7 +111,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-in"><span>        xyz <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span>  <span class="va">z</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">==</span> <span class="fl">2</span><span class="op">*</span><span class="va">x</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">y</span><span class="op">[</span><span class="va">n</span><span class="op">-</span><span class="va">i</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># But this problem has 3 extra variables and 3 extra constraints:</span></span></span>
+<span class="r-in"><span><span class="co">## But this problem has 3 extra variables and 3 extra constraints:</span></span></span>
 <span class="r-in"><span><span class="va">p0</span><span class="op">$</span><span class="va">constraints</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> An object containing 7 linear constraints.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -141,7 +141,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   xyz[i=3] 0    0    -2   -1   0    0    0    0    1    ==  0  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Instead, we can define 'z' as an alias</span></span></span>
+<span class="r-in"><span><span class="co">## Instead, we can define 'z' as an alias</span></span></span>
 <span class="r-in"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">set</span><span class="op">]</span>, lower <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_variable</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="va">set</span><span class="op">]</span>, lower <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
@@ -154,7 +154,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-in"><span>        constraint_with_z <span class="op">=</span> <span class="op">(</span><span class="va">z</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="fl">7</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># This problem no extra variables or constraints!</span></span></span>
+<span class="r-in"><span><span class="co">## This problem no extra variables or constraints!</span></span></span>
 <span class="r-in"><span><span class="va">p1</span><span class="op">$</span><span class="va">constraints</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> An object containing 4 linear constraints.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -175,7 +175,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   constraint_with_z 2    0    0    0    0    1    &lt;=  7  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># The solution is presented differently</span></span></span>
+<span class="r-in"><span><span class="co">## The solution is presented differently</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">ROI.plugin.highs</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="va">p0</span><span class="op">)</span> <span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"variables"</span>, <span class="st">"aliases"</span><span class="op">)</span><span class="op">]</span> <span class="co"># z is a variable</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $variables</span>
@@ -221,7 +221,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># More Interesting Example ------------------------</span></span></span>
+<span class="r-in"><span><span class="co">## More Interesting Example ------------------------</span></span></span>
 <span class="r-in"><span><span class="va">Rows</span> <span class="op">&lt;-</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">Cols</span> <span class="op">&lt;-</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>
@@ -238,7 +238,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="parameter.html">parameter</a></span><span class="op">(</span><span class="va">Rows</span>, <span class="va">Cols</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Without Aliases</span></span></span>
+<span class="r-in"><span><span class="co">## Without Aliases</span></span></span>
 <span class="r-in"><span><span class="va">p0</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">Rows</span>, <span class="va">Cols</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_objective.html">lp_max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
@@ -254,7 +254,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-in"><span>        <span class="op">}</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># With an Alias</span></span></span>
+<span class="r-in"><span><span class="co">## With an Alias</span></span></span>
 <span class="r-in"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">Rows</span>, <span class="va">Cols</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu">lp_alias</span><span class="op">(</span>col_cumsum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">2</span>, <span class="va">cumsum</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
@@ -265,7 +265,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-in"><span>        A_less_than_B <span class="op">=</span> <span class="op">(</span><span class="va">col_cumsum</span><span class="op">[</span>, <span class="st">"A"</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="va">col_cumsum</span><span class="op">[</span>, <span class="st">"B"</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># The problems are equivalent</span></span></span>
+<span class="r-in"><span><span class="co">## The problems are equivalent</span></span></span>
 <span class="r-in"><span><span class="va">p0</span><span class="op">$</span><span class="va">constraints</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> An object containing 15 linear constraints.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -339,12 +339,12 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   A_less_than_B 1      1      1      -1     -1     -1     &lt;=  0  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Notice it's not a variable, thus not adding complexity to the problem</span></span></span>
+<span class="r-in"><span><span class="co">## Notice it's not a variable, thus not adding complexity to the problem</span></span></span>
 <span class="r-in"><span><span class="va">p1</span><span class="op">$</span><span class="va">variables</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $x</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Real variable 'x[Rows, Cols]'</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="co"># Instead you can find it in $aliases</span></span></span>
+<span class="r-in"><span><span class="co">## Instead you can find it in $aliases</span></span></span>
 <span class="r-in"><span><span class="va">p1</span><span class="op">$</span><span class="va">aliases</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $col_cumsum</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $L</span>
@@ -369,7 +369,7 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Aliases are computed from the final solution</span></span></span>
+<span class="r-in"><span><span class="co">## Aliases are computed from the final solution</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">ROI.plugin.highs</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="lp_solve.html">lp_solve</a></span><span class="op">(</span><span class="va">p1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s</span><span class="op">$</span><span class="va">variables</span></span></span>

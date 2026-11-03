@@ -124,7 +124,7 @@ The following fields are meant for internal use only.
 ## Examples
 
 ``` r
-# Diet problem
+## Diet Problem -----------------------
 ## You can only eat as much as you have of each food.
 
 pantry <- c(Cookies = 8, Bread = 5, Milk = 1, Cereal = 3)
@@ -140,7 +140,7 @@ lp_problem() |>
 #> 
 
 
-# Graph problem
+## Graph Problem ----------------------
 ## active[i,j] = 1  if the edge from i to j is active.
 
 nodes <- paste("node", 1:10)
