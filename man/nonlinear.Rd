@@ -22,8 +22,8 @@ The quoted expression with class
 Nonlinear transformations and operations on variables.
 }
 \examples{
-# max  sqrt(x) * log(y)
-#  st  x^y <= 10
+## max  sqrt(x) * log(y)
+##  st  x^y <= 10
 
 p <- lp_problem() |> 
     lp_variable(x, lower = 0) |> 

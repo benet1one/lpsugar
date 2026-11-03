@@ -1,6 +1,6 @@
-# y[i] is a variable such that
-# y[i] > y[i-1]
-# Y0 is a parameter indicating what would be y[0]
+## y[i] is a variable such that
+## y[i] > y[i-1]
+## Y0 is a parameter indicating what would be y[0]
 
 Y0 <- 4
 
