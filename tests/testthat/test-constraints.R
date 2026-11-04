@@ -9,7 +9,7 @@ test_that("printing", {
     p_many_rows <- lp_problem() |>
         lp_var(y[1:3]) |>
         lp_con(
-            for (i in 1:20) y[i %% 3 + 1] <= i
+            for (i in 1:25) y[i %% 3 + 1] <= i
         )
     
     p_many_cols <- lp_problem() |>
