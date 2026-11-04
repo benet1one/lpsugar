@@ -13,6 +13,8 @@ Ops.lp_variable <- function(e1, e2) {
     call <- call(op, substitute(e1), substitute(e2)) |> 
         rlang::as_quosure(env = parent.frame())
     
+    check_valid_abs_op(e1, e2, op, call)
+    
     # Single Element --------------------
     # +x, -x, !x
     if (rlang::is_missing(e2)) {

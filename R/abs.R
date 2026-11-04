@@ -27,6 +27,17 @@ abs_constraint <- function(x, y, op, call) {
     )
 }
 
+check_valid_abs_op <- function(e1, e2, op, call) {
+    any_abs <- any(
+        is_abs_lp_variable(e1),
+        !rlang::is_missing(e2) && is_abs_lp_variable(e2)
+    )
+    
+    if (any_abs && !is.element(op, COMPARISON_OPS)) {
+        throw_abs_error(call)
+    }
+}
+
 throw_abs_error <- function(call) {
     abs_url <- "https://optimization.cbe.cornell.edu/index.php?title=Optimization_with_absolute_values"
     cli_abort(

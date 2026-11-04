@@ -218,10 +218,6 @@ update_variables <- function(.problem, field = "variables") {
 # Used when any transformation is applied to a variable
 # indexing, operations, etc.
 transformed_variable <- function(x, check_na = TRUE, call = parent.frame()) {
-    if (is_abs_lp_variable(x)) {
-        throw_abs_error(call)
-    }
-    
     x$name    <- NULL
     x$lower   <- NULL
     x$upper   <- NULL
@@ -231,7 +227,11 @@ transformed_variable <- function(x, check_na = TRUE, call = parent.frame()) {
     # x$binary is not removed, since it's updated from the transformation
     # fields x$ind, x$L, x$A are necessary
     
-    class(x) <- c("transformed_lp_variable", "lp_variable")
+    if (is_abs_lp_variable(x)) {
+        class(x) <- c("abs_lp_variable", "transformed_lp_variable", "lp_variable")
+    } else {
+        class(x) <- c("transformed_lp_variable", "lp_variable")
+    }
     
     if (check_na) {
         any_na <- any(

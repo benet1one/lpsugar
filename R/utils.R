@@ -567,6 +567,9 @@ compute_quadratic <- function(v, x) {
     if (length(out) == 1L) {
         out <- unname(out[1])
     }
+    if (is_abs_lp_variable(v)) {
+        out <- abs(out)
+    }
     
     return(out)
 }
