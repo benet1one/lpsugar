@@ -1,3 +1,10 @@
+# lpsugar (development version)
+
+## New Features
+
+* `parameter()` can now create arrays of 3 or more dimensions, but only when
+the data is a scalar. The result will be an array where every value is that scalar.
+
 # lpsugar 0.30.2
 
 ## Improvements
