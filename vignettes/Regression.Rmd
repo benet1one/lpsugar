@@ -49,39 +49,32 @@ cat("... and", n-5, "more rows")
 ## Least Absolute Deviation
 
 The objective of Least Absolute Deviation (LAD) regression is to minimize the absolute
-residuals.
+residuals $e_i$.
 
 $$
-\min{\sum_{i=1}^n{|e_i|}}
+\min{\sum_{i=1}^n{e_i}}
 $$
 
-The absolute value function $|e|$ is not linear, so we have to separate each $e_i$ into:
-
-$$
-e_i = e_i^+ - e_i^-
-$$
-$$
-e_i^+ \ge 0,\ e_i^- \ge 0
-$$
 Then the problem can be written like this:
 
 $$
 \begin{array}{rl}
-  \min & \sum_{i=1}^n{e_i^+ + e_i^-} \\
-  \text{st} & e_i^+ \ge y_i - \hat{y_i} \\
-            & e_i^- \ge \hat{y_i} - y_i \\
-            & e_i^+ \ge 0 \\
-            & e_i^- \ge 0 \\
+  \min_{\beta,e} & \sum_{i=1}^n{e_i} \\
+  \text{st} & e_i \ge |y_i - \hat{y_i}| \\
   \text{where} & \hat{y_i} = \sum_{j=1}^k{\beta_j x_{ij}}
 \end{array}
 $$
 
-This works. The objective function attempts to push both $e_i^+$ and $e_i^-$ down,
-but the constraints ensure that:
+Believe it or not, the constraint is linear, despite containing an absolute value. 
+`lpsugar` will simply expand the constraint into two. Together, they're equivalent
+to the absolute value constraint.
 
-- If $e_i > 0\ \Rightarrow\ e_i^+ = e_i,\ e_i^- = 0$.
-
-- If $e_i < 0\ \Rightarrow\ e_i^+ = 0,\ e_i^- = |e_i|$.
+$$
+\begin{aligned}
+& +e_i \ge y_i - \hat{y_i} \\
+& -e_i \le y_i - \hat{y_i}
+\end{aligned}
+$$
 
 Let's write the problem in `lpsugar`.
 
@@ -91,14 +84,10 @@ k <- ncol(x)
 
 lad <- lp_problem() |> 
     lp_var(beta[1:k]) |> 
-    lp_var(e_pos[1:n], lower = 0) |> 
-    lp_var(e_neg[1:n], lower = 0) |> 
-    lp_min(sum(e_pos + e_neg)) |> 
+    lp_var(e[1:n], lower = 0) |> 
+    lp_min(sum(e)) |> 
     lp_alias(yhat = x %*% beta) |> 
-    lp_con(
-        pos = e_pos >= y - yhat,
-        neg = e_neg >= yhat - y
-    ) |> 
+    lp_con(e >= abs(y - yhat)) |> 
     lp_solve(solver = "highs")
 ```
 
