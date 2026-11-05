@@ -135,11 +135,11 @@
       Real variable 'y[1:3]'
       
       -- $constraints
-      An object containing 20 linear constraints.
+      An object containing 25 linear constraints.
       
       #unnamed_constraint
-      | for (i in 1:20) y[i%%3 + 1] <= i
-      | Rows = 20
+      | for (i in 1:25) y[i%%3 + 1] <= i
+      | Rows = 25
       
                y[1] y[2] y[3] dir rhs
         [i=1]  0    1    0    <=  1  
@@ -162,6 +162,11 @@
         [i=18] 1    0    0    <=  18 
         [i=19] 0    1    0    <=  19 
         [i=20] 0    0    1    <=  20 
+        [i=21] 1    0    0    <=  21 
+        [i=22] 0    1    0    <=  22 
+        [i=23] 0    0    1    <=  23 
+        [i=24] 1    0    0    <=  24 
+        [i=25] 0    1    0    <=  25 
       
 
 ---

@@ -30,6 +30,18 @@
 parameter <- function(.x, ..., byrow = TRUE) {
     dots <- rlang::dots_list(..., .named = TRUE, .ignore_empty = "none")
     
+    if (length(dots) == 0L) {
+        cli_abort("`...` cannot be empty.")
+    }
+    
+    for (s in seq_along(dots)) {
+        check_variable_set(
+            set = dots[[s]],
+            name = names(dots)[s],
+            call = environment()
+        )
+    }
+    
     if (length(dots) == 1L) {
         warn_changed_args(byrow = TRUE)
         parameter_vector(.x, dots)
@@ -37,11 +49,9 @@ parameter <- function(.x, ..., byrow = TRUE) {
     else if (length(dots) == 2L) {
         parameter_matrix(.x, dots, byrow = byrow)
     } 
-    else if (length(dots) == 0L) {
-        cli_abort("`...` cannot be empty.")
-    } 
     else {
-        cli_abort("Only vectors and matrices are supported.")
+        warn_changed_args(byrow = TRUE)
+        parameter_array(.x, dots)
     }
 }
 
@@ -104,10 +114,23 @@ parameter_matrix <- function(.x, dots, byrow = TRUE) {
     } 
     else {
         cli_abort(
-            "`.x` has {ndim(.x)} dimensions. Only vectors and matrices are supported.",
+            c("Dimensions do not match.",
+              "x" = "`.x` has {ndim(.x)} dimensions.",
+              "x" = "In `...` there are {length(dots)} dimensions."),
             call = parent.frame()
         )
     }
+}
+
+parameter_array <- function(.x, dots) {
+    if (length(.x) != 1L) {
+        cli_abort(
+            "For 3 or more dimensions, `.x` must be length 1.",
+            call = parent.frame()
+        )
+    }
+
+    array(.x, dim = lengths(dots), dimnames = dimnames_non_numeric(dots))
 }
 
 

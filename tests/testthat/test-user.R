@@ -51,21 +51,20 @@ test_that("parameter", {
         true_mat |> parameter(a, b, byrow = FALSE),
         "Ignoring argument `byrow`"
     )
-
     expect_error(
         true_mat |> parameter(b, a),
         r"(`.x` has dimensions \(2, 3\)(.+)`...` has dimensions \(3, 2\))"
     )
+    
 
     arr <- array(dim = c(2, 3, 1))
 
-    expect_error(
-        arr |> parameter(a, b, 1),
-        "Only vectors and matrices are supported"
+    expect_no_error(
+        parameter(0, b, a, a)
     )
     expect_error(
-        mat |> parameter(a, b, a),
-        "Only vectors and matrices are supported"
+        arr |> parameter(a, b, 1),
+        "For 3 or more dimensions, `.x` must be length 1."
     )
 })
 

@@ -103,3 +103,15 @@ test_that("new alias", {
         )
     )
 })
+
+test_that("updating quadratic alias", {
+    p <- lp_problem() |> 
+        lp_var(x[1:2]) |> 
+        lp_alias(a = x^(1:2)) |> 
+        lp_var(y)
+    
+    expect_equal(
+        p$aliases$a$Q[[1]] |> dim(),
+        c(3, 3)
+    )
+})
