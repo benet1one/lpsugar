@@ -499,13 +499,17 @@ is_quadratic <- function(x) {
     
     # Is variable, Q_objective, Q_constraint, or unknown class
     
+    if (is_lp_variable(x)) {
+        ## Using is_empty_Q() is not desirable, leads to errors in other functions
+        return(!is.null(x$Q))
+    } 
     if (is_lp_objective(x)) {
         return(!is_empty_Q(x$Q))
     }
-    else if (is_lp_variable(x) || is_lp_constraint(x)) {
+    else if (is_lp_constraint(x)) {
         empty_Qs <- sapply(x$Q, is_empty_Q)
         return(any(!empty_Qs))
-    } 
+    }
     else {
         return(FALSE)
     }
