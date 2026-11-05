@@ -137,6 +137,7 @@ lp_alias_manual <- function(.problem, definition, expression) {
 
     variable <- list(
         binary = FALSE,
+        abs = FALSE,
         ind = ind,
         L = L,
         A = A
