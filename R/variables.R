@@ -189,25 +189,28 @@ lp_variable <- function(.problem, definition,
 # Whenever a new variable is added to a problem
 # Update $L of other variables/aliases
 update_variables <- function(.problem, field = "variables") {
-    total_vars <- ncol(.problem)
+    new_n <- ncol(.problem)
     varnames <- variable.names(.problem)
     vars <- .problem[[field]]
     
     for (i in names(vars)) {
         x <- vars[[i]]
+        old_n <- ncol(x$L)
+        add_n <- new_n - old_n
         
-        x$L <- cbind(
-            x$L,
-            matrix(
-                data = 0, 
-                nrow = nrow(x$L), 
-                ncol = total_vars - ncol(x$L)
-            )
-        )
+        if (is_quadratic(x)) for (j in seq_along(x$Q)) {
+            x$Q[[j]] <- x$Q[[j]] |> 
+                cbind(matrix(0, nrow = old_n, ncol = add_n)) |> 
+                rbind(matrix(0, nrow = add_n, ncol = new_n))
+            
+            rownames(x$Q[[j]]) <- colnames(x$Q[[j]]) <- varnames
+        }
         
-        x$L <- robust_index(x$L)
+        x$L <- x$L |> 
+            cbind(matrix(0, nrow = nrow(x$L), ncol = add_n)) |> 
+            robust_index()
+
         colnames(x$L) <- varnames
-        
         vars[[i]] <- x
     }
     
