@@ -166,8 +166,9 @@ lp_variable <- function(.problem, definition,
         type = type,
         integer = integer,
         binary = binary,
-        
         scalar = def$scalar,
+        
+        abs = FALSE,
         ind = ind,
         L = L,
         A = A
@@ -189,25 +190,28 @@ lp_variable <- function(.problem, definition,
 # Whenever a new variable is added to a problem
 # Update $L of other variables/aliases
 update_variables <- function(.problem, field = "variables") {
-    total_vars <- ncol(.problem)
+    new_n <- ncol(.problem)
     varnames <- variable.names(.problem)
     vars <- .problem[[field]]
     
     for (i in names(vars)) {
         x <- vars[[i]]
+        old_n <- ncol(x$L)
+        add_n <- new_n - old_n
         
-        x$L <- cbind(
-            x$L,
-            matrix(
-                data = 0, 
-                nrow = nrow(x$L), 
-                ncol = total_vars - ncol(x$L)
-            )
-        )
+        if (is_quadratic(x)) for (j in seq_along(x$Q)) {
+            x$Q[[j]] <- x$Q[[j]] |> 
+                cbind(matrix(0, nrow = old_n, ncol = add_n)) |> 
+                rbind(matrix(0, nrow = add_n, ncol = new_n))
+            
+            rownames(x$Q[[j]]) <- colnames(x$Q[[j]]) <- varnames
+        }
         
-        x$L <- robust_index(x$L)
+        x$L <- x$L |> 
+            cbind(matrix(0, nrow = nrow(x$L), ncol = add_n)) |> 
+            robust_index()
+
         colnames(x$L) <- varnames
-        
         vars[[i]] <- x
     }
     
@@ -218,10 +222,6 @@ update_variables <- function(.problem, field = "variables") {
 # Used when any transformation is applied to a variable
 # indexing, operations, etc.
 transformed_variable <- function(x, check_na = TRUE, call = parent.frame()) {
-    if (is_abs_lp_variable(x)) {
-        throw_abs_error(call)
-    }
-    
     x$name    <- NULL
     x$lower   <- NULL
     x$upper   <- NULL
@@ -307,6 +307,10 @@ print.lp_variable <- function(x, ...) {
 }
 #' @export
 print.transformed_lp_variable <- function(x, ...) {
+    if (x$abs) {
+        cat("| Absolute value of |\n\n")
+    }
+    
     fields <- if (is_quadratic(x)) {
         c(c("Q", "L", "A"))
     } 
@@ -361,6 +365,7 @@ bind_vars <- function(...) {
     dots_expr <- rlang::enexprs(..., .ignore_empty = "all")
     
     nams <- rlang::names2(dots)
+    
     if (any(nams != "")) {
         cli_warn("ignoring named arguments in `bind_vars()`")
     }
@@ -378,7 +383,13 @@ bind_vars <- function(...) {
         
         if (!is_lp_variable(x) && !is.numeric(x)) {
             e <- dots_expr[[i]] |> format1()
-            cli_abort("`{e}` is not numeric or an `lp_variable`.")
+            cli_abort(
+                "`{e}` is not numeric or an `lp_variable`.",
+                class = "lpsugar_error_bind_vars_invalid_class"
+            )
+        }
+        if (is_abs_variable(x)) {
+            throw_abs_error()
         }
     }
     
@@ -509,6 +520,9 @@ bind_cv <- function(x, y) {
     
     i <- c(i)
     
+    if (is_abs_variable(value)) {
+        throw_abs_error()
+    }
     if (is_lp_variable(value)) {
         y <- recycle_var(value, length(i))
         

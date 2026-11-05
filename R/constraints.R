@@ -315,8 +315,37 @@ bind_linear_cons <- function(cons) {
 }
 
 bind_simple_triplet_matrices <- function(mats) {
-    # TODO Try to improve performance?
+    # TODO Consider using the other function.
     rlang::exec(rbind, !!!mats)
+}
+# Slightly faster, but currently unused.
+bind_simple_triplet_matrices_2 <- function(mats) {
+    out <- mats[[1]]
+    rn_out <- rownames(out) %||% rep("", nrow(out))
+    cn_out <- colnames(out)
+    
+    if (length(mats) >= 2L) for (k in 2:length(mats)) {
+        mk <- mats[[k]]
+        rn <- rownames(mk) %||% rep("", nrow(mk))
+        
+        out <- slam::simple_triplet_matrix(
+            i = c(out$i, mk$i + nrow(out)),
+            j = c(out$j, mk$j),
+            v = c(out$v, mk$v),
+            nrow = nrow(out) + nrow(mk),
+            ncol = ncol(out)
+        )
+        
+        rn_out <- c(rn_out, rn)
+        cn_out <- cn_out %||% colnames(mk)
+    }
+    
+    if (!all(rn_out == "")) {
+       rownames(out) <- rn_out
+    }
+    
+    colnames(out) <- cn_out
+    out
 }
 
 roi_constraint_class <- function(con) {

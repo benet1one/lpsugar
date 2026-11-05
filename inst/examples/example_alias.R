@@ -1,12 +1,12 @@
-# Aliases are meant to avoid having to compute the same values
-# for multiple different constraints and possibly the objective function.
+## Aliases are meant to avoid having to compute the same values
+## for multiple different constraints and possibly the objective function.
 
-# Simple Example ----------------------------------
+## Simple Example ----------------------------------
 
-# Say we had x, y, and wanted to define z such that
-# z[i] = 2*x[i] + y[n-i+1]
+## Say we had x, y, and wanted to define z such that
+## z[i] = 2*x[i] + y[n-i+1]
 
-# One option is to use constraints
+## One option is to use constraints
 n <- 3
 set <- letters[1:n]
 obj_coef <- c(2, 1, 5)
@@ -22,10 +22,10 @@ p0 <- lp_problem() |>
         xyz = for (i in 1:n)  z[i] == 2*x[i] + y[n-i+1]
     )
 
-# But this problem has 3 extra variables and 3 extra constraints:
+## But this problem has 3 extra variables and 3 extra constraints:
 p0$constraints
 
-# Instead, we can define 'z' as an alias
+## Instead, we can define 'z' as an alias
 p1 <- lp_problem() |>
     lp_variable(x[set], lower = 1) |>
     lp_variable(y[set], lower = 1) |>
@@ -38,17 +38,17 @@ p1 <- lp_problem() |>
         constraint_with_z = (z[1] <= 7)
     )
 
-# This problem no extra variables or constraints!
+## This problem no extra variables or constraints!
 p1$constraints
 
-# The solution is presented differently
+## The solution is presented differently
 library(ROI.plugin.highs)
 lp_solve(p0) [c("variables", "aliases")] # z is a variable
 lp_solve(p1) [c("variables", "aliases")] # z is an alias
 
 
 
-# More Interesting Example ------------------------
+## More Interesting Example ------------------------
 Rows <- letters[1:3]
 Cols <- LETTERS[1:2]
 
@@ -65,7 +65,7 @@ max_col_cumsum <- c(
 ) |> parameter(Rows, Cols)
 
 
-# Without Aliases
+## Without Aliases
 p0 <- lp_problem() |>
     lp_var(x[Rows, Cols]) |>
     lp_max(sum(x)) |>
@@ -81,7 +81,7 @@ p0 <- lp_problem() |>
         }
     )
 
-# With an Alias
+## With an Alias
 p1 <- lp_problem() |>
     lp_var(x[Rows, Cols]) |>
     lp_alias(col_cumsum = apply(x, 2, cumsum)) |>
@@ -92,16 +92,16 @@ p1 <- lp_problem() |>
         A_less_than_B = (col_cumsum[, "A"] <= col_cumsum[, "B"])
     )
 
-# The problems are equivalent
+## The problems are equivalent
 p0$constraints
 p1$constraints
 
-# Notice it's not a variable, thus not adding complexity to the problem
+## Notice it's not a variable, thus not adding complexity to the problem
 p1$variables
-# Instead you can find it in $aliases
+## Instead you can find it in $aliases
 p1$aliases
 
-# Aliases are computed from the final solution
+## Aliases are computed from the final solution
 library(ROI.plugin.highs)
 s <- lp_solve(p1)
 s$variables

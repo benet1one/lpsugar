@@ -135,3 +135,24 @@ test_that("NA/NaN", {
     expect_error(p |> lp_min(x^2 / 0))
     expect_error(p |> lp_con(x <= NaN))
 })
+
+test_that("abs alias", {
+    p <- lp_problem() |> 
+        lp_var(x[1:3]) |> 
+        lp_min(sum(x)) |> 
+        lp_alias(ax = abs(x)) |> 
+        lp_con(
+            for (i in 1:3) x[i] >= -i^2,
+            abs = for (i in 1:3) ax[i] <= 2*i
+        )
+    
+    expect_equal(
+        nrow(p$constraints["abs"]),
+        6L
+    )
+    expect_equal(
+        compute_aliases(p, c(-1, -4, 5)) $ ax,
+        c(1, 4, 5),
+        ignore_attr = TRUE
+    )
+})

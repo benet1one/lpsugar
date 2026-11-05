@@ -294,8 +294,7 @@ test_that("operations", {
     expect_error(!(x + y[1]), "only supported for binary variables")
 
     expect_error(exp(x), "exp")
-    expect_error(-abs(x), "absolute value")
-    expect_error(abs(x) + 1, "absolute value")
+    expect_error(sqrt(x + 1), "nonlinear\\(sqrt\\(x \\+ 1\\)\\)")
 
     expect_error(y | y, "Unsupported operation")
     expect_error(y & y, "Unsupported operation")
@@ -482,3 +481,17 @@ test_that("quadratic matrix multiply", {
     )
 })
 
+test_that("abs", {
+    p <- lp_problem() |> 
+        lp_var(x[1:3]) |> 
+        lp_alias(a = abs(x))
+    
+    x <- p$variables$x
+    a <- p$aliases$a
+    
+    expect_true(a[1]$abs)
+    expect_equal(abs(x)[3], abs(x[3]))
+    
+    expect_error(bind_vars(a, x), "abs")
+    expect_error(x[1] <- a[2], "abs")
+})

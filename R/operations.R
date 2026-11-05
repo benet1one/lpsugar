@@ -13,6 +13,8 @@ Ops.lp_variable <- function(e1, e2) {
     call <- call(op, substitute(e1), substitute(e2)) |> 
         rlang::as_quosure(env = parent.frame())
     
+    check_valid_abs_op(e1, e2, op, call)
+    
     # Single Element --------------------
     # +x, -x, !x
     if (rlang::is_missing(e2)) {
@@ -556,7 +558,7 @@ compare_lp <- function(x, y, op, call) {
         op <- ">="
     }
     
-    if (is_abs_lp_variable(x) || is_abs_lp_variable(y)) {
+    if (is_abs_variable(x) || is_abs_variable(y)) {
         return(abs_constraint(x, y, op, call))
     }
     

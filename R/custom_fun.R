@@ -98,21 +98,18 @@ mean.lp_variable <- function(x, ...) {
 #' @export
 Math.lp_variable <- function(x, ...) {
     fun <- .Generic
-    call <- paste0(fun, "(", format(substitute(x)), ")") |>
-        str2lang()
-    
-    if (fun == "cumsum") {
-        return(cumsum_v(x, call))
-    }
-    
+    call <- rlang::call2(fun, substitute(x), ...)
+
     cli_abort(
-        "Function `{fun}()` is not supported in a linear problem.", 
+        c("Function `{fun}()` is not linear or quadratic.",
+          ">" = "Wrap it in `nonlinear({format1(call)})`."),
         class = "lpsugar_error_unsupported_math",
         call = call
     )
 }
 
-cumsum_v <- function(x, call) {
+#' @export
+cumsum.lp_variable <- function(x) {
     if (length(x) >= 2L) for (i in 2:length(x)) {
         if (is_quadratic(x)) {
             x$Q[[i]] <- x$Q[[i]] + x$Q[[i-1L]]

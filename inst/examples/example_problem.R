@@ -1,4 +1,4 @@
-# ROI or a ROI plugin needs to be loaded for lp_solve() to work
+## ROI or a ROI plugin needs to be loaded for lp_solve() to work
 library(ROI.plugin.highs)
 
 lp_problem() |>
@@ -10,5 +10,5 @@ lp_problem() |>
     ) |>
     lp_solve()
 
-# See the Quick Start vignette
+## See the Quick Start vignette
 # vignette("lpsugar", package = "lpsugar")
