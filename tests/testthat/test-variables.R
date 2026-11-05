@@ -296,6 +296,7 @@ test_that("operations", {
     expect_error(exp(x), "exp")
     expect_error(-abs(x), "absolute value")
     expect_error(abs(x) + 1, "absolute value")
+    expect_error(sqrt(x + 1), "nonlinear\\(sqrt\\(x \\+ 1\\)\\)")
 
     expect_error(y | y, "Unsupported operation")
     expect_error(y & y, "Unsupported operation")
