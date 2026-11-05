@@ -13,7 +13,7 @@ lp_objective <- function(.problem, objective) {
         .problem$objective <- objective_nonlinear(.problem, objective)
     } 
     else if (is_lp_variable(objective)) {
-        if (is_abs_lp_variable(objective)) {
+        if (is_abs_variable(objective)) {
             throw_abs_error(call = parent.frame())
         }
         expr <- rlang::get_expr(quosure) |> rlang::as_label()

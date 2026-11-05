@@ -166,8 +166,9 @@ lp_variable <- function(.problem, definition,
         type = type,
         integer = integer,
         binary = binary,
-        
         scalar = def$scalar,
+        
+        abs = FALSE,
         ind = ind,
         L = L,
         A = A
@@ -227,11 +228,7 @@ transformed_variable <- function(x, check_na = TRUE, call = parent.frame()) {
     # x$binary is not removed, since it's updated from the transformation
     # fields x$ind, x$L, x$A are necessary
     
-    if (is_abs_lp_variable(x)) {
-        class(x) <- c("abs_lp_variable", "transformed_lp_variable", "lp_variable")
-    } else {
-        class(x) <- c("transformed_lp_variable", "lp_variable")
-    }
+    class(x) <- c("transformed_lp_variable", "lp_variable")
     
     if (check_na) {
         any_na <- any(
@@ -307,6 +304,10 @@ print.lp_variable <- function(x, ...) {
 }
 #' @export
 print.transformed_lp_variable <- function(x, ...) {
+    if (x$abs) {
+        cat("| Absolute value of |\n\n")
+    }
+    
     fields <- if (is_quadratic(x)) {
         c(c("Q", "L", "A"))
     } 
@@ -361,6 +362,7 @@ bind_vars <- function(...) {
     dots_expr <- rlang::enexprs(..., .ignore_empty = "all")
     
     nams <- rlang::names2(dots)
+    
     if (any(nams != "")) {
         cli_warn("ignoring named arguments in `bind_vars()`")
     }
@@ -382,6 +384,9 @@ bind_vars <- function(...) {
                 "`{e}` is not numeric or an `lp_variable`.",
                 class = "lpsugar_error_bind_vars_invalid_class"
             )
+        }
+        if (is_abs_variable(x)) {
+            throw_abs_error()
         }
     }
     
@@ -512,6 +517,9 @@ bind_cv <- function(x, y) {
     
     i <- c(i)
     
+    if (is_abs_variable(value)) {
+        throw_abs_error()
+    }
     if (is_lp_variable(value)) {
         y <- recycle_var(value, length(i))
         

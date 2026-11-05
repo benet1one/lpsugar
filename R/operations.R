@@ -558,7 +558,7 @@ compare_lp <- function(x, y, op, call) {
         op <- ">="
     }
     
-    if (is_abs_lp_variable(x) || is_abs_lp_variable(y)) {
+    if (is_abs_variable(x) || is_abs_variable(y)) {
         return(abs_constraint(x, y, op, call))
     }
     

@@ -567,7 +567,7 @@ compute_quadratic <- function(v, x) {
     if (length(out) == 1L) {
         out <- unname(out[1])
     }
-    if (is_abs_lp_variable(v)) {
+    if (is_abs_variable(v)) {
         out <- abs(out)
     }
     
@@ -597,8 +597,8 @@ is_lp_variable <- function(x) {
 is_transformed_lp_variable <- function(x) {
     inherits(x, "transformed_lp_variable")
 }
-is_abs_lp_variable <- function(x) {
-    inherits(x, "abs_lp_variable")
+is_abs_variable <- function(x) {
+    is_lp_variable(x) && x$abs
 }
 is_nonlinear <- function(x) {
     if (rlang::inherits_any(x, c("nonlinear", "F_objective", "F_constraint"))) {
