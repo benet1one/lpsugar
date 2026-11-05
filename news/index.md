@@ -1,5 +1,19 @@
 # Changelog
 
+## lpsugar 0.30.3
+
+### New Features
+
+- [`parameter()`](https://benet1one.github.io/lpsugar/reference/parameter.md)
+  can now create arrays of 3 or more dimensions, but only when the data
+  is a scalar. The result will be an array where every value is that
+  scalar.
+
+### Bug Fixes
+
+- Fixed bug with quadratic part of aliases not updating when adding a
+  new variable.
+
 ## lpsugar 0.30.2
 
 ### Improvements
