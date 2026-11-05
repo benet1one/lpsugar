@@ -6,6 +6,9 @@
       $binary
       [1] FALSE
       
+      $abs
+      [1] FALSE
+      
       $ind
       A
       a b c 
@@ -33,6 +36,9 @@
       unclass(p2$aliases$z)
     Output
       $binary
+      [1] FALSE
+      
+      $abs
       [1] FALSE
       
       $ind
@@ -76,6 +82,9 @@
       unclass(p3$aliases$y)
     Output
       $binary
+      [1] FALSE
+      
+      $abs
       [1] FALSE
       
       $ind
