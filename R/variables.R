@@ -378,7 +378,10 @@ bind_vars <- function(...) {
         
         if (!is_lp_variable(x) && !is.numeric(x)) {
             e <- dots_expr[[i]] |> format1()
-            cli_abort("`{e}` is not numeric or an `lp_variable`.")
+            cli_abort(
+                "`{e}` is not numeric or an `lp_variable`.",
+                class = "lpsugar_error_bind_vars_invalid_class"
+            )
         }
     }
     
