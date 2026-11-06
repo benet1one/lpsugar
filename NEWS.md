@@ -1,3 +1,18 @@
+# lpsugar (development version)
+
+## Improvements
+
+* Output of operations is now more consistent, with the correct dimensions and names.
+* Added classes to some errors.
+
+## Documentation
+
+* Documented print methods for constraints and aliases.
+
+## Bug Fixes
+
+* Fixed rare bugs with quadratic variables.
+
 # lpsugar 0.30.3
 
 ## New Features
