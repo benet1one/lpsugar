@@ -301,6 +301,7 @@ print.lp_variable <- function(x, ...) {
     invisible(x)
 }
 #' Print method for aliases or transformed variables.
+#' @keywords internal
 #' @param x An alias or transformed variable.
 #' @param full Boolean.
 #' If TRUE, prints the relevant fields. If FALSE, prints a compact summary.

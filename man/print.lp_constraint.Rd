@@ -18,3 +18,4 @@ If FALSE, only prints a summary of each constraint.}
 \description{
 Print method for constraints.
 }
+\keyword{internal}

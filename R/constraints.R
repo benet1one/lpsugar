@@ -566,6 +566,7 @@ print.lp_empty_constraint <- function(x, ...) {
 }
 
 #' Print method for constraints.
+#' @keywords internal
 #' @param x An [lp_constraint()].
 #' @param full Boolean.
 #' If TRUE, linear constraints with less than 200 rows are printed fully.
