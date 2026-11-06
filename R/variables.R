@@ -300,16 +300,36 @@ print.lp_variable <- function(x, ...) {
     cat("\n")
     invisible(x)
 }
+#' Print method for aliases or transformed variables.
+#' @param x An alias or transformed variable.
+#' @param full Boolean.
+#' If TRUE, prints the relevant fields. If FALSE, prints a compact summary.
 #' @export
-print.transformed_lp_variable <- function(x, ...) {
-    fields <- if (is_quadratic(x)) {
-        c(c("Q", "L", "A"))
-    } 
+print.transformed_lp_variable <- function(x, full = length(x$A) <= 20, ...) {
+    if (full) {
+        fields <- if (is_quadratic(x)) {
+            c(c("Q", "L", "A"))
+        } else {
+            c("L", "A")
+        }
+        unclass(x)[fields] |> print()
+    }
     else {
-        c("L", "A")
+        if (is_quadratic(x)) {
+            l <- length(x$Q)
+            nr <- nrow(x$Q[[1]])
+            nc <- ncol(x$Q[[1]])
+            cat("$Q: List of ",l," matrices (",nr," x ",nc,")\n", sep = "")
+        }
+        
+        nr <- nrow(x$L)
+        nc <- ncol(x$L)
+        cat("$L: Matrix (",nr," x ",nc,")\n", sep = "")
+        
+        l <- length(x$A)
+        cat("$A: Vector of length ", l, "\n", sep = "")
     }
     
-    unclass(x)[fields] |> print()
     invisible(x)
 }
 #' @export

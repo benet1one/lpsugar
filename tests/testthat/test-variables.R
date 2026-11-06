@@ -1,4 +1,26 @@
 
+test_that("variable printing", {
+    p <- lp_problem() |> 
+        lp_var(x, integer = TRUE) |> 
+        lp_var(y[set = 1:3], lower = 2) |> 
+        lp_var(z[1:30])
+    
+    expect_output(
+        print(p$variables$x),
+        "Integer scalar"
+    )
+    expect_output(
+        print(p$variables$y),
+        "(Real variable)(.*)(y >= 2)"
+    )
+    expect_snapshot(
+        p |> lp_eval(z + 1)
+    )
+    expect_snapshot(
+        p |> lp_eval(z^2)
+    )
+})
+
 test_that("variable definitions", {
     a <- letters[1:3]
 

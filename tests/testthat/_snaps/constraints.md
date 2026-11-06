@@ -126,16 +126,9 @@
 ---
 
     Code
-      print(p_many_rows, full = TRUE)
+      print(p_many_rows$constraints)
     Output
-      ---- <lp_problem> ----
-      
-      -- $variables
-      $y
-      Real variable 'y[1:3]'
-      
-      -- $constraints
-      An object containing 25 linear constraints.
+      An object containing 1025 linear constraints.
       
       #unnamed_constraint
       | for (i in 1:25) y[i%%3 + 1] <= i
@@ -168,28 +161,25 @@
         [i=24] 1    0    0    <=  24 
         [i=25] 0    1    0    <=  25 
       
+      #unnamed_constraint
+      | for (i in 1:1000) y[1] >= i
+      | Rows = 1000
+      
 
 ---
 
     Code
-      print(p_many_cols, full = TRUE)
+      print(p_many_cols$constraints)
     Output
-      ---- <lp_problem> ----
-      
-      -- $variables
-      $z
-      Real variable 'z[1:300]'
-      
-      -- $constraints
-      An object containing 600 linear constraints.
+      An object containing 2 linear constraints.
       
       #unnamed_constraint
-      | z >= 0
-      | Rows = 300
+      | z[1] >= 0
+      | Rows = 1
       
       #unnamed_constraint
-      | z <= 10
-      | Rows = 300
+      | z[2] <= 10
+      | Rows = 1
       
 
 # bind constraints

@@ -1,3 +1,20 @@
+# variable printing
+
+    Code
+      lp_eval(p, z + 1)
+    Output
+      $L: Matrix (30 x 34)
+      $A: Vector of length 30
+
+---
+
+    Code
+      lp_eval(p, z^2)
+    Output
+      $Q: List of 30 matrices (34 x 34)
+      $L: Matrix (30 x 34)
+      $A: Vector of length 30
+
 # variable definitions
 
     Code

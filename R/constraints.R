@@ -565,22 +565,21 @@ print.lp_empty_constraint <- function(x, ...) {
     invisible(x)
 }
 
+#' Print method for constraints.
+#' @param x An [lp_constraint()].
+#' @param full Boolean.
+#' If TRUE, linear constraints with less than 200 rows are printed fully.
+#' If FALSE, only prints a summary of each constraint.
 #' @export
-print.lp_constraint <- function(x, full = TRUE, ...) {
+print.lp_constraint <- function(x, full = ncol(x$L) <= 20, ...) {
     NextMethod()
     cat("\n")
     
-    info <- lpsugar_attributes(x)
-    
-    conditions_for_full <- all(
-        inherits(x, "L_constraint") || inherits(x, "Q_constraint"),
-        ncol(x$L) <= 20
-    )
-    
-    if (!conditions_for_full) {
+    if (!rlang::inherits_any(x, c("L_constraint", "Q_constraint"))) {
         full <- FALSE
     }
     
+    info <- lpsugar_attributes(x)
     pairs <- data.frame(id = info$id, expr = info$expr) |> 
         unique()
     
@@ -603,7 +602,7 @@ print.lp_constraint <- function(x, full = TRUE, ...) {
             sep = ""
         )
 
-        if (full && is_linear(x[where])) {
+        if (full && is_linear(x[where]) && n <= 200) {
             mat <- as.matrix.lp_constraint(x[where])
             rownames(mat) <- paste0("  ", rownames(mat))
             print(mat, quote = FALSE)
