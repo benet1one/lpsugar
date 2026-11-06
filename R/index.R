@@ -5,7 +5,7 @@ robust_index <- function(x) {
         cli_warn("atempt to use robust_index() on a <simple_triplet_matrix>")
         return(x)
     }
-    structure(x, class = c("robust_index", class(x)))
+    structure(x, class = unique(c("robust_index", class(x))))
 }
 
 #' @export
