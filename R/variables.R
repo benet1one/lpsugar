@@ -867,7 +867,10 @@ recycle_var <- function(x, n) {
         return(transformed_variable(x, check_na = FALSE))
     }
     
-    cli_abort("Attempt to recycle variable of length {length(x)} to length {n}.")
+    cli_abort(
+        "Cannot to recycle variable of length {length(x)} to length {n}.",
+        class = "lpsugar_error_recycle_length_mismatch"
+    )
 }
 
 # Recycles a constant to length n
@@ -881,5 +884,8 @@ recycle_const <- function(x, n) {
         return(rep(x, n))
     }
     
-    cli_abort("Attempt to recycle array of length {length(x)} to length {n}.")
+    cli_abort(
+        "Cannot recycle array of length {length(x)} to length {n}.",
+        class = "lpsugar_error_recycle_length_mismatch"
+    )
 }
