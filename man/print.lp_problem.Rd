@@ -12,6 +12,8 @@
 \item{full}{Boolean.
 If TRUE, linear constraints with less than 200 rows are printed fully.
 If FALSE, only prints a summary of each constraint.}
+
+\item{...}{Ignored.}
 }
 \description{
 Print method for problems.

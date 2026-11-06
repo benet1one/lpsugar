@@ -570,6 +570,7 @@ print.lp_empty_constraint <- function(x, ...) {
 #' @param full Boolean.
 #' If TRUE, linear constraints with less than 200 rows are printed fully.
 #' If FALSE, only prints a summary of each constraint.
+#' @param ... Ignored.
 #' @export
 print.lp_constraint <- function(x, full = ncol(x$L) <= 20, ...) {
     NextMethod()

@@ -304,6 +304,7 @@ print.lp_variable <- function(x, ...) {
 #' @param x An alias or transformed variable.
 #' @param full Boolean.
 #' If TRUE, prints the relevant fields. If FALSE, prints a compact summary.
+#' @param ... Ignored.
 #' @export
 print.transformed_lp_variable <- function(x, full = length(x$A) <= 20, ...) {
     if (full) {

@@ -11,6 +11,8 @@
 
 \item{full}{Boolean.
 If TRUE, prints the relevant fields. If FALSE, prints a compact summary.}
+
+\item{...}{Ignored.}
 }
 \description{
 Print method for aliases or transformed variables.

@@ -49,6 +49,7 @@ lp_problem <- function(warn_infeasible = TRUE, ...) {
 #' @param full Boolean.
 #' If TRUE, linear constraints with less than 200 rows are printed fully.
 #' If FALSE, only prints a summary of each constraint.
+#' @param ... Ignored.
 #' @export
 print.lp_problem <- function(x, full = FALSE, ...) {
     cat(
