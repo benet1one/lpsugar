@@ -199,7 +199,15 @@ power_lp <- function(x, y, call) {
 
 # -var
 minus_v <- function(x, call) {
-    multiply_v_c(x, -1, call = call)
+    if (is_quadratic(x)) for (k in seq_along(x$Q)) {
+        x$Q[[k]] <- -x$Q[[k]]
+    }
+    
+    x$L <- -x$L
+    x$A <- -x$A
+    x$binary <- FALSE
+    
+    transformed_variable(x, call = call)
 }
 
 # var + var
