@@ -162,7 +162,6 @@ lp_solve(p1) [c("variables", "aliases")] # z is an alias
 #> 
 #> $aliases
 #> $aliases$z
-#> set
 #> a b c 
 #> 7 5 4 
 #> 
