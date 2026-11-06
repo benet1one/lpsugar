@@ -81,9 +81,9 @@ same_dimensions <- function(x, y, dim_x = dim2(x), dim_y = dim2(y)) {
     length(dim_x) == length(dim_y)  &&  all(dim_x == dim_y)
 }
 
-# Returns FALSE if dimensions are incompatible
-# and a condition
-are_arguments_conformable <- function(x, y, drop_dim = TRUE) {
+# Checks that arguments are conformable and returns an object (robust_index) with
+# the dimensions of the output
+check_conformable <- function(x, y, drop_dim = TRUE, call = parent.frame()) {
     if (is_lp_variable(x)) {
         x <- x$ind
     }
@@ -97,36 +97,28 @@ are_arguments_conformable <- function(x, y, drop_dim = TRUE) {
     }
     
     if (length(x) > 1L && length(y) > 1L && length(x) != length(y)) {
-        cnd <- rlang::error_cnd(
+        cli_abort(
+            c("Length mismatch.",
+              "x" =  "Left hand side is length {length(x)}",
+              "x" = "Right hand side is length {length(y)}"),
             class = "lpsugar_error_non_conformable",
-            message = c(
-                "Length mismatch.",
-                "x" = paste( "Left hand side is length", length(x)),
-                "x" = paste("Right hand side is length", length(y))
-            )
+            call = call
         )
-        return(structure(FALSE, cnd = cnd))
     }
     
     attempt <- rlang::try_fetch(x + y, warning = identity, error = identity)
     
     if (rlang::is_error(attempt)) {
-        attempt$class <- "lpsugar_error_non_conformable"
-        return(structure(FALSE, cnd = attempt))
-    } 
-    else {
-        return(TRUE)
-    }
-}
-check_conformable <- function(x, y, drop_dim = TRUE, call) {
-    conformable <- are_arguments_conformable(x, y)
-    
-    if (conformable) {
-        return()
+        cli_abort(
+            c(attempt$message,
+              "x" =  "Left hand side has dimensions {format_dim(x)}",
+              "x" = "Right hand side has dimensions {format_dim(y)}"), 
+            class = "lpsugar_error_non_conformable",
+            call = call
+        )
     }
     
-    why <- attr(conformable, "cnd")
-    cli_abort(why$message, call = call)
+    attempt
 }
 
 dimnames_non_numeric <- function(dimnames) {
@@ -357,13 +349,10 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
         dv <- dim(drop(v$ind))
         
         if (any(dx != dv)) {
-            dx_str <- paste(dim(xs), collapse = ", ")
-            dv_str <- paste(dim(v), collapse = ", ")
-            
             cli_abort(
                 c("Dimensions of variable `{v$name}` do not match.",
-                  "x" = "In `{field}` they are ({dx_str})",
-                  "x" = "In `problem` they are ({dv_str})"), 
+                  "x" = "In `{field}` they are {format_dim(xs)}",
+                  "x" = "In `problem` they are {format_dim(v)}"), 
                 class = "lpsugar_error_dimension_mismatch",
                 call = call
             )
