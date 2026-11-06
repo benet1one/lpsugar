@@ -174,7 +174,8 @@ test_that("variable indexing", {
 
     expect_equal(
         rep(x, 3) + y,
-        x + y
+        x + y,
+        ignore_attr = TRUE
     )
 
     expect_equal(
@@ -294,17 +295,17 @@ test_that("operations", {
     y <- p$variables$y
     z <- p$variables$z
 
-    expect_identical(x, +x)
-    expect_identical(x/2, x*0.5)
-    expect_identical(1-y, !y)
-    expect_identical(1-y[1], !y[1])
+    expect_equal(x, +x)
+    expect_equal(x/2, x*0.5)
+    expect_equal(1-y, !y, ignore_attr = TRUE)
+    expect_equal(1-y[1], !y[1], ignore_attr = TRUE)
     expect_true( (!y) $ binary )
     expect_true( (1 - y) $ binary )
     expect_true( (rep(1, 3) - y) $ binary )
     expect_false( (c(1, 2, 1) - y) $ binary )
 
-    expect_identical(2*y, y + y)
-    expect_identical(-z, z - 2*z)
+    expect_equal(2*y, y + y)
+    expect_equal(-z, z - 2*z)
 
     expect_error(c(1, 2, NA) + y, "Left-hand-side object contains NA values")
     expect_error(y / c(1, 2, NA), "Right-hand-side object contains NA values")
@@ -363,6 +364,50 @@ test_that("operations", {
     expect_equal(
         diff(z, lag = 2, differences = 2),
         z |> diff(lag = 2) |> diff(lag = 2)
+    )
+})
+
+test_that("operation output dim and names", {
+    let <- letters[1:3]
+    p <- lp_problem() |> 
+        lp_var(x) |> 
+        lp_var(y[1:3]) |> 
+        lp_var(named[nam = let]) |> 
+        lp_var(named_mat[let, let])
+    
+    x <- p$variables$x
+    y <- p$variables$y
+    named <- p$variables$named
+    named_mat <- p$variables$named_mat
+    
+    vec <- c(A = 1, B = 3, C = 2)
+    mat <- parameter(5, cap = LETTERS[1:3], low = letters[1:3])
+    
+    (x + y) $ ind
+    
+    expect_equal(
+        names(x + named),
+        names(named)
+    )
+    expect_equal(
+        names(y + named),
+        names(named)
+    )
+    expect_equal(
+        names(x * vec),
+        names(vec)
+    )
+    expect_equal(
+        names(y * vec),
+        names(vec)
+    )
+    expect_equal(
+        dimnames(x / mat),
+        dimnames(mat)
+    )
+    expect_equal(
+        dimnames(x - named_mat),
+        dimnames(named_mat)
     )
 })
 

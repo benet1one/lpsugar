@@ -62,6 +62,18 @@ dim2 <- function(x) {
         dim(x)
     }
 }
+dimnames2 <- function(x) {
+    if (!is.null(dimnames(x))) {
+        return(dimnames(x))
+    } 
+    else if (!is.null(names(x))) {
+        list(names(x))
+    }
+    else {
+        NULL
+    }
+}
+
 format_dim <- function(x, dim = dim2(x)) {
     paste0("(", paste(dim, collapse = ", "), ")")
 }
@@ -81,6 +93,12 @@ same_dimensions <- function(x, y, dim_x = dim2(x), dim_y = dim2(y)) {
     length(dim_x) == length(dim_y)  &&  all(dim_x == dim_y)
 }
 
+drop_to_vec <- function(x) {
+    x <- drop(x)
+    if (ndim(x) == 1L) x <- c(x)
+    return(x)
+}
+
 # Checks that arguments are conformable and returns an object (robust_index) with
 # the dimensions of the output
 check_conformable <- function(x, y, drop_dim = TRUE, call = parent.frame()) {
@@ -92,8 +110,8 @@ check_conformable <- function(x, y, drop_dim = TRUE, call = parent.frame()) {
     }
     
     if (drop_dim) {
-        x <- drop(x)
-        y <- drop(y)
+        x <- drop_to_vec(x)
+        y <- drop_to_vec(y)
     }
     
     if (length(x) > 1L && length(y) > 1L && length(x) != length(y)) {
@@ -119,6 +137,10 @@ check_conformable <- function(x, y, drop_dim = TRUE, call = parent.frame()) {
     }
     
     attempt
+}
+operation_indices <- function(base_ind = 1L, x, y, call = parent.frame()) {
+    result <- check_conformable(x, y, call = call)
+    array(base_ind, dim = dim2(result), dimnames = dimnames2(result))
 }
 
 dimnames_non_numeric <- function(dimnames) {

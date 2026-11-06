@@ -130,7 +130,7 @@ add_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
     
-    if (xv && yv) {
+    out <- if (xv && yv) {
         add_v_v(x, y, call)
     } 
     else if (xv) {
@@ -142,12 +142,15 @@ add_lp <- function(x, y, call) {
     else {
         cli_abort("None are lp_variables", call = call)
     }
+    
+    out$ind <- operation_indices(out$ind, x, y, call = call)
+    return(out)
 }
 subtract_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
     
-    if (xv && yv) {
+    out <- if (xv && yv) {
         subtract_v_v(x, y, call)
     } 
     else if (xv) {
@@ -159,12 +162,15 @@ subtract_lp <- function(x, y, call) {
     else {
         cli_abort("None are lp_variables", call = call)
     }
+    
+    out$ind <- operation_indices(out$ind, x, y, call = call)
+    return(out)
 }
 multiply_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
     
-    if (xv && yv) {
+    out <- if (xv && yv) {
         multiply_v_v(x, y, call)
     } 
     else if (xv) {
@@ -176,9 +182,12 @@ multiply_lp <- function(x, y, call) {
     else {
         cli_abort("None are lp_variables", call = call)
     }
+    
+    out$ind <- operation_indices(out$ind, x, y, call = call)
+    return(out)
 }
 divide_lp <- function(x, y, call) {
-    if (is_lp_variable(y)) {
+    out <- if (is_lp_variable(y)) {
         divide_a_v(x, y, call)
     } 
     else if (is_lp_variable(x)) {
@@ -187,14 +196,20 @@ divide_lp <- function(x, y, call) {
     else {
         cli_abort("None are lp_variables", call = call)
     }
+    
+    out$ind <- operation_indices(out$ind, x, y, call = call)
+    return(out)
 }
 power_lp <- function(x, y, call) {
-    if (is_lp_variable(x) && !is_lp_variable(y)) {
+    out <- if (is_lp_variable(x) && !is_lp_variable(y)) {
         power_v_c(x, y, call)
     } 
     else {
         cli_abort("Non-quadratic operation.", call = call)
     }
+    
+    out$ind <- operation_indices(out$ind, x, y, call = call)
+    return(out)
 }
 
 # -var
