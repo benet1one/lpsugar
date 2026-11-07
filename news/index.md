@@ -1,5 +1,11 @@
 # Changelog
 
+## lpsugar 0.30.5
+
+### Improvements
+
+- Long variables and aliases are no longer printed on the solution.
+
 ## lpsugar 0.30.4
 
 ### Improvements
