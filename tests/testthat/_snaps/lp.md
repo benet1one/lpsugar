@@ -122,3 +122,35 @@
       roi_code 1
       
 
+# print solution
+
+    Code
+      s
+    Output
+      -- $variables
+      $scalar
+      [1] 0
+      
+      $short_mat
+            1:2
+      1:2    [,1] [,2]
+        [1,]    0    0
+        [2,]    0    0
+      
+      $long_vec
+      (Too long for printing)
+      
+      -- $aliases
+      $twice_vec
+      (Too long for printing)
+      
+      $short_vec
+       [1] 0 0 0 0 0 0 0 0 0 0
+      
+      -- $objective
+      [1] 0
+      
+      -- $status
+      Optimal Solution Found [v] 
+      
+

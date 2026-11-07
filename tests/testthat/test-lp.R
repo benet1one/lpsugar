@@ -215,3 +215,19 @@ test_that("solvers", {
         )
     )
 })
+
+test_that("print solution", {
+    withr::local_package("ROI.plugin.highs")
+    
+    s <- lp_problem() |> 
+        lp_var(scalar) |> 
+        lp_var(short_mat[1:2, 1:2]) |> 
+        lp_var(long_vec[1:80]) |> 
+        lp_alias(
+            twice_vec = long_vec * 2,
+            short_vec = long_vec[1:10]
+        ) |> 
+        lp_find_feasible()
+    
+    expect_snapshot(s)
+})
