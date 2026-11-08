@@ -483,29 +483,28 @@ bind_cv <- function(x, y) {
         return(x)
     }
     
-    old_ind <- x$ind
-    old_ind[] <- seq_along(old_ind)
+    i <- x$ind
+    i[] <- seq_along(i)
     
-    old_ind <- rlang::try_fetch(
-        old_ind[..., drop = drop], 
+    i <- rlang::try_fetch(
+        i[..., drop = drop], 
         error = identity
     )
     
-    if (rlang::is_condition(old_ind)) {
+    if (rlang::is_condition(i)) {
         dots <- rlang::enexprs(..., .ignore_empty = "none")
         call <- rlang::expr((!!substitute(x))[!!!dots])
-        cli_abort(old_ind$message, call = call)
+        cli_abort(i$message, call = call)
     }
     
-    old_ind <- c(old_ind)
     x$ind <- x$ind[..., drop = drop]
     
     if (is_quadratic(x)) {
-        x$Q <- x$Q[old_ind]
+        x$Q <- x$Q[i]
     }
     
-    x$L <- x$L[old_ind, ]
-    x$A <- x$A[old_ind, ]
+    x$L <- x$L[i, ]
+    x$A <- x$A[i, ]
     
     transformed_variable(x, check_na = FALSE)
 }
@@ -526,9 +525,7 @@ bind_cv <- function(x, y) {
             cli_abort(i$message, call = call)
         }
     }
-    
-    i <- c(i)
-    
+
     if (is_lp_variable(value)) {
         y <- recycle_var(value, length(i))
         
