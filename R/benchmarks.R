@@ -9,12 +9,16 @@ transportation_benchmark <- function(n_warehouses = 50, n_markets = 20) {
     M <- paste0("Market-", 1:m)
     
     withr::with_seed(123, {
-        cost <- runif(n*m)
-        stock <- runif(n)
-        demand <- runif(m) |> parameter(M)
+        cost <- stats::runif(n*m)
+        stock <- stats::runif(n)
+        demand <- stats::runif(m) |> parameter(M)
         stock <- stock / sum(stock)
         demand <- 0.9 * demand / sum(demand)
     })
+    
+    # Happy checker
+    x <- NULL
+    built <- NULL
     
     lp_problem() |> 
         lp_var(x[W, M], lower = 0) |> 
