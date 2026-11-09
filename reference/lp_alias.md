@@ -303,7 +303,7 @@ p1$aliases
 #> [4,]      0      0      0      1      0      0
 #> [5,]      0      0      0      1      1      0
 #> [6,]      0      0      0      1      1      1
-#> with class 'robust_index' from package 'lpsugar'
+#> with class 'lpsugar_nodrop'
 #> 
 #> $A
 #>      [,1]
@@ -313,7 +313,7 @@ p1$aliases
 #> [4,]    0
 #> [5,]    0
 #> [6,]    0
-#> with class 'robust_index' from package 'lpsugar'
+#> with class 'lpsugar_nodrop'
 #> 
 #> 
 

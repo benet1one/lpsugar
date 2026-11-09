@@ -1,5 +1,21 @@
 # Changelog
 
+## lpsugar 0.31.0
+
+### Bug Fixes
+
+- Constraints no longer use a common environment, so they are now
+  completely independent.
+
+### Performance Improvements
+
+- Indexing variables is now faster.
+
+### Breaking Changes
+
+- Class has been renamed to for better traceability.
+- The variable coefficient fields (Q, L, and A) are now class instead of
+
 ## lpsugar 0.30.5
 
 ### Improvements
