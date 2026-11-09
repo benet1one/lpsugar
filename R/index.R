@@ -1,3 +1,31 @@
+# New Objects ------------------------------
+
+as_nodrop <- function(x) {
+    if (inherits(x, "lpsugar_nodrop")) {
+        x
+    } else {
+        structure(x, class = c("lpsugar_nodrop", class(x)))
+    }
+}
+
+unclass_nodrop <- function(x) {
+    class(x) <- class(x)[class(x) != "lpsugar_nodrop"]
+    x
+}
+
+#' @export
+print.lpsugar_nodrop <- function(x, ...) {
+    print(unclass(x))
+    cat("with class 'lpsugar_nodrop'\n")
+    invisible(x)
+}
+
+#' @export
+`[.lpsugar_nodrop` <- function(x, ..., drop = FALSE) {
+    NextMethod(drop = drop) |> as_nodrop()
+}
+
+# Legacy Objects ---------------------------
 
 # check out-of-bounds indices and makes drop = FALSE by default
 robust_index <- function(x) {

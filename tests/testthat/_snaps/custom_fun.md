@@ -17,13 +17,13 @@
            x[1,1] x[2,1] x[1,2] x[2,2] diag
       [1,]      1      0      0      0    0
       [2,]      0      0      0      1    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $A
            [,1]
       [1,]    0
       [2,]    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
 
 # ifelse2

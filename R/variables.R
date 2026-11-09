@@ -208,7 +208,7 @@ update_variables <- function(.problem, field = "variables") {
         
         x$L <- x$L |> 
             cbind(matrix(0, nrow = nrow(x$L), ncol = add_n)) |> 
-            robust_index()
+            as_nodrop()
 
         colnames(x$L) <- varnames
         vars[[i]] <- x
@@ -433,8 +433,8 @@ bind_vv <- function(x, y) {
         z$Q <- c(x$Q, y$Q)
     }
     
-    z$L <- rbind(x$L, y$L) |> robust_index()
-    z$A  <- rbind(x$A,  y$A)  |> robust_index()
+    z$L <- rbind(x$L, y$L) |> as_nodrop()
+    z$A <- rbind(x$A, y$A) |> as_nodrop()
     
     transformed_variable(z, check_na = FALSE)
 }
@@ -453,12 +453,12 @@ bind_vc <- function(x, y) {
     x$L <- rbind(
         x$L,
         matrix(0, nrow = length(y), ncol = ncol(x$L))
-    ) |> robust_index()
+    ) |> as_nodrop()
     
     x$A <- rbind(
         x$A,
         matrix(y, ncol = 1L)
-    ) |> robust_index()
+    ) |> as_nodrop()
     
     transformed_variable(x)
 }
@@ -806,13 +806,13 @@ variable_indices <- function(old_n, definition, fixed_at) {
 new_A_coef <- function(ind, fixed_at, fixed_values) {
     A <- matrix(0, ncol = 1, nrow = length(ind))
     A[fixed_at] <- fixed_values
-    robust_index(A)
+    as_nodrop(A)
 }
 new_L_coef <- function(ind, ncol, colnames, fixed_at) {
     L <- matrix(0, ncol = ncol, nrow = length(ind))
     L[!fixed_at, ind[!fixed_at]] <- diag(sum(!fixed_at))
     colnames(L) <- colnames
-    robust_index(L)
+    as_nodrop(L)
 }
 
 # Gives the colnames of $L

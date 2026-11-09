@@ -79,10 +79,10 @@ sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     
     x$L <- colSums(x$L) |>
         matrix(nrow = 1L) |>
-        robust_index()
+        as_nodrop()
     x$A <- sum(x$A) |>
         matrix(nrow = 1L, ncol = 1L) |>
-        robust_index()
+        as_nodrop()
     
     colnames(x$L) <- varnames
     

@@ -17,14 +17,14 @@
       [1,]      1      0      0      1      0      0
       [2,]      0      1      0      0      1      0
       [3,]      0      0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $A
            [,1]
       [1,]    0
       [2,]    0
       [3,]    5
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
 
 ---
@@ -54,7 +54,7 @@
        [7,]      0      0      0      0      0      0      0      0      1
        [8,]      0      0      0      0      0      0      0      0      1
        [9,]      0      0      0      0      0      0      0      0      1
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $A
             [,1]
@@ -67,7 +67,7 @@
        [7,]    2
        [8,]    2
        [9,]    2
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
 
 ---
@@ -89,14 +89,14 @@
       [1,]    2    0    0
       [2,]    0    2    0
       [3,]    0    0    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $A
            [,1]
       [1,]    0
       [2,]    0
       [3,]    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $Q
       $Q[[1]]
@@ -116,7 +116,7 @@
       x[a]    2    2    2
       x[b]    2    2    2
       x[c]    2    2    2
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       
 

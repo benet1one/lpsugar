@@ -9,21 +9,21 @@
       z[1]    0    0    0
       z[2]    0    0    0
       z[3]    0    0    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $Q[[2]]
            z[1] z[2] z[3]
       z[1]    0    0    0
       z[2]    0    0    0
       z[3]    0    0    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $Q[[3]]
            z[1] z[2] z[3]
       z[1]    0    0    0
       z[2]    0    0    0
       z[3]    0    0    2
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       
       $L
@@ -31,14 +31,14 @@
       [1,]    0    0    0
       [2,]    0    1    0
       [3,]    0    0    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $A
            [,1]
       [1,]    1
       [2,]    0
       [3,]    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
 
 # ifelse quadratic
