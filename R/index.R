@@ -18,8 +18,11 @@ print.robust_index <- function(x, ...) {
 #' @export
 `[.robust_index` <- function(x, ..., drop = FALSE) {
     if (...length() == 1L) {
-        check_index_valid_vector(x, index = c(...))
+        check_index_valid_vector(x, index = ...elt(1L))
     } 
+    else if (is.vector(x)) {
+        cli_abort("Incorrect number of dimensions.")
+    }
     else if (is.array(x)) {
         d <- dim(x)
         
@@ -30,13 +33,11 @@ print.robust_index <- function(x, ...) {
         dots <- rlang::dots_list(..., .ignore_empty = "none", .preserve_empty = TRUE)
         
         for (margin in 1:length(d)) {
-            dm <- dots[[margin]]
+            im <- dots[[margin]]
             
-            if (rlang::is_missing(dm)) {
+            if (rlang::is_missing(im)) {
                 next
             }
-            
-            im <- eval(dm, envir = parent.frame())
             
             check_index_valid_array(
                 x,
@@ -45,13 +46,6 @@ print.robust_index <- function(x, ...) {
             )
         }
     } 
-    else if (is.vector(x)) {
-        if (...length() != 1L) {
-            cli_abort("Incorrect number of dimensions.")
-        }
-        
-        check_index_valid_vector(x, index = im)
-    }
     
     NextMethod(drop = drop) |> robust_index()
 }

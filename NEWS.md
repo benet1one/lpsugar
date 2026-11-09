@@ -6,7 +6,7 @@
 
 ## Performance Improvements
 
-* Indexing variables is slightly faster.
+* Indexing variables is now faster.
 
 # lpsugar 0.30.5
 

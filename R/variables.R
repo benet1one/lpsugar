@@ -497,7 +497,7 @@ bind_cv <- function(x, y) {
         cli_abort(i$message, call = call)
     }
     
-    x$ind <- x$ind[..., drop = drop]
+    x$ind <- i
     
     if (is_quadratic(x)) {
         x$Q <- x$Q[i]
