@@ -10,7 +10,7 @@
 
 ## Breaking Changes
 
-* Class <robust_index> has been renamed to <lpsugar_robust_indexing> for
+* Class <robust_index> has been renamed to <lpsugar_robust_index> for
 better traceability.
 * The variable coefficient fields (Q, L, and A) are now class <lpsugar_nodrop>
 instead of <robust_index>
