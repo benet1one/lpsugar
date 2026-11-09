@@ -99,7 +99,7 @@ drop_to_vec <- function(x) {
     return(x)
 }
 
-# Checks that arguments are conformable and returns an object (robust_index) with
+# Checks that arguments are conformable and returns an object with
 # the dimensions of the output
 check_conformable <- function(x, y, drop_dim = TRUE, call = parent.frame()) {
     if (is_lp_variable(x)) {

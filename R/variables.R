@@ -425,7 +425,7 @@ bind_vv <- function(x, y) {
     z <- x
     z$ind  <- seq_len(length(x) + length(y)) |>
         unname() |>
-        robust_index()
+        as_robust_index()
     
     if (is_quadratic(x) || is_quadratic(y)) {
         x <- as_quadratic(x)
@@ -442,7 +442,7 @@ bind_vv <- function(x, y) {
 bind_vc <- function(x, y) {
     x$ind <- c(x$ind, numeric(length(y))) |>
         unname() |>
-        robust_index()
+        as_robust_index()
     x$ind[] <- seq_along(x$ind)
     
     if (is_quadratic(x)) {
@@ -466,7 +466,7 @@ bind_vc <- function(x, y) {
 bind_cv <- function(x, y) {
     i <- c(seq_along(x) + length(y), seq_along(y))
     z <- bind_vc(y, x)[i]
-    z$ind <- seq_along(i) |> robust_index()
+    z$ind <- seq_along(i) |> as_robust_index()
     return(z)
 }
 
@@ -800,7 +800,7 @@ variable_indices <- function(old_n, definition, fixed_at) {
         ind[!fixed_at] <- seq_along(ind[!fixed_at]) + old_n
     }
     
-    robust_index(ind)
+    as_robust_index(ind)
 }
 
 new_A_coef <- function(ind, fixed_at, fixed_values) {

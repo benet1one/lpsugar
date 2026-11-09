@@ -28,23 +28,23 @@ print.lpsugar_nodrop <- function(x, ...) {
 # Legacy Objects ---------------------------
 
 # check out-of-bounds indices and makes drop = FALSE by default
-robust_index <- function(x) {
+as_robust_index <- function(x) {
     if (slam::is.simple_triplet_matrix(x)) {
         cli_warn("atempt to use robust_index() on a <simple_triplet_matrix>")
         return(x)
     }
-    structure(x, class = unique(c("robust_index", class(x))))
+    structure(x, class = unique(c("lpsugar_robust_index", class(x))))
 }
 
 #' @export
-print.robust_index <- function(x, ...) {
+print.lpsugar_robust_index <- function(x, ...) {
     print(unclass(x))
-    cat("with class 'robust_index' from package 'lpsugar'\n")
+    cat("with class 'lpsugar_robust_index'\n")
     invisible(x)
 }
 
 #' @export
-`[.robust_index` <- function(x, ..., drop = FALSE) {
+`[.lpsugar_robust_index` <- function(x, ..., drop = FALSE) {
     if (...length() == 1L) {
         check_index_valid_vector(x, index = ...elt(1L))
     } 
@@ -75,7 +75,7 @@ print.robust_index <- function(x, ...) {
         }
     } 
     
-    NextMethod(drop = drop) |> robust_index()
+    NextMethod(drop = drop) |> as_robust_index()
 }
 
 check_index_valid_array <- function(x, margin, index, call = parent.frame()) {

@@ -10,7 +10,7 @@
       A
       a b c 
       1 2 3 
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_robust_index'
       
       $L
            x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B]
@@ -41,7 +41,7 @@
         a 1 4 7
         b 2 5 8
         c 3 6 9
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_robust_index'
       
       $L
             x[a,a] x[b,a] x[c,a] x[a,b] x[b,b] x[c,b] x[a,c] x[b,c] x[c,c]
@@ -82,7 +82,7 @@
       A
       a b c 
       1 2 3 
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_robust_index'
       
       $L
            x[a] x[b] x[c]

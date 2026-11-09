@@ -312,7 +312,7 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     
     if (is.array(out_ind)) {
         out_ind[] <- seq_along(out_ind)
-        out$ind <- out_ind |> robust_index()
+        out$ind <- out_ind |> as_robust_index()
     } 
     else {
         out$ind <- 1:nrow(out$L)
