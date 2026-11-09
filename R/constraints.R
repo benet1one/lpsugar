@@ -33,7 +33,6 @@ lp_constraint <- function(.problem, ...) {
     check_problem(.problem)
     quos <- rlang::enquos(...)
     nams <- rlang::names2(quos)
-    data <- data_mask(.problem)
     varnames <- c(
         names(.problem$variables), 
         names(.problem$aliases)
@@ -50,7 +49,6 @@ lp_constraint <- function(.problem, ...) {
         cons[[i]] <- lp_constraint_internal(
             quosure = quos[[i]],
             id = nams[i],
-            data = data,
             varnames = varnames,
             problem = .problem
         )
@@ -69,7 +67,7 @@ lp_constraint <- function(.problem, ...) {
     return(.problem)
 }
 
-lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
+lp_constraint_internal <- function(quosure, id, varnames, problem) {
     if (!any(all.vars(quosure) %in% varnames)) {
         msg <- "Constraint does not contain any variables."
         
@@ -83,6 +81,7 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
         )
     }
     
+    data <- data_mask(problem)
     cons <- eval_split_for(quosure, data = data)
     expr <- format1(quosure)
     ids <- rlang::names2(cons)
