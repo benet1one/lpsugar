@@ -8,6 +8,13 @@
 
 * Indexing variables is now faster.
 
+## Breaking Changes
+
+* Class <robust_index> has been renamed to <lpsugar_robust_indexing> for
+better traceability.
+* The variable coefficient fields (Q, L, and A) are now class <lpsugar_nodrop>
+instead of <robust_index>
+
 # lpsugar 0.30.5
 
 ## Improvements
