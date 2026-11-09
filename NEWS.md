@@ -1,3 +1,13 @@
+# lpsugar (development version)
+
+## Bug Fixes
+
+* Constraints no longer use a common environment, so they are now completely independent.
+
+## Performance Improvements
+
+* Indexing variables is slightly faster.
+
 # lpsugar 0.30.5
 
 ## Improvements
