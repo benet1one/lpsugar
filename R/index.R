@@ -33,7 +33,11 @@ as_robust_index <- function(x) {
         cli_warn("atempt to use robust_index() on a <simple_triplet_matrix>")
         return(x)
     }
-    structure(x, class = unique(c("lpsugar_robust_index", class(x))))
+    if (inherits(x, "lpsugar_robust_index")) {
+        x
+    } else {
+        structure(x, class = c("lpsugar_robust_index", class(x)))
+    }
 }
 
 #' @export
