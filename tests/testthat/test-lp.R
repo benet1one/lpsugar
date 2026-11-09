@@ -231,3 +231,8 @@ test_that("print solution", {
     
     expect_snapshot(s)
 })
+
+test_that("benchmarks work", {
+    transportation_benchmark()
+    expect_no_error(0)
+})
