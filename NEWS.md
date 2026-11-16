@@ -1,3 +1,10 @@
+# lpsugar (development version)
+
+## Improvements
+
+* Variables have cleaner dimnames. When defining a variable such as `x[1:5, b]`, 
+the name of the first dimension is now empty instead of being `"1:5"`.
+
 # lpsugar 0.31.0
 
 ## Bug Fixes
