@@ -359,7 +359,7 @@ test_that("operations", {
 
     expect_error(y + z, "Length mismatch")
     expect_error(y * 1:2, "Length mismatch")
-    expect_error(z + t(z), "non-conformable")
+    expect_error(z + t(z), "Non-conformable")
 
     p2 <- lp_problem() |>
         lp_variable(u[1:2, 1:2, 1:3]) |>
@@ -378,8 +378,8 @@ test_that("operations", {
     u[1,,1] - t[,1,1]
     u[1,1,] - t[1,,1]
 
-    expect_error(u[1,,] + t[1,,], "non-conformable")
-    expect_error(t + b, "non-conformable")
+    expect_error(u[1,,] + t[1,,], "Non-conformable")
+    expect_error(t + b, "Non-conformable")
 
     expect_snapshot(diff(y) $ L)
     expect_snapshot(diff(y, lag = 2) $ L)

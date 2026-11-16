@@ -124,11 +124,11 @@ check_conformable <- function(x, y, drop_dim = TRUE, call = parent.frame()) {
         )
     }
     
-    attempt <- rlang::try_fetch(x + y, warning = identity, error = identity)
+    attempt <- rlang::try_fetch(x + y, error = identity)
     
     if (rlang::is_error(attempt)) {
         cli_abort(
-            c(attempt$message,
+            c("Non-conformable arrays.",
               "x" =  "Left hand side has dimensions {format_dim(x)}",
               "x" = "Right hand side has dimensions {format_dim(y)}"), 
             class = "lpsugar_error_non_conformable",
