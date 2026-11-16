@@ -1,4 +1,4 @@
-# lpsugar (development version)
+# lpsugar 0.31.1
 
 ## Improvements
 
