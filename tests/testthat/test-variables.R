@@ -208,8 +208,34 @@ test_that("variable indexing", {
     expect_error(y[4], "out of bounds")
     expect_error(y[-4], "out of bounds")
     expect_error(y[0], "Invalid subscript")
-    expect_error(y["d"], "Invalid subscript 'd'")
+    expect_error(y["d"], "Invalid subscript: d(.*)Names are: a, b, and c.")
     expect_error(y[1,1], "Incorrect number of dimensions")
+    expect_error(y[c(1, NA)], "Subscript contains NA values")
+    expect_error(y[TRUE], "Subscript length mismatch.")
+    expect_error(z[TRUE, ], "Subscript length mismatch in dimension 1.")
+    expect_error(x["A"], "Object is unnamed.(.*)Subscript is class <character>.")
+    expect_error(x[factor("A")], "Object is unnamed.(.*)Subscript is class <factor>.")
+    expect_error(z["A", ], "Object is unnamed in dimension 1.")
+    expect_error(y[data.frame()], "Invalid subscript of class <data.frame>.")
+    
+    expect_error(
+        z[5, ],
+        paste(
+            "Subscript out of bounds in dimension 1.",
+            "Invalid subscript: 5.",
+            "Dimension 1 is length 2.",
+            sep = ".*"
+        )
+    )
+    expect_error(
+        z[, letters[3:5]],
+        paste(
+            "Invalid subscript in dimension 2 \\(a\\).",
+            "Invalid subscript: d.",
+            "Names in dimension 2 \\(a\\) are: a, b, and c.",
+            sep = ".*"
+        )
+    )
 
     # Transpose
     expect_identical(z$L, t(t(z))$L)

@@ -496,7 +496,7 @@ bind_cv <- function(x, y) {
     if (rlang::is_condition(i)) {
         dots <- rlang::enexprs(..., .ignore_empty = "none")
         call <- rlang::expr((!!substitute(x))[!!!dots])
-        cli_abort(i$message, call = call)
+        rlang::abort(rlang::cnd_message(i), call = call)
     }
     
     x$ind <- i
