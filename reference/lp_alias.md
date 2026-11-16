@@ -222,24 +222,24 @@ p0$constraints
 #> | Rows = 6
 #> 
 #>                   x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs
-#>   min[i=1, j="A"] 1      0      0      0      0      0      >=  1  
-#>   min[i=2, j="A"] 1      1      0      0      0      0      >=  1  
-#>   min[i=3, j="A"] 1      1      1      0      0      0      >=  5  
-#>   min[i=1, j="B"] 0      0      0      1      0      0      >=  0  
-#>   min[i=2, j="B"] 0      0      0      1      1      0      >=  0  
-#>   min[i=3, j="B"] 0      0      0      1      1      1      >=  3  
+#>   min[j="A", i=1] 1      0      0      0      0      0      >=  1  
+#>   min[j="A", i=2] 1      1      0      0      0      0      >=  1  
+#>   min[j="A", i=3] 1      1      1      0      0      0      >=  5  
+#>   min[j="B", i=1] 0      0      0      1      0      0      >=  0  
+#>   min[j="B", i=2] 0      0      0      1      1      0      >=  0  
+#>   min[j="B", i=3] 0      0      0      1      1      1      >=  3  
 #> 
 #> max
 #> | for (j in Cols) for (i in seq_along(Rows)) { ... }
 #> | Rows = 6
 #> 
 #>                   x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs
-#>   max[i=1, j="A"] 1      0      0      0      0      0      <=  4  
-#>   max[i=2, j="A"] 1      1      0      0      0      0      <=  5  
-#>   max[i=3, j="A"] 1      1      1      0      0      0      <=  9  
-#>   max[i=1, j="B"] 0      0      0      1      0      0      <=  3  
-#>   max[i=2, j="B"] 0      0      0      1      1      0      <=  9  
-#>   max[i=3, j="B"] 0      0      0      1      1      1      <=  7  
+#>   max[j="A", i=1] 1      0      0      0      0      0      <=  4  
+#>   max[j="A", i=2] 1      1      0      0      0      0      <=  5  
+#>   max[j="A", i=3] 1      1      1      0      0      0      <=  9  
+#>   max[j="B", i=1] 0      0      0      1      0      0      <=  3  
+#>   max[j="B", i=2] 0      0      0      1      1      0      <=  9  
+#>   max[j="B", i=3] 0      0      0      1      1      1      <=  7  
 #> 
 #> A_less_than_B
 #> | for (i in seq_along(Rows)) { ... }

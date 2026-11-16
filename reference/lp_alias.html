@@ -273,24 +273,24 @@ a linear function of previously defined variables or aliases.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>Rows = 6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   min[i=1, j="A"] 1      0      0      0      0      0      &gt;=  1  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   min[i=2, j="A"] 1      1      0      0      0      0      &gt;=  1  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   min[i=3, j="A"] 1      1      1      0      0      0      &gt;=  5  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   min[i=1, j="B"] 0      0      0      1      0      0      &gt;=  0  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   min[i=2, j="B"] 0      0      0      1      1      0      &gt;=  0  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   min[i=3, j="B"] 0      0      0      1      1      1      &gt;=  3  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min[j="A", i=1] 1      0      0      0      0      0      &gt;=  1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min[j="A", i=2] 1      1      0      0      0      0      &gt;=  1  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min[j="A", i=3] 1      1      1      0      0      0      &gt;=  5  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min[j="B", i=1] 0      0      0      1      0      0      &gt;=  0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min[j="B", i=2] 0      0      0      1      1      0      &gt;=  0  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min[j="B", i=3] 0      0      0      1      1      1      &gt;=  3  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> max</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>for (j in Cols) for (i in seq_along(Rows)) { ... }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>Rows = 6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   x[a,A] x[b,A] x[c,A] x[a,B] x[b,B] x[c,B] dir rhs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   max[i=1, j="A"] 1      0      0      0      0      0      &lt;=  4  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   max[i=2, j="A"] 1      1      0      0      0      0      &lt;=  5  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   max[i=3, j="A"] 1      1      1      0      0      0      &lt;=  9  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   max[i=1, j="B"] 0      0      0      1      0      0      &lt;=  3  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   max[i=2, j="B"] 0      0      0      1      1      0      &lt;=  9  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   max[i=3, j="B"] 0      0      0      1      1      1      &lt;=  7  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   max[j="A", i=1] 1      0      0      0      0      0      &lt;=  4  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   max[j="A", i=2] 1      1      0      0      0      0      &lt;=  5  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   max[j="A", i=3] 1      1      1      0      0      0      &lt;=  9  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   max[j="B", i=1] 0      0      0      1      0      0      &lt;=  3  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   max[j="B", i=2] 0      0      0      1      1      0      &lt;=  9  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   max[j="B", i=3] 0      0      0      1      1      1      &lt;=  7  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A_less_than_B</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">| </span>for (i in seq_along(Rows)) { ... }</span>

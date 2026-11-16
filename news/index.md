@@ -9,6 +9,10 @@
   `x[1:5, b]`, the name of the first dimension is now empty instead of
   being `"1:5"`.
 
+### Performance Improvements
+
+- The `for` notation for defining constraints is now slightly faster.
+
 ### Bug Fixes
 
 - Scalar variables no longer have `"n_variables"` as a name.
