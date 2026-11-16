@@ -791,7 +791,7 @@ variable_indices <- function(old_n, definition, fixed_at) {
             ind <- NA_integer_
         }
         else {
-            ind <- old_n + 1L
+            ind <- unname(old_n + 1L)
         }
     } 
     else {
