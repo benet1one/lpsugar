@@ -1,5 +1,18 @@
 # Changelog
 
+## lpsugar 0.31.1
+
+### Improvements
+
+- When indexing variables, errors messages are now more helpful.
+- Variables have cleaner dimnames. When defining a variable such as
+  `x[1:5, b]`, the name of the first dimension is now empty instead of
+  being `"1:5"`.
+
+### Bug Fixes
+
+- Scalar variables no longer have `"n_variables"` as a name.
+
 ## lpsugar 0.31.0
 
 ### Bug Fixes
