@@ -146,8 +146,14 @@ operation_indices <- function(base_ind = 1L, x, y, call = parent.frame()) {
 dimnames_non_numeric <- function(dimnames) {
     for (i in seq_along(dimnames)) {
         d <- dimnames[[i]]
+        nam <- names(dimnames)[i]
+        
         if (is.numeric(d) && all(d == seq_along(d))) {
             dimnames[i] <- list(NULL)
+            
+            if (grepl("^1", nam)) {
+                names(dimnames)[i] <- ""
+            }
         }
     }
     

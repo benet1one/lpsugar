@@ -279,7 +279,9 @@ print.lp_variable <- function(x, ...) {
     cat(x$name)
     
     if (length(x) > 1L) {
-        cat("[", paste(names(dimnames(x)), collapse = ", "), "]", sep = "")
+        dnn <- names(dimnames(x))
+        dnn[dnn == ""] <- paste0("1:", dim(x)[dnn == ""])
+        cat("[", paste(dnn, collapse = ", "), "]", sep = "")
     }
     
     cat("'")
