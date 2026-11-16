@@ -13,6 +13,7 @@ eval_split_for <- function(quosure, data = NULL) {
     expr <- include_all_element_adders(expr)
     result_env <- rlang::new_environment(parent = env)
     result_env$.___ind_names <- get_loop_indices(expr)
+    result_env$.___format_ind <- format_ind
     
     with(result_env, {
         .___result <- base::list()
@@ -21,20 +22,13 @@ eval_split_for <- function(quosure, data = NULL) {
             ind <- mget(.___ind_names, envir = parent.frame(), ifnotfound = 0)
             ind <- ind[.___ind_names]
             
-            val <- sapply(ind, format_ind)
+            val <- sapply(ind, .___format_ind)
             ind_txt <- paste0(names(ind), "=", val, collapse = ", ")
             
             x # prevents execution when there's a `next`
             
-            .___indices <<- base::c(
-                .___indices,
-                ind_txt
-            )
-            
-            .___result <<- base::c(
-                .___result,
-                base::list(x)
-            )
+            .___indices <<- c(.___indices, ind_txt)
+            .___result <<- c(.___result, list(x))
         }
     })
     
