@@ -1,6 +1,7 @@
 
 Code
 - Check TODOs
+- Fasten operations by recycling smarter
 
 Nonlinear
 - gradient
