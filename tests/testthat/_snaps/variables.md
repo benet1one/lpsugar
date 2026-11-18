@@ -1,3 +1,20 @@
+# variable printing
+
+    Code
+      lp_eval(p, z + 1)
+    Output
+      $L: Matrix (30 x 34)
+      $A: Vector of length 30
+
+---
+
+    Code
+      lp_eval(p, z^2)
+    Output
+      $Q: List of 30 matrices (34 x 34)
+      $L: Matrix (30 x 34)
+      $A: Vector of length 30
+
 # variable definitions
 
     Code
@@ -53,7 +70,7 @@
       [6,]    0    0    0      0      0      0      1
       [7,]    1    0    0      0      0      0      0
       [8,]    0    0    0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $A
            [,1]
@@ -65,7 +82,7 @@
       [6,]    0
       [7,]    0
       [8,]    3
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
 
 ---
@@ -83,7 +100,7 @@
       y[2,1]    0    0    0      0      0      0      0
       y[1,2]    0    0    0      0      0      0      0
       y[2,2]    0    0    0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $Q[[2]]
              x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
@@ -94,7 +111,7 @@
       y[2,1]    0    0    0      0      0      0      0
       y[1,2]    0    0    0      0      0      0      0
       y[2,2]    0    0    0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $Q[[3]]
              x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
@@ -105,7 +122,7 @@
       y[2,1]    0    0    0      0      0      0      0
       y[1,2]    0    0    0      0      0      0      0
       y[2,2]    0    0    0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $Q[[4]]
              x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
@@ -116,7 +133,7 @@
       y[2,1]    0    0    0      0      0      0      0
       y[1,2]    0    0    0      0      0      0      0
       y[2,2]    0    0    0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $Q[[5]]
              x[1] x[2] x[3] y[1,1] y[2,1] y[1,2] y[2,2]
@@ -127,7 +144,7 @@
       y[2,1]    0    0    0      0      0      0      0
       y[1,2]    0    0    0      0      0      0      0
       y[2,2]    0    0    0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       
       $L
@@ -137,7 +154,7 @@
       [3,]    0    0    0      0      0      0      0
       [4,]    0    0    0      0      0      0      0
       [5,]    0    0    0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $A
            [,1]
@@ -146,7 +163,7 @@
       [3,]    0
       [4,]    0
       [5,]    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
 
 # variable indexing
@@ -162,7 +179,7 @@
       [4,] 0    0    0    0      0      1      0      0      0      0
       [5,] 0    0    0    0      0      0      0      1      0      0
       [6,] 0    0    0    0      0      0      0      0      0      1
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $A
            [,1]
@@ -172,7 +189,7 @@
       [4,]    0
       [5,]    0
       [6,]    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
 
 ---
@@ -209,7 +226,7 @@
       [4,]             0             0             0
       [5,]             0             0             0
       [6,]             0             0             0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
       $A
            [,1]
@@ -219,7 +236,7 @@
       [4,]    0
       [5,]    0
       [6,]    0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
       
 
 # operations
@@ -230,7 +247,7 @@
            x y[a] y[b] y[c] z[1,a] z[2,a] z[1,b] z[2,b] z[1,c] z[2,c]
       [1,] 0   -1    1    0      0      0      0      0      0      0
       [2,] 0    0   -1    1      0      0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
 
 ---
 
@@ -239,5 +256,5 @@
     Output
            x y[a] y[b] y[c] z[1,a] z[2,a] z[1,b] z[2,b] z[1,c] z[2,c]
       [1,] 0   -1    0    1      0      0      0      0      0      0
-      with class 'robust_index' from package 'lpsugar'
+      with class 'lpsugar_nodrop'
 

@@ -334,21 +334,46 @@ solution.lp_solution <- function(
 
 # Methods -------------------------------
 
+#' Print method for solutions.
+#' @keywords internal
+#' @param x A solution.
+#' @param max_len Integer, maximum length of printed variables and aliases.
+#' @param ... Ignored.
+#' 
 #' @export
-print.lp_solution <- function(x, ...) {
+print.lp_solution <- function(x, max_len = 50L, ...) {
     if (!is.na(x$objective)) {
-        print_field(x, "variables")
+        print_field_name("variables")
+        print_solution_vars(x$variables, max_len)
         
         if (length(x$aliases) > 0L) {
-            print_field(x, "aliases")
+            print_field_name("aliases")
+            print_solution_vars(x$aliases, max_len)
         }
         
         print_field(x, "objective")
         cat("\n")
     }
     
-    print_field_name("status")
-    
+    print_solution_status(x$status)
+}
+
+print_solution_vars <- function(vars, max_len = 50L) {
+    for (i in seq_along(vars)) {
+        cat("$", names(vars)[i], "\n", sep = "")
+        v <- vars[[i]]
+        
+        if (length(v) <= max_len) {
+            print(v)
+            cat("\n")
+        } 
+        else {
+            cat(cli::col_grey("(Too long for printing)\n\n"))
+        }
+    }
+}
+
+print_solution_status <- function(status) {
     if (cli::is_utf8_output()) {
         tick <- cli::symbol$tick
         cross <- cli::symbol$checkbox_circle_on
@@ -358,12 +383,14 @@ print.lp_solution <- function(x, ...) {
         cross <- "[x]"
     }
     
-    if (x$status$code == 0) {
+    print_field_name("status")
+    
+    if (status$code == 0) {
         cat("Optimal Solution Found", tick, "\n\n")
     } 
     else {
         cat("No Optimal Solution Found", cross, "\n\n")
-        print(x$status)
+        print(status)
     }
 }
 

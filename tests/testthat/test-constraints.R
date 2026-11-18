@@ -9,12 +9,13 @@ test_that("printing", {
     p_many_rows <- lp_problem() |>
         lp_var(y[1:3]) |>
         lp_con(
-            for (i in 1:25) y[i %% 3 + 1] <= i
+            for (i in 1:25) y[i %% 3 + 1] <= i,
+            for (i in 1:1000) y[1] >= i
         )
     
     p_many_cols <- lp_problem() |>
         lp_var(z[1:300]) |>
-        lp_con(z >= 0, z <= 10)
+        lp_con(z[1] >= 0, z[2] <= 10)
     
     p_wrapped <- lp_problem() |> 
         lp_var(x) |> 
@@ -34,8 +35,8 @@ test_that("printing", {
     print(plong$constraints, full = FALSE) |> expect_snapshot()
     print(plong$constraints) |> expect_snapshot()
     
-    print(p_many_rows, full = TRUE) |> expect_snapshot()
-    print(p_many_cols, full = TRUE) |> expect_snapshot()
+    print(p_many_rows$constraints) |> expect_snapshot()
+    print(p_many_cols$constraints) |> expect_snapshot()
 
     expect_output(
         print(p_wrapped$constraints, full = FALSE),

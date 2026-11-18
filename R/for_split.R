@@ -11,36 +11,30 @@ eval_split_for <- function(quosure, data = NULL) {
     }
     
     expr <- include_all_element_adders(expr)
-    ind_names <- get_loop_indices(expr)
     result_env <- rlang::new_environment(parent = env)
+    result_env$.___ind_names <- get_loop_indices(expr)
+    result_env$.___format_ind <- format_ind
     
     with(result_env, {
         .___result <- base::list()
-        .___indices <- base::list()
+        .___indices <- base::character()
         .___add_loop_element <- function(x) {
-            ind <- as.list(parent.frame())
+            ind <- mget(.___ind_names, envir = parent.frame(), ifnotfound = 0)
+            ind <- ind[.___ind_names]
+            
+            val <- sapply(ind, .___format_ind)
+            ind_txt <- paste0(names(ind), "=", val, collapse = ", ")
+            
             x # prevents execution when there's a `next`
             
-            .___indices <<- base::c(
-                .___indices,
-                base::list(ind)
-            )
-            
-            .___result <<- base::c(
-                .___result,
-                base::list(x)
-            )
+            .___indices <<- c(.___indices, ind_txt)
+            .___result <<- c(.___result, list(x))
         }
     })
     
     rlang::eval_tidy(expr, data = data, env = result_env)
     result <- result_env$.___result
-    
-    names(result) <- sapply(result_env$.___indices, function(i) {
-        i <- i[names(i) %in% ind_names]
-        val <- sapply(i, format_ind)
-        paste0(names(i), "=", val, collapse = ", ")
-    })
+    names(result) <- result_env$.___indices
     
     result
 }

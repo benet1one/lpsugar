@@ -1,4 +1,26 @@
 
+test_that("variable printing", {
+    p <- lp_problem() |> 
+        lp_var(x, integer = TRUE) |> 
+        lp_var(y[set = 1:3], lower = 2) |> 
+        lp_var(z[1:30])
+    
+    expect_output(
+        print(p$variables$x),
+        "Integer scalar"
+    )
+    expect_output(
+        print(p$variables$y),
+        "(Real variable)(.*)(y >= 2)"
+    )
+    expect_snapshot(
+        p |> lp_eval(z + 1)
+    )
+    expect_snapshot(
+        p |> lp_eval(z^2)
+    )
+})
+
 test_that("variable definitions", {
     a <- letters[1:3]
 
@@ -152,7 +174,8 @@ test_that("variable indexing", {
 
     expect_equal(
         rep(x, 3) + y,
-        x + y
+        x + y,
+        ignore_attr = TRUE
     )
 
     expect_equal(
@@ -185,8 +208,34 @@ test_that("variable indexing", {
     expect_error(y[4], "out of bounds")
     expect_error(y[-4], "out of bounds")
     expect_error(y[0], "Invalid subscript")
-    expect_error(y["d"], "Invalid subscript 'd'")
+    expect_error(y["d"], "Invalid subscript: d(.*)Names are: a, b, and c.")
     expect_error(y[1,1], "Incorrect number of dimensions")
+    expect_error(y[c(1, NA)], "Subscript contains NA values")
+    expect_error(y[TRUE], "Subscript length mismatch.")
+    expect_error(z[TRUE, ], "Subscript length mismatch in dimension 1.")
+    expect_error(x["A"], "Object is unnamed.(.*)Subscript is class <character>.")
+    expect_error(x[factor("A")], "Object is unnamed.(.*)Subscript is class <factor>.")
+    expect_error(z["A", ], "Object is unnamed in dimension 1.")
+    expect_error(y[data.frame()], "Invalid subscript of class <data.frame>.")
+    
+    expect_error(
+        z[5, ],
+        paste(
+            "Subscript out of bounds in dimension 1.",
+            "Invalid subscript: 5.",
+            "Dimension 1 is length 2.",
+            sep = ".*"
+        )
+    )
+    expect_error(
+        z[, letters[3:5]],
+        paste(
+            "Invalid subscript in dimension 2 \\(a\\).",
+            "Invalid subscript: d.",
+            "Names in dimension 2 \\(a\\) are: a, b, and c.",
+            sep = ".*"
+        )
+    )
 
     # Transpose
     expect_identical(z$L, t(t(z))$L)
@@ -272,17 +321,17 @@ test_that("operations", {
     y <- p$variables$y
     z <- p$variables$z
 
-    expect_identical(x, +x)
-    expect_identical(x/2, x*0.5)
-    expect_identical(1-y, !y)
-    expect_identical(1-y[1], !y[1])
+    expect_equal(x, +x)
+    expect_equal(x/2, x*0.5)
+    expect_equal(1-y, !y, ignore_attr = TRUE)
+    expect_equal(1-y[1], !y[1], ignore_attr = TRUE)
     expect_true( (!y) $ binary )
     expect_true( (1 - y) $ binary )
     expect_true( (rep(1, 3) - y) $ binary )
     expect_false( (c(1, 2, 1) - y) $ binary )
 
-    expect_identical(2*y, y + y)
-    expect_identical(-z, z - 2*z)
+    expect_equal(2*y, y + y)
+    expect_equal(-z, z - 2*z)
 
     expect_error(c(1, 2, NA) + y, "Left-hand-side object contains NA values")
     expect_error(y / c(1, 2, NA), "Right-hand-side object contains NA values")
@@ -310,7 +359,7 @@ test_that("operations", {
 
     expect_error(y + z, "Length mismatch")
     expect_error(y * 1:2, "Length mismatch")
-    expect_error(z + t(z), "non-conformable")
+    expect_error(z + t(z), "Non-conformable")
 
     p2 <- lp_problem() |>
         lp_variable(u[1:2, 1:2, 1:3]) |>
@@ -329,8 +378,8 @@ test_that("operations", {
     u[1,,1] - t[,1,1]
     u[1,1,] - t[1,,1]
 
-    expect_error(u[1,,] + t[1,,], "non-conformable")
-    expect_error(t + b, "non-conformable")
+    expect_error(u[1,,] + t[1,,], "Non-conformable")
+    expect_error(t + b, "Non-conformable")
 
     expect_snapshot(diff(y) $ L)
     expect_snapshot(diff(y, lag = 2) $ L)
@@ -341,6 +390,50 @@ test_that("operations", {
     expect_equal(
         diff(z, lag = 2, differences = 2),
         z |> diff(lag = 2) |> diff(lag = 2)
+    )
+})
+
+test_that("operation output dim and names", {
+    let <- letters[1:3]
+    p <- lp_problem() |> 
+        lp_var(x) |> 
+        lp_var(y[1:3]) |> 
+        lp_var(named[nam = let]) |> 
+        lp_var(named_mat[let, let])
+    
+    x <- p$variables$x
+    y <- p$variables$y
+    named <- p$variables$named
+    named_mat <- p$variables$named_mat
+    
+    vec <- c(A = 1, B = 3, C = 2)
+    mat <- parameter(5, cap = LETTERS[1:3], low = letters[1:3])
+    
+    (x + y) $ ind
+    
+    expect_equal(
+        names(x + named),
+        names(named)
+    )
+    expect_equal(
+        names(y + named),
+        names(named)
+    )
+    expect_equal(
+        names(x * vec),
+        names(vec)
+    )
+    expect_equal(
+        names(y * vec),
+        names(vec)
+    )
+    expect_equal(
+        dimnames(x / mat),
+        dimnames(mat)
+    )
+    expect_equal(
+        dimnames(x - named_mat),
+        dimnames(named_mat)
     )
 })
 

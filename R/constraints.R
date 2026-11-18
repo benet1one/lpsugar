@@ -33,7 +33,6 @@ lp_constraint <- function(.problem, ...) {
     check_problem(.problem)
     quos <- rlang::enquos(...)
     nams <- rlang::names2(quos)
-    data <- data_mask(.problem)
     varnames <- c(
         names(.problem$variables), 
         names(.problem$aliases)
@@ -50,7 +49,6 @@ lp_constraint <- function(.problem, ...) {
         cons[[i]] <- lp_constraint_internal(
             quosure = quos[[i]],
             id = nams[i],
-            data = data,
             varnames = varnames,
             problem = .problem
         )
@@ -69,7 +67,7 @@ lp_constraint <- function(.problem, ...) {
     return(.problem)
 }
 
-lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
+lp_constraint_internal <- function(quosure, id, varnames, problem) {
     if (!any(all.vars(quosure) %in% varnames)) {
         msg <- "Constraint does not contain any variables."
         
@@ -83,6 +81,7 @@ lp_constraint_internal <- function(quosure, id, data, varnames, problem) {
         )
     }
     
+    data <- data_mask(problem)
     cons <- eval_split_for(quosure, data = data)
     expr <- format1(quosure)
     ids <- rlang::names2(cons)
@@ -565,22 +564,23 @@ print.lp_empty_constraint <- function(x, ...) {
     invisible(x)
 }
 
+#' Print method for constraints.
+#' @keywords internal
+#' @param x An [lp_constraint()].
+#' @param full Boolean.
+#' If TRUE, linear constraints with less than 200 rows are printed fully.
+#' If FALSE, only prints a summary of each constraint.
+#' @param ... Ignored.
 #' @export
-print.lp_constraint <- function(x, full = TRUE, ...) {
+print.lp_constraint <- function(x, full = ncol(x$L) <= 20, ...) {
     NextMethod()
     cat("\n")
     
-    info <- lpsugar_attributes(x)
-    
-    conditions_for_full <- all(
-        inherits(x, "L_constraint") || inherits(x, "Q_constraint"),
-        ncol(x$L) <= 20
-    )
-    
-    if (!conditions_for_full) {
+    if (!rlang::inherits_any(x, c("L_constraint", "Q_constraint"))) {
         full <- FALSE
     }
     
+    info <- lpsugar_attributes(x)
     pairs <- data.frame(id = info$id, expr = info$expr) |> 
         unique()
     
@@ -603,7 +603,7 @@ print.lp_constraint <- function(x, full = TRUE, ...) {
             sep = ""
         )
 
-        if (full && is_linear(x[where])) {
+        if (full && is_linear(x[where]) && n <= 200) {
             mat <- as.matrix.lp_constraint(x[where])
             rownames(mat) <- paste0("  ", rownames(mat))
             print(mat, quote = FALSE)

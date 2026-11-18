@@ -62,6 +62,18 @@ dim2 <- function(x) {
         dim(x)
     }
 }
+dimnames2 <- function(x) {
+    if (!is.null(dimnames(x))) {
+        return(dimnames(x))
+    } 
+    else if (!is.null(names(x))) {
+        list(names(x))
+    }
+    else {
+        NULL
+    }
+}
+
 format_dim <- function(x, dim = dim2(x)) {
     paste0("(", paste(dim, collapse = ", "), ")")
 }
@@ -81,9 +93,15 @@ same_dimensions <- function(x, y, dim_x = dim2(x), dim_y = dim2(y)) {
     length(dim_x) == length(dim_y)  &&  all(dim_x == dim_y)
 }
 
-# Returns FALSE if dimensions are incompatible
-# and a condition
-are_arguments_conformable <- function(x, y, drop_dim = TRUE) {
+drop_to_vec <- function(x) {
+    x <- drop(x)
+    if (ndim(x) == 1L) x <- c(x)
+    return(x)
+}
+
+# Checks that arguments are conformable and returns an object with
+# the dimensions of the output
+check_conformable <- function(x, y, drop_dim = TRUE, call = parent.frame()) {
     if (is_lp_variable(x)) {
         x <- x$ind
     }
@@ -92,48 +110,50 @@ are_arguments_conformable <- function(x, y, drop_dim = TRUE) {
     }
     
     if (drop_dim) {
-        x <- drop(x)
-        y <- drop(y)
+        x <- drop_to_vec(x)
+        y <- drop_to_vec(y)
     }
     
     if (length(x) > 1L && length(y) > 1L && length(x) != length(y)) {
-        cnd <- rlang::error_cnd(
+        cli_abort(
+            c("Length mismatch.",
+              "x" =  "Left hand side is length {length(x)}",
+              "x" = "Right hand side is length {length(y)}"),
             class = "lpsugar_error_non_conformable",
-            message = c(
-                "Length mismatch.",
-                "x" = paste( "Left hand side is length", length(x)),
-                "x" = paste("Right hand side is length", length(y))
-            )
+            call = call
         )
-        return(structure(FALSE, cnd = cnd))
     }
     
-    attempt <- rlang::try_fetch(x + y, warning = identity, error = identity)
+    attempt <- rlang::try_fetch(x + y, error = identity)
     
     if (rlang::is_error(attempt)) {
-        attempt$class <- "lpsugar_error_non_conformable"
-        return(structure(FALSE, cnd = attempt))
-    } 
-    else {
-        return(TRUE)
+        cli_abort(
+            c("Non-conformable arrays.",
+              "x" =  "Left hand side has dimensions {format_dim(x)}",
+              "x" = "Right hand side has dimensions {format_dim(y)}"), 
+            class = "lpsugar_error_non_conformable",
+            call = call
+        )
     }
+    
+    attempt
 }
-check_conformable <- function(x, y, drop_dim = TRUE, call) {
-    conformable <- are_arguments_conformable(x, y)
-    
-    if (conformable) {
-        return()
-    }
-    
-    why <- attr(conformable, "cnd")
-    cli_abort(why$message, call = call)
+operation_indices <- function(base_ind = 1L, x, y, call = parent.frame()) {
+    result <- check_conformable(x, y, call = call)
+    array(base_ind, dim = dim2(result), dimnames = dimnames2(result))
 }
 
 dimnames_non_numeric <- function(dimnames) {
     for (i in seq_along(dimnames)) {
         d <- dimnames[[i]]
+        nam <- names(dimnames)[i]
+        
         if (is.numeric(d) && all(d == seq_along(d))) {
             dimnames[i] <- list(NULL)
+            
+            if (grepl("^1", nam)) {
+                names(dimnames)[i] <- ""
+            }
         }
     }
     
@@ -357,13 +377,10 @@ variables_to_vec.list <- function(x, problem, miss_error = TRUE,
         dv <- dim(drop(v$ind))
         
         if (any(dx != dv)) {
-            dx_str <- paste(dim(xs), collapse = ", ")
-            dv_str <- paste(dim(v), collapse = ", ")
-            
             cli_abort(
                 c("Dimensions of variable `{v$name}` do not match.",
-                  "x" = "In `{field}` they are ({dx_str})",
-                  "x" = "In `problem` they are ({dv_str})"), 
+                  "x" = "In `{field}` they are {format_dim(xs)}",
+                  "x" = "In `problem` they are {format_dim(v)}"), 
                 class = "lpsugar_error_dimension_mismatch",
                 call = call
             )
@@ -499,13 +516,17 @@ is_quadratic <- function(x) {
     
     # Is variable, Q_objective, Q_constraint, or unknown class
     
+    if (is_lp_variable(x)) {
+        ## Using is_empty_Q() is not desirable, leads to errors in other functions
+        return(!is.null(x$Q))
+    } 
     if (is_lp_objective(x)) {
         return(!is_empty_Q(x$Q))
     }
-    else if (is_lp_variable(x) || is_lp_constraint(x)) {
+    else if (is_lp_constraint(x)) {
         empty_Qs <- sapply(x$Q, is_empty_Q)
         return(any(!empty_Qs))
-    } 
+    }
     else {
         return(FALSE)
     }
