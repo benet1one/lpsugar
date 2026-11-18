@@ -1,7 +1,6 @@
 
 Code
 - Check TODOs
-- Consider strict_index branch
 
 Nonlinear
 - gradient
