@@ -707,6 +707,16 @@ check_variable_set <- function(set, name, call = environment()) {
             call = call
         )
     }
+    
+    if (anyDuplicated(set)) {
+        duped <- set[duplicated(set)] |> unique() |> sQuote(FALSE)
+        
+        cli_abort(
+            c("Set `{name}` contains duplicated elements.",
+              "x" = "Duplicated values: {duped}."),
+            call = call
+        )
+    }
 }
 
 # Used in lp_variable()
