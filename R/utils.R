@@ -244,7 +244,7 @@ variables_to_list.default <- function(x, problem,
         cli_abort("`{field}` must not contain NA values.")
     }
     
-    purrr::map(problem$variables, function(v) {
+    lapply(problem$variables, function(v) {
         fixed_at <- is.na(v$ind)
         fixed_values <- v$lower[fixed_at]
         
@@ -271,7 +271,7 @@ variables_to_list.list <- function(x, problem,
                                    call = environment(), 
                                    field = "x", ...) {
     
-    purrr::map(problem$variables, function(v) {
+    lapply(problem$variables, function(v) {
         xs <- x[[v$name]]
         
         if (is.null(xs)) {
@@ -745,7 +745,7 @@ get_bounds.lp_variable <- function(x, include_fixed = FALSE) {
 #' @export
 get_bounds.lp_problem <- function(x, include_fixed = FALSE) {
     x$variables |> 
-        purrr::map(get_bounds, include_fixed = include_fixed) |> 
+        lapply(get_bounds, include_fixed = include_fixed) |> 
         purrr::list_rbind()
 }
 

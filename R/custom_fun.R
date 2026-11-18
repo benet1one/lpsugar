@@ -142,7 +142,7 @@ custom_fun <- function() {
     # this allows the first element to be anything
     e$sum <- function(..., na.rm = FALSE) {
         rlang::dots_list(...) |>
-            purrr::map(base::sum, na.rm = na.rm) |>
+            lapply(base::sum, na.rm = na.rm) |>
             purrr::reduce(`+`)
     }
     

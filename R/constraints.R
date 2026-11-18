@@ -251,7 +251,7 @@ update_constraints <- function(.problem) {
 bind_cons <- function(...) {
     dots <- rlang::dots_list(...)
     dots <- dots[lengths(dots) > 0]
-    dots <- purrr::keep(dots, function(d) {
+    dots <- Filter(x = dots, function(d) {
         if (!is_lp_constraint(d)) {
             cli_abort(
                 "`bind_cons()` can only bind <lp_constraint>, not <{class(d)[1]}>.",
@@ -271,9 +271,9 @@ bind_cons <- function(...) {
     
     out <- bind_cons_internal(dots)
     
-    lpsugar_attributes(out) <- purrr::map(dots, lpsugar_attributes) |> 
+    lpsugar_attributes(out) <- lapply(dots, lpsugar_attributes) |> 
         purrr::list_transpose(simplify = FALSE, template = c("id", "index", "expr")) |> 
-        purrr::map(\(x) unlist(x, use.names = FALSE))
+        lapply(\(x) unlist(x, use.names = FALSE))
 
     return(out)
 }

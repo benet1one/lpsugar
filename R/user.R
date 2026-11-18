@@ -281,6 +281,6 @@ compute_aliases <- function(problem, solution) {
         field = "solution"
     )
     
-    purrr::map(problem$aliases, \(a) compute_quadratic(a, x = solution))
+    lapply(problem$aliases, \(a) compute_quadratic(a, x = solution))
 }
 
