@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.31.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.32.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,35 +103,28 @@ y_i = \sum_{j=1}^k{\beta_j x_{ij}} + e_i
 <h2 id="least-absolute-deviation">Least Absolute Deviation<a class="anchor" aria-label="anchor" href="#least-absolute-deviation"></a>
 </h2>
 <p>The objective of Least Absolute Deviation (LAD) regression is to
-minimize the absolute residuals.</p>
+minimize the absolute residuals <span class="math inline">\(e_i\)</span>.</p>
 <p><span class="math display">\[
-\min{\sum_{i=1}^n{|e_i|}}
+\min{\sum_{i=1}^n{e_i}}
 \]</span></p>
-<p>The absolute value function <span class="math inline">\(|e|\)</span>
-is not linear, so we have to separate each <span class="math inline">\(e_i\)</span> into:</p>
-<p><span class="math display">\[
-e_i = e_i^+ - e_i^-
-\]</span> <span class="math display">\[
-e_i^+ \ge 0,\ e_i^- \ge 0
-\]</span> Then the problem can be written like this:</p>
+<p>Then the problem can be written like this:</p>
 <p><span class="math display">\[
 \begin{array}{rl}
-  \min &amp; \sum_{i=1}^n{e_i^+ + e_i^-} \\
-  \text{st} &amp; e_i^+ \ge y_i - \hat{y_i} \\
-            &amp; e_i^- \ge \hat{y_i} - y_i \\
-            &amp; e_i^+ \ge 0 \\
-            &amp; e_i^- \ge 0 \\
+  \min_{\beta,e} &amp; \sum_{i=1}^n{e_i} \\
+  \text{st} &amp; e_i \ge |y_i - \hat{y_i}| \\
   \text{where} &amp; \hat{y_i} = \sum_{j=1}^k{\beta_j x_{ij}}
 \end{array}
 \]</span></p>
-<p>This works. The objective function attempts to push both <span class="math inline">\(e_i^+\)</span> and <span class="math inline">\(e_i^-\)</span> down, but the constraints ensure
-that:</p>
-<ul>
-<li><p>If <span class="math inline">\(e_i &gt; 0\ \Rightarrow\ e_i^+ =
-e_i,\ e_i^- = 0\)</span>.</p></li>
-<li><p>If <span class="math inline">\(e_i &lt; 0\ \Rightarrow\ e_i^+ =
-0,\ e_i^- = |e_i|\)</span>.</p></li>
-</ul>
+<p>Believe it or not, the constraint is linear, despite containing an
+absolute value. <code>lpsugar</code> will simply expand the constraint
+into two. Together, they’re equivalent to the absolute value
+constraint.</p>
+<p><span class="math display">\[
+\begin{aligned}
+&amp; +e_i \ge y_i - \hat{y_i} \\
+&amp; -e_i \le y_i - \hat{y_i}
+\end{aligned}
+\]</span></p>
 <p>Let’s write the problem in <code>lpsugar</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
@@ -139,14 +132,10 @@ e_i,\ e_i^- = 0\)</span>.</p></li>
 <span></span>
 <span><span class="va">lad</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">beta</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">e_pos</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">e_neg</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/lp_objective.html">lp_min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">e_pos</span> <span class="op">+</span> <span class="va">e_neg</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">e</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_objective.html">lp_min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_alias.html">lp_alias</a></span><span class="op">(</span>yhat <span class="op">=</span> <span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_con</a></span><span class="op">(</span></span>
-<span>        pos <span class="op">=</span> <span class="va">e_pos</span> <span class="op">&gt;=</span> <span class="va">y</span> <span class="op">-</span> <span class="va">yhat</span>,</span>
-<span>        neg <span class="op">=</span> <span class="va">e_neg</span> <span class="op">&gt;=</span> <span class="va">yhat</span> <span class="op">-</span> <span class="va">y</span></span>
-<span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_con</a></span><span class="op">(</span><span class="va">e</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">yhat</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_solve.html">lp_solve</a></span><span class="op">(</span>solver <span class="op">=</span> <span class="st">"highs"</span><span class="op">)</span></span></code></pre></div>
 <p>The estimated <span class="math inline">\(\hat{\beta}\)</span> is
 quite similar to the <code>true_beta</code> <span class="math inline">\(\beta\)</span>.</p>
@@ -170,9 +159,10 @@ quite similar to the <code>true_beta</code> <span class="math inline">\(\beta\)<
 <p>Support Vector Machines (SVM) are a binary classification method,
 that uses a hyperplane to separate the groups.</p>
 <p><span class="math display">\[
-x_{ij} \in \mathbb{R} \qquad i \in [1,n],\ j\in [1,k]
-\]</span> <span class="math display">\[
-y_i \in \{\text{TRUE},\ \text{FALSE}\} \qquad i \in [1,n]
+\begin{array}{rl}
+x_{ij} \in \mathbb{R} &amp;\quad i \in [1,n],\ j\in [1,k] \\
+y_i \in \{\text{TRUE},\ \text{FALSE}\} &amp;\quad i \in [1,n]
+\end{array}
 \]</span></p>
 <p>Usually, <span class="math inline">\(y\)</span> is represented as
 <span class="math inline">\(y_i \in \{-1, +1\}\)</span>, but I believe
@@ -180,21 +170,25 @@ it’s easier to understand as a boolean variable.</p>
 <div class="section level3">
 <h3 id="basic-idea">Basic Idea<a class="anchor" aria-label="anchor" href="#basic-idea"></a>
 </h3>
-<p>An SVM finds a vector <span class="math inline">\(\{w_j\}_{j\in[1,k]}\)</span> and scalar <span class="math inline">\(b\)</span> that represents a hyperplane <span class="math inline">\(h\)</span>:</p>
+<p>An SVM finds a vector <span class="math inline">\(\{w_j\}_{j\in[1,k]}\)</span> and scalar <span class="math inline">\(b\)</span> that represents a hyperplane:</p>
 <p><span class="math display">\[
-h : \sum_{j=1}^k{(h_{j} w_{j})} + b = 0
+\sum_{j=1}^k{w_j X_j} + b = 0
 \]</span></p>
-<p>Classifications works like this. When the hyperplane expression is
-positive <span class="math inline">\(y_i\)</span> is predicted
-<code>TRUE</code>; when the expression is negative <span class="math inline">\(y_i\)</span> is predicted <code>FALSE</code>.</p>
+<p>Classifications works like this. If the <em>signed distance</em> from
+<span class="math inline">\(x_{ij}\)</span> to the hyperplane is
+positive, <span class="math inline">\(y_i\)</span> is predicted
+<code>TRUE</code>. If it’s negative, <span class="math inline">\(y_i\)</span> is preficted <code>FALSE</code>.</p>
 <p><span class="math display">\[
-\sum_{j=1}^k{(x_{ij} w_{j})} + b &gt; 0 \Rightarrow y_i=\text{TRUE}
-\qquad \forall i\in[1,n]
-\]</span> <span class="math display">\[
-\sum_{j=1}^k{(x_{ij} w_{j})} + b &lt; 0 \Rightarrow y_i=\text{FALSE}
-\qquad \forall i\in[1,n]
-\]</span> With this randomly generated data, we can find a line (which
-is an <span class="math inline">\(\mathbb{R}^2\)</span> hyperplane) that
+d_i = \sum_{j=1}^k{w_{j} x_{ij}} + b
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+d_i &gt; 0  &amp; \Rightarrow  y_i=\text{TRUE} \\
+d_i &lt; 0  &amp; \Rightarrow  y_i=\text{FALSE}
+\end{aligned}
+\]</span></p>
+<p>With this randomly generated data, we can find a line (which is an
+<span class="math inline">\(\mathbb{R}^2\)</span> hyperplane) that
 perfectly separates orange from blue.</p>
 <p><img src="Regression_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
 <p>However, this is not the <em>best</em> separator. There are two
@@ -213,28 +207,26 @@ Minimizing the margin is equivalent to minimizing the quadratic sum of
 \]</span></p>
 <p>And these constraints ensure the prediction is always correct.</p>
 <p><span class="math display">\[
-\sum_{j=1}^k{(x_{ij} w_{j})} + b \ge +1   \qquad \forall i : y_i =
-\text{TRUE}
-\]</span> <span class="math display">\[
-\sum_{j=1}^k{(x_{ij} w_{j})} + b \le -1   \qquad \forall i : y_i =
-\text{FALSE}
+\begin{array}{rl}
+d_i \ge +1  &amp;\quad \forall i : y_i = \text{TRUE} \\
+d_i \le -1  &amp;\quad \forall i : y_i = \text{FALSE}
+\end{array}
 \]</span></p>
 <p>The Hard Margin SVM can be written in <code>lpsugar</code> with the
-following code.</p>
+following code. The problem has a quadratic objective function and
+linear constraints.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">svm_hard</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">w</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_objective.html">lp_min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">w</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_constraint</a></span><span class="op">(</span></span>
-<span>        true_y <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>            <span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
-<span>            <span class="va">predicted</span> <span class="op">&gt;=</span> <span class="op">+</span><span class="fl">1</span></span>
-<span>        <span class="op">}</span>,</span>
-<span>        false_y <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>            <span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
-<span>            <span class="va">predicted</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">1</span></span>
-<span>        <span class="op">}</span></span>
+<span>    <span class="fu"><a href="../reference/lp_alias_manual.html">lp_alias_manual</a></span><span class="op">(</span></span>
+<span>        <span class="va">signed_dist</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>,</span>
+<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="va">signed_dist</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span><span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span>, j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_con</a></span><span class="op">(</span></span>
+<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span>  <span class="va">signed_dist</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="op">+</span><span class="fl">1</span>,</span>
+<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="va">signed_dist</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">1</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_solve.html">lp_solve</a></span><span class="op">(</span>solver <span class="op">=</span> <span class="st">"highs"</span><span class="op">)</span></span></code></pre></div>
 <p>This is the result. The continuous line represent the hyperplane, and
@@ -260,11 +252,10 @@ Regularization Hyperparameter.</p>
 <p>The constraints will now allow some flexibility by adding the slack
 variables <span class="math inline">\(\xi\)</span>:</p>
 <p><span class="math display">\[
-\sum_{j=1}^k{(x_{ij} w_{j})} + b \ge +1 - \xi_i   \qquad \forall i : y_i
-= \text{TRUE}
-\]</span> <span class="math display">\[
-\sum_{j=1}^k{(x_{ij} w_{j})} + b \le -1 + \xi_i   \qquad \forall i : y_i
-= \text{FALSE}
+\begin{array}{rl}
+d_i \ge +1 - \xi_i  &amp;\quad \forall i : y_i = \text{TRUE} \\
+d_i \le -1 + \xi_i  &amp;\quad \forall i : y_i = \text{FALSE}
+\end{array}
 \]</span></p>
 <p>In <code>lpsugar</code>, the Soft Margin SVM can be coded as
 follows.</p>
@@ -276,15 +267,13 @@ follows.</p>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">slack</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>, lower <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_objective.html">lp_min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">w</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="va">C</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">slack</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_constraint</a></span><span class="op">(</span></span>
-<span>        true_y <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>            <span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
-<span>            <span class="va">predicted</span> <span class="op">&gt;=</span> <span class="op">+</span><span class="fl">1</span> <span class="op">-</span> <span class="va">slack</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
-<span>        <span class="op">}</span>,</span>
-<span>        false_y <span class="op">=</span> <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>            <span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>, j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
-<span>            <span class="va">predicted</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="va">slack</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
-<span>        <span class="op">}</span></span>
+<span>    <span class="fu"><a href="../reference/lp_alias_manual.html">lp_alias_manual</a></span><span class="op">(</span></span>
+<span>        <span class="va">signed_dist</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>,</span>
+<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="va">signed_dist</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="../reference/sum_over.html">sum_over</a></span><span class="op">(</span><span class="va">w</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span>, j <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">)</span> <span class="op">+</span> <span class="va">b</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_con</a></span><span class="op">(</span></span>
+<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span>  <span class="va">signed_dist</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="op">+</span><span class="fl">1</span> <span class="op">-</span> <span class="va">slack</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,</span>
+<span>        <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="va">signed_dist</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="va">slack</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/lp_solve.html">lp_solve</a></span><span class="op">(</span>solver <span class="op">=</span> <span class="st">"highs"</span><span class="op">)</span></span></code></pre></div>
 <p>Notice that all blue values fall on top of the hyperplane, but some

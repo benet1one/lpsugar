@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">lpsugar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.31.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.32.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -161,7 +161,59 @@ browser. These prove that Ours is the best browser!</p>
 <span><span class="co">#&gt;    Ours Firefox  Safari  Chrome   Opera </span></span>
 <span><span class="co">#&gt;     116      96      96      95      58</span></span></code></pre></div>
 </div>
-  </main>
+<div class="section level2">
+<h2 id="not-so-random-number-generator-nsrng">Not-So-Random Number Generator (NSRNG)<a class="anchor" aria-label="anchor" href="#not-so-random-number-generator-nsrng"></a>
+</h2>
+<p>We want to generate a sequence of values according to a probability
+distribution.</p>
+<p><span class="math display">\[
+y_t \sim \text{Bernoulli}(p = 0.308) \qquad t \in [1,n]
+\]</span></p>
+<p>But we will do it in a not-so-random way. Let <span class="math inline">\(y_{1:k}\)</span> denote the subsequence <span class="math inline">\(\{y_t\}_{t \in [1,k]}\)</span>. For each of these
+subsequences, we will minimize the absolute difference between the real
+probability <span class="math inline">\(p\)</span> and the estimated
+probability <span class="math inline">\(\hat{p}_k\)</span></p>
+<p><span class="math display">\[
+\min_y \sum_{k=1}^n{|p - \hat{p}_k|}
+\]</span> <span class="math display">\[
+\hat{p}_k = \frac{1}{k}\sum_{t=1}^k{y_t}
+\]</span></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">n</span> <span class="op">=</span> <span class="fl">40</span></span>
+<span><span class="va">p</span> <span class="op">=</span> <span class="fl">0.308</span></span>
+<span></span>
+<span><span class="va">nsrng</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lp_problem.html">lp_problem</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>, binary <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_alias.html">lp_alias</a></span><span class="op">(</span>phat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_variable.html">lp_var</a></span><span class="op">(</span><span class="va">err</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_constraint.html">lp_con</a></span><span class="op">(</span><span class="va">err</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">phat</span> <span class="op">-</span> <span class="va">p</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_objective.html">lp_min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/lp_solve.html">lp_solve</a></span><span class="op">(</span>solver <span class="op">=</span> <span class="st">"highs"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">phat</span> <span class="op">&lt;-</span> <span class="va">nsrng</span><span class="op">$</span><span class="va">aliases</span><span class="op">$</span><span class="va">phat</span></span></code></pre></div>
+<p>See how quickly <span class="math inline">\(\hat{p}\)</span>
+converges to the true probability <span class="math inline">\(p\)</span>.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">phat</span>, pch <span class="op">=</span> <span class="fl">16</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span>, <span class="va">phat</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">p</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="misc_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="576"></p>
+<p>For reference, in blue you can see how a random sequence would
+converge.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">101</span><span class="op">)</span></span>
+<span><span class="va">rng</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n</span>, size <span class="op">=</span> <span class="fl">1</span>, prob <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
+<span><span class="va">phat_rng</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">rng</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">phat</span>, pch <span class="op">=</span> <span class="fl">16</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span>, <span class="va">phat</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span>, <span class="va">phat_rng</span>, col <span class="op">=</span> <span class="st">"royalblue"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span>, <span class="va">phat_rng</span>, col <span class="op">=</span> <span class="st">"royalblue"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">p</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="misc_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="576"></p>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

@@ -35,27 +35,22 @@ y <- x %*% true_beta + rnorm(n)
 ## Least Absolute Deviation
 
 The objective of Least Absolute Deviation (LAD) regression is to
-minimize the absolute residuals.
+minimize the absolute residuals \\e_i\\.
 
-\\ \min{\sum\_{i=1}^n{\|e_i\|}} \\
+\\ \min{\sum\_{i=1}^n{e_i}} \\
 
-The absolute value function \\\|e\|\\ is not linear, so we have to
-separate each \\e_i\\ into:
+Then the problem can be written like this:
 
-\\ e_i = e_i^+ - e_i^- \\ \\ e_i^+ \ge 0,\\ e_i^- \ge 0 \\ Then the
-problem can be written like this:
+\\ \begin{array}{rl} \min\_{\beta,e} & \sum\_{i=1}^n{e_i} \\ \text{st} &
+e_i \ge \|y_i - \hat{y_i}\| \\ \text{where} & \hat{y_i} =
+\sum\_{j=1}^k{\beta_j x\_{ij}} \end{array} \\
 
-\\ \begin{array}{rl} \min & \sum\_{i=1}^n{e_i^+ + e_i^-} \\ \text{st} &
-e_i^+ \ge y_i - \hat{y_i} \\ & e_i^- \ge \hat{y_i} - y_i \\ & e_i^+ \ge
-0 \\ & e_i^- \ge 0 \\ \text{where} & \hat{y_i} = \sum\_{j=1}^k{\beta_j
-x\_{ij}} \end{array} \\
+Believe it or not, the constraint is linear, despite containing an
+absolute value. `lpsugar` will simply expand the constraint into two.
+Together, they’re equivalent to the absolute value constraint.
 
-This works. The objective function attempts to push both \\e_i^+\\ and
-\\e_i^-\\ down, but the constraints ensure that:
-
-- If \\e_i \> 0\\ \Rightarrow\\ e_i^+ = e_i,\\ e_i^- = 0\\.
-
-- If \\e_i \< 0\\ \Rightarrow\\ e_i^+ = 0,\\ e_i^- = \|e_i\|\\.
+\\ \begin{aligned} & +e_i \ge y_i - \hat{y_i} \\ & -e_i \le y_i -
+\hat{y_i} \end{aligned} \\
 
 Let’s write the problem in `lpsugar`.
 
@@ -66,14 +61,10 @@ k <- ncol(x)
 
 lad <- lp_problem() |> 
     lp_var(beta[1:k]) |> 
-    lp_var(e_pos[1:n], lower = 0) |> 
-    lp_var(e_neg[1:n], lower = 0) |> 
-    lp_min(sum(e_pos + e_neg)) |> 
+    lp_var(e[1:n], lower = 0) |> 
+    lp_min(sum(e)) |> 
     lp_alias(yhat = x %*% beta) |> 
-    lp_con(
-        pos = e_pos >= y - yhat,
-        neg = e_neg >= yhat - y
-    ) |> 
+    lp_con(e >= abs(y - yhat)) |> 
     lp_solve(solver = "highs")
 ```
 
@@ -105,8 +96,9 @@ lad$objective
 Support Vector Machines (SVM) are a binary classification method, that
 uses a hyperplane to separate the groups.
 
-\\ x\_{ij} \in \mathbb{R} \qquad i \in \[1,n\],\\ j\in \[1,k\] \\ \\ y_i
-\in \\\text{TRUE},\\ \text{FALSE}\\ \qquad i \in \[1,n\] \\
+\\ \begin{array}{rl} x\_{ij} \in \mathbb{R} &\quad i \in \[1,n\],\\ j\in
+\[1,k\] \\ y_i \in \\\text{TRUE},\\ \text{FALSE}\\ &\quad i \in \[1,n\]
+\end{array} \\
 
 Usually, \\y\\ is represented as \\y_i \in \\-1, +1\\\\, but I believe
 it’s easier to understand as a boolean variable.
@@ -114,18 +106,20 @@ it’s easier to understand as a boolean variable.
 ### Basic Idea
 
 An SVM finds a vector \\\\w_j\\\_{j\in\[1,k\]}\\ and scalar \\b\\ that
-represents a hyperplane \\h\\:
+represents a hyperplane:
 
-\\ h : \sum\_{j=1}^k{(h\_{j} w\_{j})} + b = 0 \\
+\\ \sum\_{j=1}^k{w_j X_j} + b = 0 \\
 
-Classifications works like this. When the hyperplane expression is
-positive \\y_i\\ is predicted `TRUE`; when the expression is negative
-\\y_i\\ is predicted `FALSE`.
+Classifications works like this. If the *signed distance* from
+\\x\_{ij}\\ to the hyperplane is positive, \\y_i\\ is predicted `TRUE`.
+If it’s negative, \\y_i\\ is preficted `FALSE`.
 
-\\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \> 0 \Rightarrow y_i=\text{TRUE}
-\qquad \forall i\in\[1,n\] \\ \\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \<
-0 \Rightarrow y_i=\text{FALSE} \qquad \forall i\in\[1,n\] \\ With this
-randomly generated data, we can find a line (which is an
+\\ d_i = \sum\_{j=1}^k{w\_{j} x\_{ij}} + b \\
+
+\\ \begin{aligned} d_i \> 0 & \Rightarrow y_i=\text{TRUE} \\ d_i \< 0 &
+\Rightarrow y_i=\text{FALSE} \end{aligned} \\
+
+With this randomly generated data, we can find a line (which is an
 \\\mathbb{R}^2\\ hyperplane) that perfectly separates orange from blue.
 
 ![](Regression_files/figure-html/unnamed-chunk-7-1.png)
@@ -144,11 +138,11 @@ coefficients.
 
 And these constraints ensure the prediction is always correct.
 
-\\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \ge +1 \qquad \forall i : y_i =
-\text{TRUE} \\ \\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \le -1 \qquad
-\forall i : y_i = \text{FALSE} \\
+\\ \begin{array}{rl} d_i \ge +1 &\quad \forall i : y_i = \text{TRUE} \\
+d_i \le -1 &\quad \forall i : y_i = \text{FALSE} \end{array} \\
 
 The Hard Margin SVM can be written in `lpsugar` with the following code.
+The problem has a quadratic objective function and linear constraints.
 
 ``` r
 
@@ -156,15 +150,13 @@ svm_hard <- lp_problem() |>
     lp_var(w[1:k]) |> 
     lp_var(b) |> 
     lp_min(sum(w^2)) |> 
-    lp_constraint(
-        true_y = for (i in which(y)) {
-            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
-            predicted >= +1
-        },
-        false_y = for (i in which(!y)) {
-            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
-            predicted <= -1
-        }
+    lp_alias_manual(
+        signed_dist[1:n],
+        for (i in 1:n) signed_dist[i] = sum_over(w[j] * x[i,j], j = 1:k) + b
+    ) |> 
+    lp_con(
+        for (i in which(y))  signed_dist[i] >= +1,
+        for (i in which(!y)) signed_dist[i] <= -1
     ) |> 
     lp_solve(solver = "highs")
 ```
@@ -194,9 +186,9 @@ Where \\C\\ is known as the Regularization Hyperparameter.
 The constraints will now allow some flexibility by adding the slack
 variables \\\xi\\:
 
-\\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \ge +1 - \xi_i \qquad \forall i :
-y_i = \text{TRUE} \\ \\ \sum\_{j=1}^k{(x\_{ij} w\_{j})} + b \le -1 +
-\xi_i \qquad \forall i : y_i = \text{FALSE} \\
+\\ \begin{array}{rl} d_i \ge +1 - \xi_i &\quad \forall i : y_i =
+\text{TRUE} \\ d_i \le -1 + \xi_i &\quad \forall i : y_i = \text{FALSE}
+\end{array} \\
 
 In `lpsugar`, the Soft Margin SVM can be coded as follows.
 
@@ -209,15 +201,13 @@ svm_soft <- lp_problem() |>
     lp_var(b) |> 
     lp_var(slack[1:n], lower = 0) |> 
     lp_min(sum(w^2) + C * sum(slack)) |> 
-    lp_constraint(
-        true_y = for (i in which(y)) {
-            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
-            predicted >= +1 - slack[i]
-        },
-        false_y = for (i in which(!y)) {
-            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
-            predicted <= -1 + slack[i]
-        }
+    lp_alias_manual(
+        signed_dist[1:n],
+        for (i in 1:n) signed_dist[i] = sum_over(w[j] * x[i,j], j = 1:k) + b
+    ) |> 
+    lp_con(
+        for (i in which(y))  signed_dist[i] >= +1 - slack[i],
+        for (i in which(!y)) signed_dist[i] <= -1 + slack[i]
     ) |> 
     lp_solve(solver = "highs")
 ```

@@ -1,5 +1,25 @@
 # Changelog
 
+## lpsugar 0.32.0
+
+### New Features
+
+- It’s now possible to use
+  [`abs()`](https://rdrr.io/r/base/MathFun.html) on the lesser side of
+  an inequality constraint.
+
+### Documentation
+
+- New example in vignette ‘Miscellaneous Examples’.
+- Improved linear regression in vignette ‘Regression’ by using
+  [`abs()`](https://rdrr.io/r/base/MathFun.html).
+- Simplified SVM in vignette ‘Regression’ by using aliases.
+
+### Breaking Changes
+
+- Variable sets must now have unique elements. If any element is
+  duplicated, an error will be thrown, showing the duplicated values.
+
 ## lpsugar 0.31.1
 
 ### Improvements
