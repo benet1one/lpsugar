@@ -113,10 +113,10 @@ Support Vector Machines (SVM) are a binary classification method, that uses a hy
 to separate the groups.
 
 $$
-x_{ij} \in \mathbb{R} \qquad i \in [1,n],\ j\in [1,k]
-$$
-$$
-y_i \in \{\text{TRUE},\ \text{FALSE}\} \qquad i \in [1,n]
+\begin{array}{rl}
+x_{ij} \in \mathbb{R} &\quad i \in [1,n],\ j\in [1,k] \\
+y_i \in \{\text{TRUE},\ \text{FALSE}\} &\quad i \in [1,n]
+\end{array}
 $$
 
 Usually, $y$ is represented as $y_i \in \{-1, +1\}$, but I believe it's easier to understand
@@ -124,21 +124,26 @@ as a boolean variable.
 
 ### Basic Idea
 
-An SVM finds a vector $\{w_j\}_{j\in[1,k]}$ and scalar $b$ that represents a hyperplane $h$:
+An SVM finds a vector $\{w_j\}_{j\in[1,k]}$ and scalar $b$ that represents a hyperplane:
 
 $$
-h : \sum_{j=1}^k{(h_{j} w_{j})} + b = 0
+\sum_{j=1}^k{w_j X_j} + b = 0
 $$
 
-Classifications works like this. When the hyperplane expression is positive $y_i$ is 
-predicted `TRUE`; when the expression is negative $y_i$ is predicted `FALSE`.
+Classifications works like this. If the *signed distance* from $x_{ij}$ to the hyperplane 
+is positive, $y_i$ is predicted `TRUE`. If it's negative, $y_i$ is preficted `FALSE`.
 
 $$
-\sum_{j=1}^k{(x_{ij} w_{j})} + b > 0 \Rightarrow y_i=\text{TRUE} \qquad \forall i\in[1,n]
+d_i = \sum_{j=1}^k{w_{j} x_{ij}} + b
 $$
+
 $$
-\sum_{j=1}^k{(x_{ij} w_{j})} + b < 0 \Rightarrow y_i=\text{FALSE} \qquad \forall i\in[1,n]
+\begin{aligned}
+d_i > 0  & \Rightarrow  y_i=\text{TRUE} \\
+d_i < 0  & \Rightarrow  y_i=\text{FALSE}
+\end{aligned}
 $$
+
 With this randomly generated data, we can find a line (which is an $\mathbb{R}^2$ hyperplane) that perfectly separates orange from blue.
 
 ```{r echo=FALSE}
@@ -179,28 +184,27 @@ $$
 And these constraints ensure the prediction is always correct.
 
 $$
-\sum_{j=1}^k{(x_{ij} w_{j})} + b \ge +1   \qquad \forall i : y_i = \text{TRUE}
-$$
-$$
-\sum_{j=1}^k{(x_{ij} w_{j})} + b \le -1   \qquad \forall i : y_i = \text{FALSE}
+\begin{array}{rl}
+d_i \ge +1  &\quad \forall i : y_i = \text{TRUE} \\
+d_i \le -1  &\quad \forall i : y_i = \text{FALSE}
+\end{array}
 $$
 
-The Hard Margin SVM can be written in `lpsugar` with the following code.
+The Hard Margin SVM can be written in `lpsugar` with the following code. 
+The problem has a quadratic objective function and linear constraints.
 
 ```{r}
 svm_hard <- lp_problem() |> 
     lp_var(w[1:k]) |> 
     lp_var(b) |> 
     lp_min(sum(w^2)) |> 
-    lp_constraint(
-        true_y = for (i in which(y)) {
-            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
-            predicted >= +1
-        },
-        false_y = for (i in which(!y)) {
-            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
-            predicted <= -1
-        }
+    lp_alias_manual(
+        signed_dist[1:n],
+        for (i in 1:n) signed_dist[i] = sum_over(w[j] * x[i,j], j = 1:k) + b
+    ) |> 
+    lp_con(
+        for (i in which(y))  signed_dist[i] >= +1,
+        for (i in which(!y)) signed_dist[i] <= -1
     ) |> 
     lp_solve(solver = "highs")
 ```
@@ -244,10 +248,10 @@ Where $C$ is known as the Regularization Hyperparameter.
 The constraints will now allow some flexibility by adding the slack variables $\xi$:
 
 $$
-\sum_{j=1}^k{(x_{ij} w_{j})} + b \ge +1 - \xi_i   \qquad \forall i : y_i = \text{TRUE}
-$$
-$$
-\sum_{j=1}^k{(x_{ij} w_{j})} + b \le -1 + \xi_i   \qquad \forall i : y_i = \text{FALSE}
+\begin{array}{rl}
+d_i \ge +1 - \xi_i  &\quad \forall i : y_i = \text{TRUE} \\
+d_i \le -1 + \xi_i  &\quad \forall i : y_i = \text{FALSE}
+\end{array}
 $$
 
 In `lpsugar`, the Soft Margin SVM can be coded as follows.
@@ -260,15 +264,13 @@ svm_soft <- lp_problem() |>
     lp_var(b) |> 
     lp_var(slack[1:n], lower = 0) |> 
     lp_min(sum(w^2) + C * sum(slack)) |> 
-    lp_constraint(
-        true_y = for (i in which(y)) {
-            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
-            predicted >= +1 - slack[i]
-        },
-        false_y = for (i in which(!y)) {
-            predicted <- sum_over(x[i,j] * w[j], j = 1:k) + b
-            predicted <= -1 + slack[i]
-        }
+    lp_alias_manual(
+        signed_dist[1:n],
+        for (i in 1:n) signed_dist[i] = sum_over(w[j] * x[i,j], j = 1:k) + b
+    ) |> 
+    lp_con(
+        for (i in which(y))  signed_dist[i] >= +1 - slack[i],
+        for (i in which(!y)) signed_dist[i] <= -1 + slack[i]
     ) |> 
     lp_solve(solver = "highs")
 ```
@@ -285,4 +287,3 @@ with(svm_soft$variables, {
      abline(a = (-1 - b) / w[2], b = - w[1] / w[2], lty = 2)
 })
 ```
-
