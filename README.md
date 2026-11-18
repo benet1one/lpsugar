@@ -13,9 +13,8 @@ vectorized syntax, used to define and solve Mixed Integer Linear
 Problems (MILP), Mixed Integer Quadratic Problems (MIQP) and General
 Nonlinear Problems (NLP).
 
-This package is in development, and being made by a solo student. For a
-safer choice, I recommend using
-[ompr](https://dirkschumacher.github.io/ompr/).
+Also check out [ompr](https://dirkschumacher.github.io/ompr/) for linear
+programming and [CVXR](https://cvxr.rbind.io/) for convex optimization.
 
 ## Installation
 
