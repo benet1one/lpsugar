@@ -1,3 +1,57 @@
+# lpsugar 0.31.1
+
+## Improvements
+
+* When indexing variables, errors messages are now more helpful. 
+* Variables have cleaner dimnames. When defining a variable such as `x[1:5, b]`, 
+the name of the first dimension is now empty instead of being `"1:5"`.
+
+## Performance Improvements
+
+* The `for` notation for defining constraints is now slightly faster.
+
+## Bug Fixes
+
+* Scalar variables no longer have `"n_variables"` as a name.
+
+# lpsugar 0.31.0
+
+## Bug Fixes
+
+* Constraints no longer use a common environment, so they are now completely independent.
+
+## Performance Improvements
+
+* Indexing variables is now faster.
+
+## Breaking Changes
+
+* Class <robust_index> has been renamed to <lpsugar_robust_index> for
+better traceability.
+* The variable coefficient fields (Q, L, and A) are now class <lpsugar_nodrop>
+instead of <robust_index>
+
+# lpsugar 0.30.5
+
+## Improvements
+
+* Long variables and aliases are no longer printed on the solution.
+
+# lpsugar 0.30.4
+
+## Improvements
+
+* Output of operations is now more consistent, with the correct dimensions and names.
+* Added classes to some errors.
+
+## Documentation
+
+* Documented print methods for constraints and aliases.
+
+## Bug Fixes
+
+* Fixed rare bugs with quadratic variables.
+
 # lpsugar 0.30.3
 
 ## New Features

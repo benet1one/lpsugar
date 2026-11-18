@@ -79,10 +79,10 @@ sum.lp_variable <- function(x, ..., na.rm = FALSE) {
     
     x$L <- colSums(x$L) |>
         matrix(nrow = 1L) |>
-        robust_index()
+        as_nodrop()
     x$A <- sum(x$A) |>
         matrix(nrow = 1L, ncol = 1L) |>
-        robust_index()
+        as_nodrop()
     
     colnames(x$L) <- varnames
     
@@ -299,7 +299,7 @@ apply_v <- function(x, margin, fun, ..., simplify = TRUE) {
     
     if (is.array(out_ind)) {
         out_ind[] <- seq_along(out_ind)
-        out$ind <- out_ind |> robust_index()
+        out$ind <- out_ind |> as_robust_index()
     } 
     else {
         out$ind <- 1:nrow(out$L)

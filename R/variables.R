@@ -209,7 +209,7 @@ update_variables <- function(.problem, field = "variables") {
         
         x$L <- x$L |> 
             cbind(matrix(0, nrow = nrow(x$L), ncol = add_n)) |> 
-            robust_index()
+            as_nodrop()
 
         colnames(x$L) <- varnames
         vars[[i]] <- x
@@ -284,7 +284,9 @@ print.lp_variable <- function(x, ...) {
     cat(x$name)
     
     if (length(x) > 1L) {
-        cat("[", paste(names(dimnames(x)), collapse = ", "), "]", sep = "")
+        dnn <- names(dimnames(x))
+        dnn[dnn == ""] <- paste0("1:", dim(x)[dnn == ""])
+        cat("[", paste(dnn, collapse = ", "), "]", sep = "")
     }
     
     cat("'")
@@ -305,20 +307,42 @@ print.lp_variable <- function(x, ...) {
     cat("\n")
     invisible(x)
 }
+#' Print method for aliases or transformed variables.
+#' @keywords internal
+#' @param x An alias or transformed variable.
+#' @param full Boolean.
+#' If TRUE, prints the relevant fields. If FALSE, prints a compact summary.
+#' @param ... Ignored.
 #' @export
-print.transformed_lp_variable <- function(x, ...) {
+print.transformed_lp_variable <- function(x, full = length(x$A) <= 20, ...) {
     if (x$abs) {
         cat("| Absolute value of |\n\n")
     }
     
-    fields <- if (is_quadratic(x)) {
-        c(c("Q", "L", "A"))
-    } 
+    if (full) {
+        fields <- if (is_quadratic(x)) {
+            c(c("Q", "L", "A"))
+        } else {
+            c("L", "A")
+        }
+        unclass(x)[fields] |> print()
+    }
     else {
-        c("L", "A")
+        if (is_quadratic(x)) {
+            l <- length(x$Q)
+            nr <- nrow(x$Q[[1]])
+            nc <- ncol(x$Q[[1]])
+            cat("$Q: List of ",l," matrices (",nr," x ",nc,")\n", sep = "")
+        }
+        
+        nr <- nrow(x$L)
+        nc <- ncol(x$L)
+        cat("$L: Matrix (",nr," x ",nc,")\n", sep = "")
+        
+        l <- length(x$A)
+        cat("$A: Vector of length ", l, "\n", sep = "")
     }
     
-    unclass(x)[fields] |> print()
     invisible(x)
 }
 #' @export
@@ -416,7 +440,7 @@ bind_vv <- function(x, y) {
     z <- x
     z$ind  <- seq_len(length(x) + length(y)) |>
         unname() |>
-        robust_index()
+        as_robust_index()
     
     if (is_quadratic(x) || is_quadratic(y)) {
         x <- as_quadratic(x)
@@ -424,8 +448,8 @@ bind_vv <- function(x, y) {
         z$Q <- c(x$Q, y$Q)
     }
     
-    z$L <- rbind(x$L, y$L) |> robust_index()
-    z$A  <- rbind(x$A,  y$A)  |> robust_index()
+    z$L <- rbind(x$L, y$L) |> as_nodrop()
+    z$A <- rbind(x$A, y$A) |> as_nodrop()
     
     transformed_variable(z, check_na = FALSE)
 }
@@ -433,7 +457,7 @@ bind_vv <- function(x, y) {
 bind_vc <- function(x, y) {
     x$ind <- c(x$ind, numeric(length(y))) |>
         unname() |>
-        robust_index()
+        as_robust_index()
     x$ind[] <- seq_along(x$ind)
     
     if (is_quadratic(x)) {
@@ -444,12 +468,12 @@ bind_vc <- function(x, y) {
     x$L <- rbind(
         x$L,
         matrix(0, nrow = length(y), ncol = ncol(x$L))
-    ) |> robust_index()
+    ) |> as_nodrop()
     
     x$A <- rbind(
         x$A,
         matrix(y, ncol = 1L)
-    ) |> robust_index()
+    ) |> as_nodrop()
     
     transformed_variable(x)
 }
@@ -457,7 +481,7 @@ bind_vc <- function(x, y) {
 bind_cv <- function(x, y) {
     i <- c(seq_along(x) + length(y), seq_along(y))
     z <- bind_vc(y, x)[i]
-    z$ind <- seq_along(i) |> robust_index()
+    z$ind <- seq_along(i) |> as_robust_index()
     return(z)
 }
 
@@ -474,29 +498,28 @@ bind_cv <- function(x, y) {
         return(x)
     }
     
-    old_ind <- x$ind
-    old_ind[] <- seq_along(old_ind)
+    i <- x$ind
+    i[] <- seq_along(i)
     
-    old_ind <- rlang::try_fetch(
-        old_ind[..., drop = drop], 
+    i <- rlang::try_fetch(
+        i[..., drop = drop], 
         error = identity
     )
     
-    if (rlang::is_condition(old_ind)) {
+    if (rlang::is_condition(i)) {
         dots <- rlang::enexprs(..., .ignore_empty = "none")
         call <- rlang::expr((!!substitute(x))[!!!dots])
-        cli_abort(old_ind$message, call = call)
+        rlang::abort(rlang::cnd_message(i), call = call)
     }
     
-    old_ind <- c(old_ind)
-    x$ind <- x$ind[..., drop = drop]
+    x$ind <- i
     
     if (is_quadratic(x)) {
-        x$Q <- x$Q[old_ind]
+        x$Q <- x$Q[i]
     }
     
-    x$L <- x$L[old_ind, ]
-    x$A <- x$A[old_ind, ]
+    x$L <- x$L[i, ]
+    x$A <- x$A[i, ]
     
     transformed_variable(x, check_na = FALSE)
 }
@@ -517,12 +540,11 @@ bind_cv <- function(x, y) {
             cli_abort(i$message, call = call)
         }
     }
-    
-    i <- c(i)
-    
+
     if (is_abs_variable(value)) {
         throw_abs_error()
     }
+    
     if (is_lp_variable(value)) {
         y <- recycle_var(value, length(i))
         
@@ -786,7 +808,7 @@ variable_indices <- function(old_n, definition, fixed_at) {
             ind <- NA_integer_
         }
         else {
-            ind <- old_n + 1L
+            ind <- unname(old_n + 1L)
         }
     } 
     else {
@@ -797,19 +819,19 @@ variable_indices <- function(old_n, definition, fixed_at) {
         ind[!fixed_at] <- seq_along(ind[!fixed_at]) + old_n
     }
     
-    robust_index(ind)
+    as_robust_index(ind)
 }
 
 new_A_coef <- function(ind, fixed_at, fixed_values) {
     A <- matrix(0, ncol = 1, nrow = length(ind))
     A[fixed_at] <- fixed_values
-    robust_index(A)
+    as_nodrop(A)
 }
 new_L_coef <- function(ind, ncol, colnames, fixed_at) {
     L <- matrix(0, ncol = ncol, nrow = length(ind))
     L[!fixed_at, ind[!fixed_at]] <- diag(sum(!fixed_at))
     colnames(L) <- colnames
-    robust_index(L)
+    as_nodrop(L)
 }
 
 # Gives the colnames of $L
@@ -863,7 +885,10 @@ recycle_var <- function(x, n) {
         return(transformed_variable(x, check_na = FALSE))
     }
     
-    cli_abort("Attempt to recycle variable of length {length(x)} to length {n}.")
+    cli_abort(
+        "Cannot to recycle variable of length {length(x)} to length {n}.",
+        class = "lpsugar_error_recycle_length_mismatch"
+    )
 }
 
 # Recycles a constant to length n
@@ -877,5 +902,8 @@ recycle_const <- function(x, n) {
         return(rep(x, n))
     }
     
-    cli_abort("Attempt to recycle array of length {length(x)} to length {n}.")
+    cli_abort(
+        "Cannot recycle array of length {length(x)} to length {n}.",
+        class = "lpsugar_error_recycle_length_mismatch"
+    )
 }

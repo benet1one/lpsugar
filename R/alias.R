@@ -128,10 +128,10 @@ lp_alias_manual <- function(.problem, definition, expression) {
     )
 
     A <- matrix(NA_real_, nrow = length(ind), ncol = 1L) |> 
-        robust_index()
+        as_nodrop()
     
     L <- matrix(0, nrow = length(ind), ncol = ncol(.problem)) |> 
-        robust_index()
+        as_nodrop()
     
     colnames(L) <- variable.names(.problem)
 
