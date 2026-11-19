@@ -1,3 +1,10 @@
+# lpsugar 0.32.1
+
+## Performance Improvements
+
+* Arithmetic operations with variables and constants are now significantly faster.
+* Binding constraints is now slightly faster.
+
 # lpsugar 0.32.0
 
 ## New Features
