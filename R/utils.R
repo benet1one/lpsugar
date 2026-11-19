@@ -138,10 +138,6 @@ check_conformable <- function(x, y, drop_dim = TRUE, call = parent.frame()) {
     
     attempt
 }
-operation_indices <- function(base_ind = 1L, x, y, call = parent.frame()) {
-    result <- check_conformable(x, y, call = call)
-    array(base_ind, dim = dim2(result), dimnames = dimnames2(result))
-}
 
 dimnames_non_numeric <- function(dimnames) {
     for (i in seq_along(dimnames)) {

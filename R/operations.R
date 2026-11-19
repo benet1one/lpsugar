@@ -1,4 +1,5 @@
 
+ARITHMETIC_OPS <- c("+", "-", "*", "/", "^")
 COMPARISON_OPS <- c("<", "<=", "==", ">=", ">")
 
 # Wrappers -------------------
@@ -34,33 +35,17 @@ Ops.lp_variable <- function(e1, e2) {
         )
     }
     
-    # Checks ----------------------------
-    
     # Error if anyNA
     check_no_na(e1, e2, call)
     
-    # Compatible dims
-    check_conformable(e1, e2, drop_dim = TRUE, call = call)
-    
-    # Two element arithmetic
-    if (op == "+") {
-        return(add_lp(e1, e2, call))
-    } 
-    else if (op == "-") {
-        return(subtract_lp(e1, e2, call))
-    } 
-    else if (op == "*") {
-        return(multiply_lp(e1, e2, call))
-    } 
-    else if (op == "/") {
-        return(divide_lp(e1, e2, call))
-    } 
-    else if (op == "^") {
-        return(power_lp(e1, e2, call))
+    # Two Element Arithmetic ------------
+    if (op %in% ARITHMETIC_OPS) {
+        return(arith_lp(e1, e2, op, call))
     }
     
     # Comparison -----------------------
     if (op %in% COMPARISON_OPS) {
+        check_conformable(e1, e2, drop_dim = TRUE, call = call)
         return(compare_lp(e1, e2, op, call))
     }
     else if (op == "!=") {
@@ -128,11 +113,28 @@ check_no_na <- function(e1, e2, call) {
 
 # Arithmetics -----------------------
 
+arith_lp <- function(x, y, op, call) {
+    ptype <- check_conformable(x, y, drop_dim = TRUE, call = call)
+    
+    out <- switch(
+        op,
+        "+" = add_lp(x, y, call),
+        "-" = subtract_lp(x, y, call),
+        "*" = multiply_lp(x, y, call),
+        "/" = divide_lp(x, y, call),
+        "^" = power_lp(x, y, call),
+        cli_abort("Internal error.")
+    )
+    
+    out$ind <- array(out$ind, dim = dim2(ptype), dimnames = dimnames2(ptype))
+    return(out)
+}
+
 add_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
     
-    out <- if (xv && yv) {
+    if (xv && yv) {
         add_v_v(x, y, call)
     } 
     else if (xv) {
@@ -144,15 +146,12 @@ add_lp <- function(x, y, call) {
     else {
         cli_abort("None are lp_variables", call = call)
     }
-    
-    out$ind <- operation_indices(out$ind, x, y, call = call)
-    return(out)
 }
 subtract_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
     
-    out <- if (xv && yv) {
+    if (xv && yv) {
         subtract_v_v(x, y, call)
     } 
     else if (xv) {
@@ -164,15 +163,12 @@ subtract_lp <- function(x, y, call) {
     else {
         cli_abort("None are lp_variables", call = call)
     }
-    
-    out$ind <- operation_indices(out$ind, x, y, call = call)
-    return(out)
 }
 multiply_lp <- function(x, y, call) {
     xv <- is_lp_variable(x)
     yv <- is_lp_variable(y)
     
-    out <- if (xv && yv) {
+    if (xv && yv) {
         multiply_v_v(x, y, call)
     } 
     else if (xv) {
@@ -184,12 +180,9 @@ multiply_lp <- function(x, y, call) {
     else {
         cli_abort("None are lp_variables", call = call)
     }
-    
-    out$ind <- operation_indices(out$ind, x, y, call = call)
-    return(out)
 }
 divide_lp <- function(x, y, call) {
-    out <- if (is_lp_variable(y)) {
+    if (is_lp_variable(y)) {
         divide_a_v(x, y, call)
     } 
     else if (is_lp_variable(x)) {
@@ -198,20 +191,14 @@ divide_lp <- function(x, y, call) {
     else {
         cli_abort("None are lp_variables", call = call)
     }
-    
-    out$ind <- operation_indices(out$ind, x, y, call = call)
-    return(out)
 }
 power_lp <- function(x, y, call) {
-    out <- if (is_lp_variable(x) && !is_lp_variable(y)) {
+    if (is_lp_variable(x) && !is_lp_variable(y)) {
         power_v_c(x, y, call)
     } 
     else {
         cli_abort("Non-quadratic operation.", call = call)
     }
-    
-    out$ind <- operation_indices(out$ind, x, y, call = call)
-    return(out)
 }
 
 # -var
@@ -584,6 +571,8 @@ compare_lp <- function(x, y, op, call) {
     if (is_abs_variable(x) || is_abs_variable(y)) {
         return(abs_constraint(x, y, op, call))
     }
+    
+    check_conformable(x, y, drop_dim = TRUE, call = call)
     
     var <- x - y
     rhs <- c(-var$A)
