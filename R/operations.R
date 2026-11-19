@@ -242,7 +242,7 @@ add_v_v <- function(x, y, call) {
 add_v_c <- function(x, c, call) {
     max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
-    c <- recycle_const(c, max_n)
+    c <- atomize_const(c)
     
     x$A <- x$A + c
     x$binary <- FALSE
@@ -275,7 +275,7 @@ subtract_c_v <- function(c, x, call) {
 multiply_v_c <- function(x, c, call) {
     max_n <- max(length(x), length(c))
     x <- recycle_var(x, max_n)
-    c <- recycle_const(c, max_n)
+    c <- atomize_const(c)
     
     if (is_quadratic(x)) {
         x$Q <- q_list_multiply(x$Q, c)
@@ -641,20 +641,35 @@ compare_nl <- function(x, y, op, call) {
 
 # Utils ----------------------
 
-# Functions to apply vectorized operations on lp_variables
-
 # Multiplies each row for a constant
 # x[i, ] <- x[i, ] * c[i]
 horizontal_multiply <- function(x, c) {
-    stopifnot(length(c) == nrow(x) || length(c) == 1L)
-    c <- array(c, dim = dim(x))
-    x*c
+    if (length(c) == 1L) {
+        x*c[1]
+    }
+    else {
+        c <- array(c, dim = dim(x))
+        x*c
+    }
 }
 
 # Multiplies each element of a list for a constant
 # q[[i]] <- q[[i]] * c[i]
 # meant for updating the quadratic `Q` field
 q_list_multiply <- function(q, c) {
-    stopifnot(length(q) == length(c))
-    purrr::map2(q, c, `*`)
+    if (length(c) == 1L) {
+        lapply(q, `*`, c[1])
+    }
+    else {
+        purrr::map2(q, c, `*`)
+    }
+}
+
+# Atomizes constants quickly
+atomize_const <- function(x) {
+    if (length(x) == 1L) {
+        x[1]
+    } else {
+        c(x)
+    }
 }
